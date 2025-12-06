@@ -70,7 +70,7 @@ app.post("/barcode", async (req, res) => {
         fat_g: product.nutriments.fat || 0,
         fiber_g: product.nutriments.fiber || 0,
         sugar_g: product.nutriments.sugars || 0,
-        nutritional_score: product.nutriscore_score || 0,
+        health_score: product.nutriscore_grade || 0,
       },
 
       confidence_score: 1.0,
