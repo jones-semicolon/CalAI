@@ -8,6 +8,7 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 const PORT = process.env.PORT || 3000;
+const ingredients_origin = "https://world.openfoodfacts.net/api/v2/product/";
 
 // Middleware
 app.use(cors());
@@ -29,8 +30,10 @@ app.get("/test", async (req, res) => {
   }
 });
 
+app.post("/barcode", async (req, res) => {});
+
 // Chat endpoint
-app.post("/chat", async (req, res) => {
+app.post("/image", async (req, res) => {
   try {
     const { image_url } = req.body;
 
