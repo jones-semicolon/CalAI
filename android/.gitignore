@@ -1,0 +1,77 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+.pub/
+build/
+flutter_*.png
+
+# Generated plugin registrant
+lib/generated_plugin_registrant.dart
+
+# IntelliJ related
+*.iml
+.idea/
+*.ipr
+*.iws
+
+# VS Code related
+.vscode/
+.history/
+
+# Linux/Mac/Windows related
+.DS_Store
+Thumbs.db
+
+# Android related
+**/android/**/gradle-wrapper.jar
+**/android/.gradle/
+**/android/captures/
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+
+# iOS related
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/engine/
+**/ios/Flutter/Generated.xcconfig
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+
+# CocoaPods
+**/ios/Pods/
+**/macos/Pods/
+.pub-cache/
+.symlinks/
+Generated.xcconfig
+
+# Web
+web/.dart_tool/
+web/.sass-cache/
+
+# Windows
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+
+# macOS
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Linux
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+
+# Firebase & secrets (optional but recommended)
+*.keystore
+*.jks
+*.p12
+*.pem
+google-services.json
+GoogleService-Info.plist
+
+# Logs
+*.log
+
+# Other
+coverage/
+.env
