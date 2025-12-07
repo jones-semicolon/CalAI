@@ -30,8 +30,48 @@ app.get("/test", async (req, res) => {
   }
 });
 
+app.post("/calculate_goals", async (req, res) => {
+  try {
+    const { age, weight, height, activity_level, gender, goal } = req.body;
+    if (!age || !weight || !height || !activity_level || !gender || !goal) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+    const completion = await groq.chat.completions.create({
+      messages: [
+        { role: "system", content: "You are a nutrition expert." },
+        {
+          role: "user",
+          content: `Calculate daily caloric and macronutrient needs for a ${age}-year-old ${gender} weighing ${weight} kg, ${height} cm tall, with a ${activity_level} activity level, aiming to ${goal}. Provide results in a strictly JSON format with calories, protein_g, carbs_g, and fat_g.`,
+        },
+      ],
+      model: "meta-llama/llama-4-maverick-17b-128e-instruct",
+      temperature: 0.7,
+      max_completion_tokens: 500,
+      top_p: 1,
+      stream: false,
+    });
+    const message = completion.choices?.[0]?.message?.content || "";
+    console.log("Calculate goals response message:", message);
+    let goals;
+    try {
+      goals = JSON.parse(message);
+    } catch (parseErr) {
+      return res.status(500).json({ error: "Failed to parse goals from model response", details: parseErr.message });
+    }
+    res.json({
+      success: true,
+      model: completion.model,
+      goals,
+      usage: completion.usage,
+    });
+  } catch (err) {
+    console.error("Calculate goals endpoint error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 //Barcode endpoint
-app.post("/barcode", async (req, res) => {
+app.post("/scan_barcode", async (req, res) => {
   try {
     const { barcode } = req.body;
 
@@ -75,7 +115,7 @@ app.post("/barcode", async (req, res) => {
 
       confidence_score: 1.0,
 
-      notes: "Converted from OpenFoodFacts data"
+      notes: "From OpenFoodFacts data"
     };
     // -------------------------------------
 
@@ -92,15 +132,13 @@ app.post("/barcode", async (req, res) => {
 });
 
 // Chat endpoint
-app.post("/image", async (req, res) => {
+app.post("/scan_food", async (req, res) => {
   try {
     const { image_url } = req.body;
 
     if (!image_url) {
       return res.status(400).json({ error: "image_url is required" });
     }
-
-    // console.log("Received image URL:", image_url);
 
     const completion = await groq.chat.completions.create({
       messages: [
