@@ -12,6 +12,6 @@ class GlobalData {
   int carbsADay = 118;
   int fatsADay = 37;
   int fiberADay = 38;
-  int sugarADay = 51;
+  int sugarADay = 51; 
   int sodiumADay = 2300;
 }
