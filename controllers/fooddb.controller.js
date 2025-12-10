@@ -5,15 +5,6 @@ const { foodtoCalAI } = require("../utils/fooddatabase");
 const FOODCENTRAL_BASE_URL = "https://api.nal.usda.gov/fdc/v1/foods/";
 const FOODCENTRAL_API_KEY = process.env.FOODCENTRAL_API_KEY;
 
-const NUTRIENT_IDS = {
-  carbs_g: 1005,
-  calories_kcal: 1008,
-  sugar_g: 2000,
-  sodium_mg: 1093,
-  protein_g: 1003,
-  fat_g: 1004,
-};
-
 /**
  * Helper function to handle the fetch request to the FoodData Central API.
  * This function now returns the data or throws a detailed error object.
