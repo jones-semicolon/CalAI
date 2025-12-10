@@ -18,6 +18,7 @@ const PRODUCT_FIELDS = [
   "nutriscore_grade",
   "nutriscore_score",
   "nutriments",
+  "image_url",
 ].join(","); // Join the array into the required comma-separated string
 
 exports.scanBarcode = async (req, res) => {

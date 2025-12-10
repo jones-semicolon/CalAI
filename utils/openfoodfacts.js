@@ -2,6 +2,7 @@ exports.convertToCalAI = (product) => ({
   meal_name: product.product_name || "Unknown product",
   health_score: product.nutriscore_grade || 0,
   calories_kcal: product.nutriments["energy-kcal"] || 0,
+  image_url: product.image_url || null,
 
   ingredients: (product.ingredients || []).map((i) => ({
     name: i.text,
