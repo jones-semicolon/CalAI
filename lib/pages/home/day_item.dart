@@ -103,10 +103,10 @@ class _DayItemState extends State<DayItem> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(day, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 6),
+        const SizedBox(height: 5),
         Container(
-          width: 38, // fixed circle size
-          height: 38,
+          width: 28, // fixed circle size
+          height: 28,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,

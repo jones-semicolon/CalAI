@@ -30,7 +30,7 @@ class _HomeBodyState extends State<HomeBody> {
       Offstage(
         offstage: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           child: GestureDetector(
             onTap: () => setState(() => isTap = !isTap),
             child: Column(
