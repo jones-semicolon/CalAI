@@ -13,7 +13,7 @@ exports.calculateGoals = async (req, res) => {
         { role: "system", content: "You are a nutrition expert." },
         {
           role: "user",
-          content: `Calculate daily caloric and macronutrient needs for a ${age}-year-old ${gender} weighing ${weight} kg, ${height} cm tall, with a ${activity_level} activity level, aiming to ${goal}. Provide results ONLY in JSON: calories, protein_g, carbs_g, fat_g.`,
+          content: `Calculate daily caloric and macronutrient needs for a ${age}-year-old ${gender} weighing ${weight} kg, ${height} cm tall, with a ${activity_level} activity level, aiming to ${goal}. Provide results ONLY in JSON: calories, protein_g, carbs_g, fat_g, micronutrients: {sugar_g, sodium_mg, fiber_g}`,
         },
       ],
       model: "openai/gpt-oss-120b",
