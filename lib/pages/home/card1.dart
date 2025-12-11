@@ -23,7 +23,7 @@ class CalorieCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: Theme.of(context).appBarTheme.backgroundColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(

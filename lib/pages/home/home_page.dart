@@ -200,9 +200,9 @@ class _HomeBodyState extends State<HomeBody> {
                     height: 10,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isActive ? Colors.black : Colors.transparent,
+                      color: isActive ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).appBarTheme.backgroundColor,
                       border: Border.all(
-                        color: isActive ? Colors.black : Colors.grey,
+                        color: isActive ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.outline,
                         width: 1.5,
                       ),
                     ),
@@ -219,6 +219,11 @@ class _HomeBodyState extends State<HomeBody> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
+              
+              Container(
+                height: 400,
+                
+              )
             ],
           ),
         ),

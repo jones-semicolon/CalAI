@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../theme/theme_service.dart';
+import '../../main.dart'; // To call MyApp.of(context) for theme changes
 
 class PreferencesSection extends StatefulWidget {
   const PreferencesSection({super.key});
@@ -8,9 +10,45 @@ class PreferencesSection extends StatefulWidget {
 }
 
 class _PreferencesSectionState extends State<PreferencesSection> {
-  String appearance = "Light";
+  // -------------------------- INITIAL STATE --------------------------
+  String appearance = "Light"; // CHANGED: this will load from local storage
   bool addBurnedCalories = false;
   bool rolloverCalories = false;
+
+  final ThemeService _themeService = ThemeService(); // CHANGED: ThemeService instance
+
+  // -------------------------- INIT STATE --------------------------
+  @override
+  void initState() {
+    super.initState();
+    _loadTheme(); // CHANGED: Load saved theme from local storage
+  }
+
+  // -------------------------- LOAD THEME --------------------------
+  Future<void> _loadTheme() async {
+    final savedTheme = await _themeService.loadTheme(); // CHANGED
+    setState(() {
+      appearance = savedTheme; // CHANGED
+    });
+  }
+
+  // -------------------------- SAVE THEME --------------------------
+  Future<void> _saveTheme(String theme) async {
+    await _themeService.saveTheme(theme); // CHANGED
+    setState(() => appearance = theme);   // CHANGED
+
+    // CHANGED: Update app theme dynamically
+    ThemeMode mode;
+    if (theme == "Light") {
+      mode = ThemeMode.light;
+    } else if (theme == "Dark") {
+      mode = ThemeMode.dark;
+    } else {
+      mode = ThemeMode.system;
+    }
+
+    MyApp.of(context)?.setThemeMode(mode); // CHANGED: call MyApp to rebuild theme
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +82,11 @@ class _PreferencesSectionState extends State<PreferencesSection> {
 
           _divider(),
 
-          // 1 — Appearance
+          // -------------------------- 1 — Appearance --------------------------
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
-                // LEFT SIDE TEXTS
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,19 +103,19 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                         "Choose light, dark, or system appearance",
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.grey,
+                          color: Color.fromARGB(255, 117, 117, 117)
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                // DROPDOWN WITH WHITE BG, ROUNDED, PADDING
+                // DROPDOWN BUTTON
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
-                      value: appearance,
+                      value: appearance, // CHANGED: dynamic value
                       items: ["Light", "Dark", "Automatic"]
                           .map(
                             (e) => DropdownMenuItem(
@@ -97,7 +134,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                           )
                           .toList(),
                       onChanged: (value) {
-                        setState(() => appearance = value!);
+                        if (value != null) _saveTheme(value); // CHANGED: save to storage
                       },
                       dropdownColor: Colors.white,
                     ),
@@ -109,7 +146,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
 
           _divider(),
 
-          // 2 — Add Burned Calories
+          // -------------------------- 2 — Add Burned Calories --------------------------
           GestureDetector(
             onTap: () {
               setState(() => addBurnedCalories = !addBurnedCalories);
@@ -153,7 +190,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
 
           _divider(),
 
-          // 3 — Rollover Calories
+          // -------------------------- 3 — Rollover Calories --------------------------
           GestureDetector(
             onTap: () {
               setState(() => rolloverCalories = !rolloverCalories);
@@ -202,6 +239,6 @@ class _PreferencesSectionState extends State<PreferencesSection> {
   Widget _divider() => Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         height: 1,
-        color: Colors.grey.shade400,
+        color: Colors.black26,
       );
 }

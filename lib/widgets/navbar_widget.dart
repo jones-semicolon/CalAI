@@ -9,52 +9,49 @@ class NavBarWidget extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: selectedPage,
       builder: (context, page, child) {
-        return Container(
-          height: 60,
-          padding: const EdgeInsets.symmetric(horizontal: 0),
-          decoration: const BoxDecoration(
+        return IntrinsicHeight(
+          child: Container(
             color: Colors.white,
-          ),
-          child: Row(
-            children: [
-              // HOME
-              Expanded(
-                child: _navItem(
-                  icon: Icons.home_outlined,
-                  selectedIcon: Icons.home,
-                  label: "Home",
-                  index: 0,
-                  selectedIndex: page,
+            padding: const EdgeInsets.only(bottom: 25, top: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment:
+                  CrossAxisAlignment.center, // ⭐ Fixes vertical stretch
+              children: [
+                Expanded(
+                  child: _navItem(
+                    icon: Icons.home_outlined,
+                    selectedIcon: Icons.home,
+                    label: "Home",
+                    index: 0,
+                    selectedIndex: page,
+                  ),
                 ),
-              ),
 
-              // PROGRESS
-              Expanded(
-                child: _navItem(
-                  icon: Icons.show_chart_outlined,
-                  selectedIcon: Icons.show_chart,
-                  label: "Progress",
-                  index: 1,
-                  selectedIndex: page,
+                Expanded(
+                  child: _navItem(
+                    icon: Icons.show_chart_outlined,
+                    selectedIcon: Icons.show_chart,
+                    label: "Progress",
+                    index: 1,
+                    selectedIndex: page,
+                  ),
                 ),
-              ),
 
-              // SETTINGS
-              Expanded(
-                child: _navItem(
-                  icon: Icons.settings_outlined,
-                  selectedIcon: Icons.settings,
-                  label: "Settings",
-                  index: 2,
-                  selectedIndex: page,
+                Expanded(
+                  child: _navItem(
+                    icon: Icons.settings_outlined,
+                    selectedIcon: Icons.settings,
+                    label: "Settings",
+                    index: 2,
+                    selectedIndex: page,
+                  ),
                 ),
-              ),
 
-              // RESERVED SPACE for FAB
-              SizedBox(
-                width: 100,
-              ),
-            ],
+                // FAB space unchanged
+                const SizedBox(width: 100),
+              ],
+            ),
           ),
         );
       },
