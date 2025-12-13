@@ -9,7 +9,7 @@ class FloatActionContent extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOut,
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 90,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 120,
       ),
 
       child: Align(
@@ -26,6 +26,7 @@ class FloatActionContent extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _actionButton(
+                        context: context,
                         icon: Icons.fitness_center,
                         label: "Log Exercise",
                       ),
@@ -33,6 +34,7 @@ class FloatActionContent extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _actionButton(
+                        context: context,
                         icon: Icons.bookmark_outline,
                         label: "Save Foods",
                       ),
@@ -47,6 +49,7 @@ class FloatActionContent extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _actionButton(
+                        context: context,
                         icon: Icons.search,
                         label: "Food Database",
                       ),
@@ -54,6 +57,7 @@ class FloatActionContent extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _actionButton(
+                        context: context,
                         icon: Icons.qr_code_scanner,
                         label: "Scan Food",
                       ),
@@ -69,28 +73,45 @@ class FloatActionContent extends StatelessWidget {
   }
 
   /// -------- Action Button Widget --------
-  Widget _actionButton({required IconData icon, required String label}) {
+  Widget _actionButton({
+    required IconData icon,
+    required String label,
+    required BuildContext context,
+  }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.symmetric(vertical: 15),
       decoration: BoxDecoration(
-        color: Colors.white, // 🔥 White background added
+        color: Theme.of(
+          context,
+        ).appBarTheme.backgroundColor, // 🔥 White background added
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Colors.grey, // Border
+          color: Theme.of(context).colorScheme.onSurface, // Border
           width: 2,
         ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 28, color: Colors.black),
+          Container(
+            padding: const EdgeInsets.all(12), // Responsive padding
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.secondary,
+              borderRadius: BorderRadius.circular(15), // Rounded circle
+            ),
+            child: Icon(
+              icon,
+              size: 28,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
           const SizedBox(height: 6),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
             textAlign: TextAlign.center,
           ),

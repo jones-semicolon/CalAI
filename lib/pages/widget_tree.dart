@@ -68,32 +68,41 @@ class _WidgetTreeState extends State<WidgetTree> {
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Image.asset('assets/favicon.png', height: 32),
-                              const Text(
+                              Image.asset(
+                                'assets/favicon.png',
+                                height: 32,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                              Text(
                                 'Cal AI',
                                 style: TextStyle(
                                   height: 1.5,
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
                             ],
                           );
                         } else if (pages == 1) {
-                          return const Text(
+                          return Text(
                             'Progress',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           );
                         } else {
-                          return const Text(
+                          return Text(
                             'Settings',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           );
                         }
@@ -124,11 +133,11 @@ class _WidgetTreeState extends State<WidgetTree> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Theme.of(context).scaffoldBackgroundColor,
                               borderRadius: BorderRadius.circular(25),
                             ),
                             child: Row(
-                              children: const [
+                              children: [
                                 Icon(
                                   Icons.local_fire_department,
                                   color: Colors.orange,
@@ -139,6 +148,9 @@ class _WidgetTreeState extends State<WidgetTree> {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
                                   ),
                                 ),
                               ],
@@ -170,11 +182,14 @@ class _WidgetTreeState extends State<WidgetTree> {
         height: FABSize,
         width: FABSize,
         child: FloatingActionButton(
-          backgroundColor: Colors.black,
+          backgroundColor: Theme.of(context).colorScheme.onPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),
           ),
-          child: const Icon(Icons.add, color: Colors.white),
+          child: Icon(
+            Icons.add,
+            color: Theme.of(context).scaffoldBackgroundColor,
+          ),
           onPressed: () {
             showGeneralDialog(
               context: context,

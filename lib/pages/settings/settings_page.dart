@@ -13,7 +13,10 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600);
+    final textStyle = Theme.of(
+      context,
+    ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600);
+    final bgColor = Theme.of(context).appBarTheme.backgroundColor;
 
     return SingleChildScrollView(
       child: Column(
@@ -26,16 +29,16 @@ class _SettingsPageState extends State<SettingsPage> {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: bgColor,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
               children: [
                 // PROFILE ICON
                 Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: const BoxDecoration(
-                    color: Colors.black12,
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondary,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.person_outlined, size: 30),
@@ -61,7 +64,9 @@ class _SettingsPageState extends State<SettingsPage> {
                               children: [
                                 Text(
                                   name.isEmpty ? "Enter your name" : name,
-                                  style: textStyle,
+                                  style: TextStyle(
+                                    color: Theme.of(context).highlightColor,
+                                  ),
                                 ),
                                 const SizedBox(width: 6),
                                 Icon(
@@ -76,7 +81,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         const SizedBox(height: 6),
                         Text(
                           "17 years old",
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
                         ),
                       ],
                     ),
@@ -111,10 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                Text(
-                  "Invite Friends",
-                  style: textStyle,
-                ),
+                Text("Invite Friends", style: textStyle),
                 const Spacer(),
                 Icon(
                   Icons.arrow_forward_ios,
@@ -133,7 +137,9 @@ class _SettingsPageState extends State<SettingsPage> {
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.9),
+              color: Theme.of(
+                context,
+              ).colorScheme.primaryContainer.withOpacity(0.9),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -213,10 +219,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Icon(icon, size: 24, color: Colors.black87),
             ),
             const SizedBox(width: 16),
-            Text(
-              label,
-              style: textStyle,
-            ),
+            Text(label, style: textStyle),
             const Spacer(),
             Icon(
               Icons.arrow_forward_ios,
@@ -231,9 +234,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   // THIN DIVIDER LIKE IOS
   Widget _divider() => Container(
-        alignment: Alignment.center,
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        height: 1,
-        color: Colors.black26,
-      );
+    alignment: Alignment.center,
+    margin: const EdgeInsets.symmetric(horizontal: 20),
+    height: 1,
+    color: Colors.black26,
+  );
 }

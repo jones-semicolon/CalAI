@@ -61,7 +61,7 @@ class _DayItemState extends State<DayItem> {
           final weekDays = monthDays.sublist(start, end);
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
               mainAxisAlignment:
                   MainAxisAlignment.spaceBetween, // 🔥 FIXED for large screens
@@ -89,10 +89,12 @@ class _DayItemState extends State<DayItem> {
 
   Widget _dayWrapper(bool isActive, Widget child) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
       decoration: BoxDecoration(
-        color: isActive ? Colors.white : Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
+        color: isActive
+            ? Theme.of(context).appBarTheme.backgroundColor
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(15),
       ),
       child: child,
     );
@@ -102,7 +104,13 @@ class _DayItemState extends State<DayItem> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(day, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+          day,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
         const SizedBox(height: 5),
         Container(
           width: 28, // fixed circle size
@@ -111,16 +119,22 @@ class _DayItemState extends State<DayItem> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: selected ? Colors.black45 : Colors.grey,
+              color: selected
+                  ? Theme.of(context).shadowColor
+                  : Theme.of(context).hintColor,
               width: 2,
             ),
-            color: selected ? Colors.transparent : Colors.transparent,
+            color: selected
+                ? Theme.of(context).appBarTheme.backgroundColor
+                : Colors.transparent,
           ),
           child: Text(
             num,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: selected ? Colors.black : Colors.grey,
+              color: selected
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).colorScheme.onPrimary,
             ),
           ),
         ),

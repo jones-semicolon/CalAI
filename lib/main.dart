@@ -24,7 +24,7 @@ void main() async {
 class MyApp extends StatefulWidget {
   final ThemeMode initialThemeMode;
 
-   const MyApp({super.key, this.initialThemeMode = ThemeMode.light}); 
+  const MyApp({super.key, this.initialThemeMode = ThemeMode.light});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Cal AI',
+      title: 'Cal AI - Calorie Tracker',
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
       theme: AppTheme.lightTheme,

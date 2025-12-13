@@ -21,10 +21,12 @@ class CalorieCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      constraints: const BoxConstraints(minHeight: 120),
       decoration: BoxDecoration(
         color: Theme.of(context).appBarTheme.backgroundColor,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).dividerColor, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,46 +37,57 @@ class CalorieCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isEaten ? "$progress / $nutrients" : nutrients.toString(),
-                style: const TextStyle(
+                isEaten ? "$progress /${nutrients}g" : "${nutrients}g",
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
-              Text("$title ${isEaten ? 'eaten' : 'left'}"),
+              Text(
+                "$title ${isEaten ? 'eaten' : 'left'}",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
             ],
           ),
 
           const SizedBox(height: 20), // gap
           // Second item: circular progress indicator
           Center(
-            child: SizedBox(
-              height: 60,
-              width: 60,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    height: 60,
-                    width: 60,
-                    child: CircularProgressIndicator(
-                      value: (progress / nutrients).clamp(0.0, 1.0),
-                      strokeWidth: 6,
-                      backgroundColor: Colors.grey.shade300,
-                      color: color,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 10),
+              child: SizedBox(
+                height: 60,
+                width: 60,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      height: 60,
+                      width: 60,
+                      child: CircularProgressIndicator(
+                        value: (progress / nutrients).clamp(0.0, 1.0),
+                        strokeWidth: 6,
+                        backgroundColor: Theme.of(context).cardColor,
+                        color: color,
+                      ),
                     ),
-                  ),
-                  // Icon with grey circular background
-                  Container(
-                    height: 30,
-                    width: 30,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200, // grey bg
-                      shape: BoxShape.circle,
+                    // Icon with grey circular background
+                    Container(
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.secondary, // grey bg
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(icon, size: 20, color: color),
                     ),
-                    child: Icon(icon, size: 20, color: color),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

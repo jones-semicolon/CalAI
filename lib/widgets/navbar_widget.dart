@@ -11,7 +11,7 @@ class NavBarWidget extends StatelessWidget {
       builder: (context, page, child) {
         return IntrinsicHeight(
           child: Container(
-            color: Colors.white,
+            color: Theme.of(context).scaffoldBackgroundColor,
             padding: const EdgeInsets.only(bottom: 25, top: 10),
             child: Row(
               mainAxisSize: MainAxisSize.max,
@@ -20,6 +20,7 @@ class NavBarWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: _navItem(
+                    context: context,
                     icon: Icons.home_outlined,
                     selectedIcon: Icons.home,
                     label: "Home",
@@ -30,6 +31,7 @@ class NavBarWidget extends StatelessWidget {
 
                 Expanded(
                   child: _navItem(
+                    context: context,
                     icon: Icons.show_chart_outlined,
                     selectedIcon: Icons.show_chart,
                     label: "Progress",
@@ -40,6 +42,7 @@ class NavBarWidget extends StatelessWidget {
 
                 Expanded(
                   child: _navItem(
+                    context: context,
                     icon: Icons.settings_outlined,
                     selectedIcon: Icons.settings,
                     label: "Settings",
@@ -59,6 +62,7 @@ class NavBarWidget extends StatelessWidget {
   }
 
   Widget _navItem({
+    required BuildContext context,
     required IconData icon,
     required IconData selectedIcon,
     required String label,
@@ -75,14 +79,18 @@ class NavBarWidget extends StatelessWidget {
         children: [
           Icon(
             selected ? selectedIcon : icon,
-            color: selected ? Colors.black : Colors.grey,
+            color: selected
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.onSecondary,
             size: 24,
           ),
           const SizedBox(height: 3),
           Text(
             label,
             style: TextStyle(
-              color: selected ? Colors.black : Colors.grey,
+              color: selected
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).colorScheme.onSecondary,
               fontSize: 12,
             ),
           ),

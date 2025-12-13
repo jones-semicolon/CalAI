@@ -37,10 +37,14 @@ class _HomeBodyState extends State<HomeBody> {
               children: [
                 /// CALORIE CARD
                 Container(
-                  padding: const EdgeInsets.all(25),
+                  padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 255, 255, 255),
+                    color: Theme.of(context).appBarTheme.backgroundColor,
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      width: 1,
+                    ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -50,19 +54,20 @@ class _HomeBodyState extends State<HomeBody> {
                         children: [
                           Text(
                             isTap
-                                ? "$calorieEaten / ${globalData.caloriesADay}"
+                                ? "$calorieEaten /${globalData.caloriesADay}"
                                 : globalData.caloriesADay.toString(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 32,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w700,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           ),
                           const SizedBox(height: 6),
                           Text(
                             "Calories ${isTap ? 'eaten' : 'left'}",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
-                              color: Colors.black54,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           ),
                         ],
@@ -82,20 +87,20 @@ class _HomeBodyState extends State<HomeBody> {
                                 value: (calorieEaten / globalData.caloriesADay)
                                     .clamp(0.0, 1.0),
                                 strokeWidth: 7,
-                                backgroundColor: Colors.grey.shade300,
-                                color: Colors.black,
+                                backgroundColor: Theme.of(context).cardColor,
+                                color: Theme.of(context).colorScheme.onPrimary,
                               ),
                             ),
                             Container(
                               height: 50,
                               width: 50,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
+                                color: Theme.of(context).colorScheme.secondary,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Icon(
                                 Icons.local_fire_department,
-                                size: 35,
+                                size: 25,
                               ),
                             ),
                           ],
@@ -115,7 +120,7 @@ class _HomeBodyState extends State<HomeBody> {
                         title: "Protein",
                         nutrients: globalData.proteinADay,
                         progress: proteinEaten,
-                        color: Colors.red,
+                        color: Color.fromARGB(255, 221, 105, 105),
                         icon: Icons.set_meal_outlined,
                         isEaten: isTap,
                       ),
@@ -126,7 +131,7 @@ class _HomeBodyState extends State<HomeBody> {
                         title: "Carbs",
                         nutrients: globalData.carbsADay,
                         progress: carbsEaten,
-                        color: Colors.orange,
+                        color: Color.fromARGB(255, 222, 154, 105),
                         icon: Icons.bubble_chart,
                         isEaten: isTap,
                       ),
@@ -137,7 +142,7 @@ class _HomeBodyState extends State<HomeBody> {
                         title: "Fats",
                         nutrients: globalData.fatsADay,
                         progress: fatsEaten,
-                        color: Colors.blue,
+                        color: Color.fromARGB(255, 105, 152, 222),
                         icon: Icons.oil_barrel,
                         isEaten: isTap,
                       ),
@@ -164,68 +169,67 @@ class _HomeBodyState extends State<HomeBody> {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: DayItem(),
-              ), // NEW DAY ITEM WIDGET
-              /// ============ CAROUSEL ============
-              CarouselSlider(
-                items: carouselItems,
-                options: CarouselOptions(
-                  height: 320,
-                  viewportFraction: 1,
-                  enableInfiniteScroll: false,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: DayItem(),
+            ), // NEW DAY ITEM WIDGET
+            /// ============ CAROUSEL ============
+            CarouselSlider(
+              items: carouselItems,
+              options: CarouselOptions(
+                height: 310,
+                viewportFraction: 1,
+                enableInfiniteScroll: false,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    currentIndex = index;
+                  });
+                },
               ),
+            ),
 
-              const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-              /// ============ BULLET INDICATOR ============
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(carouselItems.length, (index) {
-                  bool isActive = index == currentIndex;
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isActive ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).appBarTheme.backgroundColor,
-                      border: Border.all(
-                        color: isActive ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.outline,
-                        width: 1.5,
-                      ),
+            /// ============ BULLET INDICATOR ============
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(carouselItems.length, (index) {
+                bool isActive = index == currentIndex;
+                return Container(
+                  margin: EdgeInsets.symmetric(horizontal: 4),
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isActive
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).appBarTheme.backgroundColor,
+                    border: Border.all(
+                      color: isActive
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.outline,
+                      width: 1.5,
                     ),
-                  );
-                }),
-              ),
+                  ),
+                );
+              }),
+            ),
 
-              const SizedBox(height: 30),
+            const SizedBox(height: 30),
 
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: const Text(
-                  "Recently uploaded",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: const Text(
+                "Recently uploaded",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              
-              Container(
-                height: 400,
-                
-              )
-            ],
-          ),
+            ),
+
+            Container(height: 400),
+          ],
         ),
       ),
     );
