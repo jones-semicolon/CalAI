@@ -13,10 +13,9 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(
-      context,
-    ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600);
-    final bgColor = Theme.of(context).appBarTheme.backgroundColor;
+    final textStyle = Theme.of(context).textTheme.titleMedium;
+    final primaryColor = Theme.of(context).colorScheme.onPrimary;
+    final bgColor = Theme.of(context).scaffoldBackgroundColor;
 
     return SingleChildScrollView(
       child: Column(
@@ -31,6 +30,14 @@ class _SettingsPageState extends State<SettingsPage> {
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).shadowColor.withOpacity(0.2),
+                  blurRadius: 5,
+                  spreadRadius: 1,
+                  offset: const Offset(2, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -61,6 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           valueListenable: changeName,
                           builder: (context, name, child) {
                             return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   name.isEmpty ? "Enter your name" : name,
@@ -68,12 +76,15 @@ class _SettingsPageState extends State<SettingsPage> {
                                     color: Theme.of(context).highlightColor,
                                   ),
                                 ),
+
                                 const SizedBox(width: 6),
-                                Icon(
-                                  Icons.edit,
-                                  size: 18,
-                                  color: Colors.grey.shade700,
-                                ),
+
+                                if (name.isEmpty)
+                                  Icon(
+                                    Icons.edit,
+                                    size: 18,
+                                    color: Colors.grey.shade700,
+                                  ),
                               ],
                             );
                           },
@@ -81,9 +92,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         const SizedBox(height: 6),
                         Text(
                           "17 years old",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
+                          style: TextStyle(color: primaryColor),
                         ),
                       ],
                     ),
@@ -100,31 +109,31 @@ class _SettingsPageState extends State<SettingsPage> {
             margin: const EdgeInsets.symmetric(horizontal: 16),
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).shadowColor.withOpacity(0.2),
+                  blurRadius: 5,
+                  spreadRadius: 1,
+                  offset: const Offset(2, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: const BoxDecoration(
-                    color: Colors.black12,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
+                  padding: const EdgeInsets.all(5),
+                  decoration: const BoxDecoration(),
+                  child: Icon(
                     Icons.group_outlined,
-                    size: 26,
-                    color: Colors.black87,
+                    size: 20,
+                    color: primaryColor,
                   ),
                 ),
-                const SizedBox(width: 16),
-                Text("Invite Friends", style: textStyle),
+                const SizedBox(width: 10),
+                Text("Invite friends", style: textStyle),
                 const Spacer(),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 18,
-                  color: Colors.grey.shade500,
-                ),
               ],
             ),
           ),
@@ -137,9 +146,7 @@ class _SettingsPageState extends State<SettingsPage> {
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.primaryContainer.withOpacity(0.9),
+              color: Theme.of(context).colorScheme.secondary,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -207,25 +214,21 @@ class _SettingsPageState extends State<SettingsPage> {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: Colors.black12,
-                shape: BoxShape.circle,
+              padding: EdgeInsets.all(4),
+              decoration: BoxDecoration(),
+              child: Icon(
+                icon,
+                size: 20,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
-              child: Icon(icon, size: 24, color: Colors.black87),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 10),
             Text(label, style: textStyle),
             const Spacer(),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 18,
-              color: Colors.grey.shade500,
-            ),
           ],
         ),
       ),
@@ -236,7 +239,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _divider() => Container(
     alignment: Alignment.center,
     margin: const EdgeInsets.symmetric(horizontal: 20),
-    height: 1,
-    color: Colors.black26,
+    height: 1.5,
+    color: Theme.of(context).splashColor,
   );
 }

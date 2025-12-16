@@ -1,3 +1,4 @@
+// day_item.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -39,12 +40,18 @@ class _DayItemState extends State<DayItem> {
   }
 
   @override
+  void dispose() {
+    _weekController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final totalWeeks = (monthDays.length / 7).ceil();
     final today = DateTime.now();
 
     return SizedBox(
-      height: 80,
+      height: 80, // Fixed height for calendar
       child: PageView.builder(
         controller: _weekController,
         itemCount: totalWeeks,
@@ -52,10 +59,6 @@ class _DayItemState extends State<DayItem> {
           setState(() => activeWeekIndex = index);
         },
         itemBuilder: (_, weekIndex) {
-          if (weekIndex != activeWeekIndex) {
-            return const SizedBox.shrink();
-          }
-
           final start = weekIndex * 7;
           final end = (start + 7).clamp(0, monthDays.length);
           final weekDays = monthDays.sublist(start, end);
@@ -63,8 +66,7 @@ class _DayItemState extends State<DayItem> {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween, // 🔥 FIXED for large screens
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: weekDays.map((day) {
                 bool isSelected =
                     day.day == today.day &&
@@ -89,7 +91,7 @@ class _DayItemState extends State<DayItem> {
 
   Widget _dayWrapper(bool isActive, Widget child) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
       decoration: BoxDecoration(
         color: isActive
             ? Theme.of(context).appBarTheme.backgroundColor
@@ -113,7 +115,7 @@ class _DayItemState extends State<DayItem> {
         ),
         const SizedBox(height: 5),
         Container(
-          width: 28, // fixed circle size
+          width: 28,
           height: 28,
           alignment: Alignment.center,
           decoration: BoxDecoration(
@@ -132,9 +134,7 @@ class _DayItemState extends State<DayItem> {
             num,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: selected
-                  ? Theme.of(context).colorScheme.onPrimary
-                  : Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
         ),

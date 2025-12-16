@@ -46,6 +46,7 @@ class _EditNamePageState extends State<EditNamePage> {
               controller: _controller,
               decoration: InputDecoration(
                 labelText: "Enter your name",
+                counterStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

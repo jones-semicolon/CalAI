@@ -14,8 +14,10 @@ class _PreferencesSectionState extends State<PreferencesSection> {
   String appearance = "Light"; // CHANGED: this will load from local storage
   bool addBurnedCalories = false;
   bool rolloverCalories = false;
+  bool badgeCelebration = false;
 
-  final ThemeService _themeService = ThemeService(); // CHANGED: ThemeService instance
+  final ThemeService _themeService =
+      ThemeService(); // CHANGED: ThemeService instance
 
   // -------------------------- INIT STATE --------------------------
   @override
@@ -26,18 +28,17 @@ class _PreferencesSectionState extends State<PreferencesSection> {
 
   // -------------------------- LOAD THEME --------------------------
   Future<void> _loadTheme() async {
-    final savedTheme = await _themeService.loadTheme(); // CHANGED
+    final savedTheme = await _themeService.loadTheme();
     setState(() {
-      appearance = savedTheme; // CHANGED
+      appearance = savedTheme;
     });
   }
 
   // -------------------------- SAVE THEME --------------------------
   Future<void> _saveTheme(String theme) async {
-    await _themeService.saveTheme(theme); // CHANGED
-    setState(() => appearance = theme);   // CHANGED
+    await _themeService.saveTheme(theme);
+    setState(() => appearance = theme);
 
-    // CHANGED: Update app theme dynamically
     ThemeMode mode;
     if (theme == "Light") {
       mode = ThemeMode.light;
@@ -47,16 +48,18 @@ class _PreferencesSectionState extends State<PreferencesSection> {
       mode = ThemeMode.system;
     }
 
-    MyApp.of(context)?.setThemeMode(mode); // CHANGED: call MyApp to rebuild theme
+    MyApp.of(context)?.setThemeMode(mode);
   }
 
   @override
   Widget build(BuildContext context) {
+    final textColor = Theme.of(context).colorScheme.onPrimary;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
+        color: Theme.of(context).colorScheme.secondary,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -66,15 +69,15 @@ class _PreferencesSectionState extends State<PreferencesSection> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
-                Icon(
-                  Icons.settings_outlined,
-                  color: Colors.grey.shade700,
-                  size: 26,
-                ),
+                Icon(Icons.settings_outlined, color: textColor, size: 26),
                 const SizedBox(width: 12),
-                const Text(
+                Text(
                   "Preferences",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
                 ),
               ],
             ),
@@ -84,27 +87,25 @@ class _PreferencesSectionState extends State<PreferencesSection> {
 
           // -------------------------- 1 — Appearance --------------------------
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
             child: Row(
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         "Appearance",
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
+                          color: textColor,
                         ),
                       ),
                       SizedBox(height: 4),
                       Text(
                         "Choose light, dark, or system appearance",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Color.fromARGB(255, 117, 117, 117)
-                        ),
+                        style: TextStyle(fontSize: 10, color: textColor),
                       ),
                     ],
                   ),
@@ -112,9 +113,15 @@ class _PreferencesSectionState extends State<PreferencesSection> {
 
                 // DROPDOWN BUTTON
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
+                      dropdownColor: Theme.of(
+                        context,
+                      ).dialogTheme.surfaceTintColor,
+                      borderRadius: BorderRadius.circular(14),
+                      elevation: 4,
+
                       value: appearance, // CHANGED: dynamic value
                       items: ["Light", "Dark", "Automatic"]
                           .map(
@@ -123,10 +130,12 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                               child: Center(
                                 child: Text(
                                   e,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSecondary,
                                   ),
                                 ),
                               ),
@@ -134,9 +143,10 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                           )
                           .toList(),
                       onChanged: (value) {
-                        if (value != null) _saveTheme(value); // CHANGED: save to storage
+                        if (value != null){
+                          _saveTheme(value); // CHANGED: save to storage
+                          }
                       },
-                      dropdownColor: Colors.white,
                     ),
                   ),
                 ),
@@ -152,27 +162,25 @@ class _PreferencesSectionState extends State<PreferencesSection> {
               setState(() => addBurnedCalories = !addBurnedCalories);
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
               child: Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Add Burned Calories",
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
+                            color: textColor,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           "Add burned calories to daily goal",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey.shade600,
-                          ),
+                          style: TextStyle(fontSize: 10, color: textColor),
                         ),
                       ],
                     ),
@@ -182,6 +190,21 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                     onChanged: (v) {
                       setState(() => addBurnedCalories = v);
                     },
+                    thumbColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return Colors.white;
+                      }
+                      return Colors.white;
+                    }),
+                    trackColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return Theme.of(context).dialogTheme.barrierColor;
+                      }
+                      return Theme.of(context).dialogTheme.backgroundColor;
+                    }),
+                    trackOutlineColor: WidgetStateProperty.all(
+                      Colors.transparent,
+                    ),
                   ),
                 ],
               ),
@@ -196,27 +219,25 @@ class _PreferencesSectionState extends State<PreferencesSection> {
               setState(() => rolloverCalories = !rolloverCalories);
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
               child: Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Rollover Calories",
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
+                            color: textColor,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           "Add up to 200 leftover calories into today's goal",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey.shade600,
-                          ),
+                          style: TextStyle(fontSize: 10, color: textColor),
                         ),
                       ],
                     ),
@@ -226,6 +247,78 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                     onChanged: (v) {
                       setState(() => rolloverCalories = v);
                     },
+                    thumbColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return Colors.white;
+                      }
+                      return Colors.white;
+                    }),
+                    trackColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return Theme.of(context).dialogTheme.barrierColor;
+                      }
+                      return Theme.of(context).dialogTheme.backgroundColor;
+                    }),
+                    trackOutlineColor: WidgetStateProperty.all(
+                      Colors.transparent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          _divider(),
+
+          // -------------------------- 4 — Badge Celebration --------------------------
+          GestureDetector(
+            onTap: () {
+              setState(() => rolloverCalories = !rolloverCalories);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Badge Celebration",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Show celebrations when you unlock new badges",
+                          style: TextStyle(fontSize: 10, color: textColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: badgeCelebration,
+                    onChanged: (v) {
+                      setState(() => badgeCelebration = v);
+                    },
+                    thumbColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return Colors.white;
+                      }
+                      return Colors.white;
+                    }),
+                    trackColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return Theme.of(context).dialogTheme.barrierColor;
+                      }
+                      return Theme.of(context).dialogTheme.backgroundColor;
+                    }),
+                    trackOutlineColor: WidgetStateProperty.all(
+                      Colors.transparent,
+                    ),
                   ),
                 ],
               ),
@@ -237,8 +330,9 @@ class _PreferencesSectionState extends State<PreferencesSection> {
   }
 
   Widget _divider() => Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        height: 1,
-        color: Colors.black26,
-      );
+    alignment: Alignment.center,
+    margin: const EdgeInsets.symmetric(horizontal: 20),
+    height: 1,
+    color: Theme.of(context).splashColor,
+  );
 }
