@@ -53,7 +53,7 @@ class CarouselCalories extends StatelessWidget {
                             Text(
                               isTap
                                   ? calorieEaten.toString()
-                                  : globalData.caloriesADay.toString(),
+                                  : (globalData.caloriesADay-calorieEaten).toString(),
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.w700,
@@ -151,6 +151,7 @@ class CarouselCalories extends StatelessWidget {
                     progress: proteinEaten,
                     color: const Color.fromARGB(255, 221, 105, 105),
                     icon: Icons.set_meal_outlined,
+                    unit: "g",
                     isEaten: isTap,
                   ),
                 ),
@@ -162,6 +163,7 @@ class CarouselCalories extends StatelessWidget {
                     progress: carbsEaten,
                     color: const Color.fromARGB(255, 222, 154, 105),
                     icon: Icons.bubble_chart,
+                    unit: "g",
                     isEaten: isTap,
                   ),
                 ),
@@ -173,6 +175,7 @@ class CarouselCalories extends StatelessWidget {
                     progress: fatsEaten,
                     color: const Color.fromARGB(255, 105, 152, 222),
                     icon: Icons.oil_barrel,
+                    unit: "g",
                     isEaten: isTap,
                   ),
                 ),

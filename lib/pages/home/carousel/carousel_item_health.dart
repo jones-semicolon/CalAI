@@ -6,20 +6,18 @@ class CarouselHealth extends StatelessWidget {
   final bool isTap;
   final VoidCallback onTap;
   final GlobalData globalData;
-  final int calorieEaten;
-  final int proteinEaten;
-  final int carbsEaten;
-  final int fatsEaten;
+  final int fiberEaten;
+  final int sugarEaten;
+  final int sodiumEaten;
 
   const CarouselHealth({
     super.key,
     required this.isTap,
     required this.onTap,
     required this.globalData,
-    required this.calorieEaten,
-    required this.proteinEaten,
-    required this.carbsEaten,
-    required this.fatsEaten,
+    required this.fiberEaten,
+    required this.sugarEaten,
+    required this.sodiumEaten,
   });
 
   @override
@@ -37,9 +35,10 @@ class CarouselHealth extends StatelessWidget {
                   child: CalorieCard(
                     title: "Fiber",
                     nutrients: globalData.fiberADay,
-                    progress: proteinEaten,
+                    progress: fiberEaten,
                     color: const Color.fromARGB(255, 163, 137, 211),
                     icon: Icons.favorite_border,
+                    unit: "g",
                     isEaten: isTap,
                   ),
                 ),
@@ -48,9 +47,10 @@ class CarouselHealth extends StatelessWidget {
                   child: CalorieCard(
                     title: "Sugar",
                     nutrients: globalData.sugarADay,
-                    progress: carbsEaten,
+                    progress: sugarEaten,
                     color: const Color.fromARGB(255, 244, 143, 177),
                     icon: Icons.rice_bowl,
+                    unit: "g",
                     isEaten: isTap,
                   ),
                 ),
@@ -59,9 +59,10 @@ class CarouselHealth extends StatelessWidget {
                   child: CalorieCard(
                     title: "Sodium",
                     nutrients: globalData.sodiumADay,
-                    progress: fatsEaten,
+                    progress: sodiumEaten,
                     color: const Color.fromARGB(255, 231, 185, 110),
                     icon: Icons.grain,
+                    unit: "mg",
                     isEaten: isTap,
                   ),
                 ),
@@ -100,7 +101,7 @@ class CarouselHealth extends StatelessWidget {
                     ],
                   ),
                   LinearProgressIndicator(
-                    value: (calorieEaten / globalData.caloriesADay)
+                    value: (0 / globalData.caloriesADay)
                         .clamp(0.0, 1.0),
                     color: const Color.fromARGB(255, 132, 224, 125),
                   ),

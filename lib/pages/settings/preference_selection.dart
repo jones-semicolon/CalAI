@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../theme/theme_service.dart';
 import '../../main.dart'; // To call MyApp.of(context) for theme changes
 
+/// Preferences Section: Handles appearance, calorie settings, and badge celebration.
 class PreferencesSection extends StatefulWidget {
   const PreferencesSection({super.key});
 
@@ -10,43 +11,35 @@ class PreferencesSection extends StatefulWidget {
 }
 
 class _PreferencesSectionState extends State<PreferencesSection> {
-  // -------------------------- INITIAL STATE --------------------------
-  String appearance = "Light"; // CHANGED: this will load from local storage
+  // -------------------------- STATE --------------------------
+  String appearance = "Light";
   bool addBurnedCalories = false;
   bool rolloverCalories = false;
   bool badgeCelebration = false;
 
-  final ThemeService _themeService =
-      ThemeService(); // CHANGED: ThemeService instance
+  final ThemeService _themeService = ThemeService();
 
-  // -------------------------- INIT STATE --------------------------
   @override
   void initState() {
     super.initState();
-    _loadTheme(); // CHANGED: Load saved theme from local storage
+    _loadTheme();
   }
 
-  // -------------------------- LOAD THEME --------------------------
+  // -------------------------- LOAD & SAVE THEME --------------------------
   Future<void> _loadTheme() async {
     final savedTheme = await _themeService.loadTheme();
-    setState(() {
-      appearance = savedTheme;
-    });
+    setState(() => appearance = savedTheme);
   }
 
-  // -------------------------- SAVE THEME --------------------------
   Future<void> _saveTheme(String theme) async {
     await _themeService.saveTheme(theme);
     setState(() => appearance = theme);
 
-    ThemeMode mode;
-    if (theme == "Light") {
-      mode = ThemeMode.light;
-    } else if (theme == "Dark") {
-      mode = ThemeMode.dark;
-    } else {
-      mode = ThemeMode.system;
-    }
+    ThemeMode mode = switch (theme) {
+      "Light" => ThemeMode.light,
+      "Dark" => ThemeMode.dark,
+      _ => ThemeMode.system,
+    };
 
     MyApp.of(context)?.setThemeMode(mode);
   }
@@ -64,264 +57,49 @@ class _PreferencesSectionState extends State<PreferencesSection> {
       ),
       child: Column(
         children: [
-          // TITLE
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Row(
-              children: [
-                Icon(Icons.settings_outlined, color: textColor, size: 26),
-                const SizedBox(width: 12),
-                Text(
-                  "Preferences",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
+          _buildTitle(context, textColor),
           _divider(),
-
-          // -------------------------- 1 — Appearance --------------------------
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Appearance",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: textColor,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        "Choose light, dark, or system appearance",
-                        style: TextStyle(fontSize: 10, color: textColor),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // DROPDOWN BUTTON
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      dropdownColor: Theme.of(
-                        context,
-                      ).dialogTheme.surfaceTintColor,
-                      borderRadius: BorderRadius.circular(14),
-                      elevation: 4,
-
-                      value: appearance, // CHANGED: dynamic value
-                      items: ["Light", "Dark", "Automatic"]
-                          .map(
-                            (e) => DropdownMenuItem(
-                              value: e,
-                              child: Center(
-                                child: Text(
-                                  e,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSecondary,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null){
-                          _saveTheme(value); // CHANGED: save to storage
-                          }
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
+          _buildAppearanceDropdown(context, textColor),
           _divider(),
-
-          // -------------------------- 2 — Add Burned Calories --------------------------
-          GestureDetector(
-            onTap: () {
-              setState(() => addBurnedCalories = !addBurnedCalories);
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Add Burned Calories",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "Add burned calories to daily goal",
-                          style: TextStyle(fontSize: 10, color: textColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Switch(
-                    value: addBurnedCalories,
-                    onChanged: (v) {
-                      setState(() => addBurnedCalories = v);
-                    },
-                    thumbColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Colors.white;
-                      }
-                      return Colors.white;
-                    }),
-                    trackColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Theme.of(context).dialogTheme.barrierColor;
-                      }
-                      return Theme.of(context).dialogTheme.backgroundColor;
-                    }),
-                    trackOutlineColor: WidgetStateProperty.all(
-                      Colors.transparent,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          _buildSwitchOption(
+            title: "Add Burned Calories",
+            subtitle: "Add burned calories to daily goal",
+            value: addBurnedCalories,
+            onChanged: (v) => setState(() => addBurnedCalories = v),
           ),
-
           _divider(),
-
-          // -------------------------- 3 — Rollover Calories --------------------------
-          GestureDetector(
-            onTap: () {
-              setState(() => rolloverCalories = !rolloverCalories);
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Rollover Calories",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Add up to 200 leftover calories into today's goal",
-                          style: TextStyle(fontSize: 10, color: textColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Switch(
-                    value: rolloverCalories,
-                    onChanged: (v) {
-                      setState(() => rolloverCalories = v);
-                    },
-                    thumbColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Colors.white;
-                      }
-                      return Colors.white;
-                    }),
-                    trackColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Theme.of(context).dialogTheme.barrierColor;
-                      }
-                      return Theme.of(context).dialogTheme.backgroundColor;
-                    }),
-                    trackOutlineColor: WidgetStateProperty.all(
-                      Colors.transparent,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          _buildSwitchOption(
+            title: "Rollover Calories",
+            subtitle: "Add up to 200 leftover calories into today's goal",
+            value: rolloverCalories,
+            onChanged: (v) => setState(() => rolloverCalories = v),
           ),
-
           _divider(),
+          _buildSwitchOption(
+            title: "Badge Celebration",
+            subtitle: "Show celebrations when you unlock new badges",
+            value: badgeCelebration,
+            onChanged: (v) => setState(() => badgeCelebration = v),
+          ),
+        ],
+      ),
+    );
+  }
 
-          // -------------------------- 4 — Badge Celebration --------------------------
-          GestureDetector(
-            onTap: () {
-              setState(() => rolloverCalories = !rolloverCalories);
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Badge Celebration",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Show celebrations when you unlock new badges",
-                          style: TextStyle(fontSize: 10, color: textColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Switch(
-                    value: badgeCelebration,
-                    onChanged: (v) {
-                      setState(() => badgeCelebration = v);
-                    },
-                    thumbColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Colors.white;
-                      }
-                      return Colors.white;
-                    }),
-                    trackColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Theme.of(context).dialogTheme.barrierColor;
-                      }
-                      return Theme.of(context).dialogTheme.backgroundColor;
-                    }),
-                    trackOutlineColor: WidgetStateProperty.all(
-                      Colors.transparent,
-                    ),
-                  ),
-                ],
-              ),
+  /// -------------------------- TITLE --------------------------
+  Widget _buildTitle(BuildContext context, Color textColor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          Icon(Icons.settings_outlined, color: textColor, size: 26),
+          const SizedBox(width: 12),
+          Text(
+            "Preferences",
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: textColor,
             ),
           ),
         ],
@@ -329,6 +107,116 @@ class _PreferencesSectionState extends State<PreferencesSection> {
     );
   }
 
+  /// -------------------------- APPEARANCE DROPDOWN --------------------------
+  Widget _buildAppearanceDropdown(BuildContext context, Color textColor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Appearance",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Choose light, dark, or system appearance",
+                  style: TextStyle(fontSize: 10, color: textColor),
+                ),
+              ],
+            ),
+          ),
+          DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              dropdownColor: Theme.of(context).dialogTheme.surfaceTintColor,
+              borderRadius: BorderRadius.circular(14),
+              elevation: 4,
+              value: appearance,
+              items: ["Light", "Dark", "Automatic"]
+                  .map(
+                    (e) => DropdownMenuItem(
+                  value: e,
+                  child: Center(
+                    child: Text(
+                      e,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSecondary,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+                  .toList(),
+              onChanged: (value) {
+                if (value != null) _saveTheme(value);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// -------------------------- SWITCH OPTION --------------------------
+  Widget _buildSwitchOption({
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onPrimary),
+                  ),
+                ],
+              ),
+            ),
+            Switch(
+              value: value,
+              onChanged: onChanged,
+              thumbColor: MaterialStateProperty.all(Colors.white),
+              trackColor: MaterialStateProperty.resolveWith((states) {
+                return states.contains(MaterialState.selected)
+                    ? Theme.of(context).dialogTheme.barrierColor
+                    : Theme.of(context).dialogTheme.backgroundColor;
+              }),
+              trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// -------------------------- DIVIDER --------------------------
   Widget _divider() => Container(
     alignment: Alignment.center,
     margin: const EdgeInsets.symmetric(horizontal: 20),

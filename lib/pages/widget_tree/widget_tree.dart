@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../widgets/CustomFab.dart';
+import '../../widgets/lower_end_fab_location.dart';
 import '../../widgets/navbar_widget.dart';
 import '../../widgets/radial_background/radial_background.dart';
 

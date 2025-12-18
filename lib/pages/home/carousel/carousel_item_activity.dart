@@ -287,13 +287,37 @@ class CarouselActivity extends StatelessWidget {
                 const Spacer(),
                 GestureDetector(
                   onTap: () => onWaterChange(-250),
-                  child: const Icon(Icons.remove),
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        // color: Theme.of(context).appBarTheme.foregroundColor,
+                        borderRadius: BorderRadius.circular(50),
+                        border: BoxBorder.all(width: 1.5)
+                    ),
+                    child: Icon(
+                      Icons.remove,
+                      size: 20,
+                      // color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 20),
                 GestureDetector(
                   onTap: () => onWaterChange(250),
-                  child: const Icon(Icons.add),
-                ),
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).appBarTheme.foregroundColor,
+                        borderRadius: BorderRadius.circular(50),
+                        border: BoxBorder.all(width: 1.5)
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                )
               ],
             ),
           ),

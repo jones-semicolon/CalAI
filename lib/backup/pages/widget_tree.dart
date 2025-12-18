@@ -1,6 +1,6 @@
 import 'package:calai/pages/home/home_body.dart';
 import 'package:calai/pages/progress/progress_page.dart';
-import 'package:calai/widgets/CustomFab.dart';
+import 'package:calai/widgets/lower_end_fab_location.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/navbar_widget.dart';
 import '../../data/notifiers.dart';

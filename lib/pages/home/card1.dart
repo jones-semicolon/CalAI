@@ -7,7 +7,8 @@ class CalorieCard extends StatelessWidget {
   final int progress;
   final Color color;
   final IconData icon;
-  final bool isEaten; 
+  final bool isEaten;
+  final String unit;
 
   const CalorieCard({
     super.key,
@@ -16,6 +17,7 @@ class CalorieCard extends StatelessWidget {
     required this.progress,
     required this.color,
     required this.icon,
+    required this.unit,
     this.isEaten = false,
   });
 
@@ -42,7 +44,7 @@ class CalorieCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      isEaten ? progress.toString() : "${nutrients}g",
+                      isEaten ? progress.toString() : "${nutrients-progress}${unit}",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
@@ -54,7 +56,7 @@ class CalorieCard extends StatelessWidget {
                         baseline: 10,
                         baselineType: TextBaseline.alphabetic,
                         child: Text(
-                          " /${progress}g",
+                          " /${nutrients}${unit}",
                           style: TextStyle(
                             fontSize: 8,
                             fontWeight: FontWeight.w700,

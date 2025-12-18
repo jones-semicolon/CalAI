@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 
 import '../../../data/global_data.dart';
 import '../../../pages/home/day_item.dart';
-
 import 'carousel/carousel_item_calories.dart';
 import 'carousel/carousel_item_health.dart';
 import 'carousel/carousel_item_activity.dart';
@@ -16,13 +16,14 @@ class HomeBody extends StatefulWidget {
 }
 
 class _HomeBodyState extends State<HomeBody> {
-  final globalData = GlobalData();
-
   bool isTap = false;
-  int calorieEaten = 50;
+  int calorieEaten = 200;
   int proteinEaten = 50;
   int carbsEaten = 50;
   int fatsEaten = 50;
+  int fiberEaten = 12;
+  int sugarEaten = 15;
+  int sodiumEaten = 900;
   int currentIndex = 0;
   int waterIntakeMl = 0;
 
@@ -35,6 +36,9 @@ class _HomeBodyState extends State<HomeBody> {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Watch GlobalData to rebuild UI on API update
+    final globalData = context.watch<GlobalData>();
+
     final carouselItems = [
       CarouselCalories(
         isTap: isTap,
@@ -49,10 +53,9 @@ class _HomeBodyState extends State<HomeBody> {
         isTap: isTap,
         onTap: () => setState(() => isTap = !isTap),
         globalData: globalData,
-        calorieEaten: calorieEaten,
-        proteinEaten: proteinEaten,
-        carbsEaten: carbsEaten,
-        fatsEaten: fatsEaten,
+        fiberEaten: fiberEaten,
+        sugarEaten: sugarEaten,
+        sodiumEaten: sodiumEaten,
       ),
       CarouselActivity(
         waterIntakeMl: waterIntakeMl,

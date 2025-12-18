@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'data/global_data.dart';
+import 'package:provider/provider.dart';
 import 'pages/widget_tree/widget_tree.dart';
 import 'theme/theme_service.dart';
 import 'theme/app_theme.dart';
@@ -18,7 +20,10 @@ void main() async {
     initialThemeMode = ThemeMode.system;
   }
 
-  runApp(MyApp(initialThemeMode: initialThemeMode));
+  runApp(ChangeNotifierProvider(
+    create: (_) => GlobalData()..fetchGoals(), // fetch goals on startup
+    child: const MyApp(),
+  ),);
 }
 
 class MyApp extends StatefulWidget {
