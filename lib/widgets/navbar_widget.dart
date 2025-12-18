@@ -12,7 +12,7 @@ class NavBarWidget extends StatelessWidget {
         return IntrinsicHeight(
           child: Container(
             color: Theme.of(context).scaffoldBackgroundColor,
-            padding: const EdgeInsets.only(bottom: 25, top: 10),
+            padding: const EdgeInsets.only(bottom: 15, top: 15),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment:

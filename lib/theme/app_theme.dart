@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
+  // We will define a consistent font family using GoogleFonts.inter()
+  // to apply across all TextStyles for a uniform look, similar to San Francisco.
+
   // --------------------------
   // LIGHT THEME (Material 3)
   // --------------------------
@@ -19,7 +22,7 @@ class AppTheme {
 
     shadowColor: Color.fromARGB(255, 142, 140, 145),
 
-    hintColor: Color.fromARGB(255, 127, 126, 132),
+    hintColor: Color.fromARGB(255, 210, 210, 212),
     highlightColor: Color.fromARGB(255, 72, 69, 78),
     splashColor: Color.fromARGB(255, 217, 218, 220),
 
@@ -49,19 +52,19 @@ class AppTheme {
       surfaceTintColor: Color.fromARGB(255, 249, 248, 253),
     ),
 
-    // Google Fonts text theme
+    // Global Text Theme using Inter for a modern, system-like sans-serif look
     textTheme: TextTheme(
-      displayLarge: GoogleFonts.poppins(
+      displayLarge: GoogleFonts.inter( // Changed from Poppins
         fontSize: 32,
         fontWeight: FontWeight.w700,
         color: Color.fromARGB(255, 29, 26, 35),
       ),
-      titleLarge: GoogleFonts.poppins(
+      titleLarge: GoogleFonts.inter( // Changed from Poppins
         fontSize: 20,
         fontWeight: FontWeight.w600,
         color: Color.fromARGB(255, 29, 26, 35),
       ),
-      titleMedium: GoogleFonts.roboto(
+      titleMedium: GoogleFonts.inter( // Changed from Roboto
         fontSize: 18,
         fontWeight: FontWeight.w500,
         color: Color.fromARGB(255, 29, 26, 35),
@@ -102,7 +105,7 @@ class AppTheme {
     dividerColor: Color.fromARGB(255, 42, 42, 42), //used in card border
 
     shadowColor: Color.fromARGB(255, 143, 141, 146), // use in day time circle
-    hintColor: Color.fromARGB(255, 151, 148, 155), // use day time not active
+    hintColor: Color.fromARGB(255, 210, 210, 212),
     highlightColor: Color.fromARGB(255, 202, 196, 208), // used in setting name
     splashColor: Color.fromARGB(255, 58, 58, 60), // use in div
 
@@ -140,19 +143,19 @@ class AppTheme {
       onSurface: Color.fromARGB(255, 43, 39, 53), //used in calorie border
     ),
 
-    // Google Fonts text theme (adjust colors for dark mode)
+    // Global Text Theme using Inter for a modern, system-like sans-serif look
     textTheme: TextTheme(
-      displayLarge: GoogleFonts.poppins(
+      displayLarge: GoogleFonts.inter( // Changed from Poppins
         fontSize: 40,
         fontWeight: FontWeight.w700,
         color: Colors.white,
       ),
-      titleLarge: GoogleFonts.poppins(
+      titleLarge: GoogleFonts.inter( // Changed from Poppins
         fontSize: 20,
         fontWeight: FontWeight.w600,
         color: Colors.white,
       ),
-      titleMedium: GoogleFonts.poppins(
+      titleMedium: GoogleFonts.inter( // Changed from Poppins
         fontSize: 18,
         fontWeight: FontWeight.w500,
         color: Colors.white,

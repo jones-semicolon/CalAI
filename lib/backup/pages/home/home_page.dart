@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider_plus/carousel_slider_plus.dart';
-import '../../data/global_data.dart';
-import 'card1.dart';
-import 'day_item.dart';
+import '../../../data/global_data.dart';
+import '../../../pages/home/card1.dart';
+import '../../../pages/home/day_item.dart';
 
 class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
@@ -21,6 +21,15 @@ class _HomeBodyState extends State<HomeBody> {
   int fatsEaten = 50;
   int currentIndex = 0;
 
+  int waterIntakeMl = 0;
+
+  void _updateWaterIntake(int amount) {
+    setState(() {
+      waterIntakeMl += amount;
+      if (waterIntakeMl < 0) waterIntakeMl = 0; // Prevent negative intake
+    });
+  }
+
   // --- Carousel Item 1 Content ---
   Widget _buildCarouselItem1(BuildContext context) {
     return Padding(
@@ -28,6 +37,7 @@ class _HomeBodyState extends State<HomeBody> {
       child: GestureDetector(
         onTap: () => setState(() => isTap = !isTap),
         child: Column(
+          spacing: 20,
           children: [
             // Top Calorie Card
             Container(
@@ -47,22 +57,56 @@ class _HomeBodyState extends State<HomeBody> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          isTap
-                              ? "$calorieEaten /${globalData.caloriesADay}"
-                              : globalData.caloriesADay.toString(),
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          // crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              isTap
+                                  ? calorieEaten.toString()
+                                  : globalData.caloriesADay.toString(),
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
+                            if (isTap)
+                              Baseline(
+                                baseline: 28,
+                                baselineType: TextBaseline.alphabetic,
+                                child: Text(
+                                  " /${globalData.caloriesADay.toString()}",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSecondary,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                        Text(
-                          "Calories ${isTap ? 'eaten' : 'left'}",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Calories ",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
+                            Text(
+                              isTap ? "eaten" : "left",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -102,7 +146,6 @@ class _HomeBodyState extends State<HomeBody> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
 
             // PROTEIN / CARBS / FATS - Inner row of cards
             Row(
@@ -153,6 +196,7 @@ class _HomeBodyState extends State<HomeBody> {
       child: GestureDetector(
         onTap: () => setState(() => isTap = !isTap),
         child: Column(
+          spacing: 10,
           children: [
             // FIBER / SUGAR / SODIUM - Inner row of cards
             Row(
@@ -191,14 +235,13 @@ class _HomeBodyState extends State<HomeBody> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
             // Health Score Card
             GestureDetector(
               onTap: () {
                 // Placeholder for tap action on Health Score Card
               },
               child: Padding(
-                padding: const EdgeInsets.only(top: 8.0),
+                padding: const EdgeInsets.symmetric(vertical: 5),
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -213,16 +256,17 @@ class _HomeBodyState extends State<HomeBody> {
                     ],
                   ),
                   child: Column(
+                    spacing: 8,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Health Score',
+                            'Health score',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 16,
                               color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           ),
@@ -231,14 +275,12 @@ class _HomeBodyState extends State<HomeBody> {
                             '0/10',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 16,
                               color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           ),
                         ],
                       ),
-
-                      const SizedBox(height: 12),
 
                       // 2. Linear Progress Bar
                       Container(
@@ -262,14 +304,12 @@ class _HomeBodyState extends State<HomeBody> {
                         ),
                       ),
 
-                      const SizedBox(height: 10),
-
                       // 3. Summary Text
                       Text(
                         // Provides contextual feedback based on the current state.
                         'Carbs and fat are on track. You’re low in calories and protein, which can slow weight loss and impact muscle retention.',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           color: Theme.of(context).colorScheme.onSecondary,
                           height: 1.4, // Improves readability for block text
                         ),
@@ -294,6 +334,8 @@ class _HomeBodyState extends State<HomeBody> {
           // TOP ROW: Steps + Calories
           // ─────────────────────────
           Row(
+            spacing: 10,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // STEPS TODAY
               Expanded(
@@ -399,14 +441,10 @@ class _HomeBodyState extends State<HomeBody> {
                 ),
               ),
 
-              const SizedBox(width: 12),
-
               // CALORIES BURNED
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(
-                    16,
-                  ), 
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(20),
@@ -415,107 +453,118 @@ class _HomeBodyState extends State<HomeBody> {
                       width: 1,
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      /// -------- Calories --------
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
+                  child: Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 10,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 5,
+                          children: [
+                            Padding(
+                              padding: EdgeInsetsGeometry.symmetric(
+                                vertical: 7.5,
+                              ),
+                              child: Icon(
                                 Icons.local_fire_department,
                                 color: Theme.of(context).colorScheme.onPrimary,
+                                size: 20,
                               ),
-
-                              const SizedBox(width: 3),
-
-                              Text(
-                                "0",
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimary,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22,
-                                ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "0",
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 24,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Calories Burned",
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimary,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-
-                          Text(
-                            "Calories Burned",
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontSize: 12,
                             ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      /// -------- Steps --------
-                      Row(
-                        children: [
-                          Container(
-                            height: 25,
-                            width: 25,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.battery_std,
-                              size: 14,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                            ),
-                          ),
-
-                          const SizedBox(width: 6),
-
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Steps",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimary,
-                                ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              height: 25,
+                              width: 25,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                shape: BoxShape.circle,
                               ),
+                              child: Icon(
+                                Icons.battery_std,
+                                size: 14,
+                                color: Theme.of(
+                                  context,
+                                ).scaffoldBackgroundColor,
+                              ),
+                            ),
 
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.secondary,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Text(
-                                  "+0",
+                            const SizedBox(width: 6),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Steps",
                                   style: TextStyle(
                                     fontSize: 10,
-                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 95),
-                    ],
+
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.secondary,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Text(
+                                    "+0",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 80)
+                      ],
+                    ),
                   ),
                 ),
               ),
+
             ],
           ),
 
@@ -539,22 +588,77 @@ class _HomeBodyState extends State<HomeBody> {
             ),
             child: Row(
               children: [
-                Icon(Icons.water_drop_outlined, size: 22),
+                Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondary,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: const Icon(
+                    Icons.water_drop_outlined,
+                    size: 25,
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Water Intake",
+                      "Water",
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "0 ml",
-                      style: Theme.of(context).textTheme.titleMedium,
+                      "$waterIntakeMl ml",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
+                const Spacer(), // Pushes buttons to the right
+                Row(
+                  children: [
+                    // Minus Container
+                    GestureDetector(
+                      onTap: () => _updateWaterIntake(-250),
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          // color: Theme.of(context).colorScheme.secondary,
+                          borderRadius: BorderRadius.circular(50),
+                          border: BoxBorder.all(width: 1.5)
+                        ),
+                        child: Icon(
+                          Icons.remove,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    // Plus Container
+                    GestureDetector(
+                      onTap: () => _updateWaterIntake(250),
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).appBarTheme.foregroundColor,
+                          borderRadius: BorderRadius.circular(50),
+                          border: BoxBorder.all(width: 1.5)
+                        ),
+                        child: Icon(
+                          Icons.add,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                  ],
+                )
               ],
             ),
           ),
@@ -585,7 +689,7 @@ class _HomeBodyState extends State<HomeBody> {
               children: [
                 // 1. Day Item
                 const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                  padding: EdgeInsets.symmetric(vertical: 10),
                   child: DayItem(),
                 ),
 
@@ -593,7 +697,7 @@ class _HomeBodyState extends State<HomeBody> {
                 CarouselSlider(
                   items: carouselItems,
                   options: CarouselOptions(
-                    height: 340.0,
+                    height: 330.0,
                     viewportFraction: 1,
                     enableInfiniteScroll: false,
                     onPageChanged: (index, reason) {

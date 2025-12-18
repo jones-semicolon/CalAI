@@ -1,13 +1,13 @@
-import 'package:calai/pages/home/home_page.dart';
+import 'package:calai/pages/home/home_body.dart';
 import 'package:calai/pages/progress/progress_page.dart';
 import 'package:calai/widgets/CustomFab.dart';
 import 'package:flutter/material.dart';
-import '../widgets/navbar_widget.dart';
-import '../data/notifiers.dart';
-import '../pages/home/day_streak.dart';
-import '../pages/home/float_action.dart';
+import '../../widgets/navbar_widget.dart';
+import '../../data/notifiers.dart';
+import '../../pages/home/day_streak.dart';
+import '../../pages/home/float_action.dart';
 import 'package:calai/pages/settings/settings_page.dart';
-import './radial_background.dart';
+import 'radial_background.dart';
 
 List<Widget> pages = [HomeBody(), ProgressPage(), SettingsPage()];
 
@@ -47,7 +47,7 @@ class _WidgetTreeState extends State<WidgetTree> {
   Widget build(BuildContext context) {
     return RadialBackground(
       child: Scaffold(
-        backgroundColor: Colors.transparent, 
+        backgroundColor: Colors.transparent,
         bottomNavigationBar: NavBarWidget(),
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(_appBarHeight),
@@ -132,8 +132,8 @@ class _WidgetTreeState extends State<WidgetTree> {
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
+                                horizontal: 8,
+                                vertical: 3,
                               ),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).scaffoldBackgroundColor,
@@ -149,7 +149,7 @@ class _WidgetTreeState extends State<WidgetTree> {
                                   Text(
                                     '0',
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(
                                         context,
@@ -169,7 +169,7 @@ class _WidgetTreeState extends State<WidgetTree> {
             ),
           ),
         ),
-      
+
         body: ValueListenableBuilder(
           valueListenable: selectedPage,
           builder: (context, page, child) {
@@ -180,7 +180,7 @@ class _WidgetTreeState extends State<WidgetTree> {
             );
           },
         ),
-      
+
         floatingActionButton: SizedBox(
           height: FABSize,
           width: FABSize,
@@ -200,11 +200,11 @@ class _WidgetTreeState extends State<WidgetTree> {
                 barrierLabel: "",
                 barrierColor: Colors.black26,
                 transitionDuration: const Duration(milliseconds: 200),
-      
+
                 pageBuilder: (_, __, ___) {
                   return const SizedBox.shrink();
                 },
-      
+
                 transitionBuilder: (_, animation, __, ___) {
                   return Transform.translate(
                     offset: Offset(
@@ -213,7 +213,7 @@ class _WidgetTreeState extends State<WidgetTree> {
                     ), // bottom to top animation
                     child: Opacity(
                       opacity: animation.value,
-                      child: const FloatActionContent(),
+                      child: const FloatingActionGrid(),
                     ),
                   );
                 },

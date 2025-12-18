@@ -22,51 +22,76 @@ class CalorieCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // **FIX:** Explicitly defining height ensures the Spacer works correctly 
-      // when inside an Expanded widget, preventing vertical collapse (the "disappearing card" issue).
-      height: 150, 
+      height: 150,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         color: Theme.of(context).appBarTheme.backgroundColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(17),
         border: Border.all(color: Theme.of(context).dividerColor, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // 1. Text Content
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FittedBox( 
                 fit: BoxFit.scaleDown,
-                child: Text(
-                  isEaten ? "$progress /${nutrients}g" : "${nutrients}g",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Theme.of(context).colorScheme.onPrimary,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      isEaten ? progress.toString() : "${nutrients}g",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                    if (isEaten)
+                      Baseline(
+                        baseline: 10,
+                        baselineType: TextBaseline.alphabetic,
+                        child: Text(
+                          " /${progress}g",
+                          style: TextStyle(
+                            fontSize: 8,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSecondary,
+                          ),
+                        ),
+                      ),
+                  ],
+                )
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSecondary,
+                    ),
                   ),
-                ),
-              ),
-              Text(
-                "$title ${isEaten ? 'eaten' : 'left'}",
-                style: TextStyle(
-                  fontSize: 12, 
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
-              ),
+                  Text(
+                    isEaten ? " eaten" : " left",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
 
-          // 2. Spacer pushes content down
-          const Spacer(), 
-
-          // 3. Circular progress indicator
           Center(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(top: 20),
               child: SizedBox(
                 height: 60,
                 width: 60,
@@ -74,11 +99,11 @@ class CalorieCard extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     SizedBox(
-                      height: 50,
-                      width: 50,
+                      height: 55,
+                      width: 55,
                       child: CircularProgressIndicator(
                         value: (progress / nutrients).clamp(0.0, 1.0),
-                        strokeWidth: 4,
+                        strokeWidth: 5,
                         backgroundColor: Theme.of(context).cardColor,
                         color: color,
                       ),

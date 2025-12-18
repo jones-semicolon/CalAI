@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/widget_tree.dart';
+import 'pages/widget_tree/widget_tree.dart';
 import 'theme/theme_service.dart';
 import 'theme/app_theme.dart';
 
