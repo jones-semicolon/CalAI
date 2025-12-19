@@ -198,7 +198,7 @@ class _HomeBodyState extends State<HomeBody> {
                 // Placeholder for tap action on Health Score Card
               },
               child: Padding(
-                padding: const EdgeInsets.only(top: 8.0),
+                padding: const EdgeInsets.only(top: 2),
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -238,7 +238,7 @@ class _HomeBodyState extends State<HomeBody> {
                         ],
                       ),
 
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
 
                       // 2. Linear Progress Bar
                       Container(
@@ -347,16 +347,16 @@ class _HomeBodyState extends State<HomeBody> {
                         const SizedBox(height: 10),
                         Center(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             child: SizedBox(
-                              height: 95,
-                              width: 95,
+                              height: 90,
+                              width: 90,
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
                                   SizedBox(
-                                    height: 95,
-                                    width: 95,
+                                    height: 90,
+                                    width: 90,
                                     child: CircularProgressIndicator(
                                       value: (1 / 2).clamp(
                                         0.0,
@@ -404,9 +404,7 @@ class _HomeBodyState extends State<HomeBody> {
               // CALORIES BURNED
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(
-                    16,
-                  ), 
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(20),
@@ -511,7 +509,7 @@ class _HomeBodyState extends State<HomeBody> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 95),
+                      const SizedBox(height: 80),
                     ],
                   ),
                 ),
@@ -519,40 +517,114 @@ class _HomeBodyState extends State<HomeBody> {
             ],
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
 
           // ─────────────────────────
           // WATER INTAKE
           // ─────────────────────────
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 14,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+
+              border: Border.all(
+                color: Theme.of(context).dividerColor,
+                width: 1,
+              ),
             ),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(Icons.water_drop_outlined, size: 22),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                /// ================= LEFT SIDE =================
+                Row(
                   children: [
-                    Text(
-                      "Water Intake",
-                      style: Theme.of(context).textTheme.labelSmall,
+                    Container(
+                      height: 60,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondary,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Icon(
+                        Icons.water_drop_outlined,
+                        size: 30,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "0 ml",
-                      style: Theme.of(context).textTheme.titleMedium,
+
+                    const SizedBox(width: 10),
+
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Water",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Text(
+                              "0 ml",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontSize: 16,
+                              ),
+                            ),
+
+                            const SizedBox(width: 10),
+                            Icon(
+                              Icons.settings_outlined,
+                              size: 20,
+                              color: Theme.of(context).hintColor,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
+                  ],
+                ),
+
+                /// ================= RIGHT SIDE =================
+                Row(
+                  children: [
+                    Container(
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          width: 2,
+                        ),
+                      ),
+                      child: const Icon(Icons.remove, size: 20),
+                    ),
+
+                    const SizedBox(width: 20),
+                    Container(
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          width: 2,
+                        ),
+                      ),
+
+                      child: Icon(
+                        Icons.add,
+                        size: 20,
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
                   ],
                 ),
               ],

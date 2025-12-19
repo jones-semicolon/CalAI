@@ -22,6 +22,10 @@ class AppTheme {
     hintColor: Color.fromARGB(255, 127, 126, 132),
     highlightColor: Color.fromARGB(255, 72, 69, 78),
     splashColor: Color.fromARGB(255, 217, 218, 220),
+    primaryColor: Color.fromARGB(255, 111, 111, 111),
+    primaryColorLight: Color.fromARGB(255, 249, 248, 253), // timeline
+    primaryColorDark: Color.fromARGB(255, 195, 195, 195),
+    unselectedWidgetColor: Color.fromARGB(255, 251, 251, 251),
 
     // App bar
     appBarTheme: const AppBarTheme(
@@ -39,8 +43,12 @@ class AppTheme {
       primary: Colors.white, // black and white
       secondary: Color.fromARGB(255, 249, 248, 253),
       onPrimary: Color.fromARGB(255, 29, 26, 35),
+      onPrimaryFixed: Color.fromARGB(255, 255, 255, 255),
       onSecondary: Color.fromARGB(255, 127, 127, 127),
+      onTertiary: Color.fromARGB(255, 74, 71, 80), // timeline progress
       onSurface: Color.fromARGB(255, 243, 244, 246),
+      onSurfaceVariant: Color.fromARGB(255, 228, 228, 228),
+      inversePrimary: Color.fromARGB(255, 188, 188, 190),
     ),
 
     dialogTheme: DialogThemeData(
@@ -105,6 +113,10 @@ class AppTheme {
     hintColor: Color.fromARGB(255, 151, 148, 155), // use day time not active
     highlightColor: Color.fromARGB(255, 202, 196, 208), // used in setting name
     splashColor: Color.fromARGB(255, 58, 58, 60), // use in div
+    primaryColor: Color.fromARGB(255, 142, 140, 145), // used in text grey
+    primaryColorLight: Color.fromARGB(255, 55, 55, 63), // timeline
+    primaryColorDark: Color.fromARGB(255, 77, 74, 81),
+    unselectedWidgetColor: Color.fromARGB(255, 33, 30, 39),
 
     dialogTheme: DialogThemeData(
       backgroundColor: Color.fromARGB(255, 42, 39, 48),
@@ -131,12 +143,16 @@ class AppTheme {
       primary: Colors.black,
       secondary: Color.fromARGB(255, 39, 36, 45), // used in icon bg floating
       onPrimary: Colors.white, // used in reverse of scaffold color
+      onPrimaryFixed: Color.fromARGB(255, 137, 137, 139), // timeline progress
+      onTertiary: Color.fromARGB(255, 215, 215, 217), // timeline progress
       onSecondary: Color.fromARGB(
         255,
         176,
         176,
         176,
       ), // used in navbar if not active
+      onSurfaceVariant: Color.fromARGB(255, 56, 53, 62),
+      inversePrimary: Color.fromARGB(255, 97, 94, 101),
       onSurface: Color.fromARGB(255, 43, 39, 53), //used in calorie border
     ),
 
