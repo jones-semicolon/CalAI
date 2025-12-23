@@ -7,7 +7,7 @@ class CalorieCard extends StatelessWidget {
   final int progress;
   final Color color;
   final IconData icon;
-  final bool isEaten; 
+  final bool isEaten;
 
   const CalorieCard({
     super.key,
@@ -19,12 +19,32 @@ class CalorieCard extends StatelessWidget {
     this.isEaten = false,
   });
 
+  bool get overEat {
+    return progress > nutrients;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final textStyle = TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Theme.of(context).colorScheme.onPrimary,
+    );
+
+    Widget valueText(String text, {double fontSize = 16, Color? color}) {
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
+          style: textStyle.copyWith(
+            fontSize: fontSize,
+            color: color ?? textStyle.color,
+          ),
+        ),
+      );
+    }
+
     return Container(
-      // **FIX:** Explicitly defining height ensures the Spacer works correctly 
-      // when inside an Expanded widget, preventing vertical collapse (the "disappearing card" issue).
-      height: 150, 
+      height: 150,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         color: Theme.of(context).appBarTheme.backgroundColor,
@@ -39,21 +59,27 @@ class CalorieCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              FittedBox( 
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  isEaten ? "$progress /${nutrients}g" : "${nutrients}g",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
-                ),
-              ),
+              !isEaten
+                  ? overEat
+                        ? valueText("${progress - nutrients}g")
+                        : valueText("${nutrients}g")
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        valueText(progress.toString()),
+                        const SizedBox(width: 5),
+                        valueText(
+                          '/${nutrients}g',
+                          fontSize: 11,
+                          color: Theme.of(context).secondaryHeaderColor,
+                        ),
+                      ],
+                    ),
               Text(
-                "$title ${isEaten ? 'eaten' : 'left'}",
+                "$title ${isEaten ? 'eaten' : (overEat ? 'over' : 'left')}",
                 style: TextStyle(
-                  fontSize: 12, 
+                  fontSize: 12,
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
@@ -61,7 +87,7 @@ class CalorieCard extends StatelessWidget {
           ),
 
           // 2. Spacer pushes content down
-          const Spacer(), 
+          const Spacer(),
 
           // 3. Circular progress indicator
           Center(

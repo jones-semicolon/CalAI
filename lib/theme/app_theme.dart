@@ -26,6 +26,9 @@ class AppTheme {
     primaryColorLight: Color.fromARGB(255, 249, 248, 253), // timeline
     primaryColorDark: Color.fromARGB(255, 195, 195, 195),
     unselectedWidgetColor: Color.fromARGB(255, 251, 251, 251),
+    canvasColor: Colors.white,
+    focusColor: Colors.black,
+    secondaryHeaderColor: Color.fromARGB(255, 127, 127, 127),
 
     // App bar
     appBarTheme: const AppBarTheme(
@@ -49,6 +52,7 @@ class AppTheme {
       onSurface: Color.fromARGB(255, 243, 244, 246),
       onSurfaceVariant: Color.fromARGB(255, 228, 228, 228),
       inversePrimary: Color.fromARGB(255, 188, 188, 190),
+      scrim: Color.fromARGB(255, 239, 246, 238),
     ),
 
     dialogTheme: DialogThemeData(
@@ -117,6 +121,9 @@ class AppTheme {
     primaryColorLight: Color.fromARGB(255, 55, 55, 63), // timeline
     primaryColorDark: Color.fromARGB(255, 77, 74, 81),
     unselectedWidgetColor: Color.fromARGB(255, 33, 30, 39),
+    canvasColor: Colors.black,
+    focusColor: Colors.white,
+    secondaryHeaderColor: Color.fromARGB(255, 176, 176, 176),
 
     dialogTheme: DialogThemeData(
       backgroundColor: Color.fromARGB(255, 42, 39, 48),
@@ -154,6 +161,7 @@ class AppTheme {
       onSurfaceVariant: Color.fromARGB(255, 56, 53, 62),
       inversePrimary: Color.fromARGB(255, 97, 94, 101),
       onSurface: Color.fromARGB(255, 43, 39, 53), //used in calorie border
+      scrim: Color.fromARGB(255, 32, 35, 36),
     ),
 
     // Google Fonts text theme (adjust colors for dark mode)

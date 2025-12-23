@@ -86,6 +86,7 @@ class WeightCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 5),
                 ],
               ),
             ),
@@ -138,7 +139,7 @@ class StreakCard extends StatelessWidget {
     final streak = dayStreak.reversed.takeWhile((e) => e).length;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 10),
       decoration: _decoration(context),
       child: Column(
         children: [
@@ -190,26 +191,37 @@ class StreakCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(7, (i) {
               final done = dayStreak[i];
-              return Column(
+              return Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12, // horizontal space between days
+                runSpacing: 8, // vertical space on small screens
                 children: [
-                  Text(
-                    days[i],
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: done
-                          ? Color.fromARGB(255, 249, 149, 11)
-                          : Theme.of(context).primaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  CircleAvatar(
-                    radius: 10,
-                    backgroundColor: done
-                        ? Color.fromARGB(255, 249, 149, 11)
-                        : Theme.of(context).dialogTheme.backgroundColor,
-                    child: done
-                        ? const Icon(Icons.check, size: 12, color: Colors.white)
-                        : null,
+                  Column(
+                    children: [
+                      Text(
+                        days[i],
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: done
+                              ? const Color.fromARGB(255, 249, 149, 11)
+                              : Theme.of(context).primaryColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      CircleAvatar(
+                        radius: 8,
+                        backgroundColor: done
+                            ? const Color.fromARGB(255, 249, 149, 11)
+                            : Theme.of(context).dialogTheme.backgroundColor,
+                        child: done
+                            ? const Icon(
+                                Icons.check,
+                                size: 12,
+                                color: Colors.white,
+                              )
+                            : null,
+                      ),
+                    ],
                   ),
                 ],
               );

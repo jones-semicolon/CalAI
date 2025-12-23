@@ -21,8 +21,30 @@ class _HomeBodyState extends State<HomeBody> {
   int fatsEaten = 50;
   int currentIndex = 0;
 
+  bool get isOverEaten {
+    return calorieEaten > globalData.caloriesADay;
+  }
+
   // --- Carousel Item 1 Content ---
   Widget _buildCarouselItem1(BuildContext context) {
+    final textStyle = TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Theme.of(context).colorScheme.onPrimary,
+    );
+
+    Widget valueText(String text, {double fontSize = 32, Color? color}) {
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
+          style: textStyle.copyWith(
+            fontSize: fontSize,
+            color: color ?? textStyle.color,
+          ),
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       child: GestureDetector(
@@ -47,20 +69,31 @@ class _HomeBodyState extends State<HomeBody> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        !isTap
+                            ? isOverEaten
+                                  ? valueText(
+                                      "${calorieEaten - globalData.caloriesADay}g",
+                                    )
+                                  : valueText("${globalData.caloriesADay}g")
+                            : Row(
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.alphabetic,
+                                children: [
+                                  valueText(calorieEaten.toString()),
+                                  const SizedBox(width: 5),
+                                  valueText(
+                                    '/${globalData.caloriesADay}g',
+                                    fontSize: 16,
+                                    color: Theme.of(
+                                      context,
+                                    ).secondaryHeaderColor,
+                                  ),
+                                ],
+                              ),
                         Text(
-                          isTap
-                              ? "$calorieEaten /${globalData.caloriesADay}"
-                              : globalData.caloriesADay.toString(),
+                          "Calories ${isTap ? 'eaten' : (isOverEaten ? 'over' : 'left')}",
                           style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                        ),
-                        Text(
-                          "Calories ${isTap ? 'eaten' : 'left'}",
-                          style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 12,
                             color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
@@ -704,11 +737,15 @@ class _HomeBodyState extends State<HomeBody> {
                 const SizedBox(height: 30),
 
                 // 4. Section Title
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
                     "Recently uploaded",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                   ),
                 ),
 
