@@ -12,19 +12,20 @@ class AppTheme {
     brightness: Brightness.light,
 
     // Scaffold background
-    scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
-
-    // Card, container, and item backgrounds
-    cardColor: const Color.fromARGB(255, 237, 237, 239),
-
-    // Dividers and shadows
-    dividerColor: const Color.fromARGB(255, 239, 240, 245),
-    shadowColor: const Color.fromARGB(255, 142, 140, 145),
-
-    // Hints and highlights
-    hintColor: const Color.fromARGB(255, 210, 210, 212),
-    highlightColor: const Color.fromARGB(255, 72, 69, 78),
-    splashColor: const Color.fromARGB(255, 217, 218, 220),
+    // scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
+    //
+    // // Card, container, and item backgrounds
+    cardColor: const Color.fromARGB(255, 249, 248, 253),
+    splashColor: const Color.fromARGB(255, 237, 237, 239),
+    //
+    // // Dividers and shadows
+    // dividerColor: const Color.fromARGB(255, 217, 218, 220),
+    shadowColor: const Color.fromARGB(255, 129, 128, 136),
+    //
+    // // Hints and highlights
+    hintColor: const Color.fromARGB(255, 127, 127, 127),
+    highlightColor: const Color.fromARGB(255, 214, 214, 214),
+    // splashColor: const Color.fromARGB(255, 217, 218, 220),
 
     // AppBar styling
     appBarTheme: const AppBarTheme(
@@ -35,23 +36,27 @@ class AppTheme {
 
     // Material 3 Color Scheme
     colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.blue,
+      seedColor: Colors.black,
       brightness: Brightness.light,
-      outline: const Color.fromARGB(255, 210, 210, 212),
-      surface: const Color.fromARGB(255, 255, 255, 255),
-      primary: Colors.white,
-      secondary: const Color.fromARGB(255, 249, 248, 253),
-      onPrimary: const Color.fromARGB(255, 29, 26, 35),
-      onSecondary: const Color.fromARGB(255, 127, 127, 127),
-      onSurface: const Color.fromARGB(255, 243, 244, 246),
+      primary: Colors.black,
+      onPrimary: Color.fromARGB(255, 127, 127, 127),
+      secondary: Colors.grey,
+      onTertiary: Color.fromARGB(255, 239, 239, 247),
+      // outline: const Color.fromARGB(255, 75, 72, 79),
+      surface: const Color.fromARGB(255, 250, 249, 254),
+      // primary: Colors.black,
+      // secondary: const Color.fromARGB(255, 248, 247, 252),
+      // onPrimary: Colors.white,
+      // onSecondary: const Color.fromARGB(255, 28, 25, 34),
+      // onSurface: const Color.fromARGB(255, 43, 39, 53),
     ),
 
     // Dialog styling
-    dialogTheme: const DialogThemeData(
-      backgroundColor: Color.fromARGB(255, 217, 218, 220),
-      barrierColor: Color.fromARGB(255, 29, 26, 35),
-      surfaceTintColor: Color.fromARGB(255, 249, 248, 253),
-    ),
+    // dialogTheme: const DialogThemeData(
+    //   backgroundColor: Color.fromARGB(255, 217, 218, 220),
+    //   barrierColor: Color.fromARGB(255, 29, 26, 35),
+    //   surfaceTintColor: Color.fromARGB(255, 249, 248, 253),
+    // ),
 
     // Global Text Theme using Inter font
     textTheme: TextTheme(
@@ -128,13 +133,13 @@ class AppTheme {
     colorScheme: ColorScheme.fromSeed(
       seedColor: Colors.blue,
       brightness: Brightness.dark,
-      outline: const Color.fromARGB(255, 75, 72, 79),
-      surface: const Color.fromARGB(255, 40, 35, 50),
-      primary: Colors.black,
-      secondary: const Color.fromARGB(255, 39, 36, 45),
-      onPrimary: Colors.white,
-      onSecondary: const Color.fromARGB(255, 176, 176, 176),
-      onSurface: const Color.fromARGB(255, 43, 39, 53),
+      outline: const Color.fromARGB(255, 210, 210, 212),
+      surface: const Color.fromARGB(255, 255, 255, 255),
+      primary: Colors.white,
+      secondary: const Color.fromARGB(255, 249, 248, 253),
+      onPrimary: const Color.fromARGB(255, 29, 26, 35),
+      onSecondary: const Color.fromARGB(255, 127, 127, 127),
+      onSurface: const Color.fromARGB(255, 243, 244, 246),
     ),
 
     // Global Text Theme using Inter font

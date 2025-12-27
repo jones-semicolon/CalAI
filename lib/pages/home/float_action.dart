@@ -91,7 +91,7 @@ class ActionGridButton extends StatelessWidget {
         color: theme.appBarTheme.backgroundColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: theme.colorScheme.onSurface,
+          color: Theme.of(context).splashColor,
           width: 2,
         ),
       ),
@@ -101,13 +101,13 @@ class ActionGridButton extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: theme.colorScheme.secondary,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(15),
             ),
             child: Icon(
               icon,
               size: 28,
-              color: theme.colorScheme.onPrimary,
+              color: theme.colorScheme.primary,
             ),
           ),
           const SizedBox(height: 6),
@@ -116,7 +116,7 @@ class ActionGridButton extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onPrimary,
+              color: theme.colorScheme.primary,
             ),
             textAlign: TextAlign.center,
           ),

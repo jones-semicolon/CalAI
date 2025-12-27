@@ -35,8 +35,8 @@ class NameAgeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textColor = Theme.of(context).highlightColor;
-    final primaryColor = Theme.of(context).colorScheme.onPrimary;
-    final bgColor = Theme.of(context).scaffoldBackgroundColor;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final bgColor = Theme.of(context).colorScheme.surface;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -46,7 +46,7 @@ class NameAgeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).shadowColor.withOpacity(0.2),
+            color: Theme.of(context).splashColor.withOpacity(0.2),
             blurRadius: 5,
             spreadRadius: 1,
             offset: const Offset(2, 2),
@@ -58,7 +58,7 @@ class NameAgeCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).colorScheme.onSecondary,
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.person_outlined, size: 30),
@@ -110,7 +110,7 @@ class InviteFriendsItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textStyle = Theme.of(context).textTheme.titleMedium;
-    final primaryColor = Theme.of(context).colorScheme.onPrimary;
+    final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -120,7 +120,7 @@ class InviteFriendsItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).shadowColor.withOpacity(0.2),
+            color: Theme.of(context).splashColor.withOpacity(0.2),
             blurRadius: 5,
             spreadRadius: 1,
             offset: const Offset(2, 2),
@@ -155,7 +155,7 @@ class SettingsGroup extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondary,
+        color: Color.fromARGB(26, 185, 168, 209),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -182,7 +182,7 @@ class SettingsGroup extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         child: Row(
           children: [
-            Container(padding: const EdgeInsets.all(4), child: Icon(icon, size: 20, color: Theme.of(context).colorScheme.onPrimary)),
+            Container(padding: const EdgeInsets.all(4), child: Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary)),
             const SizedBox(width: 10),
             Text(label, style: textStyle),
             const Spacer(),
@@ -196,6 +196,6 @@ class SettingsGroup extends StatelessWidget {
     alignment: Alignment.center,
     margin: const EdgeInsets.symmetric(horizontal: 20),
     height: 1.5,
-    color: Theme.of(context).splashColor,
+    color: Theme.of(context).hintColor,
   );
 }

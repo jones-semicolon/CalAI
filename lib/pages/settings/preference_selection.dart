@@ -46,13 +46,13 @@ class _PreferencesSectionState extends State<PreferencesSection> {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Theme.of(context).colorScheme.onPrimary;
+    final textColor = Theme.of(context).colorScheme.primary;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondary,
+        color: Color.fromARGB(26, 185, 168, 209),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -148,8 +148,8 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                       e,
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onSecondary,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -188,13 +188,13 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onPrimary),
+                    style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.primary),
                   ),
                 ],
               ),
@@ -206,7 +206,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
               trackColor: MaterialStateProperty.resolveWith((states) {
                 return states.contains(MaterialState.selected)
                     ? Theme.of(context).dialogTheme.barrierColor
-                    : Theme.of(context).dialogTheme.backgroundColor;
+                    : Theme.of(context).colorScheme.secondary;
               }),
               trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
             ),
@@ -221,6 +221,6 @@ class _PreferencesSectionState extends State<PreferencesSection> {
     alignment: Alignment.center,
     margin: const EdgeInsets.symmetric(horizontal: 20),
     height: 1,
-    color: Theme.of(context).splashColor,
+    color: Theme.of(context).dividerColor,
   );
 }

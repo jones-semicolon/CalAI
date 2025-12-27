@@ -39,7 +39,7 @@ class WidgetTreeAppBar extends StatelessWidget implements PreferredSizeWidget {
             Image.asset(
               'assets/favicon.png',
               height: 32,
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(width: 8),
             Text(
@@ -47,7 +47,7 @@ class WidgetTreeAppBar extends StatelessWidget implements PreferredSizeWidget {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ],
@@ -92,7 +92,7 @@ class WidgetTreeAppBar extends StatelessWidget implements PreferredSizeWidget {
                             fontWeight: FontWeight.bold,
                             color: Theme.of(
                               context,
-                            ).colorScheme.onPrimary,
+                            ).colorScheme.primary,
                           ),
                         ),
                       ],
@@ -113,7 +113,7 @@ class WidgetTreeAppBar extends StatelessWidget implements PreferredSizeWidget {
       style: TextStyle(
         fontSize: 28,
         fontWeight: FontWeight.bold,
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: Theme.of(context).colorScheme.primary,
       ),
     );
   }

@@ -33,7 +33,7 @@ class CarouselActivity extends StatelessWidget {
                       color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: Theme.of(context).dividerColor,
+                        color: Theme.of(context).splashColor,
                         width: 1,
                       ),
                     ),
@@ -45,7 +45,7 @@ class CarouselActivity extends StatelessWidget {
                             Text(
                               "5000", // stepsCount
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
+                                color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 22,
                               ),
@@ -56,7 +56,7 @@ class CarouselActivity extends StatelessWidget {
                               style: TextStyle(
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.onSecondary,
+                                ).colorScheme.secondary,
                                 fontSize: 14,
                               ),
                             ),
@@ -65,7 +65,7 @@ class CarouselActivity extends StatelessWidget {
                         Text(
                           "Steps Today",
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.primary,
                             fontSize: 12,
                           ),
                         ),
@@ -90,10 +90,10 @@ class CarouselActivity extends StatelessWidget {
                                       strokeWidth: 7,
                                       backgroundColor: Theme.of(
                                         context,
-                                      ).cardColor,
+                                      ).splashColor,
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.onPrimary,
+                                      ).colorScheme.primary,
                                     ),
                                   ),
                                   Container(
@@ -102,7 +102,7 @@ class CarouselActivity extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.secondary,
+                                      ).cardColor,
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
@@ -110,7 +110,7 @@ class CarouselActivity extends StatelessWidget {
                                       size: 25,
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.onPrimary,
+                                      ).colorScheme.primary,
                                     ),
                                   ),
                                 ],
@@ -132,7 +132,7 @@ class CarouselActivity extends StatelessWidget {
                     color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Theme.of(context).dividerColor,
+                      color: Theme.of(context).splashColor,
                       width: 1,
                     ),
                   ),
@@ -152,7 +152,7 @@ class CarouselActivity extends StatelessWidget {
                               ),
                               child: Icon(
                                 Icons.local_fire_department,
-                                color: Theme.of(context).colorScheme.onPrimary,
+                                color: Theme.of(context).colorScheme.primary,
                                 size: 20,
                               ),
                             ),
@@ -166,7 +166,7 @@ class CarouselActivity extends StatelessWidget {
                                     style: TextStyle(
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.onPrimary,
+                                      ).colorScheme.primary,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 24,
                                     ),
@@ -176,7 +176,7 @@ class CarouselActivity extends StatelessWidget {
                                     style: TextStyle(
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.onPrimary,
+                                      ).colorScheme.primary,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -191,7 +191,7 @@ class CarouselActivity extends StatelessWidget {
                               height: 25,
                               width: 25,
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.onPrimary,
+                                color: Theme.of(context).colorScheme.primary,
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
@@ -214,7 +214,7 @@ class CarouselActivity extends StatelessWidget {
                                     fontSize: 10,
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onPrimary,
+                                    ).colorScheme.primary,
                                   ),
                                 ),
 
@@ -226,7 +226,7 @@ class CarouselActivity extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.secondary,
+                                    ).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: const Text(
@@ -265,7 +265,7 @@ class CarouselActivity extends StatelessWidget {
                   height: 50,
                   width: 50,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: const Icon(Icons.water_drop_outlined),
@@ -314,7 +314,7 @@ class CarouselActivity extends StatelessWidget {
                     child: Icon(
                       Icons.add,
                       size: 20,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.onSecondary,
                     ),
                   ),
                 )

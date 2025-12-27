@@ -10,13 +10,13 @@ class GlobalData extends ChangeNotifier {
   GlobalData._internal();
 
   // Default values
-  int caloriesADay = 0;
-  int proteinADay = 0;
-  int carbsADay = 0;
-  int fatsADay = 0;
-  int fiberADay = 0;
-  int sugarADay = 0;
-  int sodiumADay = 0;
+  int calorieGoal = 0;
+  int proteinGoal = 0;
+  int carbsGoal = 0;
+  int fatsGoal = 0;
+  int fiberGoal = 0;
+  int sugarGoal = 0;
+  int sodiumGoal = 0;
 
   /// Fetch goals from API
   Future<void> fetchGoals() async {
@@ -32,13 +32,13 @@ class GlobalData extends ChangeNotifier {
         final nutrients = data['nutrients'];
         final micro = nutrients['micronutrients'];
 
-        caloriesADay = data['calories'] ?? caloriesADay;
-        proteinADay = nutrients['protein_g'] ?? proteinADay;
-        carbsADay = nutrients['carbs_g'] ?? carbsADay;
-        fatsADay = nutrients['fat_g'] ?? fatsADay;
-        sugarADay = micro['sugar_g'] ?? sugarADay;
-        sodiumADay = micro['sodium_mg'] ?? sodiumADay;
-        fiberADay = micro['fiber_g'] ?? fiberADay;
+        calorieGoal = data['calories'] ?? calorieGoal;
+        proteinGoal = nutrients['protein_g'] ?? proteinGoal;
+        carbsGoal = nutrients['carbs_g'] ?? carbsGoal;
+        fatsGoal = nutrients['fat_g'] ?? fatsGoal;
+        sugarGoal = micro['sugar_g'] ?? sugarGoal;
+        sodiumGoal = micro['sodium_mg'] ?? sodiumGoal;
+        fiberGoal = micro['fiber_g'] ?? fiberGoal;
 
         notifyListeners();
       } else {

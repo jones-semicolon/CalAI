@@ -17,10 +17,10 @@ class HomeBody extends StatefulWidget {
 
 class _HomeBodyState extends State<HomeBody> {
   bool isTap = false;
-  int calorieEaten = 200;
-  int proteinEaten = 50;
-  int carbsEaten = 50;
-  int fatsEaten = 50;
+  int calorieTaken = 300;
+  int proteinTaken = 50;
+  int carbsTaken = 50;
+  int fatsTaken = 50;
   int fiberEaten = 12;
   int sugarEaten = 15;
   int sodiumEaten = 900;
@@ -44,10 +44,10 @@ class _HomeBodyState extends State<HomeBody> {
         isTap: isTap,
         onTap: () => setState(() => isTap = !isTap),
         globalData: globalData,
-        calorieEaten: calorieEaten,
-        proteinEaten: proteinEaten,
-        carbsEaten: carbsEaten,
-        fatsEaten: fatsEaten,
+        calorieTaken: calorieTaken,
+        proteinTaken: proteinTaken,
+        carbsTaken: carbsTaken,
+        fatsTaken: fatsTaken,
       ),
       CarouselHealth(
         isTap: isTap,
@@ -99,11 +99,11 @@ class _HomeBodyState extends State<HomeBody> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: isActive
-                            ? Theme.of(context).colorScheme.onPrimary
+                            ? Theme.of(context).colorScheme.primary
                             : Colors.transparent,
                         border: Border.all(
                           color: isActive
-                              ? Theme.of(context).colorScheme.onPrimary
+                              ? Theme.of(context).colorScheme.primary
                               : Theme.of(context).colorScheme.outline,
                           width: 1.5,
                         ),

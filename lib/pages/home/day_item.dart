@@ -158,7 +158,7 @@ class _DayItemState extends State<DayItem> {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 7.5),
       decoration: BoxDecoration(
         color: isActive
-            ? Theme.of(context).appBarTheme.backgroundColor
+            ? Theme.of(context).cardColor
             : Colors.transparent,
         borderRadius: BorderRadius.circular(15),
       ),
@@ -171,13 +171,13 @@ class _DayItemState extends State<DayItem> {
     final isPast = _isPastDay(dayDate);
     final borderColor = selected
         ? Theme.of(context).shadowColor
-        : Theme.of(context).colorScheme.outline;
+        : Theme.of(context).highlightColor;
 
     Widget dayNumberWidget = Text(
       num,
       style: TextStyle(
         fontWeight: FontWeight.bold,
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: isPast || selected ? Theme.of(context).colorScheme.primary : Theme.of(context).hintColor,
       ),
     );
 
@@ -210,12 +210,10 @@ class _DayItemState extends State<DayItem> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: borderColor,
+            color: selected ? borderColor : Theme.of(context).shadowColor.withOpacity(0.5),
             width: 1.5,
           ),
-          color: selected
-              ? Theme.of(context).appBarTheme.backgroundColor
-              : Colors.transparent,
+          color: Colors.transparent,
         ),
         child: dayNumberWidget,
       );
@@ -229,7 +227,7 @@ class _DayItemState extends State<DayItem> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 11,
-            color: Theme.of(context).colorScheme.onPrimary,
+            color: isPast || selected ? Theme.of(context).colorScheme.primary : Theme.of(context).hintColor,
           ),
         ),
         borderedContainer,

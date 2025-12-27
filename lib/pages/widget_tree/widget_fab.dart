@@ -14,7 +14,7 @@ class WidgetTreeFAB extends StatelessWidget {
           height: 65,
           width: 65,
           child: FloatingActionButton(
-            backgroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(50),
             ),

@@ -80,8 +80,8 @@ class NavBarWidget extends StatelessWidget {
           Icon(
             selected ? selectedIcon : icon,
             color: selected
-                ? Theme.of(context).colorScheme.onPrimary
-                : Theme.of(context).colorScheme.onSecondary,
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onPrimary,
             size: 24,
           ),
           const SizedBox(height: 3),
@@ -89,8 +89,8 @@ class NavBarWidget extends StatelessWidget {
             label,
             style: TextStyle(
               color: selected
-                  ? Theme.of(context).colorScheme.onPrimary
-                  : Theme.of(context).colorScheme.onSecondary,
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onPrimary,
               fontSize: 12,
             ),
           ),
