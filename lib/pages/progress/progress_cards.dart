@@ -74,7 +74,7 @@ class WeightCard extends StatelessWidget {
                         'Goal',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       const SizedBox(width: 4),

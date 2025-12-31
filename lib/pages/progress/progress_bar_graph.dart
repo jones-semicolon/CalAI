@@ -1,3 +1,4 @@
+import 'package:calai/pages/progress/widgets/time_range_selector.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +20,7 @@ class ProgressBarGraph extends StatefulWidget {
 
 class _ProgressBarGraphState extends State<ProgressBarGraph> {
   WeekRange selectedRange = WeekRange.thisWeek;
+
   double _dayProtein(int index) {
     final log = filteredLogs.firstWhere(
           (e) => ((e['date'] as DateTime).weekday % 7) == index,
@@ -188,7 +190,10 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Theme
+                              .of(context)
+                              .colorScheme
+                              .primary,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -201,7 +206,10 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme
+                                  .of(context)
+                                  .colorScheme
+                                  .primary,
                             ),
                           ),
                           Text(
@@ -209,7 +217,9 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.normal,
-                              color: Theme.of(context).primaryColor,
+                              color: Theme
+                                  .of(context)
+                                  .primaryColor,
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -305,10 +315,13 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                     gridData: FlGridData(
                       drawVerticalLine: false,
                       horizontalInterval: interval,
-                      getDrawingHorizontalLine: (_) => FlLine(
-                        dashArray: [4, 4],
-                        color: Theme.of(context).primaryColor,
-                      ),
+                      getDrawingHorizontalLine: (_) =>
+                          FlLine(
+                            dashArray: [4, 4],
+                            color: Theme
+                                .of(context)
+                                .primaryColor,
+                          ),
                     ),
                     titlesData: FlTitlesData(
                       topTitles: const AxisTitles(
@@ -368,8 +381,12 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                     barTouchData: BarTouchData(
                       enabled: true,
                       touchTooltipData: BarTouchTooltipData(
-                        getTooltipColor: (_) => Theme.of(context).canvasColor,
-                        tooltipBorderRadius: BorderRadius.all(Radius.circular(10)),
+                        getTooltipColor: (_) =>
+                        Theme
+                            .of(context)
+                            .canvasColor,
+                        tooltipBorderRadius: BorderRadius.all(
+                            Radius.circular(10)),
                         tooltipPadding: const EdgeInsets.all(10),
                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
                           const days = [
@@ -393,7 +410,10 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                                 'Carbs: ${carbs.toStringAsFixed(0)}g\n'
                                 'Fats: ${fats.toStringAsFixed(0)}g\n',
                             TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Theme
+                                  .of(context)
+                                  .colorScheme
+                                  .primary,
                               fontWeight: FontWeight.w500,
                               height: 1.4,
                             ),
@@ -401,7 +421,7 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                             children: [
                               TextSpan(
                                 text: days[group.x],
-                                style:  TextStyle(
+                                style: TextStyle(
                                   color: Color.fromARGB(255, 136, 136, 136),
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -487,84 +507,32 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
   // ================= TIME SELECTOR CARD =================
 
   Widget _weekSelectorCard(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+    final options = const [
+      RangeOption(
+        value: WeekRange.thisWeek,
+        label: 'This Week',
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final ranges = WeekRange.values;
-          final itemWidth = constraints.maxWidth / ranges.length;
-          final selectedIndex = ranges.indexOf(selectedRange);
+      RangeOption(
+        value: WeekRange.lastWeek,
+        label: 'Last Week',
+      ),
+      RangeOption(
+        value: WeekRange.twoWeeksAgo,
+        label: '2 wks ago',
+      ),
+      RangeOption(
+        value: WeekRange.threeWeeksAgo,
+        label: '3 wks ago',
+      ),
+    ];
 
-          return SizedBox(
-            height: 40,
-            child: Stack(
-              children: [
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 260),
-                  curve: Curves.easeOut,
-                  left: selectedIndex * itemWidth,
-                  width: itemWidth,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).splashColor,
-                          blurRadius: 3,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Row(
-                  children: ranges.map((r) {
-                    final selected = r == selectedRange;
-                    return Expanded(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => setState(() => selectedRange = r),
-                        child: Center(
-                          child: Text(
-                            _rangeText(r),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: selected
-                                  ? FontWeight.bold
-                                  : FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+    return SegmentedSelector<WeekRange>(
+      options: options,
+      selected: selectedRange,
+      onChanged: (value) {
+        setState(() => selectedRange = value);
+      },
     );
-  }
-
-  String _rangeText(WeekRange r) {
-    switch (r) {
-      case WeekRange.thisWeek:
-        return 'This Week';
-      case WeekRange.lastWeek:
-        return 'Last Week';
-      case WeekRange.twoWeeksAgo:
-        return '2 wks ago';
-      case WeekRange.threeWeeksAgo:
-        return '3 wks ago';
-    }
   }
 }
 

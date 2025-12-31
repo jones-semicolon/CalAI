@@ -34,7 +34,7 @@ class NameAgeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Theme.of(context).highlightColor;
+    final textColor = Theme.of(context).colorScheme.onPrimary;
     final primaryColor = Theme.of(context).colorScheme.primary;
     final bgColor = Theme.of(context).colorScheme.surface;
 
@@ -58,7 +58,7 @@ class NameAgeCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSecondary,
+              color: Color.fromARGB(26, 185, 168, 209),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.person_outlined, size: 30),
@@ -77,14 +77,15 @@ class NameAgeCard extends StatelessWidget {
                     valueListenable: changeName,
                     builder: (context, name, _) {
                       return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
                             name.isEmpty ? "Enter your name" : name,
                             style: TextStyle(color: textColor),
                           ),
+                          SizedBox(width: 5),
                           if (name.isEmpty)
-                            Icon(Icons.edit, size: 18, color: Colors.grey.shade700),
+                            Icon(Icons.edit, size: 18, color: Colors.grey),
                         ],
                       );
                     },

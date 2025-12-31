@@ -48,7 +48,8 @@ class AppTheme {
       // secondary: const Color.fromARGB(255, 248, 247, 252),
       // onPrimary: Colors.white,
       // onSecondary: const Color.fromARGB(255, 28, 25, 34),
-      // onSurface: const Color.fromARGB(255, 43, 39, 53),
+      secondaryContainer: const Color.fromARGB(128, 249, 248, 253),
+      onSecondaryContainer: const Color.fromARGB(255, 249, 248, 253),
     ),
 
     // Dialog styling
@@ -131,15 +132,17 @@ class AppTheme {
 
     // Material 3 Color Scheme
     colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.blue,
+      seedColor: Colors.black,
       brightness: Brightness.dark,
       outline: const Color.fromARGB(255, 210, 210, 212),
-      surface: const Color.fromARGB(255, 255, 255, 255),
+      surface: const Color.fromARGB(255, 28, 25, 34),
       primary: Colors.white,
-      secondary: const Color.fromARGB(255, 249, 248, 253),
-      onPrimary: const Color.fromARGB(255, 29, 26, 35),
+      secondary: Colors.grey,
+      onPrimary: Colors.grey,
       onSecondary: const Color.fromARGB(255, 127, 127, 127),
-      onSurface: const Color.fromARGB(255, 243, 244, 246),
+      secondaryContainer: const Color.fromARGB(255, 55, 55, 62),
+      onSecondaryContainer: const Color.fromARGB(127, 55, 55, 62),
+      onTertiary: Color.fromARGB(255, 52, 48, 58),
     ),
 
     // Global Text Theme using Inter font

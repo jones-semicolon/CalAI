@@ -1,6 +1,11 @@
+import 'package:calai/pages/progress/progress_page.dart';
+import 'package:calai/pages/progress/widgets/goal_progress_header.dart';
+import 'package:calai/pages/progress/widgets/graph_card_decoration.dart';
+import 'package:calai/pages/progress/widgets/progress_message_pill.dart';
+import 'package:calai/pages/progress/widgets/time_range_selector.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'progress_page.dart';
 
 class ProgressGraph extends StatelessWidget {
   final TimeRange selectedRange;
@@ -20,188 +25,61 @@ class ProgressGraph extends StatelessWidget {
     required this.progressPercent,
   });
 
+  String _monthName(int month) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return months[month - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<double> weights = logs
+    final weights = logs
         .map<double>((e) => (e['weight'] as num).toDouble())
         .toList();
 
     final minWeight = weights.reduce((a, b) => a < b ? a : b);
     final maxWeight = weights.reduce((a, b) => a > b ? a : b);
-    final double range = maxWeight - minWeight;
-    final double yPadding = range * 0.1;
-
-    final double minY = (minWeight - yPadding).toDouble();
-    final double maxY = (maxWeight + yPadding).toDouble();
-
-    final double interval = (maxY - minY) / 4;
-
-    String _monthName(int month) {
-      const months = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December',
-      ];
-      return months[month - 1];
-    }
+    final range = maxWeight - minWeight;
+    final yPadding = range * 0.1;
+    final interval = (maxWeight - minWeight) / 4;
 
     return Column(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
-          ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final ranges = TimeRange.values;
-              final itemWidth = constraints.maxWidth / ranges.length;
-              final selectedIndex = ranges.indexOf(selectedRange);
-
-              return SizedBox(
-                height: 40,
-                child: Stack(
-                  children: [
-                    AnimatedPositioned(
-                      duration: const Duration(milliseconds: 260),
-                      curve: Curves.easeOut,
-                      left: selectedIndex * itemWidth,
-                      width: itemWidth,
-                      top: 0,
-                      bottom: 0,
-                      child: Container(
-                        margin: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).splashColor,
-                              blurRadius: 3,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    Row(
-                      children: ranges.map((r) {
-                        final selected = r == selectedRange;
-
-                        return Expanded(
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () => onRangeChanged(r),
-                            child: Center(
-                              child: Text(
-                                _rangeText(r),
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                fontWeight: selected
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+        SegmentedSelector<TimeRange>(
+          options: const [
+            RangeOption(value: TimeRange.days90, label: '90 Days'),
+            RangeOption(value: TimeRange.months6, label: '6 Months'),
+            RangeOption(value: TimeRange.year1, label: '1 Year'),
+            RangeOption(value: TimeRange.all, label: 'All time'),
+          ],
+          selected: selectedRange,
+          onChanged: onRangeChanged,
         ),
 
         const SizedBox(height: 22),
 
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: _decoration(context),
+          decoration: graphCardDecoration(context),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Text(
-                      'Goal Progress',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () {
-                        // Handle edit goal action
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.onTertiary,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.secondary.withOpacity(0.1),
-                            width: 2,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.flag_outlined,
-                              size: 18,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              '${progressPercent.round()}%',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 11,
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              'of goal',
-                              style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                                fontSize: 11,
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Icon(
-                              Icons.edit,
-                              size: 16,
-                              color: Theme.of(context).colorScheme.secondary.withOpacity(0.5),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              GoalProgressHeader(progressPercent: progressPercent),
+
               const SizedBox(height: 16),
+
               SizedBox(
                 height: 250,
                 child: LineChart(
@@ -234,7 +112,7 @@ class ProgressGraph extends StatelessWidget {
                           showTitles: true,
                           reservedSize: 34,
                           getTitlesWidget: (value, _) {
-                            if (value == minY || value == maxY) {
+                            if (value == minWeight || value == maxWeight) {
                               return const SizedBox.shrink();
                             }
 
@@ -277,8 +155,11 @@ class ProgressGraph extends StatelessWidget {
                       enabled: true,
                       handleBuiltInTouches: true,
                       touchTooltipData: LineTouchTooltipData(
-                        tooltipBorderRadius: BorderRadius.all(Radius.circular(10)),
-                        getTooltipColor: (touchResponse) => Theme.of(context).focusColor.withOpacity(0.9),
+                        tooltipBorderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                        getTooltipColor: (touchResponse) =>
+                            Theme.of(context).focusColor.withOpacity(0.9),
                         getTooltipItems: (touchedSpots) {
                           interval;
                           return touchedSpots.map((spot) {
@@ -321,7 +202,7 @@ class ProgressGraph extends StatelessWidget {
                       LineChartBarData(
                         spots: List.generate(
                           logs.length,
-                              (i) => FlSpot(i.toDouble(), logs[i]['weight']),
+                          (i) => FlSpot(i.toDouble(), logs[i]['weight']),
                         ),
                         isCurved: true,
                         barWidth: 3,
@@ -347,69 +228,14 @@ class ProgressGraph extends StatelessWidget {
               ),
 
               const SizedBox(height: 16),
+
               Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Color.fromARGB(26, 35, 138, 29),
-                  ),
-                  child: Text(
-                    progressPercent.round() <= 24
-                        ? "Getting started is the hardest part, You're ready for this!"
-                        : progressPercent.round() >= 25 &&
-                        progressPercent.round() <= 49
-                        ? "You're making progress—now's the time to keep pushing!"
-                        : progressPercent.round() >= 50 &&
-                        progressPercent.round() <= 74
-                        ? "You're dedication is paying off! Keep going."
-                        : progressPercent.round() >= 75 &&
-                        progressPercent.round() <= 99
-                        ? "It's the final stretch! Push yourself!"
-                        : "You did it! Congratulations!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 35, 138, 29),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 11,
-                    ),
-                  ),
-                ),
+                child: ProgressMessagePill(progressPercent: progressPercent),
               ),
-              const SizedBox(height: 5),
             ],
           ),
         ),
       ],
     );
   }
-
-  String _rangeText(TimeRange r) {
-    switch (r) {
-      case TimeRange.days90:
-        return '90 Days';
-      case TimeRange.months6:
-        return '6 Months';
-      case TimeRange.year1:
-        return '1 Year';
-      case TimeRange.all:
-        return 'All time';
-    }
-  }
 }
-
-BoxDecoration _decoration(BuildContext context) => BoxDecoration(
-  borderRadius: BorderRadius.circular(25),
-  color: Theme.of(context).scaffoldBackgroundColor,
-  border: Border.all(color: Theme.of(context).splashColor, width: 2),
-  boxShadow: [
-    BoxShadow(
-      color: Theme.of(context).splashColor,
-      blurRadius: 10,
-      offset: const Offset(0, 2),
-    ),
-  ],
-);
