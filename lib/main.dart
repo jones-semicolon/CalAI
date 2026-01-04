@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'pages/widget_tree.dart';
 import 'theme/theme_service.dart';
 import 'theme/app_theme.dart';
+import './onboarding/app_entry.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +55,7 @@ class _MyAppState extends State<MyApp> {
       themeMode: _themeMode,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      home: const WidgetTree(),
+      home: const AppEntry(),
     );
   }
 }

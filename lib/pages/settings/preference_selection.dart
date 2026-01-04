@@ -143,9 +143,9 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                           )
                           .toList(),
                       onChanged: (value) {
-                        if (value != null){
+                        if (value != null) {
                           _saveTheme(value); // CHANGED: save to storage
-                          }
+                        }
                       },
                     ),
                   ),
@@ -267,63 +267,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
               ),
             ),
           ),
-
-          _divider(),
-
-          // -------------------------- 4 — Badge Celebration --------------------------
-          GestureDetector(
-            onTap: () {
-              setState(() => rolloverCalories = !rolloverCalories);
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Badge Celebration",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Show celebrations when you unlock new badges",
-                          style: TextStyle(fontSize: 10, color: textColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Switch(
-                    value: badgeCelebration,
-                    onChanged: (v) {
-                      setState(() => badgeCelebration = v);
-                    },
-                    thumbColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Colors.white;
-                      }
-                      return Colors.white;
-                    }),
-                    trackColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Theme.of(context).dialogTheme.barrierColor;
-                      }
-                      return Theme.of(context).dialogTheme.backgroundColor;
-                    }),
-                    trackOutlineColor: WidgetStateProperty.all(
-                      Colors.transparent,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          SizedBox(height: 10,)
         ],
       ),
     );

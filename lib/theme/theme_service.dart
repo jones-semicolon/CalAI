@@ -12,6 +12,6 @@ class ThemeService {
   // Load theme as String
   Future<String> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_key) ?? "Light"; // default: Light
+    return prefs.getString(_key) ?? "Automatic";
   }
 }
