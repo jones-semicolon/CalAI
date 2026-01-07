@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:calai/core/constants/constants.dart';
 
 class SegmentedSelector<T> extends StatelessWidget {
   final List<RangeOption<T>> options;

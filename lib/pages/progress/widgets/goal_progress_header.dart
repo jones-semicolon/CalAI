@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:calai/core/constants/constants.dart';
 
 class GoalProgressHeader extends StatelessWidget {
   final double progressPercent;
@@ -34,7 +35,7 @@ class GoalProgressHeader extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.onTertiary,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppSizes.cardRadius),
                 border: Border.all(
                   color: Theme.of(context)
                       .colorScheme.secondary

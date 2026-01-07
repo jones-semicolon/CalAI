@@ -1,39 +1,54 @@
 import 'package:flutter/material.dart';
-import 'data/global_data.dart';
 import 'package:provider/provider.dart';
-import 'pages/widget_tree/widget_tree.dart';
-import 'theme/theme_service.dart';
-import 'theme/app_theme.dart';
+
+import 'package:calai/data/global_data.dart';
+import 'package:calai/pages/shell/widget_tree.dart';
+import 'package:calai/theme/app_theme.dart';
+import 'package:calai/theme/theme_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Load theme settings before app launch
   final themeService = ThemeService();
-  String savedTheme = await themeService.loadTheme();
+  final savedTheme = await themeService.loadTheme();
+  final initialThemeMode = _getThemeMode(savedTheme);
 
-  ThemeMode initialThemeMode;
-  if (savedTheme == "Light") {
-    initialThemeMode = ThemeMode.light;
-  } else if (savedTheme == "Dark") {
-    initialThemeMode = ThemeMode.dark;
-  } else {
-    initialThemeMode = ThemeMode.system;
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => GlobalData()..fetchGoals(),
+        ),
+      ],
+      child: MyApp(initialThemeMode: initialThemeMode),
+    ),
+  );
+}
+
+/// Maps saved string theme to Flutter [ThemeMode]
+ThemeMode _getThemeMode(String theme) {
+  switch (theme) {
+    case 'Light':
+      return ThemeMode.light;
+    case 'Dark':
+      return ThemeMode.dark;
+    case 'Automatic':
+      return ThemeMode.system;
+    default:
+      return ThemeMode.light;
   }
-
-  runApp(ChangeNotifierProvider(
-    create: (_) => GlobalData()..fetchGoals(), // fetch goals on startup
-    child: const MyApp(),
-  ),);
 }
 
 class MyApp extends StatefulWidget {
   final ThemeMode initialThemeMode;
 
-  const MyApp({super.key, this.initialThemeMode = ThemeMode.light});
+  const MyApp({super.key, required this.initialThemeMode});
 
   @override
   State<MyApp> createState() => _MyAppState();
 
+  /// Static helper to access theme switching logic from child widgets
   static _MyAppState? of(BuildContext context) =>
       context.findAncestorStateOfType<_MyAppState>();
 }
@@ -47,8 +62,11 @@ class _MyAppState extends State<MyApp> {
     _themeMode = widget.initialThemeMode;
   }
 
+  /// Sets the application's theme mode and triggers a rebuild
   void setThemeMode(ThemeMode mode) {
-    setState(() => _themeMode = mode);
+    if (_themeMode != mode) {
+      setState(() => _themeMode = mode);
+    }
   }
 
   @override

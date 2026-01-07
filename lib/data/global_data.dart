@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:calai/core/constants/constants.dart';
 import 'package:http/http.dart' as http;
 
 class GlobalData extends ChangeNotifier {

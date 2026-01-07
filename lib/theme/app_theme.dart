@@ -1,65 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// AppTheme defines the Light and Dark themes for the app using Material 3.
-/// Uses GoogleFonts.inter() for a consistent, modern sans-serif typography.
+/// A class that defines the light and dark themes for the application.
+///
+/// It uses Material 3 design and the Google Fonts`Inter` for a clean,
+/// modern, and consistent typography across the app.
 class AppTheme {
-  // --------------------------
-  // LIGHT THEME (Material 3)
-  // --------------------------
+  /// --------------------------
+  /// LIGHT THEME (Material 3)
+  /// --------------------------
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-
-    // Scaffold background
-    // scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
-    //
-    // // Card, container, and item backgrounds
+    dividerColor: const Color.fromARGB(255, 217, 218, 220),
     cardColor: const Color.fromARGB(255, 249, 248, 253),
     splashColor: const Color.fromARGB(255, 237, 237, 239),
-    //
-    // // Dividers and shadows
-    // dividerColor: const Color.fromARGB(255, 217, 218, 220),
     shadowColor: const Color.fromARGB(255, 129, 128, 136),
-    //
-    // // Hints and highlights
     hintColor: const Color.fromARGB(255, 127, 127, 127),
     highlightColor: const Color.fromARGB(255, 214, 214, 214),
-    // splashColor: const Color.fromARGB(255, 217, 218, 220),
-
-    // AppBar styling
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.white,
       foregroundColor: Colors.black,
       elevation: 0,
     ),
-
-    // Material 3 Color Scheme
     colorScheme: ColorScheme.fromSeed(
       seedColor: Colors.black,
       brightness: Brightness.light,
       primary: Colors.black,
-      onPrimary: Color.fromARGB(255, 127, 127, 127),
+      onPrimary: const Color.fromARGB(255, 127, 127, 127),
       secondary: Colors.grey,
-      onTertiary: Color.fromARGB(255, 239, 239, 247),
-      // outline: const Color.fromARGB(255, 75, 72, 79),
-      surface: const Color.fromARGB(255, 250, 249, 254),
-      // primary: Colors.black,
-      // secondary: const Color.fromARGB(255, 248, 247, 252),
-      // onPrimary: Colors.white,
-      // onSecondary: const Color.fromARGB(255, 28, 25, 34),
+      onTertiary: const Color.fromARGB(255, 239, 239, 247),
+      surface: const Color.fromARGB(255, 253, 253, 253),
+      onSurface: const Color.fromARGB(26, 185, 168, 209),
       secondaryContainer: const Color.fromARGB(128, 249, 248, 253),
       onSecondaryContainer: const Color.fromARGB(255, 249, 248, 253),
     ),
-
-    // Dialog styling
-    // dialogTheme: const DialogThemeData(
-    //   backgroundColor: Color.fromARGB(255, 217, 218, 220),
-    //   barrierColor: Color.fromARGB(255, 29, 26, 35),
-    //   surfaceTintColor: Color.fromARGB(255, 249, 248, 253),
-    // ),
-
-    // Global Text Theme using Inter font
     textTheme: TextTheme(
       displayLarge: GoogleFonts.inter(
         fontSize: 32,
@@ -94,43 +69,29 @@ class AppTheme {
     ),
   );
 
-  // --------------------------
-  // DARK THEME (Material 3)
-  // --------------------------
+  /// --------------------------
+  /// DARK THEME (Material 3)
+  /// --------------------------
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-
-    // Scaffold background
     scaffoldBackgroundColor: const Color.fromARGB(255, 29, 26, 35),
-
-    // Cards
     cardColor: const Color.fromARGB(255, 47, 41, 53),
-
-    // Dividers and shadows
     dividerColor: const Color.fromARGB(255, 42, 42, 42),
     shadowColor: const Color.fromARGB(255, 143, 141, 146),
-
-    // Hints and highlights
     hintColor: const Color.fromARGB(255, 210, 210, 212),
     highlightColor: const Color.fromARGB(255, 202, 196, 208),
     splashColor: const Color.fromARGB(255, 58, 58, 60),
-
-    // Dialog styling
     dialogTheme: const DialogThemeData(
       backgroundColor: Color.fromARGB(255, 42, 39, 48),
       barrierColor: Color.fromARGB(255, 132, 224, 125),
       surfaceTintColor: Color.fromARGB(255, 39, 36, 45),
     ),
-
-    // AppBar styling
     appBarTheme: const AppBarTheme(
       backgroundColor: Color.fromARGB(255, 29, 26, 35),
       foregroundColor: Colors.white,
       elevation: 0,
     ),
-
-    // Material 3 Color Scheme
     colorScheme: ColorScheme.fromSeed(
       seedColor: Colors.black,
       brightness: Brightness.dark,
@@ -142,13 +103,11 @@ class AppTheme {
       onSecondary: const Color.fromARGB(255, 127, 127, 127),
       secondaryContainer: const Color.fromARGB(255, 55, 55, 62),
       onSecondaryContainer: const Color.fromARGB(127, 55, 55, 62),
-      onTertiary: Color.fromARGB(255, 52, 48, 58),
+      onTertiary: const Color.fromARGB(255, 52, 48, 58),
     ),
-
-    // Global Text Theme using Inter font
     textTheme: TextTheme(
       displayLarge: GoogleFonts.inter(
-        fontSize: 40,
+        fontSize: 32,
         fontWeight: FontWeight.w700,
         color: Colors.white,
       ),
@@ -163,19 +122,19 @@ class AppTheme {
         color: Colors.white,
       ),
       bodyMedium: GoogleFonts.inter(
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: FontWeight.w500,
-        color: Colors.white70,
+        color: Colors.white,
       ),
       bodySmall: GoogleFonts.inter(
         fontSize: 12,
         fontWeight: FontWeight.w500,
-        color: Colors.white60,
+        color: Colors.white,
       ),
       labelSmall: GoogleFonts.inter(
         fontSize: 13,
         fontWeight: FontWeight.w400,
-        color: Colors.white54,
+        color: Colors.white,
       ),
     ),
   );

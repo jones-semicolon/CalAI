@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import '../data/notifiers.dart';
 
+/// The main navigation bar widget displayed at the bottom of the scaffold.
+///
+/// It uses a [ValueListenableBuilder] to reactively build its state
+/// based on the `selectedPage` notifier.
 class NavBarWidget extends StatelessWidget {
   const NavBarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
+    return ValueListenableBuilder<int>(
       valueListenable: selectedPage,
       builder: (context, page, child) {
         return IntrinsicHeight(
@@ -15,12 +19,10 @@ class NavBarWidget extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 15, top: 15),
             child: Row(
               mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment:
-                  CrossAxisAlignment.center, // ⭐ Fixes vertical stretch
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _navItem(
-                    context: context,
+                  child: _NavItem(
                     icon: Icons.home_outlined,
                     selectedIcon: Icons.home,
                     label: "Home",
@@ -28,10 +30,8 @@ class NavBarWidget extends StatelessWidget {
                     selectedIndex: page,
                   ),
                 ),
-
                 Expanded(
-                  child: _navItem(
-                    context: context,
+                  child: _NavItem(
                     icon: Icons.show_chart_outlined,
                     selectedIcon: Icons.show_chart,
                     label: "Progress",
@@ -39,10 +39,8 @@ class NavBarWidget extends StatelessWidget {
                     selectedIndex: page,
                   ),
                 ),
-
                 Expanded(
-                  child: _navItem(
-                    context: context,
+                  child: _NavItem(
                     icon: Icons.settings_outlined,
                     selectedIcon: Icons.settings,
                     label: "Settings",
@@ -50,8 +48,7 @@ class NavBarWidget extends StatelessWidget {
                     selectedIndex: page,
                   ),
                 ),
-
-                // FAB space unchanged
+                // This SizedBox creates the empty space for the FAB.
                 const SizedBox(width: 100),
               ],
             ),
@@ -60,16 +57,31 @@ class NavBarWidget extends StatelessWidget {
       },
     );
   }
+}
 
-  Widget _navItem({
-    required BuildContext context,
-    required IconData icon,
-    required IconData selectedIcon,
-    required String label,
-    required int index,
-    required int selectedIndex,
-  }) {
-    final bool selected = index == selectedIndex;
+/// An individual item within the [NavBarWidget].
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final int index;
+  final int selectedIndex;
+
+  const _NavItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+    required this.index,
+    required this.selectedIndex,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Determine if this item is selected based on the passed-in index.
+    final bool isSelected = selectedIndex == index;
+    final Color color = isSelected
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colorScheme.onPrimary;
 
     return InkWell(
       borderRadius: BorderRadius.circular(10),
@@ -78,19 +90,15 @@ class NavBarWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            selected ? selectedIcon : icon,
-            color: selected
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.onPrimary,
+            isSelected ? selectedIcon : icon,
+            color: color,
             size: 24,
           ),
           const SizedBox(height: 3),
           Text(
             label,
             style: TextStyle(
-              color: selected
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onPrimary,
+              color: color,
               fontSize: 12,
             ),
           ),
