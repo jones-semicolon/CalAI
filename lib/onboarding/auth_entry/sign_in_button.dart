@@ -6,6 +6,7 @@ class SignInButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const SignInButton({
+    super.key,
     required this.icon,
     required this.text,
     required this.onTap,
@@ -14,21 +15,39 @@ class SignInButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      borderRadius: BorderRadius.circular(25),
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
       child: Container(
         width: double.infinity,
-        height: 52,
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black),
-          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.onTertiaryFixed,
+          ),
+          borderRadius: BorderRadius.circular(25),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon),
+            Icon(
+              icon,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
             const SizedBox(width: 8),
-            Text(text),
+
+            /// TEXT WITH ELLIPSIS
+            Flexible(
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
+            ),
           ],
         ),
       ),

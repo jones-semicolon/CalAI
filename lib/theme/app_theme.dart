@@ -52,6 +52,7 @@ class AppTheme {
       onSurface: Color.fromARGB(255, 243, 244, 246),
       onSurfaceVariant: Color.fromARGB(255, 228, 228, 228),
       inversePrimary: Color.fromARGB(255, 188, 188, 190),
+      onTertiaryFixed: Color.fromARGB(255, 122, 117, 124),
       scrim: Color.fromARGB(255, 239, 246, 238),
     ),
 
@@ -162,6 +163,7 @@ class AppTheme {
       inversePrimary: Color.fromARGB(255, 97, 94, 101),
       onSurface: Color.fromARGB(255, 43, 39, 53), //used in calorie border
       scrim: Color.fromARGB(255, 32, 35, 36),
+      onTertiaryFixed: Color.fromARGB(255, 146, 143, 152),
     ),
 
     // Google Fonts text theme (adjust colors for dark mode)

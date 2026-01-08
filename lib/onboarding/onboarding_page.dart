@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../pages/widget_tree.dart';
 import 'auth_entry/auth_entry_page.dart';
-import 'onboarding_appbar.dart';
-import 'steps_widgets/onboarding_step_1.dart';
-import 'steps_widgets/onboarding_step_2.dart';
-import 'steps_widgets/onboarding_step_3.dart';
-import 'steps_widgets/onboarding_step_4.dart';
-import 'steps_widgets/onboarding_step_5.dart';
+import 'onboarding_widgets/onboarding_appbar.dart';
+import 'steps_pages/step_1.dart';
+import 'steps_pages/step_2.dart';
+import 'steps_pages/step_3.dart';
+import 'steps_pages/step_4.dart';
+import 'steps_pages/step_5.dart';
+import 'steps_pages/step_6.dart';
+import 'steps_pages/step_7.dart';
+import 'steps_pages/step_8.dart';
+import 'steps_pages/step_9.dart';
+import 'steps_pages/step_10.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -22,31 +27,35 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   List<Widget> get _pages => [
     AuthEntryPage(onGetStarted: _nextPage),
-    const OnboardingStep1(),
-    const OnboardingStep2(),
-    const OnboardingStep3(),
-    const OnboardingStep4(),
-    const OnboardingStep5(),
+    OnboardingStep1(nextPage: _nextPage),
+    OnboardingStep2(nextPage: _nextPage),
+    OnboardingStep3(nextPage: _nextPage),
+    OnboardingStep4(nextPage: _nextPage),
+    OnboardingStep5(nextPage: _nextPage),
+    OnboardingStep6(nextPage: _nextPage),
+    OnboardingStep7(nextPage: _nextPage),
+    OnboardingStep8(nextPage: _nextPage),
+    OnboardingStep9(nextPage: _nextPage),
+    OnboardingStep10(nextPage: _nextPage),
   ];
 
-  void _nextPage() {
+  void _nextPage() async {
     if (_currentIndex < _pages.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
+    } else {
+      // Last page: finish onboarding
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('onboarding_completed', true);
+
+      if (!mounted) return;
+
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const WidgetTree()));
     }
-  }
-
-  Future<void> _finishOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_completed', true);
-
-    if (!mounted) return;
-
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => const WidgetTree()));
   }
 
   @override
@@ -60,6 +69,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final bool isAuthPage = _currentIndex == 0;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -81,8 +91,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
             /// PAGES
             Expanded(
               child: PageView(
+                physics: const NeverScrollableScrollPhysics(),
                 controller: _pageController,
-                physics: const BouncingScrollPhysics(),
                 onPageChanged: (index) {
                   setState(() => _currentIndex = index);
                 },
@@ -92,25 +102,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
           ],
         ),
       ),
-
-      /// BOTTOM BUTTON (ONLY AFTER AUTH PAGE)
-      bottomNavigationBar: isAuthPage
-          ? null
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _currentIndex == _pages.length - 1
-                      ? _finishOnboarding
-                      : _nextPage,
-                  child: Text(
-                    _currentIndex == _pages.length - 1 ? 'Finish' : 'Next',
-                  ),
-                ),
-              ),
-            ),
     );
   }
 }

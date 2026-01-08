@@ -1,4 +1,4 @@
-import 'package:calai/onboarding/auth_entry/sign_in_page.dart';
+import 'package:calai/onboarding/auth_entry/sign_in_sheet.dart';
 import 'package:flutter/material.dart';
 import 'language_card.dart';
 
@@ -21,27 +21,45 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
         children: [
           /// MAIN CONTENT
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.only(
+              right: 24,
+              left: 24,
+              top: 5,
+              bottom: 25,
+            ),
             child: Column(
               children: [
                 /// TOP RIGHT LANGUAGE BUTTON
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: () {
-                        setState(() => _showLanguagePicker = true);
-                      },
-                      child: Row(
-                        children: const [
-                          Text('🇺🇸', style: TextStyle(fontSize: 18)),
-                          SizedBox(width: 6),
-                          Text(
-                            'EN',
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                    Material(
+                      color: Theme.of(context).colorScheme.secondary,
+                      borderRadius: BorderRadius.circular(10),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: () {
+                          setState(() => _showLanguagePicker = true);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 5,
+                            horizontal: 10,
                           ),
-                        ],
+                          child: Row(
+                            children: const [
+                              Text('🇺🇸', style: TextStyle(fontSize: 11)),
+                              SizedBox(width: 4),
+                              Text(
+                                'EN',  // TODO: store in storage connected to settings language
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -50,41 +68,81 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
                 const Spacer(),
 
                 Text(
-                  'Welcome to Cal AI',
-                  style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center,
+                  'Calorie tracking made easy',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 ),
 
-                const SizedBox(height: 12),
-
-                Text(
-                  'Track smarter. Eat better.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-
-                const Spacer(),
+                const SizedBox(height: 20),
 
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
                     onPressed: widget.onGetStarted,
-                    child: const Text('Get Started'),
+                    child: Text(
+                      'Get Started',
+                      style: TextStyle(
+                        letterSpacing: 1,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                      ),
+                    ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
 
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SignInPage(),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      'Already have an account? ',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
-                    );
-                  },
-                  child: const Text('Already have an account? Sign in'),
+                    ),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            opaque: false,
+                            pageBuilder: (_, __, ___) => const SignInPage(),
+                          ),
+                        );
+                      },
+                      child: Text.rich(
+                        TextSpan(
+                          text: 'Sign in',
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            decorationThickness: 1.5,
+                            decorationColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
