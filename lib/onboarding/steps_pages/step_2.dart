@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
+import '../../data/user_data.dart';
 
-class OnboardingStep2 extends StatefulWidget {
+class OnboardingStep2 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
   const OnboardingStep2({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep2> createState() => _OnboardingStep2State();
+  ConsumerState<OnboardingStep2> createState() => _OnboardingStep2State();
 }
 
-class _OnboardingStep2State extends State<OnboardingStep2> {
+class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
   bool isEnable = false;
   int? selectedIndex;
 
@@ -29,9 +31,25 @@ class _OnboardingStep2State extends State<OnboardingStep2> {
     ),
     OptionCard(title: '6+', subtitle: 'Dedicated athlete', icon: Icons.apps),
   ];
+  @override
+  void initState() {
+    super.initState();
+
+    // Get saved gender from UserData
+    final physicalActivity = ref.read(userProvider).workOutPerWeek;
+
+    // Find index of option matching saved gender
+    final matchIndex = options.indexWhere((o) => o.title == physicalActivity);
+
+    if (matchIndex != -1) {
+      selectedIndex = matchIndex;
+      isEnable = true; // enable continue because something is already selected
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final userData = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
@@ -91,12 +109,15 @@ class _OnboardingStep2State extends State<OnboardingStep2> {
             child: ContinueButton(
               enabled: isEnable,
               onNext: () {
-                final selectedOption = options[selectedIndex!];
                 if (selectedIndex != null) {
-                  debugPrint('Workout per week: ${selectedOption.title}');
-                  if (selectedOption.subtitle != null) {
-                    debugPrint('Workout per week: ${selectedOption.subtitle}');
-                  }
+                  final selectedOption = options[selectedIndex!];
+
+                  // Update UserData.gender in Riverpod
+                  userData.setWorkOutPerWeek(selectedOption.title);
+
+                  debugPrint(
+                    'WorkoutPerWeek: ${selectedOption.title}',
+                  );
                 }
                 // TODO : this will post to api
                 widget.nextPage();

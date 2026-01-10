@@ -5,6 +5,7 @@ class NoYesButton extends StatelessWidget {
   final VoidCallback onYes;
   final String noText;
   final String yesText;
+  
 
   const NoYesButton({
     super.key,

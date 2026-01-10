@@ -4,6 +4,11 @@ import '../pages/widget_tree.dart';
 import 'auth_entry/auth_entry_page.dart';
 import 'onboarding_widgets/onboarding_appbar.dart';
 import 'steps_pages/step_1.dart';
+import 'steps_pages/step_12.dart';
+import 'steps_pages/step_13.dart';
+import 'steps_pages/step_14.dart';
+import 'steps_pages/step_15.dart';
+import 'steps_pages/step_16.dart';
 import 'steps_pages/step_2.dart';
 import 'steps_pages/step_3.dart';
 import 'steps_pages/step_4.dart';
@@ -13,6 +18,7 @@ import 'steps_pages/step_7.dart';
 import 'steps_pages/step_8.dart';
 import 'steps_pages/step_9.dart';
 import 'steps_pages/step_10.dart';
+import 'steps_pages/step_11.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -22,7 +28,10 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
+  
   final PageController _pageController = PageController();
+
+
   int _currentIndex = 0;
 
   List<Widget> get _pages => [
@@ -37,6 +46,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
     OnboardingStep8(nextPage: _nextPage),
     OnboardingStep9(nextPage: _nextPage),
     OnboardingStep10(nextPage: _nextPage),
+    OnboardingStep11(nextPage: _nextPage),
+    OnboardingStep12(nextPage: _nextPage),
+    OnboardingStep13(nextPage: _nextPage),
+    OnboardingStep14(nextPage: _nextPage),
+    OnboardingStep15(nextPage: _nextPage),
+    OnboardingStep16(nextPage: _nextPage),
   ];
 
   void _nextPage() async {

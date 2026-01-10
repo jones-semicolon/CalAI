@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'theme/theme_service.dart';
 import 'theme/app_theme.dart';
 import './onboarding/app_entry.dart';
@@ -7,7 +9,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final themeService = ThemeService();
-  String savedTheme = await themeService.loadTheme();
+  final savedTheme = await themeService.loadTheme();
 
   ThemeMode initialThemeMode;
   if (savedTheme == "Light") {
@@ -18,7 +20,7 @@ void main() async {
     initialThemeMode = ThemeMode.system;
   }
 
-  runApp(MyApp(initialThemeMode: initialThemeMode));
+  runApp(ProviderScope(child: MyApp(initialThemeMode: initialThemeMode)));
 }
 
 class MyApp extends StatefulWidget {

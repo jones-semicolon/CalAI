@@ -26,28 +26,17 @@ class _OnboardingStep5State extends State<OnboardingStep5> {
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                return CustomScrollView(
-                  slivers: [
-                    SliverFillRemaining(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              height: constraints.maxHeight * 0.5,
-                              child: AnimatedWeightChart(),
-                            ),
-                            const SizedBox(height: 24),
-                            const Text(
-                              "Track your progress!",
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: constraints.maxHeight * 0.6,
+                        child: AnimatedWeightChart(),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               },
             ),

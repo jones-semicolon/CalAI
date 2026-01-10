@@ -3,17 +3,19 @@ import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/user_data.dart';
 
-class OnboardingStep1 extends StatefulWidget {
+class OnboardingStep1 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
 
   const OnboardingStep1({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep1> createState() => _OnboardingStep1State();
+  ConsumerState<OnboardingStep1> createState() => _OnboardingStep1State();
 }
 
-class _OnboardingStep1State extends State<OnboardingStep1> {
+class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
   bool isEnable = false;
   int? selectedIndex;
 
@@ -24,7 +26,25 @@ class _OnboardingStep1State extends State<OnboardingStep1> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+
+    // Get saved gender from UserData
+    final savedGender = ref.read(userProvider).gender;
+
+    // Find index of option matching saved gender
+    final matchIndex = options.indexWhere((o) => o.title == savedGender);
+
+    if (matchIndex != -1) {
+      selectedIndex = matchIndex;
+      isEnable = true; // enable continue because something is already selected
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final userNotifier = ref.read(userProvider.notifier);
+
     return SafeArea(
       child: Column(
         children: [
@@ -79,14 +99,17 @@ class _OnboardingStep1State extends State<OnboardingStep1> {
             child: ContinueButton(
               enabled: isEnable,
               onNext: () {
-                final selectedOption = options[selectedIndex!];
                 if (selectedIndex != null) {
-                  debugPrint('Gender: ${selectedOption.title}');
-                  if (selectedOption.subtitle != null) {
-                    debugPrint('Gender: ${selectedOption.subtitle}');
-                  }
+                  final selectedOption = options[selectedIndex!];
+
+                  // Update UserData.gender in Riverpod
+                  userNotifier.setGender(selectedOption.title);
+
+                  debugPrint(
+                    'Gender: ${selectedOption.title}',
+                  );
                 }
-                // TODO : this will post to api
+
                 widget.nextPage();
               },
             ),

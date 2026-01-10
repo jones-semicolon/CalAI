@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
-import '../onboarding_widgets/dynamic_card.dart';
-import '../onboarding_widgets/animated_option_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/user_data.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
+import '../onboarding_widgets/birthday_picker_widget.dart';
 
-class OnboardingStep7 extends StatefulWidget {
+class OnboardingStep7 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
+
   const OnboardingStep7({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep7> createState() => _OnboardingStep7State();
+  ConsumerState<OnboardingStep7> createState() => _OnboardingStep7State();
 }
 
-class _OnboardingStep7State extends State<OnboardingStep7> {
-  bool isEnable = false;
-  int? selectedIndex;
+class _OnboardingStep7State extends ConsumerState<OnboardingStep7> {
+  // We keep a temporary local state while the user is scrolling
+  // so we don't spam the provider with every tiny scroll movement.
+  late DateTime selectedBirthday;
 
-  final List<OptionCard> options = [
-    OptionCard(title: 'Yes', icon: Icons.thumb_up),
-    OptionCard(title: 'No', icon: Icons.thumb_down),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Load the existing birthday from the provider
+    selectedBirthday = ref.read(userProvider).birthDay;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,59 +37,33 @@ class _OnboardingStep7State extends State<OnboardingStep7> {
                 'This will be taken into account when calculating your daily nutrition goals.',
           ),
 
-          /// SCROLLABLE CONTENT
-          Expanded(
-            child: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 25,
-                      vertical: 10,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(options.length, (index) {
-                        final item = options[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 15),
-                          child: AnimatedOptionCard(
-                            index: index,
-                            child: OptionCard(
-                              icon: item.icon,
-                              title: item.title,
-                              subtitle: item.subtitle,
-                              isSelected: selectedIndex == index,
-                              onTap: () {
-                                WidgetsBinding.instance.addPostFrameCallback((
-                                  _,
-                                ) {
-                                  if (!mounted) return;
-                                  setState(() {
-                                    isEnable = true;
-                                    selectedIndex = index;
-                                  });
-                                });
-                              },
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          Spacer(),
+
+          /// 🎂 Birthday Picker
+          BirthdayPickerWidget(
+            initialDate: selectedBirthday,
+            onChanged: (date) {
+              setState(() {
+                selectedBirthday = date;
+              });
+            },
           ),
+
+          const Spacer(),
 
           SizedBox(
             width: double.infinity,
             child: ContinueButton(
-              enabled: true,
+              enabled: true, // Birthday is never null based on your provider default
               onNext: () {
+                // Finalize the selection in Riverpod
+                ref.read(userProvider.notifier).setBirthDay(selectedBirthday);
+                
+                debugPrint(
+                  'Birthday: ${selectedBirthday.toIso8601String()}',
+                );
+
                 widget.nextPage();
-                // TODO: height and weight
               },
             ),
           ),

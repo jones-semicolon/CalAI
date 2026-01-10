@@ -32,7 +32,7 @@ class _AnimatedOptionCardState extends State<AnimatedOptionCard>
     );
 
     // starting scale decreases with index for cascading
-    double startScale = 1.0 - (widget.index * 0.1);
+    double startScale = 0 - (widget.index * 0.1);
     if (startScale < 0.5) startScale = 0.5;
 
     _scaleAnimation = Tween<double>(

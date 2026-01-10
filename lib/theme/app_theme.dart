@@ -54,6 +54,8 @@ class AppTheme {
       inversePrimary: Color.fromARGB(255, 188, 188, 190),
       onTertiaryFixed: Color.fromARGB(255, 122, 117, 124),
       scrim: Color.fromARGB(255, 239, 246, 238),
+      secondaryFixed: Color.fromARGB(255, 232, 232, 232),
+      surfaceContainerHighest: Color.fromARGB(255, 217, 218, 220),
     ),
 
     dialogTheme: DialogThemeData(
@@ -164,6 +166,8 @@ class AppTheme {
       onSurface: Color.fromARGB(255, 43, 39, 53), //used in calorie border
       scrim: Color.fromARGB(255, 32, 35, 36),
       onTertiaryFixed: Color.fromARGB(255, 146, 143, 152),
+      secondaryFixed: Color.fromARGB(255, 52, 49, 58),
+      surfaceContainerHighest: Color.fromARGB(255, 0, 0, 0),
     ),
 
     // Google Fonts text theme (adjust colors for dark mode)

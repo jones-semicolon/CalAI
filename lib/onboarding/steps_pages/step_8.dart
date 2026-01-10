@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
+import '../../data/user_data.dart';
 
-class OnboardingStep8 extends StatefulWidget {
+class OnboardingStep8 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
   const OnboardingStep8({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep8> createState() => _OnboardingStep8State();
+  ConsumerState<OnboardingStep8> createState() => _OnboardingStep8State();
 }
 
-class _OnboardingStep8State extends State<OnboardingStep8> {
+class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
   bool isEnable = false;
   int? selectedIndex;
 
@@ -21,9 +23,22 @@ class _OnboardingStep8State extends State<OnboardingStep8> {
     OptionCard(title: 'Maintain'),
     OptionCard(title: 'Gain Weight'),
   ];
+  @override
+  void initState() {
+    super.initState();
+
+    final goal = ref.read(userProvider).goal;
+
+    final matchOption = options.indexWhere((i) => i.title == goal);
+    if (matchOption != -1) {
+      selectedIndex = matchOption;
+      isEnable = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final userGoal = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
@@ -83,12 +98,10 @@ class _OnboardingStep8State extends State<OnboardingStep8> {
             child: ContinueButton(
               enabled: isEnable,
               onNext: () {
-                final selectedOption = options[selectedIndex!];
                 if (selectedIndex != null) {
-                  debugPrint('Goal: ${selectedOption.title}');
-                  if (selectedOption.subtitle != null) {
-                    debugPrint('Goal: ${selectedOption.subtitle}');
-                  }
+                  final updateGoal = options[selectedIndex!].title;
+                  userGoal.setGoal(updateGoal);
+                  debugPrint('Goal: $updateGoal');
                 }
                 // TODO : this will post to api
                 widget.nextPage();

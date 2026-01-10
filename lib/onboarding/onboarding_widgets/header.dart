@@ -3,8 +3,19 @@ import 'package:flutter/material.dart';
 class Header extends StatelessWidget {
   final String title;
   final String? subtitle;
-
-  const Header({super.key, required this.title, this.subtitle});
+  final TextAlign textAlign;
+  final CrossAxisAlignment crossAxisAlignment;
+  const Header({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.textAlign = TextAlign.start,
+    CrossAxisAlignment? crossAxisAlignment,
+  }) : crossAxisAlignment =
+           crossAxisAlignment ??
+           (textAlign == TextAlign.center
+               ? CrossAxisAlignment.center
+               : CrossAxisAlignment.start);
 
   @override
   Widget build(BuildContext context) {
@@ -12,14 +23,15 @@ class Header extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 16),
+      padding: const EdgeInsets.fromLTRB(25, 0, 25, 10),
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: crossAxisAlignment,
         children: [
           /// TITLE
           Text(
             title,
+            textAlign: textAlign,
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -31,6 +43,7 @@ class Header extends StatelessWidget {
           if (subtitle != null) ...[
             const SizedBox(height: 6),
             Text(
+              textAlign: textAlign,
               subtitle!,
               style: TextStyle(fontSize: 14, color: colorScheme.onSecondary),
             ),

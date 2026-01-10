@@ -1,19 +1,21 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
+import '../../data/user_data.dart';
 
-class OnboardingStep3 extends StatefulWidget {
+class OnboardingStep3 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
   const OnboardingStep3({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep3> createState() => _OnboardingStep3State();
+  ConsumerState<OnboardingStep3> createState() => _OnboardingStep3State();
 }
 
-class _OnboardingStep3State extends State<OnboardingStep3> {
+class _OnboardingStep3State extends ConsumerState<OnboardingStep3> {
   bool isEnable = false;
   int? selectedIndex;
 
@@ -29,9 +31,22 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
     OptionCard(title: 'X', icon: FontAwesomeIcons.xTwitter),
     OptionCard(title: 'Other', icon: Icons.dynamic_feed_outlined),
   ];
+  @override
+  void initState() {
+    super.initState();
+
+    final social = ref.read(userProvider).social;
+
+    final matchSocial = options.indexWhere((i) => i.title == social);
+    if (matchSocial != -1) {
+      isEnable = true;
+      selectedIndex = matchSocial;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final userData = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
@@ -88,14 +103,12 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
             child: ContinueButton(
               enabled: isEnable,
               onNext: () {
-                final selectedOption = options[selectedIndex!];
                 if (selectedIndex != null) {
-                  debugPrint('Socials: ${selectedOption.title}');
-                  if (selectedOption.subtitle != null) {
-                    debugPrint('Socials: ${selectedOption.subtitle}');
-                  }
+                  final selectedOption = options[selectedIndex!].title;
+
+                  userData.setSocial(selectedOption);
+                  debugPrint('Heard us from: $selectedOption');
                 }
-                // TODO : this will post to api
                 widget.nextPage();
               },
             ),

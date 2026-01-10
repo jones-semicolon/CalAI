@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
+import '../../data/user_data.dart';
 
-class OnboardingStep4 extends StatefulWidget {
+class OnboardingStep4 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
   const OnboardingStep4({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep4> createState() => _OnboardingStep4State();
+  ConsumerState<OnboardingStep4> createState() => _OnboardingStep4State();
 }
 
-class _OnboardingStep4State extends State<OnboardingStep4> {
+class _OnboardingStep4State extends ConsumerState<OnboardingStep4> {
   bool isEnable = false;
   int? selectedIndex;
 
@@ -20,9 +22,27 @@ class _OnboardingStep4State extends State<OnboardingStep4> {
     OptionCard(title: 'Yes', icon: Icons.thumb_up),
     OptionCard(title: 'No', icon: Icons.thumb_down),
   ];
+  @override
+  void initState() {
+    super.initState();
+
+    final hasTriedOtherCalorieApps = ref
+        .read(userProvider)
+        .hasTriedOtherCalorieApps;
+
+    final matchOption = options.indexWhere(
+      (i) => i.title == hasTriedOtherCalorieApps,
+    );
+
+    if (matchOption != -1) {
+      isEnable = true;
+      selectedIndex = matchOption;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final userData = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
@@ -79,14 +99,12 @@ class _OnboardingStep4State extends State<OnboardingStep4> {
             child: ContinueButton(
               enabled: isEnable,
               onNext: () {
-                final selectedOption = options[selectedIndex!];
                 if (selectedIndex != null) {
-                  debugPrint('Tried any app?: ${selectedOption.title}');
-                  if (selectedOption.subtitle != null) {
-                    debugPrint('Tried any app?: ${selectedOption.subtitle}');
-                  }
+                  final data = options[selectedIndex!].title;
+
+                  userData.setHasTriedOtherCalorieApps(data);
+                  debugPrint('Has tried any app: $data');
                 }
-                // TODO : this will post to api
                 widget.nextPage();
               },
             ),

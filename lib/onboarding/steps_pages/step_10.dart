@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../data/user_data.dart';
 
-class OnboardingStep10 extends StatefulWidget {
+class OnboardingStep10 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
   const OnboardingStep10({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep10> createState() => _OnboardingStep10State();
+  ConsumerState<OnboardingStep10> createState() => _OnboardingStep10State();
 }
 
-class _OnboardingStep10State extends State<OnboardingStep10> {
+class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
   bool isEnable = false;
   int? selectedIndex;
 
@@ -22,9 +24,7 @@ class _OnboardingStep10State extends State<OnboardingStep10> {
       title: 'Eat and live healthier',
       icon: FontAwesomeIcons.appleWhole,
     ),
-    OptionCard(
-      title: 'Boost my energy and mood', 
-      icon: FontAwesomeIcons.sun),
+    OptionCard(title: 'Boost my energy and mood', icon: FontAwesomeIcons.sun),
     OptionCard(
       title: 'Stay motivated and consistent',
       icon: FontAwesomeIcons.personRunning,
@@ -34,9 +34,21 @@ class _OnboardingStep10State extends State<OnboardingStep10> {
       icon: FontAwesomeIcons.personPraying,
     ),
   ];
+  @override
+  void initState() {
+    super.initState();
+    final accomplish = ref.read(userProvider).likeToAccomplish;
+
+    final matchOption = options.indexWhere((i) => i.title == accomplish);
+    if (matchOption != -1) {
+      selectedIndex = matchOption;
+      isEnable = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final accomplishData = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
@@ -93,14 +105,10 @@ class _OnboardingStep10State extends State<OnboardingStep10> {
             child: ContinueButton(
               enabled: isEnable,
               onNext: () {
-                final selectedOption = options[selectedIndex!];
                 if (selectedIndex != null) {
-                  debugPrint('like to accomplish: ${selectedOption.title}');
-                  if (selectedOption.subtitle != null) {
-                    debugPrint(
-                      'like to accomplish: ${selectedOption.subtitle}',
-                    );
-                  }
+                  final data = options[selectedIndex!].title;
+                  accomplishData.setLikeToAccomplish(data);
+                  debugPrint('Like to accomplish: $data');
                 }
                 // TODO : this will post to api
                 widget.nextPage();

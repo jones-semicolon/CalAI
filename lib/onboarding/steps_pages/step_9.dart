@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../data/user_data.dart';
 
-class OnboardingStep9 extends StatefulWidget {
+class OnboardingStep9 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
   const OnboardingStep9({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep9> createState() => _OnboardingStep9State();
+  ConsumerState<OnboardingStep9> createState() => _OnboardingStep9State();
 }
 
-class _OnboardingStep9State extends State<OnboardingStep9> {
+class _OnboardingStep9State extends ConsumerState<OnboardingStep9> {
   bool isEnable = false;
   int? selectedIndex;
 
@@ -23,15 +25,25 @@ class _OnboardingStep9State extends State<OnboardingStep9> {
     OptionCard(title: 'Vegetarian', icon: FontAwesomeIcons.carrot),
     OptionCard(title: 'Vegan', icon: FontAwesomeIcons.leaf),
   ];
+  @override
+  void initState() {
+    super.initState();
+    final dietType = ref.read(userProvider).dietType;
+
+    final matchOption = options.indexWhere((i) => i.title == dietType);
+    if (matchOption != -1) {
+      selectedIndex = matchOption;
+      isEnable = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final dietData = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
-          Header(
-            title: 'Do you follow a specific diet?',
-          ),
+          Header(title: 'Do you follow a specific diet?'),
 
           /// SCROLLABLE CONTENT
           Expanded(
@@ -84,12 +96,11 @@ class _OnboardingStep9State extends State<OnboardingStep9> {
             child: ContinueButton(
               enabled: isEnable,
               onNext: () {
-                final selectedOption = options[selectedIndex!];
                 if (selectedIndex != null) {
-                  debugPrint('diet: ${selectedOption.title}');
-                  if (selectedOption.subtitle != null) {
-                    debugPrint('diet: ${selectedOption.subtitle}');
-                  }
+                  final data = options[selectedIndex!].title;
+
+                  dietData.setDietType(data);
+                  debugPrint('Diet type: $data');
                 }
                 // TODO : this will post to api
                 widget.nextPage();
