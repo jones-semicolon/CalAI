@@ -9,6 +9,7 @@ class UserData {
   final double weight;
   final DateTime birthDay;
   final String goal;
+  final double targetWeight;
   final String dietType;
   final String likeToAccomplish;
   final bool isAddCalorieBurn;
@@ -23,6 +24,7 @@ class UserData {
     required this.weight,
     required this.birthDay,
     required this.goal,
+    required this.targetWeight,
     required this.dietType,
     required this.likeToAccomplish,
     required this.isAddCalorieBurn,
@@ -38,6 +40,7 @@ class UserData {
     double? weight,
     DateTime? birthDay,
     String? goal,
+    double? targetWeight,
     String? dietType,
     String? likeToAccomplish,
     bool? isAddCalorieBurn,
@@ -47,11 +50,13 @@ class UserData {
       gender: gender ?? this.gender,
       workOutPerWeek: workOutPerWeek ?? this.workOutPerWeek,
       social: social ?? this.social,
-      hasTriedOtherCalorieApps: hasTriedOtherCalorieApps ?? this.hasTriedOtherCalorieApps,
+      hasTriedOtherCalorieApps:
+          hasTriedOtherCalorieApps ?? this.hasTriedOtherCalorieApps,
       height: height ?? this.height,
       weight: weight ?? this.weight,
       birthDay: birthDay ?? this.birthDay,
       goal: goal ?? this.goal,
+      targetWeight: targetWeight ?? this.targetWeight,
       dietType: dietType ?? this.dietType,
       likeToAccomplish: likeToAccomplish ?? this.likeToAccomplish,
       isAddCalorieBurn: isAddCalorieBurn ?? this.isAddCalorieBurn,
@@ -64,10 +69,11 @@ class UserDataNotifier extends StateNotifier<UserData> {
   UserDataNotifier()
     : super(
         UserData(
+          gender: "",
           height: 168,
           weight: 54,
           goal: "",
-          gender: "",
+          targetWeight: 0.0,
           workOutPerWeek: "",
           social: "",
           hasTriedOtherCalorieApps: "",
@@ -82,14 +88,18 @@ class UserDataNotifier extends StateNotifier<UserData> {
   void setGender(String g) => state = state.copyWith(gender: g);
   void setWorkOutPerWeek(String w) => state = state.copyWith(workOutPerWeek: w);
   void setSocial(String s) => state = state.copyWith(social: s);
-  void setHasTriedOtherCalorieApps(String h) => state = state.copyWith(hasTriedOtherCalorieApps: h);
+  void setHasTriedOtherCalorieApps(String h) =>
+      state = state.copyWith(hasTriedOtherCalorieApps: h);
   void setHeight(double h) => state = state.copyWith(height: h);
   void setWeight(double w) => state = state.copyWith(weight: w);
   void setBirthDay(DateTime b) => state = state.copyWith(birthDay: b);
   void setGoal(String g) => state = state.copyWith(goal: g);
+  void setTargetWeight(double t) => state = state.copyWith(targetWeight: t);
   void setDietType(String d) => state = state.copyWith(dietType: d);
-  void setLikeToAccomplish(String l) => state = state.copyWith(likeToAccomplish: l);
-  void setIsAddCalorieBurn(bool b) => state = state.copyWith(isAddCalorieBurn: b);
+  void setLikeToAccomplish(String l) =>
+      state = state.copyWith(likeToAccomplish: l);
+  void setIsAddCalorieBurn(bool b) =>
+      state = state.copyWith(isAddCalorieBurn: b);
   void setIsRollover(bool r) => state = state.copyWith(isRollover: r);
 }
 
