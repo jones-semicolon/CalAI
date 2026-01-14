@@ -7,6 +7,7 @@ const goalsRoute = require("./routes/goals.route");
 const barcodeRoute = require("./routes/barcode.route");
 const scanRoute = require("./routes/scan.route");
 const foodDatabase = require("./routes/fooddb.route");
+const exerciseRoute = require("./routes/exercise.route");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,7 @@ app.use("/test", testRoute);
 app.use("/calculate_goals", goalsRoute);
 app.use("/scan_barcode", barcodeRoute);
 app.use("/scan_food", scanRoute);
+app.use("/log_exercise", exerciseRoute);
 app.use("/food", foodDatabase);
 
 app.listen(PORT, () => {
