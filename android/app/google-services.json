@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "530467491766",
+    "project_id": "calai-11be1",
+    "storage_bucket": "calai-11be1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:530467491766:android:9699fa4a0420d9319b3b17",
+        "android_client_info": {
+          "package_name": "com.example.calai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "530467491766-rpoclgct9o8ekbsuukvscbnv7ou5ipkr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.calai",
+            "certificate_hash": "76b4769a228de066e37e20a4b2f7390952c69485"
+          }
+        },
+        {
+          "client_id": "530467491766-dlp2dkncq9t3urv9lf56vmfuiim1kfj7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4KVObqa466x4EisRrtEjVbBx--jhV2xE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "530467491766-dlp2dkncq9t3urv9lf56vmfuiim1kfj7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "530467491766-53nb81qnsc5eds4eb0mbot0m0jrpin0g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.calai"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

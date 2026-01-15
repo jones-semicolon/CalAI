@@ -1,0 +1,116 @@
+import 'package:flutter_riverpod/legacy.dart';
+
+class UserData {
+  final String gender;
+  final String name;
+  final String workOutPerWeek;
+  final String social;
+  final String hasTriedOtherCalorieApps;
+  final double height;
+  final double weight;
+  final DateTime birthDay;
+  final String goal;
+  final double targetWeight;
+  final String dietType;
+  final String likeToAccomplish;
+  final bool isAddCalorieBurn;
+  final bool isRollover;
+
+  const UserData({
+    required this.gender,
+    required this.name,
+    required this.workOutPerWeek,
+    required this.social,
+    required this.hasTriedOtherCalorieApps,
+    required this.height,
+    required this.weight,
+    required this.birthDay,
+    required this.goal,
+    required this.targetWeight,
+    required this.dietType,
+    required this.likeToAccomplish,
+    required this.isAddCalorieBurn,
+    required this.isRollover,
+  });
+
+  UserData copyWith({
+    String? gender,
+    String? name,
+    String? workOutPerWeek,
+    String? social,
+    String? hasTriedOtherCalorieApps,
+    double? height,
+    double? weight,
+    DateTime? birthDay,
+    String? goal,
+    double? targetWeight,
+    String? dietType,
+    String? likeToAccomplish,
+    bool? isAddCalorieBurn,
+    bool? isRollover,
+  }) {
+    return UserData(
+      gender: gender ?? this.gender,
+      name: name ?? this.name,
+      workOutPerWeek: workOutPerWeek ?? this.workOutPerWeek,
+      social: social ?? this.social,
+      hasTriedOtherCalorieApps:
+          hasTriedOtherCalorieApps ?? this.hasTriedOtherCalorieApps,
+      height: height ?? this.height,
+      weight: weight ?? this.weight,
+      birthDay: birthDay ?? this.birthDay,
+      goal: goal ?? this.goal,
+      targetWeight: targetWeight ?? this.targetWeight,
+      dietType: dietType ?? this.dietType,
+      likeToAccomplish: likeToAccomplish ?? this.likeToAccomplish,
+      isAddCalorieBurn: isAddCalorieBurn ?? this.isAddCalorieBurn,
+      isRollover: isRollover ?? this.isRollover,
+    );
+  }
+}
+
+class UserDataNotifier extends StateNotifier<UserData> {
+  UserDataNotifier()
+    : super(
+        UserData(
+          gender: "",
+          name: "",
+          height: 0,
+          weight: 0,
+          goal: "",
+          targetWeight: 0.0,
+          workOutPerWeek: "",
+          social: "",
+          hasTriedOtherCalorieApps: "",
+          birthDay: DateTime(2001, 1, 1),
+          dietType: "",
+          likeToAccomplish: "",
+          isAddCalorieBurn: false,
+          isRollover: false,
+        ),
+      );
+
+
+
+  void setName(String n) => state = state.copyWith(name: n);
+  void setGender(String g) => state = state.copyWith(gender: g);
+  void setWorkOutPerWeek(String w) => state = state.copyWith(workOutPerWeek: w);
+  void setSocial(String s) => state = state.copyWith(social: s);
+  void setHasTriedOtherCalorieApps(String h) =>
+      state = state.copyWith(hasTriedOtherCalorieApps: h);
+  void setHeight(double h) => state = state.copyWith(height: h);
+  void setWeight(double w) => state = state.copyWith(weight: w);
+  void setBirthDay(DateTime b) => state = state.copyWith(birthDay: b);
+  void setGoal(String g) => state = state.copyWith(goal: g);
+  void setTargetWeight(double t) => state = state.copyWith(targetWeight: t);
+  void setDietType(String d) => state = state.copyWith(dietType: d);
+  void setLikeToAccomplish(String l) =>
+      state = state.copyWith(likeToAccomplish: l);
+  void setIsAddCalorieBurn(bool b) =>
+      state = state.copyWith(isAddCalorieBurn: b);
+  void setIsRollover(bool r) => state = state.copyWith(isRollover: r);
+}
+
+final userProvider = StateNotifierProvider<UserDataNotifier, UserData>(
+  (ref) => UserDataNotifier(),
+);
