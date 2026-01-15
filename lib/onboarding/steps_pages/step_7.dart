@@ -57,7 +57,7 @@ class _OnboardingStep7State extends ConsumerState<OnboardingStep7> {
               enabled: true, // Birthday is never null based on your provider default
               onNext: () {
                 // Finalize the selection in Riverpod
-                ref.read(userProvider.notifier).setBirthDay(selectedBirthday);
+                ref.read(userProvider.notifier).update((s) => s.copyWith(birthDay: selectedBirthday));
                 
                 debugPrint(
                   'Birthday: ${selectedBirthday.toIso8601String()}',

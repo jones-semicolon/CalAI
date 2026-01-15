@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:calai/pages/progress/widgets/progress_bar_graph_logic.dart';
 import 'package:calai/pages/progress/widgets/graph_card_decoration.dart';
 import 'package:calai/pages/progress/widgets/graph_header.dart';
@@ -47,8 +49,10 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
             .reduce((a, b) => a > b ? a : b);
 
     final double interval = maxCalories / 4;
+
+    // small padding so top bar doesn’t touch the line
     final double minY = -interval * 0.01;
-    final double maxY = maxCalories + interval * 0.01;
+    final double maxY = maxCalories + (interval * 0.10);
 
     return Column(
       children: [
@@ -60,7 +64,7 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
             RangeOption(value: WeekRange.threeWeeksAgo, label: '3 wks ago'),
           ],
           selected: _selectedRange,
-          onChanged: (value) => setState(() => _selectedRange = value as WeekRange),
+          onChanged: (value) => setState(() => _selectedRange = value),
         ),
         const SizedBox(height: 22),
         Container(
@@ -84,22 +88,29 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
               SizedBox(
                 height: 200,
                 child: BarChart(
-                  BarChartData(
-                    minY: minY,
-                    maxY: maxY,
-                    barGroups: logic.getBarGroups(),
-                    borderData: FlBorderData(show: false),
-                    gridData: FlGridData(
-                      drawVerticalLine: false,
-                      horizontalInterval: interval,
-                      getDrawingHorizontalLine: (_) => FlLine(
-                        dashArray: [4, 4],
-                        color: Theme.of(context).primaryColor,
+                    BarChartData(
+                      minY: minY,
+                      maxY: maxY,
+                      barGroups: logic.getBarGroups(),
+                      borderData: FlBorderData(show: false),
+                      gridData: FlGridData(
+                        drawVerticalLine: false,
+                        horizontalInterval: interval,
+                        checkToShowHorizontalLine: (value) {
+                          if (value == 0) return true;
+
+                          final ratio = value / interval;
+                          return (ratio - ratio.round()).abs() < 0.001;
+                        },
+                        getDrawingHorizontalLine: (_) => FlLine(
+                          dashArray: [6, 6],
+                          strokeWidth: 1.5,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
-                    ),
-                    titlesData: _buildTitlesData(interval),
-                    barTouchData: _buildTouchData(context, logic),
-                  ),
+                      titlesData: _buildTitlesData(interval),
+                      barTouchData: _buildTouchData(context, logic),
+                    )
                 ),
               ),
               const SizedBox(height: 10),
@@ -152,8 +163,14 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
           reservedSize: 40,
           getTitlesWidget: (v, _) {
             if (v < 0) return const SizedBox.shrink();
+
+            // ✅ show ONLY exact tick labels to prevent duplicates at top
+            final ratio = v / interval;
+            final isTick = (ratio - ratio.round()).abs() < 0.001;
+            if (!isTick) return const SizedBox.shrink();
+
             return Text(
-              v.round().toString(),
+              v.floor().toString(),
               style: const TextStyle(
                 fontSize: 11,
                 color: Color.fromARGB(255, 137, 137, 139),

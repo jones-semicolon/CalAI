@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/health_data.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../../data/user_data.dart';
-import '../onboarding_widgets/weight_picker/weight_enums.dart';
 import '../onboarding_widgets/weight_picker/weight_unit_provider.dart';
 
 class EncourageMessage extends ConsumerStatefulWidget {
@@ -23,7 +23,7 @@ class _EncourageMessage extends ConsumerState<EncourageMessage> {
     super.initState();
 
     final user = ref.read(userProvider);
-    final goalString = user.goal.toLowerCase();
+    final goalString = user.goal.value;
 
     if (goalString == 'lose weight') {
       goal = 'Losing';

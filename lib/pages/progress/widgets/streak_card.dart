@@ -3,8 +3,7 @@ import 'card_decorations.dart';
 
 /// A card widget to display the user's current day streak.
 ///
-/// It shows a prominent fire icon with the streak number and a weekly
-/// view of completed days.
+/// dayStreak must be [Sun, Mon, Tue, Wed, Thu, Fri, Sat]
 class StreakCard extends StatelessWidget {
   final List<bool> dayStreak;
 
@@ -34,9 +33,32 @@ class _StreakIcon extends StatelessWidget {
 
   const _StreakIcon({required this.dayStreak});
 
+  int _todayIndexSunFirst() {
+    // Dart weekday: Mon=1 ... Sun=7
+    // We want: Sun=0 ... Sat=6
+    return DateTime.now().weekday % 7;
+  }
+
+  int _calculateStreakFromToday(List<bool> streakWeek) {
+    if (streakWeek.length != 7) return 0;
+
+    final today = _todayIndexSunFirst();
+
+    int streak = 0;
+    for (int i = today; i >= 0; i--) {
+      if (streakWeek[i] == true) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+
+    return streak;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final streak = dayStreak.reversed.takeWhile((e) => e).length;
+    final streak = _calculateStreakFromToday(dayStreak);
 
     return Stack(
       alignment: Alignment.center,
@@ -46,7 +68,6 @@ class _StreakIcon extends StatelessWidget {
           size: 70,
           color: Color.fromARGB(255, 249, 149, 11),
         ),
-        // This creates the outlined text effect.
         Positioned(
           top: 35,
           child: Text(
@@ -61,7 +82,6 @@ class _StreakIcon extends StatelessWidget {
             ),
           ),
         ),
-        // This is the solid text on top of the outline.
         Positioned(
           top: 35,
           child: Text(
@@ -125,7 +145,7 @@ class _DayIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = const Color.fromARGB(255, 249, 149, 11);
+    const activeColor = Color.fromARGB(255, 249, 149, 11);
     final inactiveColor = Theme.of(context).colorScheme.onTertiary;
 
     return Column(
@@ -143,10 +163,10 @@ class _DayIndicator extends StatelessWidget {
           backgroundColor: isDone ? activeColor : inactiveColor,
           child: isDone
               ? const Icon(
-                  Icons.check,
-                  size: 12,
-                  color: Colors.white,
-                )
+            Icons.check,
+            size: 12,
+            color: Colors.white,
+          )
               : null,
         ),
       ],

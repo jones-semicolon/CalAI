@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/health_data.dart';
 import '../../data/user_data.dart';
 
 class HeightWeightPickerWidget extends ConsumerStatefulWidget {
@@ -103,11 +104,6 @@ class _HeightWeightPickerWidgetState
     }
   }
 
-  void _updateImpHeight(int ft, int inch) {
-    double cm = ((ft * 12) + inch) * 2.54;
-    ref.read(userProvider.notifier).setHeight(cm);
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
@@ -145,7 +141,7 @@ class _HeightWeightPickerWidgetState
               _individualWheel(
                 cmRange,
                 user.height.round(),
-                (v) => ref.read(userProvider.notifier).setHeight(v.toDouble()),
+                (v) => ref.read(userProvider.notifier).setHeight(cm: v.toDouble(), unit: HeightUnit.cm),
                 "cm",
                 _cmController,
                 itemH,
@@ -155,7 +151,7 @@ class _HeightWeightPickerWidgetState
               _individualWheel(
                 weightKgRange,
                 user.weight.round(),
-                (v) => ref.read(userProvider.notifier).setWeight(v.toDouble()),
+                (v) => ref.read(userProvider.notifier).setWeight(v.toDouble(), WeightUnit.kg),
                 "kg",
                 _kgController,
                 itemH,
@@ -167,10 +163,20 @@ class _HeightWeightPickerWidgetState
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // ... inside your build method, in the Imperial Row:
+
               _individualWheel(
                 feetRange,
                 currentFt,
-                (v) => _updateImpHeight(v, currentIn),
+                    (v) {
+                  // When Feet changes, get the current Inches from the other wheel
+                  final currentInches = inchesRange[_inController.selectedItem];
+                  ref.read(userProvider.notifier).setHeight(
+                    unit: HeightUnit.ft,
+                    ft: v,
+                    inches: currentInches.toDouble(),
+                  );
+                },
                 "ft",
                 _ftController,
                 itemH,
@@ -179,8 +185,16 @@ class _HeightWeightPickerWidgetState
               const SizedBox(width: 8),
               _individualWheel(
                 inchesRange,
-                currentIn,
-                (v) => _updateImpHeight(currentFt, v),
+                currentIn = (totalInches % 12),
+                    (v) {
+                  // When Inches changes, get the current Feet from the other wheel
+                  final currentFeet = feetRange[_ftController.selectedItem];
+                  ref.read(userProvider.notifier).setHeight(
+                    unit: HeightUnit.ft,
+                    ft: currentFeet,
+                    inches: v.toDouble(),
+                  );
+                },
                 "in",
                 _inController,
                 itemH,
@@ -190,7 +204,7 @@ class _HeightWeightPickerWidgetState
               _individualWheel(
                 weightLbRange,
                 currentLb,
-                (v) => ref.read(userProvider.notifier).setWeight(v * 0.453592),
+                (v) => ref.read(userProvider.notifier).setWeight(v.toDouble(), WeightUnit.lbs),
                 "lb",
                 _lbController,
                 itemH,

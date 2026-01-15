@@ -106,7 +106,7 @@ class _OnboardingStep3State extends ConsumerState<OnboardingStep3> {
                 if (selectedIndex != null) {
                   final selectedOption = options[selectedIndex!].title;
 
-                  userData.setSocial(selectedOption);
+                  userData.update((s) => s.copyWith(social: selectedOption));
                   debugPrint('Heard us from: $selectedOption');
                 }
                 widget.nextPage();

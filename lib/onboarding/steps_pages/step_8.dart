@@ -19,9 +19,9 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
   int? selectedIndex;
 
   final List<OptionCard> options = [
-    OptionCard(title: 'Lose Weight'),
-    OptionCard(title: 'Maintain'),
-    OptionCard(title: 'Gain Weight'),
+    OptionCard(title: 'Lose Weight', value: Goal.loseWeight),
+    OptionCard(title: 'Maintain', value: Goal.maintain),
+    OptionCard(title: 'Gain Weight', value: Goal.gainWeight),
   ];
   @override
   void initState() {
@@ -99,8 +99,8 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
               enabled: isEnable,
               onNext: () {
                 if (selectedIndex != null) {
-                  final updateGoal = options[selectedIndex!].title;
-                  userGoal.setGoal(updateGoal);
+                  final updateGoal = options[selectedIndex!];
+                  userGoal.update((s) => s.copyWith(goal: updateGoal.value));
                   debugPrint('Goal: $updateGoal');
                 }
                 // TODO : this will post to api

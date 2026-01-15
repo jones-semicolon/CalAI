@@ -23,15 +23,18 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
     OptionCard(
       title: 'Eat and live healthier',
       icon: FontAwesomeIcons.appleWhole,
+      value: GoalFocus.healthier,
     ),
     OptionCard(title: 'Boost my energy and mood', icon: FontAwesomeIcons.sun),
     OptionCard(
       title: 'Stay motivated and consistent',
       icon: FontAwesomeIcons.personRunning,
+      value: GoalFocus.consistency,
     ),
     OptionCard(
       title: 'feel better about my body',
       icon: FontAwesomeIcons.personPraying,
+      value: GoalFocus.bodyConfidence,
     ),
   ];
   @override
@@ -106,8 +109,8 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
               enabled: isEnable,
               onNext: () {
                 if (selectedIndex != null) {
-                  final data = options[selectedIndex!].title;
-                  accomplishData.setLikeToAccomplish(data);
+                  final data = options[selectedIndex!];
+                  accomplishData.update((s) => s.copyWith(likeToAccomplish: data.value));
                   debugPrint('Like to accomplish: $data');
                 }
                 // TODO : this will post to api

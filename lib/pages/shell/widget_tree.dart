@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Data Providers
+import '../../data/global_data.dart';
 
 // Global App Widgets
 import '../../widgets/lower_end_fab_location.dart';
@@ -10,12 +14,22 @@ import 'widget_app_bar.dart';
 import 'widget_content.dart';
 import 'widget_fab.dart';
 
-/// The root widget that assembles the main UI structure of the application.
-///
-/// It combines the background, navigation bar, app bar, floating action button,
-/// and the main page content into a single, cohesive layout.
-class WidgetTree extends StatelessWidget {
+class WidgetTree extends ConsumerStatefulWidget {
   const WidgetTree({super.key});
+
+  @override
+  ConsumerState<WidgetTree> createState() => _WidgetTreeState();
+}
+
+class _WidgetTreeState extends ConsumerState<WidgetTree> {
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(globalDataProvider.notifier).init();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +42,7 @@ class WidgetTree extends StatelessWidget {
             // The app bar, which dynamically changes based on the selected page.
             WidgetTreeAppBar(),
 
-            // The main content area, which uses its own listener to switch
-            // between different pages with an animation.
+            // The main content area
             SliverToBoxAdapter(
               child: WidgetTreeContent(),
             ),

@@ -53,7 +53,7 @@ class _EditNamePageState extends ConsumerState<EditNamePage> {
 
     // 3. Persist to Firestore using the updateProfile method in GlobalData
     // We already cleaned this method to save the 'name' field
-    await ref.read(globalDataProvider).updateProfile();
+    await ref.read(globalDataProvider.notifier).updateProfile();
 
     if (mounted) {
       Navigator.pop(context);
@@ -62,8 +62,8 @@ class _EditNamePageState extends ConsumerState<EditNamePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Optional: Watch isFetching to show a loading state on the button
-    final isSaving = ref.watch(globalDataProvider).isFetching;
+    final globalAsync = ref.watch(globalDataProvider);
+    final isSaving = globalAsync.isLoading;
 
     return Scaffold(
       appBar: const _EditNameAppBar(),

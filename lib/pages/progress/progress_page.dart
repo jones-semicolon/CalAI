@@ -1,83 +1,117 @@
+import 'package:calai/pages/progress/widgets/progress_bar_graph.dart';
+import 'package:calai/pages/progress/widgets/progress_bmi_card.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../data/global_data.dart';
+import 'progress_data_provider.dart';
+
 import 'widgets/progress_cards.dart';
 import 'widgets/progress_line_graph.dart';
 import 'widgets/progress_photo.dart';
-import 'widgets/progress_bar_graph.dart';
-import 'widgets/progress_bmi_card.dart';
-import 'progress_data_provider.dart'; // Import the new data provider
 
-class ProgressPage extends StatefulWidget {
+class ProgressPage extends ConsumerStatefulWidget {
   const ProgressPage({super.key});
 
   @override
-  State<ProgressPage> createState() => _ProgressPageState();
+  ConsumerState<ProgressPage> createState() => _ProgressPageState();
 }
 
-class _ProgressPageState extends State<ProgressPage> {
-  // --- STATE --- //
-
-  /// Encapsulates all mock data and business logic for this page.
-  /// In a real app, this might be a ViewModel or be provided by a state management library.
-  final _dataProvider = ProgressPageDataProvider();
-
-  /// The currently selected time range for filtering the graphs.
+class _ProgressPageState extends ConsumerState<ProgressPage> {
   TimeRange _selectedRange = TimeRange.days90;
-
-  // --- BUILD METHOD --- //
 
   @override
   Widget build(BuildContext context) {
-    // Get the filtered logs based on the current UI state.
-    final filteredLogs = _dataProvider.getFilteredLogs(_selectedRange);
+    final globalAsync = ref.watch(globalDataProvider);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSizes.md),
-      child: Column(
-        children: [
-          Row(
+    List<bool> _buildWeekStreak(Set<String> progressDays) {
+      final now = DateTime.now();
+      
+      String _toDateId(DateTime date) {
+        final y = date.year.toString().padLeft(4, '0');
+        final m = date.month.toString().padLeft(2, '0');
+        final d = date.day.toString().padLeft(2, '0');
+        return "$y-$m-$d";
+      }
+
+      // Sun..Sat (your UI shows S M T W T F S)
+      final startOfWeek = now.subtract(Duration(days: now.weekday % 7));
+
+      return List.generate(7, (i) {
+        final day = startOfWeek.add(Duration(days: i));
+        final id = _toDateId(day); // YYYY-MM-DD
+        return progressDays.contains(id);
+      });
+    }
+    
+    return globalAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text("Error: $e")),
+      data: (global) {
+        final logs = global.weightLogs;
+        final goalWeight = global.goalWeight;
+
+        if (logs.isEmpty) {
+          return const Center(child: Text("No progress logs yet."));
+        }
+
+        final provider = ProgressPageDataProvider();
+
+        final filteredLogs = provider.getFilteredLogs(logs, _selectedRange);
+
+        final startedWeight = provider.startedWeight(logs);
+        final currentWeight = provider.currentWeight(logs);
+
+        final progressPercent = provider.goalProgressPercent(
+          logs: logs,
+          goalWeight: goalWeight,
+        );
+        
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSizes.md),
+          child: Column(
             children: [
-              Expanded(
-                child: WeightCard(
-                  currentWeight: _dataProvider.currentWeight,
-                  goalWeight: _dataProvider.goalWeight,
-                  progressPercent: _dataProvider.goalProgressPercent(),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: WeightCard(
+                      currentWeight: currentWeight,
+                      goalWeight: goalWeight,
+                      progressPercent: progressPercent,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: StreakCard(
+                      dayStreak: _buildWeekStreak(global.progressDays),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: StreakCard(
-                  // Note: Streak data is hardcoded here and could also be moved to the provider.
-                  dayStreak: [true, true, false, true, true, true, true],
-                ),
+              const SizedBox(height: 25),
+              ProgressGraph(
+                selectedRange: _selectedRange,
+                onRangeChanged: (r) => setState(() => _selectedRange = r),
+                logs: filteredLogs,
+                startedWeight: startedWeight,
+                goalWeight: goalWeight,
+                progressPercent: progressPercent,
               ),
+              const SizedBox(height: 25),
+              const ProgressPhoto(),
+              const SizedBox(height: 25),
+              ProgressBarGraph(
+                calorieLogs: global.calorieLogs,
+                caloriesIntakePerDay: global.calorieGoal,
+              ),
+              const SizedBox(height: 25),
+              const ProgressBmiCard(),
+              const SizedBox(height: 25),
             ],
           ),
-          const SizedBox(height: 25),
-          ProgressGraph(
-            selectedRange: _selectedRange,
-            onRangeChanged: (r) => setState(() => _selectedRange = r as TimeRange),
-            logs: filteredLogs,
-            startedWeight: _dataProvider.startedWeight,
-            goalWeight: _dataProvider.goalWeight,
-            progressPercent: _dataProvider.goalProgressPercent(),
-          ),
-          const SizedBox(height: 25),
-          ProgressPhoto(),
-          const SizedBox(height: 25),
-          ProgressBarGraph(
-            calorieLogs: _dataProvider.calorieLogs,
-            caloriesIntakePerDay: _dataProvider.caloriesIntakePerDay,
-          ),
-          const SizedBox(height: 25),
-          ProgressBmiCard(
-            bmi: _dataProvider.bmi,
-            age: _dataProvider.age,
-            sex: _dataProvider.sex,
-          ),
-          const SizedBox(height: 25),
-        ],
-      ),
+        );
+      },
     );
   }
 }

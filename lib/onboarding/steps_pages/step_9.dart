@@ -20,10 +20,10 @@ class _OnboardingStep9State extends ConsumerState<OnboardingStep9> {
   int? selectedIndex;
 
   final List<OptionCard> options = [
-    OptionCard(title: 'Classic', icon: FontAwesomeIcons.drumstickBite),
-    OptionCard(title: 'Pescatarian', icon: FontAwesomeIcons.fish),
-    OptionCard(title: 'Vegetarian', icon: FontAwesomeIcons.carrot),
-    OptionCard(title: 'Vegan', icon: FontAwesomeIcons.leaf),
+    OptionCard(title: 'Classic', icon: FontAwesomeIcons.drumstickBite, value: DietType.classic),
+    OptionCard(title: 'Pescatarian', icon: FontAwesomeIcons.fish, value: DietType.pescatarian),
+    OptionCard(title: 'Vegetarian', icon: FontAwesomeIcons.carrot, value: DietType.vegetarian),
+    OptionCard(title: 'Vegan', icon: FontAwesomeIcons.leaf, value: DietType.vegan),
   ];
   @override
   void initState() {
@@ -97,9 +97,9 @@ class _OnboardingStep9State extends ConsumerState<OnboardingStep9> {
               enabled: isEnable,
               onNext: () {
                 if (selectedIndex != null) {
-                  final data = options[selectedIndex!].title;
+                  final data = options[selectedIndex!];
 
-                  dietData.setDietType(data);
+                  dietData.update((s) => s.copyWith(dietType: data.value));
                   debugPrint('Diet type: $data');
                 }
                 // TODO : this will post to api

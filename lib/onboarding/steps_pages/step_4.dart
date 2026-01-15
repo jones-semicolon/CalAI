@@ -19,8 +19,8 @@ class _OnboardingStep4State extends ConsumerState<OnboardingStep4> {
   int? selectedIndex;
 
   final List<OptionCard> options = [
-    OptionCard(title: 'Yes', icon: Icons.thumb_up),
-    OptionCard(title: 'No', icon: Icons.thumb_down),
+    OptionCard(title: 'Yes', icon: Icons.thumb_up, value: true),
+    OptionCard(title: 'No', icon: Icons.thumb_down, value: false),
   ];
   @override
   void initState() {
@@ -100,9 +100,9 @@ class _OnboardingStep4State extends ConsumerState<OnboardingStep4> {
               enabled: isEnable,
               onNext: () {
                 if (selectedIndex != null) {
-                  final data = options[selectedIndex!].title;
+                  final data = options[selectedIndex!];
 
-                  userData.setHasTriedOtherCalorieApps(data);
+                  userData.update((s) => s.copyWith(hasTriedOtherCalorieApps: data.value));
                   debugPrint('Has tried any app: $data');
                 }
                 widget.nextPage();

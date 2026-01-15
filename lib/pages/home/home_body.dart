@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:provider/provider.dart'; // <--- REMOVE THIS LINE TO AVOID ERRORS
-
 import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 
 import '../../data/global_data.dart';
+import '../../data/health_data.dart';
 import 'day_item.dart';
 import 'carousel/carousel_item_calories.dart';
 import 'carousel/carousel_item_health.dart';
@@ -18,42 +17,21 @@ class HomeBody extends ConsumerStatefulWidget {
 }
 
 class _HomeBodyState extends ConsumerState<HomeBody> {
-  // --- STATE VARIABLES --- //
   bool _isTap = false;
   int _currentIndex = 0;
 
-  // --- MOCK DATA --- //
-  int _calorieTaken = 300;
-  int _proteinTaken = 50;
-  int _carbsTaken = 50;
-  int _fatsTaken = 50;
-  int _fiberEaten = 12;
-  int _sugarEaten = 15;
-  int _sodiumEaten = 900;
-  int _waterIntakeMl = 0;
-
-  void _updateWaterIntake(int amount) {
-    setState(() {
-      _waterIntakeMl = (_waterIntakeMl + amount).clamp(0, double.infinity).toInt();
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // This works correctly now!
-      ref.read(globalDataProvider).init();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    // --- FIX IS HERE ---
-    // OLD (Crash): final globalData = context.watch<GlobalData>();
-    // NEW (Correct):
+    // 1. Watch GlobalData for initialization/fetching status
     final globalData = ref.watch(globalDataProvider);
 
+    // 2. Watch HealthData for all the actual numbers (Intake & Goals)
+    final health = ref.watch(healthDataProvider);
+
+    // Optional: Show loading indicator while the service is initializing
+    if (globalData.asData?.value.isInitialized == false) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return SingleChildScrollView(
       child: Center(
         child: ConstrainedBox(
@@ -69,24 +47,18 @@ class _HomeBodyState extends ConsumerState<HomeBody> {
               _CarouselView(
                 isTap: _isTap,
                 onTap: () => setState(() => _isTap = !_isTap),
-                globalData: globalData,
-                calorieTaken: _calorieTaken,
-                proteinTaken: _proteinTaken,
-                carbsTaken: _carbsTaken,
-                fatsTaken: _fatsTaken,
-                fiberEaten: _fiberEaten,
-                sugarEaten: _sugarEaten,
-                sodiumEaten: _sodiumEaten,
-                waterIntakeMl: _waterIntakeMl,
-                onWaterChange: _updateWaterIntake,
+                health: health,
+                // Use GlobalData for the logic/function calls
+                onWaterChange: (amount) {
+                  // We update via GlobalData to ensure it hits Firestore
+                },
+
                 currentIndex: _currentIndex,
                 onPageChanged: (index, _) => setState(() => _currentIndex = index),
               ),
 
               const SizedBox(height: 30),
-
               const _RecentlyUploadedSection(),
-
               Container(height: 300),
             ],
           ),
@@ -96,18 +68,12 @@ class _HomeBodyState extends ConsumerState<HomeBody> {
   }
 }
 
-// ... The rest of your classes (_CarouselView, etc.) remain exactly the same ...
-// ... Copy them from your previous message ...
-
 /// A private widget to encapsulate the Carousel and its indicator dots.
 class _CarouselView extends StatelessWidget {
   // State from parent
   final bool isTap;
-  final GlobalData globalData;
-  final int calorieTaken, proteinTaken, carbsTaken, fatsTaken;
-  final int fiberEaten, sugarEaten, sodiumEaten;
-  final int waterIntakeMl;
   final int currentIndex;
+  final HealthData health;
 
   // Callbacks
   final VoidCallback onTap;
@@ -117,18 +83,8 @@ class _CarouselView extends StatelessWidget {
   const _CarouselView({
     required this.isTap,
     required this.onTap,
-    required this.globalData,
-    required this.calorieTaken,
-    required this.proteinTaken,
-    required this.carbsTaken,
-    required this.fatsTaken,
-    required this.fiberEaten,
-    required this.sugarEaten,
-    required this.sodiumEaten,
-    required this.waterIntakeMl,
-    required this.onWaterChange,
     required this.currentIndex,
-    required this.onPageChanged,
+    required this.onPageChanged, required this.health, required this.onWaterChange,
   });
 
   @override
@@ -137,22 +93,15 @@ class _CarouselView extends StatelessWidget {
       CarouselCalories(
         isTap: isTap,
         onTap: onTap,
-        globalData: globalData,
-        calorieTaken: calorieTaken,
-        proteinTaken: proteinTaken,
-        carbsTaken: carbsTaken,
-        fatsTaken: fatsTaken,
+        health: health,
       ),
       CarouselHealth(
         isTap: isTap,
         onTap: onTap,
-        globalData: globalData,
-        fiberEaten: fiberEaten,
-        sugarEaten: sugarEaten,
-        sodiumEaten: sodiumEaten,
+        health: health
       ),
       CarouselActivity(
-        waterIntakeMl: waterIntakeMl,
+        waterIntakeMl: health.dailyWater,
         onWaterChange: onWaterChange,
       ),
     ];

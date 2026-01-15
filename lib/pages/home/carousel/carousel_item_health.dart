@@ -1,26 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
-import '../../../data/global_data.dart';
+import '../../../data/health_data.dart'; // Import the new State
 import '../activity_card.dart';
 
-/// A carousel item widget that displays a summary of key health metrics,
-/// including cards for Fiber, Sugar, and Sodium, and a "Health Score" summary.
 class CarouselHealth extends StatelessWidget {
   final bool isTap;
   final VoidCallback onTap;
-  final GlobalData globalData;
-  final int fiberEaten;
-  final int sugarEaten;
-  final int sodiumEaten;
+  // Use the HealthData state object directly
+  final HealthData health;
 
   const CarouselHealth({
     super.key,
     required this.isTap,
     required this.onTap,
-    required this.globalData,
-    required this.fiberEaten,
-    required this.sugarEaten,
-    required this.sodiumEaten,
+    required this.health,
   });
 
   @override
@@ -29,17 +22,12 @@ class CarouselHealth extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14),
       child: GestureDetector(
         onTap: onTap,
-        // The main layout is a Column, now composed of cleaner, focused widgets.
         child: Column(
           children: [
             _NutrientCardsRow(
-              globalData: globalData,
-              fiberEaten: fiberEaten,
-              sugarEaten: sugarEaten,
-              sodiumEaten: sodiumEaten,
+              health: health,
               isTap: isTap,
             ),
-            // Replaced invalid `spacing` property with a standard SizedBox.
             const SizedBox(height: 10),
             const _HealthScoreCard(),
           ],
@@ -49,34 +37,24 @@ class CarouselHealth extends StatelessWidget {
   }
 }
 
-// --- Private Helper Widgets --- //
-
-/// Displays a row of three `CalorieCard` widgets for specific nutrients.
 class _NutrientCardsRow extends StatelessWidget {
-  final GlobalData globalData;
-  final int fiberEaten;
-  final int sugarEaten;
-  final int sodiumEaten;
+  final HealthData health;
   final bool isTap;
 
   const _NutrientCardsRow({
-    required this.globalData,
-    required this.fiberEaten,
-    required this.sugarEaten,
-    required this.sodiumEaten,
+    required this.health,
     required this.isTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    // This widget's structure is identical to the original implementation.
     return Row(
       children: [
         Expanded(
           child: CalorieCard(
             title: "Fiber",
-            nutrients: globalData.fiberGoal,
-            progress: fiberEaten,
+            nutrients: health.fiberGoal, // Goal from HealthData
+            progress: health.dailyFiber, // Intake from HealthData
             color: const Color.fromARGB(255, 163, 137, 211),
             icon: Icons.favorite_border,
             unit: "g",
@@ -87,8 +65,8 @@ class _NutrientCardsRow extends StatelessWidget {
         Expanded(
           child: CalorieCard(
             title: "Sugar",
-            nutrients: globalData.sugarGoal,
-            progress: sugarEaten,
+            nutrients: health.sugarGoal,
+            progress: health.dailySugar,
             color: const Color.fromARGB(255, 244, 143, 177),
             icon: Icons.rice_bowl,
             unit: "g",
@@ -99,8 +77,8 @@ class _NutrientCardsRow extends StatelessWidget {
         Expanded(
           child: CalorieCard(
             title: "Sodium",
-            nutrients: globalData.sodiumGoal,
-            progress: sodiumEaten,
+            nutrients: health.sodiumGoal,
+            progress: health.dailySodium,
             color: const Color.fromARGB(255, 231, 185, 110),
             icon: Icons.grain,
             unit: "mg",

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'progress_data_provider.dart';
-
+import '../../data/user_data.dart';
 /// A developer-friendly class to encapsulate all BMI calculation and interpretation logic.
 ///
 /// This class takes raw BMI data and provides clean, ready-to-use outputs
@@ -9,12 +8,12 @@ import 'progress_data_provider.dart';
 class BmiCalculator {
   final double bmi;
   final int age;
-  final Sex sex;
+  final Gender gender;
 
   BmiCalculator({
     required this.bmi,
     required this.age,
-    required this.sex,
+    required this.gender,
   });
 
   // --- Color Constants --- //

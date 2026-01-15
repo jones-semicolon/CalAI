@@ -59,9 +59,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   void _nextPage() async {
-    final goal = ref.watch(userProvider).goal.toLowerCase();
+    final goal = ref.watch(userProvider).goal;
 
-    final List<Widget> pages = _pages(goal);
+    final List<Widget> pages = _pages(goal.toString());
 
     if (_currentIndex < pages.length - 1) {
       _pageController.nextPage(
@@ -74,7 +74,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       await prefs.setBool('onboarding_completed', true);
 
       if (!mounted) return;
-      ref.read(globalDataProvider).init();
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const WidgetTree()),
             (route) => false, // This removes ALL previous routes
@@ -97,8 +96,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final goal = ref.watch(userProvider).goal.toLowerCase();
-    final pages = _pages(goal);
+    final goal = ref.watch(userProvider).goal;
+    final pages = _pages(goal.toString());
 
     final bool isAuthPage = _currentIndex == 0;
 

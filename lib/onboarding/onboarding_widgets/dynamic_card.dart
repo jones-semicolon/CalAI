@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-class OptionCard extends StatelessWidget {
+class OptionCard<T> extends StatelessWidget {
   final IconData? icon;
   final String title;
   final String? subtitle;
   final VoidCallback? onTap;
   final bool isSelected;
+  final T? value;
 
   const OptionCard({
     super.key,
@@ -14,6 +15,7 @@ class OptionCard extends StatelessWidget {
     this.subtitle,
     this.onTap,
     this.isSelected = false,
+    this.value,
   });
 
   bool get _isTextOnly => icon == null && subtitle == null;

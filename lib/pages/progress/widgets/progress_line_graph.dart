@@ -1,4 +1,5 @@
-import 'package:calai/pages/progress/progress_data_provider.dart';
+import 'dart:math';
+
 import 'package:calai/pages/progress/widgets/goal_progress_header.dart';
 import 'package:calai/pages/progress/widgets/graph_card_decoration.dart';
 import 'package:calai/pages/progress/widgets/progress_message_pill.dart';
@@ -7,10 +8,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
 
-/// A widget that displays a line graph of the user's weight progress over time.
-///
-/// It includes a time range selector, a header showing goal progress, the line chart
-/// itself, and a motivational message at the bottom.
+import '../progress_data_provider.dart';
+
 class ProgressGraph extends StatelessWidget {
   final TimeRange selectedRange;
   final ValueChanged<TimeRange> onRangeChanged;
@@ -29,7 +28,18 @@ class ProgressGraph extends StatelessWidget {
     required this.progressPercent,
   });
 
-  /// A helper to convert a month's integer value to its name (e.g., 1 -> "January").
+  // ----------------------------
+  // Helpers
+  // ----------------------------
+
+  String _shortMonth(int month) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return months[month - 1];
+  }
+
   String _monthName(int month) {
     const months = [
       'January', 'February', 'March', 'April', 'May', 'June', 'July',
@@ -38,22 +48,68 @@ class ProgressGraph extends StatelessWidget {
     return months[month - 1];
   }
 
+  /// Creates a "nice" y-axis step size like: 0.2, 0.5, 1, 2, 5, 10...
+  double _niceStep(double min, double max, {int lines = 5}) {
+    final range = (max - min).abs();
+    if (range == 0) return 1;
+
+    final rawStep = range / (lines - 1);
+
+    final magnitude = pow(10, (log(rawStep) / ln10).floor()).toDouble();
+    final normalized = rawStep / magnitude;
+
+    double niceNormalized;
+    if (normalized < 1.5) {
+      niceNormalized = 1;
+    } else if (normalized < 3) {
+      niceNormalized = 2;
+    } else if (normalized < 7) {
+      niceNormalized = 5;
+    } else {
+      niceNormalized = 10;
+    }
+
+    return niceNormalized * magnitude;
+  }
+
+  // ----------------------------
+  // UI
+  // ----------------------------
+
   @override
   Widget build(BuildContext context) {
-    // This check prevents errors if the logs list is empty.
     if (logs.isEmpty) {
       return const Center(child: Text("No data available to display."));
     }
 
-    final weights = logs.map<double>((e) => (e['weight'] as num).toDouble()).toList();
+    final weights = logs
+        .map<double>((e) => (e['weight'] as num).toDouble())
+        .toList();
+
     final minWeight = weights.reduce((a, b) => a < b ? a : b);
     final maxWeight = weights.reduce((a, b) => a > b ? a : b);
-    final range = maxWeight - minWeight;
-    final yPadding = range * 0.1;
+
+    // ✅ Force Y axis range to always be at least 5kg
+    const double minRange = 5;
+
+    double chartMin = minWeight;
+    double chartMax = maxWeight;
+
+    final currentRange = chartMax - chartMin;
+
+    if (currentRange < minRange) {
+      final extra = (minRange - currentRange) / 2;
+      chartMin -= extra;
+      chartMax += extra;
+    } else {
+      // Add padding when range is normal
+      final pad = currentRange * 0.15;
+      chartMin -= pad;
+      chartMax += pad;
+    }
 
     return Column(
       children: [
-        // The selector for changing the time range of the graph.
         SegmentedSelector<TimeRange>(
           options: const [
             RangeOption(value: TimeRange.days90, label: '90 Days'),
@@ -65,7 +121,6 @@ class ProgressGraph extends StatelessWidget {
           onChanged: onRangeChanged,
         ),
         const SizedBox(height: 22),
-        // The main container for the graph card.
         Container(
           padding: const EdgeInsets.all(AppSizes.md),
           decoration: graphCardDecoration(context),
@@ -74,11 +129,10 @@ class ProgressGraph extends StatelessWidget {
             children: [
               GoalProgressHeader(progressPercent: progressPercent),
               const SizedBox(height: 16),
-              // The LineChart is now built with data from cleaner, focused methods.
               SizedBox(
                 height: 250,
                 child: LineChart(
-                  _buildChartData(context, minWeight, maxWeight, yPadding, range),
+                  _buildChartData(context, chartMin, chartMax),
                 ),
               ),
               const SizedBox(height: 16),
@@ -92,69 +146,102 @@ class ProgressGraph extends StatelessWidget {
     );
   }
 
-  // --- Chart Data Builder Methods --- //
+  // ----------------------------
+  // Chart build
+  // ----------------------------
 
-  /// Constructs the main [LineChartData] by assembling data from helper methods.
   LineChartData _buildChartData(
       BuildContext context,
-      double minWeight,
-      double maxWeight,
-      double yPadding,
-      double range,
+      double minY,
+      double maxY,
       ) {
+    final isSinglePoint = logs.length <= 1;
+
+    final yStep = _niceStep(minY, maxY, lines: 5);
+    final yMin = (minY / yStep).floor() * yStep;
+    final yMax = (maxY / yStep).ceil() * yStep;
+
+    final maxXValue = isSinglePoint ? 1.0 : (logs.length - 1).toDouble();
+
     return LineChartData(
       minX: 0,
-      maxX: (logs.length - 1).toDouble(),
-      minY: minWeight - yPadding,
-      maxY: maxWeight + yPadding,
+      maxX: maxXValue + 0.1,
+
+      minY: yMin,
+      maxY: yMax,
       borderData: FlBorderData(show: false),
       gridData: FlGridData(
         drawVerticalLine: false,
-        horizontalInterval: range / 4,
+        horizontalInterval: yStep,
         getDrawingHorizontalLine: (_) => FlLine(
           dashArray: [4, 4],
           color: Theme.of(context).colorScheme.onTertiary,
         ),
       ),
-      titlesData: _buildTitlesData(context, minWeight, maxWeight),
+      titlesData: _buildTitlesData(context, yStep),
       lineTouchData: _buildTouchData(context),
       lineBarsData: _buildLineBarsData(context),
     );
   }
 
-  /// Configures the titles for the X and Y axes.
-  FlTitlesData _buildTitlesData(BuildContext context, double minWeight, double maxWeight) {
+  FlTitlesData _buildTitlesData(BuildContext context, double yStep) {
+    // ✅ control label density for x-axis
+    final int len = logs.length;
+    final int step = switch (len) {
+      <= 2 => 2, // ✅ only first & last when 2 points
+      <= 4 => 1,
+      <= 8 => 2,
+      <= 15 => 3,
+      <= 30 => 6,
+      _ => 10,
+    };
+
     return FlTitlesData(
       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+
+      // ✅ Left axis with decimals
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          reservedSize: 34,
+          reservedSize: 44,
+          interval: yStep,
           getTitlesWidget: (value, _) {
-            if (value == minWeight || value == maxWeight) {
-              return const SizedBox.shrink();
-            }
             return Text(
-              value.toInt().toString(),
-              style: const TextStyle(color: Color.fromARGB(255, 137, 137, 139)),
+              value.toStringAsFixed(1),
+              style: const TextStyle(
+                fontSize: 12,
+                color: Color.fromARGB(255, 137, 137, 139),
+              ),
             );
           },
         ),
       ),
+
+      // ✅ Bottom axis like Jan 14 / Jan 15 or Dec 05 style
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
           interval: 1,
           reservedSize: 30,
           getTitlesWidget: (v, _) {
+            // ✅ only show labels on exact integer points
+            if (v % 1 != 0) return const SizedBox.shrink();
+
             final i = v.toInt();
             if (i < 0 || i >= logs.length) return const SizedBox.shrink();
+
+            // ✅ show only first & last when 2 points
+            if (logs.length <= 2) {
+              if (i != 0 && i != logs.length - 1) return const SizedBox.shrink();
+            }
+
             final d = logs[i]['date'] as DateTime;
+
             return Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
-                '${d.month}/${d.day}',
+                '${_shortMonth(d.month)} ${d.day.toString().padLeft(2, '0')}',
                 style: const TextStyle(
                   fontSize: 11,
                   color: Color.fromARGB(255, 137, 137, 139),
@@ -167,19 +254,23 @@ class ProgressGraph extends StatelessWidget {
     );
   }
 
-  /// Configures the interactive tooltip that appears on touch events.
   LineTouchData _buildTouchData(BuildContext context) {
     return LineTouchData(
       enabled: true,
       handleBuiltInTouches: true,
       touchTooltipData: LineTouchTooltipData(
         tooltipBorderRadius: const BorderRadius.all(Radius.circular(10)),
-        getTooltipColor: (_) => Theme.of(context).focusColor.withOpacity(0.9),
+        getTooltipColor: (_) => Theme.of(context).focusColor.withOpacity(0.92),
         getTooltipItems: (touchedSpots) {
           return touchedSpots.map((spot) {
-            final index = spot.x.toInt();
+            int index = spot.x.toInt();
+
+            // ✅ if single-point mode, our 2nd spot is fake → map back to 0
+            if (logs.length == 1) index = 0;
+
             final date = logs[index]['date'] as DateTime;
-            final formattedDate = '${_monthName(date.month)} ${date.day}, ${date.year}';
+            final formattedDate =
+                '${_monthName(date.month)} ${date.day}, ${date.year}';
 
             return LineTooltipItem(
               '${spot.y.toStringAsFixed(1)} kg',
@@ -207,15 +298,27 @@ class ProgressGraph extends StatelessWidget {
     );
   }
 
-  /// Defines the actual line on the chart, its styling, and the gradient below it.
   List<LineChartBarData> _buildLineBarsData(BuildContext context) {
+    final isSinglePoint = logs.length <= 1;
+
+    // ✅ If only 1 point, create a straight line by faking a second point
+    final spots = isSinglePoint
+        ? [
+      FlSpot(0, (logs[0]['weight'] as num).toDouble()),
+      FlSpot(1, (logs[0]['weight'] as num).toDouble()),
+    ]
+        : List.generate(
+      logs.length,
+          (i) => FlSpot(
+        i.toDouble(),
+        (logs[i]['weight'] as num).toDouble(),
+      ),
+    );
+
     return [
       LineChartBarData(
-        spots: List.generate(
-          logs.length,
-              (i) => FlSpot(i.toDouble(), logs[i]['weight']),
-        ),
-        isCurved: true,
+        spots: spots,
+        isCurved: !isSinglePoint,
         barWidth: 3,
         color: Theme.of(context).colorScheme.primary,
         dotData: const FlDotData(show: false),

@@ -23,13 +23,15 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
       title: '0-2',
       subtitle: 'Workouts now and then',
       icon: Icons.fiber_manual_record,
+      value: WorkoutFrequency.low,
     ),
     OptionCard(
       title: '3-5',
       subtitle: 'A few workouts per week',
       icon: Icons.scatter_plot,
+      value: WorkoutFrequency.moderate,
     ),
-    OptionCard(title: '6+', subtitle: 'Dedicated athlete', icon: Icons.apps),
+    OptionCard(title: '6+', subtitle: 'Dedicated athlete', icon: Icons.apps, value: WorkoutFrequency.high),
   ];
   @override
   void initState() {
@@ -113,10 +115,10 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
                   final selectedOption = options[selectedIndex!];
 
                   // Update UserData.gender in Riverpod
-                  userData.setWorkOutPerWeek(selectedOption.title);
+                  userData.update((s) => s.copyWith(workOutPerWeek: selectedOption.value));
 
                   debugPrint(
-                    'WorkoutPerWeek: ${selectedOption.title}',
+                    'WorkoutPerWeek: ${selectedOption.value}',
                   );
                 }
                 // TODO : this will post to api

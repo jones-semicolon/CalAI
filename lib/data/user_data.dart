@@ -1,20 +1,55 @@
 import 'package:flutter_riverpod/legacy.dart';
 
+import 'health_data.dart';
+// Enums
+enum Gender {
+  male("male"),
+  female("female"),
+  other("other");
+
+  final String value;
+  const Gender(this.value);
+
+  static Gender fromString(String val) {
+    return Gender.values.firstWhere(
+          (e) => e.value == val,
+      orElse: () => Gender.other,
+    );
+  }
+}
+
+enum HeightUnit { cm, ft }
+
+enum WorkoutFrequency { low("low"), moderate("moderate"), high("high"); final String value; const WorkoutFrequency(this.value); }
+
+enum Goal { loseWeight("lose weight"), maintain("maintain"), gainWeight("gain weight"); final String value; const Goal(this.value); }
+
+enum DietType { classic("classic"), pescatarian("pescatarian"), vegetarian("vegetarian"), vegan("vegan"); final String value; const DietType(this.value); }
+
+enum GoalFocus { healthier("healthier"), energy("energy"), consistency("consistency"), bodyConfidence("body confidence"); final String value; const GoalFocus(this.value); }
+
 class UserData {
-  final String gender;
+  final Gender gender;
   final String name;
-  final String workOutPerWeek;
+  final WorkoutFrequency workOutPerWeek;
   final String social;
-  final String hasTriedOtherCalorieApps;
+  final bool hasTriedOtherCalorieApps;
   final double height;
   final double weight;
   final DateTime birthDay;
-  final String goal;
+  final Goal goal;
   final double targetWeight;
-  final String dietType;
-  final String likeToAccomplish;
+  final DietType dietType;
+  final GoalFocus likeToAccomplish;
   final bool isAddCalorieBurn;
   final bool isRollover;
+  final double weightGoal;
+
+  double get bmi {
+    if (height <= 0) return 0.0;
+    final heightInMeters = height / 100;
+    return weight / (heightInMeters * heightInMeters);
+  }
 
   const UserData({
     required this.gender,
@@ -30,22 +65,42 @@ class UserData {
     required this.dietType,
     required this.likeToAccomplish,
     required this.isAddCalorieBurn,
+    required this.weightGoal,
     required this.isRollover,
   });
 
+  factory UserData.initial() => UserData(
+    gender: Gender.other,
+    name: '',
+    workOutPerWeek: WorkoutFrequency.low, // FIXED: Changed '' to Enum value
+    social: '',
+    hasTriedOtherCalorieApps: false,
+    height: 0.0,
+    weight: 0.0,
+    weightGoal: 0.0,
+    birthDay: DateTime(2001, 1, 1),
+    goal: Goal.maintain,
+    targetWeight: 0.0,
+    dietType: DietType.classic,
+    likeToAccomplish: GoalFocus.consistency,
+    isAddCalorieBurn: false,
+    isRollover: false,
+  );
+
   UserData copyWith({
-    String? gender,
+    Gender? gender,
     String? name,
-    String? workOutPerWeek,
+    WorkoutFrequency? workOutPerWeek, // FIXED: Changed String? to Enum?
     String? social,
-    String? hasTriedOtherCalorieApps,
+    bool? hasTriedOtherCalorieApps,
     double? height,
     double? weight,
+    double? weightGoal,
     DateTime? birthDay,
-    String? goal,
+    Goal? goal,
     double? targetWeight,
-    String? dietType,
-    String? likeToAccomplish,
+    DietType? dietType,
+    GoalFocus? likeToAccomplish,
     bool? isAddCalorieBurn,
     bool? isRollover,
   }) {
@@ -58,6 +113,7 @@ class UserData {
           hasTriedOtherCalorieApps ?? this.hasTriedOtherCalorieApps,
       height: height ?? this.height,
       weight: weight ?? this.weight,
+      weightGoal: weightGoal ?? this.weightGoal,
       birthDay: birthDay ?? this.birthDay,
       goal: goal ?? this.goal,
       targetWeight: targetWeight ?? this.targetWeight,
@@ -70,45 +126,45 @@ class UserData {
 }
 
 class UserDataNotifier extends StateNotifier<UserData> {
-  UserDataNotifier()
-    : super(
-        UserData(
-          gender: "",
-          name: "",
-          height: 0,
-          weight: 0,
-          goal: "",
-          targetWeight: 0.0,
-          workOutPerWeek: "",
-          social: "",
-          hasTriedOtherCalorieApps: "",
-          birthDay: DateTime(2001, 1, 1),
-          dietType: "",
-          likeToAccomplish: "",
-          isAddCalorieBurn: false,
-          isRollover: false,
-        ),
-      );
+  UserDataNotifier() : super(UserData.initial());
 
+  /// The Generic Updater for one-liners in the UI
+  void update(UserData Function(UserData state) transform) {
+    state = transform(state);
+  }
 
+  /// Complex logic setters
+  void setName(String name) => update((s) => s.copyWith(name: name.trim()));
 
-  void setName(String n) => state = state.copyWith(name: n);
-  void setGender(String g) => state = state.copyWith(gender: g);
-  void setWorkOutPerWeek(String w) => state = state.copyWith(workOutPerWeek: w);
-  void setSocial(String s) => state = state.copyWith(social: s);
-  void setHasTriedOtherCalorieApps(String h) =>
-      state = state.copyWith(hasTriedOtherCalorieApps: h);
-  void setHeight(double h) => state = state.copyWith(height: h);
-  void setWeight(double w) => state = state.copyWith(weight: w);
-  void setBirthDay(DateTime b) => state = state.copyWith(birthDay: b);
-  void setGoal(String g) => state = state.copyWith(goal: g);
-  void setTargetWeight(double t) => state = state.copyWith(targetWeight: t);
-  void setDietType(String d) => state = state.copyWith(dietType: d);
-  void setLikeToAccomplish(String l) =>
-      state = state.copyWith(likeToAccomplish: l);
-  void setIsAddCalorieBurn(bool b) =>
-      state = state.copyWith(isAddCalorieBurn: b);
-  void setIsRollover(bool r) => state = state.copyWith(isRollover: r);
+  void setWeight(double value, WeightUnit unit) {
+    if (value <= 0) return;
+    double weightInKg = (unit == WeightUnit.lbs) ? value * 0.453592 : value;
+    update((s) => s.copyWith(weight: weightInKg));
+  }
+
+  void setHeight({
+    required HeightUnit unit,
+    double? cm,
+    int? ft,
+    double? inches,
+  }) {
+    double finalCm = 0;
+    if (unit == HeightUnit.cm) {
+      finalCm = cm ?? 0;
+    } else {
+      finalCm = ((ft ?? 0) * 30.48) + ((inches ?? 0) * 2.54);
+    }
+    if (finalCm <= 0) return;
+    update((s) => s.copyWith(height: finalCm));
+  }
+
+  void setTargetWeight(double target) {
+    // Logic: Ensure target weight is within a sane range
+    if (target <= 20 || target > 500) return;
+    update((s) => s.copyWith(targetWeight: target));
+  }
+
+  void resetProfile() => state = UserData.initial();
 }
 
 final userProvider = StateNotifierProvider<UserDataNotifier, UserData>(

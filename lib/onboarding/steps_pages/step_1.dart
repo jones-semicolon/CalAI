@@ -20,9 +20,9 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
   int? selectedIndex;
 
   final List<OptionCard> options = [
-    OptionCard(title: 'Female'),
-    OptionCard(title: 'Male'),
-    OptionCard(title: 'Other'),
+    OptionCard(title: 'Female', value: Gender.female),
+    OptionCard(title: 'Male', value: Gender.male),
+    OptionCard(title: 'Other', value: Gender.other),
   ];
 
   @override
@@ -103,10 +103,12 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
                   final selectedOption = options[selectedIndex!];
 
                   // Update UserData.gender in Riverpod
-                  userNotifier.setGender(selectedOption.title);
+                  ref.read(userProvider.notifier).update(
+                        (s) => s.copyWith(gender: selectedOption.value),
+                  );
 
                   debugPrint(
-                    'Gender: ${selectedOption.title}',
+                    'Gender: ${selectedOption.value}',
                   );
                 }
 
