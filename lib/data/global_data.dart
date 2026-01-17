@@ -165,6 +165,16 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     });
   }
 
+  void selectDay(String dateId) {
+    final current = state.asData?.value ?? GlobalDataState.initial();
+
+    // update state so UI can highlight selected day
+    state = AsyncData(current.copyWith(activeDateId: dateId));
+
+    // start listening to the selected day (this updates HealthData too)
+    listenToDailySummary(dateId);
+  }
+
   /// Aggregates:
   /// - weightLogs (date + weight)
   /// - calorieLogs (date + calories + macros)
@@ -183,6 +193,8 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       final weightLogs = <Map<String, dynamic>>[];
       final calorieLogs = <Map<String, dynamic>>[];
       final progressDays = <String>{};
+      final overDays = <String>{};
+      final dailyCalories = <String, double>{};
 
       double goalWeight = 0;
       double calorieGoal = 0;
@@ -194,8 +206,10 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
         final date = DateTime.tryParse(dateId);
         if (date == null) continue;
 
+        // ----- Progress -----
         final progress = data['dailyProgress'] as Map<String, dynamic>?;
         final hasProgress = progress != null && progress.isNotEmpty;
+
         if (hasProgress) progressDays.add(dateId);
 
         // ----- Goals -----
@@ -206,17 +220,18 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
         final cg = goals?['calorieGoal'] as num?;
         if (cg != null) calorieGoal = cg.toDouble();
 
-        // ----- Weight logs for line graph -----
+        // ----- Weight logs (line graph) -----
         final w = progress?['weight'] as num?;
         if (w != null) {
           weightLogs.add({'date': date, 'weight': w.toDouble()});
         }
 
-        // ----- Calorie logs for bar graph -----
+        // ----- Calories + macros (bar graph) -----
         final calories = (progress?['caloriesEaten'] as num?)?.toDouble() ?? 0;
         final protein = (progress?['protein'] as num?)?.toDouble() ?? 0;
         final carbs = (progress?['carbs'] as num?)?.toDouble() ?? 0;
         final fats = (progress?['fats'] as num?)?.toDouble() ?? 0;
+        dailyCalories[dateId] = calories;
 
         calorieLogs.add({
           'date': date,
@@ -225,15 +240,22 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
           'carbs': carbs,
           'fats': fats,
         });
+
+        // ✅ Over progress check (red)
+        if (calorieGoal > 0 && calories > calorieGoal) {
+          overDays.add(dateId);
+        }
       }
 
       final current = state.asData?.value ?? GlobalDataState.initial();
       state = AsyncData(
         current.copyWith(
           weightLogs: weightLogs,
-          goalWeight: goalWeight,
-          progressDays: progressDays,
           calorieLogs: calorieLogs,
+          progressDays: progressDays,
+          overDays: overDays,
+          dailyCalories: dailyCalories,
+          goalWeight: goalWeight,
           calorieGoal: calorieGoal,
         ),
       );

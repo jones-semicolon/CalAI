@@ -11,6 +11,9 @@ class GlobalDataState {
   final Set<String> progressDays;
   final List<Map<String, dynamic>> calorieLogs;
   final double calorieGoal;
+  final Set<String> overDays;
+  final Map<String, double> dailyCalories; // key = "YYYY-MM-DD"\
+
 
   const GlobalDataState({
     required this.isInitialized,
@@ -19,7 +22,7 @@ class GlobalDataState {
     required this.goalWeight,
     required this.progressDays,
     required this.calorieLogs,
-    required this.calorieGoal,
+    required this.calorieGoal, required this.overDays, required this.dailyCalories,
   });
 
   factory GlobalDataState.initial() => GlobalDataState(
@@ -30,6 +33,8 @@ class GlobalDataState {
     progressDays: const {},
     calorieLogs: const [],
     calorieGoal: 0,
+    overDays: <String>{},
+    dailyCalories: const {},
   );
 
 
@@ -41,6 +46,8 @@ class GlobalDataState {
     Set<String>? progressDays,
     List<Map<String, dynamic>>? calorieLogs,
     double? calorieGoal,
+    Set<String>? overDays,
+    Map<String, double>? dailyCalories,
   }) {
     return GlobalDataState(
       isInitialized: isInitialized ?? this.isInitialized,
@@ -50,6 +57,8 @@ class GlobalDataState {
       progressDays: progressDays ?? this.progressDays,
       calorieLogs: calorieLogs ?? this.calorieLogs,
       calorieGoal: calorieGoal ?? this.calorieGoal,
+      overDays: overDays ?? this.overDays,
+      dailyCalories: dailyCalories ?? this.dailyCalories,
     );
   }
 }

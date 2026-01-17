@@ -90,7 +90,7 @@ class ProgressGraph extends StatelessWidget {
     final maxWeight = weights.reduce((a, b) => a > b ? a : b);
 
     // ✅ Force Y axis range to always be at least 5kg
-    const double minRange = 5;
+    const double minRange = 3;
 
     double chartMin = minWeight;
     double chartMax = maxWeight;

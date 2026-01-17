@@ -226,6 +226,7 @@ class _ProgressIndicator extends StatelessWidget {
                 builder: (context, value, _) => CircularProgressIndicator(
                   value: value,
                   strokeWidth: 5,
+                  strokeCap: StrokeCap.round,
                   backgroundColor: Theme.of(context).splashColor,
                   color: color,
                 ),

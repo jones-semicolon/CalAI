@@ -2,17 +2,14 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-// --- Custom Painter --- //
+// ----------------------------
+// Dashed Circle Painter
+// ----------------------------
 
-/// A custom painter that draws a dashed circle border.
-///
-/// This is used to visually distinguish past days in the calendar view,
-/// giving them a "completed" or inactive look.
 class _DashedCirclePainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
 
-  // Defines the visual style of the dashed line.
   final double dashLength = 3;
   final double spaceLength = 4;
 
@@ -26,21 +23,19 @@ class _DashedCirclePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    final double radius = size.width / 2;
-    final double circumference = 2 * pi * radius;
+    final radius = size.width / 2;
+    final circumference = 2 * pi * radius;
 
-    // Calculate how many dash-space segments can fit into the circumference.
-    final double segmentLength = dashLength + spaceLength;
-    final int numberOfSegments = (circumference / segmentLength).floor();
+    final segmentLength = dashLength + spaceLength;
+    final numberOfSegments =
+    (circumference / segmentLength).floor().clamp(1, 9999);
 
-    // Adjust segment length to ensure even spacing around the entire circle.
-    final double adjustedSegmentLength = circumference / numberOfSegments;
-    final double dashAngle = dashLength / radius;
-    final double segmentAngle = adjustedSegmentLength / radius;
+    final adjustedSegmentLength = circumference / numberOfSegments;
+    final dashAngle = dashLength / radius;
+    final segmentAngle = adjustedSegmentLength / radius;
 
     for (int i = 0; i < numberOfSegments; i++) {
-      final double startAngle = i * segmentAngle;
-      // Draw a small arc segment to simulate a dash.
+      final startAngle = i * segmentAngle;
       canvas.drawArc(
         Rect.fromCircle(center: Offset(radius, radius), radius: radius),
         startAngle,
@@ -57,14 +52,89 @@ class _DashedCirclePainter extends CustomPainter {
   }
 }
 
-// --- Main Calendar Widget --- //
+// ----------------------------
+// Circular Progress Ring Painter
+// ----------------------------
 
-/// A horizontally scrollable weekly calendar widget.
-///
-/// It displays the days of the current month, highlighting the current day
-/// and visually distinguishing past days.
+class _ProgressRingPainter extends CustomPainter {
+  final double progress; // 0..1
+  final Color progressColor;
+  final Color bgColor;
+  final double strokeWidth;
+
+  _ProgressRingPainter({
+    required this.progress,
+    required this.progressColor,
+    required this.bgColor,
+    required this.strokeWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width / 2) - strokeWidth / 2;
+
+    // background ring
+    final bgPaint = Paint()
+      ..color = bgColor
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawCircle(center, radius, bgPaint);
+
+    // progress arc
+    final progPaint = Paint()
+      ..color = progressColor
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final sweepAngle = 2 * pi * progress.clamp(0.0, 1.0);
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -pi / 2,
+      sweepAngle,
+      false,
+      progPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _ProgressRingPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.progressColor != progressColor ||
+        oldDelegate.bgColor != bgColor ||
+        oldDelegate.strokeWidth != strokeWidth;
+  }
+}
+
+// ----------------------------
+// DayItem Widget
+// ----------------------------
+
 class DayItem extends StatefulWidget {
-  const DayItem({super.key});
+  final Set<String> progressDays; // has any progress
+  final Set<String> overDays; // exceeded goal
+  final Map<String, double> dailyCalories; // calories per dateId
+  final double calorieGoal; // daily calorie goal
+
+  /// ✅ controlled selected day ("YYYY-MM-DD")
+  final String selectedDateId;
+
+  /// ✅ callback when a day is tapped
+  final ValueChanged<String> onDaySelected;
+
+  const DayItem({
+    super.key,
+    required this.progressDays,
+    required this.overDays,
+    required this.dailyCalories,
+    required this.calorieGoal,
+    required this.selectedDateId,
+    required this.onDaySelected,
+  });
 
   @override
   State<DayItem> createState() => _DayItemState();
@@ -73,6 +143,7 @@ class DayItem extends StatefulWidget {
 class _DayItemState extends State<DayItem> {
   late final List<DateTime> _monthDays;
   late final int _activeWeekIndex;
+
   final PageController _weekController = PageController();
   final double _dayContainerSize = 35;
 
@@ -82,7 +153,6 @@ class _DayItemState extends State<DayItem> {
     _initializeCalendar();
   }
 
-  /// Sets up the calendar's date range and initial page.
   void _initializeCalendar() {
     final now = DateTime.now();
     final firstDay = DateTime(now.year, now.month, 1);
@@ -93,10 +163,9 @@ class _DayItemState extends State<DayItem> {
           (i) => firstDay.add(Duration(days: i)),
     );
 
-    // Calculate which week of the month is currently active.
+    // ✅ Jump to current week on first build
     _activeWeekIndex = (now.day - 1) ~/ 7;
 
-    // Jump to the current week after the first frame is rendered.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_weekController.hasClients) {
         _weekController.jumpToPage(_activeWeekIndex);
@@ -110,20 +179,33 @@ class _DayItemState extends State<DayItem> {
     super.dispose();
   }
 
-  /// Checks if a given [date] is strictly before today.
   bool _isPastDay(DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final comparisonDate = DateTime(date.year, date.month, date.day);
-    return comparisonDate.isBefore(today);
+    final comparison = DateTime(date.year, date.month, date.day);
+    return comparison.isBefore(today);
   }
+
+  bool _isToday(DateTime d) {
+    final now = DateTime.now();
+    return now.year == d.year && now.month == d.month && now.day == d.day;
+  }
+
+  bool _isFutureDay(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final comparison = DateTime(date.year, date.month, date.day);
+    return comparison.isAfter(today);
+  }
+
+  String _toDateId(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
 
   @override
   Widget build(BuildContext context) {
     final totalWeeks = (_monthDays.length / 7).ceil();
 
     return SizedBox(
-      height: 70, // Fixed height allows the PageView to render.
+      height: 70,
       child: PageView.builder(
         controller: _weekController,
         itemCount: totalWeeks,
@@ -137,16 +219,38 @@ class _DayItemState extends State<DayItem> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: weekDays.map((day) {
-                final today = DateTime.now();
-                final isSelected = day.day == today.day && day.month == today.month;
+                final dateId = _toDateId(day);
 
-                return _DayContainer(
-                  isActive: isSelected,
-                  child: _DayDisplay(
-                    day: day,
-                    isSelected: isSelected,
-                    isPast: _isPastDay(day),
-                    containerSize: _dayContainerSize,
+                final isSelected = widget.selectedDateId == dateId;
+                final isFuture = _isFutureDay(day);
+                final isPast = _isPastDay(day);
+                final isToday = _isToday(day);
+
+                final hasProgress = widget.progressDays.contains(dateId);
+                final isOver = widget.overDays.contains(dateId);
+
+                final calories = widget.dailyCalories[dateId] ?? 0;
+                final goal = widget.calorieGoal;
+
+                return IgnorePointer(
+                  ignoring: isFuture,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(15),
+                    onTap: () => widget.onDaySelected(dateId),
+                    child: _DayContainer(
+                      isActive: isSelected,
+                      child: _DayDisplay(
+                        day: day,
+                        isSelected: isSelected,
+                        isToday: isToday,
+                        isPast: isPast,
+                        containerSize: _dayContainerSize,
+                        hasProgress: hasProgress,
+                        isOver: isOver,
+                        calories: calories,
+                        goalCalories: goal,
+                      ),
+                    ),
                   ),
                 );
               }).toList(),
@@ -158,9 +262,10 @@ class _DayItemState extends State<DayItem> {
   }
 }
 
-// --- Helper Widgets --- //
+// ----------------------------
+// Helper Widgets
+// ----------------------------
 
-/// A container that wraps each day, highlighting it if it's the selected day.
 class _DayContainer extends StatelessWidget {
   final bool isActive;
   final Widget child;
@@ -180,32 +285,52 @@ class _DayContainer extends StatelessWidget {
   }
 }
 
-/// Renders the visual representation of a single day.
-///
-/// This includes the day of the week abbreviation (e.g., "Mon") and the
-/// numbered, circular container which changes style based on its state.
 class _DayDisplay extends StatelessWidget {
   final DateTime day;
   final bool isSelected;
+  final bool isToday;
   final bool isPast;
+  final bool hasProgress;
+  final bool isOver;
+  final double calories;
+  final double goalCalories;
   final double containerSize;
 
   const _DayDisplay({
     required this.day,
     required this.isSelected,
+    required this.isToday,
     required this.isPast,
+    required this.hasProgress,
+    required this.isOver,
+    required this.calories,
+    required this.goalCalories,
     required this.containerSize,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final dayAbbreviation = DateFormat('EEE').format(day);
     final dayNumber = day.day.toString();
 
-    final Color textColor = isPast || isSelected
-        ? theme.colorScheme.primary
-        : theme.hintColor;
+    // ✅ Color priority:
+    // Today highlight = black ring
+    // Over = red
+    // Has progress = green
+    // None = grey ring/dash
+    final ringColor = isToday
+        ? Colors.black
+        : isOver
+        ? Colors.red
+        : hasProgress
+        ? Colors.green
+        : theme.shadowColor.withOpacity(0.4);
+
+    final textColor = isSelected ? theme.colorScheme.primary : theme.hintColor;
+
+    final noProgress = calories <= 0;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -217,76 +342,43 @@ class _DayDisplay extends StatelessWidget {
             color: textColor,
           ),
         ),
-        if (isPast)
-        // Use the custom painter for past days.
-          CustomPaint(
-            painter: _DashedCirclePainter(color: theme.shadowColor, strokeWidth: 1.5),
-            child: _DayNumberContainer(
-              size: containerSize,
-              dayNumber: dayNumber,
-              textColor: textColor,
-            ),
-          )
-        else
-        // Use a standard container with a solid border for present/future days.
-          Container(
-            width: containerSize,
-            height: containerSize,
+
+        SizedBox(
+          width: containerSize,
+          height: containerSize,
+          child: Stack(
             alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isSelected
-                    ? theme.shadowColor
-                    : theme.shadowColor.withOpacity(0.5),
-                width: 1.5,
+            children: [
+              if (noProgress && isPast)
+                CustomPaint(
+                  painter: _DashedCirclePainter(
+                    color: theme.shadowColor.withOpacity(0.35),
+                    strokeWidth: 2,
+                  ),
+                  child: const SizedBox.expand(),
+                )
+              else
+                CustomPaint(
+                  painter: _ProgressRingPainter(
+                    progress: (goalCalories > 0) ? (calories / goalCalories) : 0,
+                    progressColor: ringColor,
+                    bgColor: theme.shadowColor.withOpacity(0.15),
+                    strokeWidth: 2,
+                  ),
+                  child: const SizedBox.expand(),
+                ),
+
+              Text(
+                dayNumber,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
               ),
-            ),
-            child: _DayNumberText(dayNumber: dayNumber, textColor: textColor),
+            ],
           ),
+        ),
       ],
-    );
-  }
-}
-
-/// A simple container for the day number text, used by [_DayDisplay].
-class _DayNumberContainer extends StatelessWidget {
-  final double size;
-  final String dayNumber;
-  final Color textColor;
-
-  const _DayNumberContainer({
-    required this.size,
-    required this.dayNumber,
-    required this.textColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      child: _DayNumberText(dayNumber: dayNumber, textColor: textColor),
-    );
-  }
-}
-
-/// The text widget for the day number, used by [_DayDisplay].
-class _DayNumberText extends StatelessWidget {
-  final String dayNumber;
-  final Color textColor;
-
-  const _DayNumberText({required this.dayNumber, required this.textColor});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      dayNumber,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-        fontWeight: FontWeight.bold,
-        color: textColor,
-      ),
     );
   }
 }

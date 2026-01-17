@@ -22,60 +22,70 @@ class _HomeBodyState extends ConsumerState<HomeBody> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Watch GlobalData for initialization/fetching status
-    final globalData = ref.watch(globalDataProvider);
-
-    // 2. Watch HealthData for all the actual numbers (Intake & Goals)
+    final globalAsync = ref.watch(globalDataProvider);
     final health = ref.watch(healthDataProvider);
 
-    // Optional: Show loading indicator while the service is initializing
-    if (globalData.asData?.value.isInitialized == false) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    return SingleChildScrollView(
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 700),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                child: DayItem(),
+    return globalAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text("Error: $e")),
+      data: (global) {
+        // optional: if you still track "isInitialized"
+        if (!global.isInitialized) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 700),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: DayItem(
+                      progressDays: global.progressDays,
+                      overDays: global.overDays,
+                      dailyCalories: global.dailyCalories,
+                      calorieGoal: global.calorieGoal,
+                      selectedDateId: global.activeDateId,
+                      onDaySelected: (dateId) =>
+                          ref.read(globalDataProvider.notifier).selectDay(dateId),
+                    ),
+                  ),
+
+                  _CarouselView(
+                    isTap: _isTap,
+                    onTap: () => setState(() => _isTap = !_isTap),
+                    health: health,
+                    onWaterChange: (amount) {
+                      // ✅ if you want this to save to firestore, call global notifier here
+                      // ref.read(globalDataProvider.notifier).updateWater(amount);
+                    },
+                    currentIndex: _currentIndex,
+                    onPageChanged: (index, _) =>
+                        setState(() => _currentIndex = index),
+                  ),
+
+                  const SizedBox(height: 30),
+                  const _RecentlyUploadedSection(),
+                  Container(height: 300),
+                ],
               ),
-
-              _CarouselView(
-                isTap: _isTap,
-                onTap: () => setState(() => _isTap = !_isTap),
-                health: health,
-                // Use GlobalData for the logic/function calls
-                onWaterChange: (amount) {
-                  // We update via GlobalData to ensure it hits Firestore
-                },
-
-                currentIndex: _currentIndex,
-                onPageChanged: (index, _) => setState(() => _currentIndex = index),
-              ),
-
-              const SizedBox(height: 30),
-              const _RecentlyUploadedSection(),
-              Container(height: 300),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
 /// A private widget to encapsulate the Carousel and its indicator dots.
 class _CarouselView extends StatelessWidget {
-  // State from parent
   final bool isTap;
   final int currentIndex;
   final HealthData health;
 
-  // Callbacks
   final VoidCallback onTap;
   final void Function(int) onWaterChange;
   final void Function(int, CarouselPageChangedReason) onPageChanged;
@@ -84,12 +94,14 @@ class _CarouselView extends StatelessWidget {
     required this.isTap,
     required this.onTap,
     required this.currentIndex,
-    required this.onPageChanged, required this.health, required this.onWaterChange,
+    required this.onPageChanged,
+    required this.health,
+    required this.onWaterChange,
   });
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> carouselItems = [
+    final carouselItems = <Widget>[
       CarouselCalories(
         isTap: isTap,
         onTap: onTap,
@@ -98,7 +110,7 @@ class _CarouselView extends StatelessWidget {
       CarouselHealth(
         isTap: isTap,
         onTap: onTap,
-        health: health
+        health: health,
       ),
       CarouselActivity(
         waterIntakeMl: health.dailyWater,
@@ -118,7 +130,6 @@ class _CarouselView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        // Carousel indicator dots
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(carouselItems.length, (index) {
