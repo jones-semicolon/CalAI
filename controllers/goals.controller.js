@@ -31,7 +31,7 @@ const RESPONSE_TYPE = "json_object";
 exports.calculateGoals = async (req, res) => {
   try {
     // 1. Destructure and validate required user input fields.
-    const { age, weight, height, activity_level, gender, goal } = req.body;
+    const { age, weight, height, activity_level, gender, goal } = req.query;
 
     if (!age || !weight || !height || !activity_level || !gender || !goal) {
       return res.status(400).json({

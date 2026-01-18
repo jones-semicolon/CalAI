@@ -19,10 +19,10 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Routes
 app.use("/test", testRoute);
-app.use("/calculate_goals", goalsRoute);
-app.use("/scan_barcode", barcodeRoute);
-app.use("/scan_food", scanRoute);
-app.use("/log_exercise", exerciseRoute);
+app.use("/calculate-goals", goalsRoute);
+app.use("/scan-barcode", barcodeRoute);
+app.use("/scan-food", scanRoute);
+app.use("/log-exercise", exerciseRoute);
 app.use("/food", foodDatabase);
 
 app.listen(PORT, () => {

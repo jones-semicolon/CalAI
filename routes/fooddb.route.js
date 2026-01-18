@@ -6,8 +6,8 @@ const {
   getFood,
 } = require("../controllers/fooddb.controller");
 
-router.post("/search", searchFoods);
+router.get("/search", searchFoods);
 router.get("/list", getFoodList);
-router.post("/", getFood);
+router.get("/", getFood);
 
 module.exports = router;

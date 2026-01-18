@@ -23,7 +23,7 @@ const PRODUCT_FIELDS = [
 
 exports.scanBarcode = async (req, res) => {
   // Use destructuring for cleaner access to input
-  const { barcode } = req.body;
+  const { barcode } = req.query;
 
   if (!barcode) {
     // Use success: false for non-200 responses to be explicit

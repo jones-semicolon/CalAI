@@ -22,7 +22,7 @@ const FALLBACK_SYSTEM_PROMPT = "You are an assistant that analyzes images.";
  * @returns {Promise<void>} Sends a JSON response containing the calculated goals or an error.
  */
 exports.scanFood = async (req, res) => {
-  const { image_url } = req.body;
+  const { image_url } = req.query;
 
   // 1. Input Validation
   if (!image_url) {
