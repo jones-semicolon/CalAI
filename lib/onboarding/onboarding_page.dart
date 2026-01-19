@@ -1,4 +1,5 @@
 import 'package:calai/onboarding/steps_pages/step_9.1.dart';
+import 'package:calai/onboarding/steps_pages/step_9.5.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +8,7 @@ import '../pages/widget_tree.dart';
 import 'auth_entry/auth_entry_page.dart';
 import 'onboarding_widgets/onboarding_appbar.dart';
 import 'steps_pages/step_1.dart';
+import 'steps_pages/step_16.dart';
 import 'steps_pages/step_2.dart';
 import 'steps_pages/step_3.dart';
 import 'steps_pages/step_4.dart';
@@ -15,6 +17,8 @@ import 'steps_pages/step_6.dart';
 import 'steps_pages/step_7.dart';
 import 'steps_pages/step_8.dart';
 import 'steps_pages/step_9.2.dart';
+import 'steps_pages/step_9.3.dart';
+import 'steps_pages/step_9.4.dart';
 import 'steps_pages/step_9.dart';
 import 'steps_pages/step_10.dart';
 import 'steps_pages/step_11.dart';
@@ -22,7 +26,7 @@ import 'steps_pages/step_12.dart';
 import 'steps_pages/step_13.dart';
 import 'steps_pages/step_14.dart';
 import 'steps_pages/step_15.dart';
-import 'steps_pages/step_16.dart';
+import 'steps_pages/step_17.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
@@ -56,9 +60,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
       if (!mounted) return;
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const WidgetTree()),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const WidgetTree()));
     }
   }
 
@@ -86,7 +90,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       OnboardingStep7(nextPage: _nextPage),
       OnboardingStep8(nextPage: _nextPage),
       if (goal != 'maintain') WeightPickerPage(nextPage: _nextPage),
-      EncourageMessage(nextPage: _nextPage),
+      if (goal != 'maintain') EncourageMessage(nextPage: _nextPage),
+      if (goal != 'maintain') ProgressSpeed(nextPage: _nextPage),
+      if (goal != 'maintain') Comparison(nextPage: _nextPage),
+      if (goal != 'maintain') Demotivated(nextPage: _nextPage),
       OnboardingStep9(nextPage: _nextPage),
       OnboardingStep10(nextPage: _nextPage),
       OnboardingStep11(nextPage: _nextPage),
@@ -95,6 +102,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       OnboardingStep14(nextPage: _nextPage),
       OnboardingStep15(nextPage: _nextPage),
       OnboardingStep16(nextPage: _nextPage),
+      OnboardingStep17(nextPage: _nextPage),
     ];
   }
 

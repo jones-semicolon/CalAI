@@ -126,16 +126,21 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
 
     final width = MediaQuery.of(context).size.width;
     final sidePadding = width / 2 - _tickSpacing / 2;
-    final double totalHeight = 110; 
+    final double totalHeight = 110;
     final double rulerHeight = totalHeight / 1.5;
 
-    final currentX = sidePadding + _offsetFromKg(user.weight);
-    final indicatorX = width / 2;
-    final currentViewX =
+    final double indicatorX = width / 2;
+
+    final double currentX = sidePadding + _offsetFromKg(user.weight);
+
+    final double currentViewX =
         currentX - (_scrollCtrl.hasClients ? _scrollCtrl.offset : 0);
 
-    final barLeft = math.min(currentViewX, indicatorX);
-    final barWidth = (indicatorX - currentViewX).abs();
+    // Gradient bounds
+    final double gradientLeft = math.min(currentViewX, indicatorX);
+
+    final double gradientWidth = (indicatorX - currentViewX).abs();
+
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -172,35 +177,36 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
           height: totalHeight,
           width: double.infinity,
           child: Stack(
-            clipBehavior: Clip.none, 
+            clipBehavior: Clip.none,
             children: [
               // === Ruler + Gradient ===
               SizedBox(
-                height: rulerHeight, 
+                height: rulerHeight,
                 width: double.infinity,
                 child: ClipRect(
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
                       // Gradient bar
-                      if (barWidth > 0)
+                      if (gradientWidth > 0)
                         Positioned(
-                          left: math.max(barLeft, 0),
+                          left: gradientLeft,
                           bottom: 0,
-                          child: Container(
-                            width: math.min(
-                              barWidth,
-                              MediaQuery.of(context).size.width,
-                            ),
+                          child: SizedBox(
+                            width: gradientWidth,
                             height: _tallTickHeight * _scale + 20,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  theme.colorScheme.onPrimary.withOpacity(0.5),
-                                  Colors.transparent,
-                                ],
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    theme.colorScheme.onPrimary.withOpacity(
+                                      0.5,
+                                    ),
+                                    Colors.transparent,
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -254,8 +260,8 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
               ),
 
               Positioned(
-                left: currentViewX - 15, 
-                top: rulerHeight + 5, 
+                left: currentViewX - 15,
+                top: rulerHeight + 5,
                 child: Text(
                   '${_format(user.weight, unit)} ${unit == WeightUnit.kg ? 'kg' : 'lbs'}',
                   style: TextStyle(

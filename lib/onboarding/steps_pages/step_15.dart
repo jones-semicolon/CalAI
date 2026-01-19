@@ -59,8 +59,6 @@ class OnboardingStep15 extends StatelessWidget {
                 nextPage();
               },
             ),
-
-            const SizedBox(height: 20),
           ],
         ),
       ),

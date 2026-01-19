@@ -14,6 +14,8 @@ class UserData {
   final String likeToAccomplish;
   final bool isAddCalorieBurn;
   final bool isRollover;
+  final double progressSpeed;
+  final String stoppingReachGoal;
 
   const UserData({
     required this.gender,
@@ -29,6 +31,8 @@ class UserData {
     required this.likeToAccomplish,
     required this.isAddCalorieBurn,
     required this.isRollover,
+    required this.progressSpeed,
+    required this.stoppingReachGoal,
   });
 
   UserData copyWith({
@@ -45,6 +49,8 @@ class UserData {
     String? likeToAccomplish,
     bool? isAddCalorieBurn,
     bool? isRollover,
+    double? progressSpeed,
+    String? stoppingReachGoal,
   }) {
     return UserData(
       gender: gender ?? this.gender,
@@ -61,6 +67,8 @@ class UserData {
       likeToAccomplish: likeToAccomplish ?? this.likeToAccomplish,
       isAddCalorieBurn: isAddCalorieBurn ?? this.isAddCalorieBurn,
       isRollover: isRollover ?? this.isRollover,
+      progressSpeed: progressSpeed ?? this.progressSpeed,
+      stoppingReachGoal: stoppingReachGoal ?? this.stoppingReachGoal,
     );
   }
 }
@@ -82,6 +90,8 @@ class UserDataNotifier extends StateNotifier<UserData> {
           likeToAccomplish: "",
           isAddCalorieBurn: false,
           isRollover: false,
+          progressSpeed: 0.1, // in kg
+          stoppingReachGoal: "",
         ),
       );
 
@@ -101,6 +111,9 @@ class UserDataNotifier extends StateNotifier<UserData> {
   void setIsAddCalorieBurn(bool b) =>
       state = state.copyWith(isAddCalorieBurn: b);
   void setIsRollover(bool r) => state = state.copyWith(isRollover: r);
+  void setProgressSpeed(double p) => state = state.copyWith(progressSpeed: p);
+  void setStoppingReachGoal(String s) =>
+      state = state.copyWith(stoppingReachGoal: s);
 }
 
 final userProvider = StateNotifierProvider<UserDataNotifier, UserData>(

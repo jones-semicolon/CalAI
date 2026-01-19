@@ -34,6 +34,7 @@ class AppTheme {
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.white,
       foregroundColor: Colors.black,
+      surfaceTintColor: Color.fromARGB(255, 242, 240, 254),
       elevation: 0,
     ),
 
@@ -56,6 +57,7 @@ class AppTheme {
       scrim: Color.fromARGB(255, 239, 246, 238),
       secondaryFixed: Color.fromARGB(255, 232, 232, 232),
       surfaceContainerHighest: Color.fromARGB(255, 217, 218, 220),
+      tertiaryContainer: Color.fromARGB(255, 222, 221, 226),
     ),
 
     dialogTheme: DialogThemeData(
@@ -142,6 +144,7 @@ class AppTheme {
         35,
       ), // used in card, bg color
       foregroundColor: Colors.white,
+      surfaceTintColor: Color.fromARGB(255, 43, 42, 58),
       elevation: 0,
     ),
 
@@ -168,6 +171,7 @@ class AppTheme {
       onTertiaryFixed: Color.fromARGB(255, 146, 143, 152),
       secondaryFixed: Color.fromARGB(255, 52, 49, 58),
       surfaceContainerHighest: Color.fromARGB(255, 0, 0, 0),
+      tertiaryContainer: Color.fromARGB(255, 66, 63, 70),
     ),
 
     // Google Fonts text theme (adjust colors for dark mode)
