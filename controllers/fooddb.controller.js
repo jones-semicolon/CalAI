@@ -85,37 +85,64 @@ exports.getFoodList = async (_, res) => {
 
 /**
  * Handler for the /fdc endpoint. Get the the data of the current product, transformed.
- * @param {string} req.id = Food ID from the Food Data Central
+ * @param {string} req.id = Food IDs from the Food Data Central
  */
 exports.getFood = async (req, res) => {
   const { id } = req.query;
 
   if (!id) {
     return res.status(400).json({
-      error: "An ID is required for the /FDC endpoint.",
+      error: "IDs are required for the /FDC endpoint.",
       details:
-        "Please provide a 'id' query parameter with the Food Data Central ID.",
+        "Please provide 'id' query parameter(s) with the Food Data Central ID(s).",
     });
   }
 
-  // Use the /foods endpoint to get detailed nutrient information for a specific FDC ID
-  const url = `${FOODCENTRAL_BASE_URL}?api_key=${FOODCENTRAL_API_KEY}&fdcIds=${id}`;
+  // 1. Normalize input: Handle ?id=1,2,3 (string) OR ?id=1&id=2 (array) OR ?id=1 (string)
+  let fdcIds = [];
+  if (Array.isArray(id)) {
+    fdcIds = id;
+  } else if (typeof id === "string") {
+    // Split by comma in case user sends ?id=123,456
+    fdcIds = id
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s);
+  }
+
+  // 2. Validate Limit (Max 20)
+  if (fdcIds.length > 20) {
+    return res.status(400).json({
+      error: "Too many IDs.",
+      details: `You provided ${fdcIds.length} IDs. The maximum allowed is 20.`,
+    });
+  }
+
+  // 3. Construct URL with multiple fdcIds parameters
+  // The USDA API expects: .../foods?fdcIds=123&fdcIds=456&api_key=...
+  const queryParams = new URLSearchParams();
+  queryParams.append("api_key", FOODCENTRAL_API_KEY);
+
+  fdcIds.forEach((fdcId) => {
+    queryParams.append("fdcIds", fdcId);
+  });
+
+  // Note: Ensure FOODCENTRAL_BASE_URL ends without a query string, e.g., "https://api.nal.usda.gov/fdc/v1/foods"
+  const url = `${FOODCENTRAL_BASE_URL}?${queryParams.toString()}`;
 
   try {
     const rawData = await executeFetch(url);
 
-    // FDC typically returns an array even for a single ID, so we take the first element.
     if (!Array.isArray(rawData) || rawData.length === 0) {
       return res.status(404).json({
-        error: "Food not found.",
-        details: `No data returned for FDC ID: ${id}.`,
+        error: "Foods not found.",
+        details: `No data returned for the provided FDC IDs.`,
       });
     }
 
-    const foodItem = rawData[0];
+    // 4. Transform all items in the array
+    const transformedData = rawData.map((foodItem) => foodtoCalAI(foodItem));
 
-    // Apply the transformation utility to format the output
-    const transformedData = foodtoCalAI(foodItem);
     return res.json(transformedData);
   } catch (error) {
     return sendErrorResponse(res, error);
