@@ -51,6 +51,8 @@ exports.foodtoCalAI = (food) => {
     fdcId: food.fdcId,
     name: food.description,
     calories_kcal: findNutrientById(foodNutrients, NUTRIENT_IDS.calories_kcal),
+    foodPortions: food.foodPortions,
+    inputFoods: food.inputFoods,
     nutrients: {
       protein_g: findNutrientById(foodNutrients, NUTRIENT_IDS.protein_g),
       carbs_g: findNutrientById(foodNutrients, NUTRIENT_IDS.carbs_g),
