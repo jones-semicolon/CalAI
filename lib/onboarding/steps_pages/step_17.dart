@@ -63,7 +63,7 @@ class OnboardingStep17 extends StatelessWidget {
           // Continue button
           SizedBox(
             width: double.infinity,
-            child: ContinueButton(enabled: true, onNext: nextPage),
+            child: ContinueButton(enabled: true, onNext: nextPage ),// on tap calibrate the data and go to next page
           ),
         ],
       ),

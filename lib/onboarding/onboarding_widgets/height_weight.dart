@@ -280,8 +280,8 @@ class _HeightWeightPickerWidgetState
         Switch(
           value: isMetric,
           activeTrackColor: theme.colorScheme.onPrimary,
-          inactiveThumbColor: Colors.white, 
-          activeThumbColor: Colors.white,
+          inactiveThumbColor: theme.colorScheme.onPrimary, 
+          activeThumbColor: theme.scaffoldBackgroundColor,
           inactiveTrackColor: theme.colorScheme.secondaryFixed, 
           onChanged: (v) {
             setState(() => isMetric = v);

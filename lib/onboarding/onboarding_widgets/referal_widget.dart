@@ -86,13 +86,15 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
                       child: TextField(
                         controller: _controller,
                         focusNode: _focusNode,
+                        cursorColor: colors.onPrimary,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           isDense: true,
                         ),
                         style: TextStyle(
                           color: colors.onPrimary,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
                         ),
                         textInputAction: TextInputAction.done,
                         onSubmitted: (_) => _submit(),
@@ -116,7 +118,7 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
-                        vertical: 17,
+                        vertical: 10,
                       ),
                     ),
                     child: Text(
