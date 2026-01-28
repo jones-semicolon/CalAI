@@ -1,4 +1,17 @@
+import 'package:calai/data/user_data.dart';
 import 'package:flutter_riverpod/legacy.dart';
+
+enum PortionType { tbsp, grams, serving, cup }
+
+PortionType portionTypeFromLabel(String label) {
+  final l = label.toLowerCase();
+  if (l.contains("tbsp") || l.contains("tablespoon")) return PortionType.tbsp;
+  if (l.contains("serving")) return PortionType.serving;
+  if (l.contains("cup")) return PortionType.cup;
+
+  // ✅ assume grams (fallback)
+  return PortionType.grams;
+}
 
 class HealthData {
   // Goals
@@ -21,6 +34,9 @@ class HealthData {
   final int dailySugar;
   final int dailySodium;
 
+  // Others
+  final WeightUnit weightUnit;
+
   const HealthData({
     this.calorieGoal = 0,
     this.proteinGoal = 0,
@@ -38,6 +54,7 @@ class HealthData {
     this.dailyFiber = 0,
     this.dailySugar = 0,
     this.dailySodium = 0,
+    this.weightUnit = WeightUnit.kg,
   });
 
   factory HealthData.initial() => const HealthData();
@@ -48,6 +65,7 @@ class HealthData {
     int? dailyIntake, int? dailyWater, int? dailyBurned,
     int? dailyProtein, int? dailyCarbs, int? dailyFats,
     int? dailyFiber, int? dailySugar, int? dailySodium,
+    WeightUnit? weightUnit,
   }) {
     return HealthData(
       calorieGoal: calorieGoal ?? this.calorieGoal,
@@ -66,6 +84,7 @@ class HealthData {
       dailyFiber: dailyFiber ?? this.dailyFiber,
       dailySugar: dailySugar ?? this.dailySugar,
       dailySodium: dailySodium ?? this.dailySodium,
+      weightUnit: weightUnit ?? this.weightUnit,
     );
   }
 }
@@ -82,7 +101,7 @@ class HealthDataNotifier extends StateNotifier<HealthData> {
     required int water,
     required int burned,
     required int p, required int c, required int f,
-    int? fiber, int? sugar, int? sodium,
+    required int fiber, required int sugar, required int sodium, required WeightUnit unit,
   }) {
     state = state.copyWith(
       dailyIntake: intake,
@@ -94,6 +113,7 @@ class HealthDataNotifier extends StateNotifier<HealthData> {
       dailyFiber: fiber,
       dailySugar: sugar,
       dailySodium: sodium,
+      weightUnit: unit,
     );
   }
 }
@@ -101,5 +121,3 @@ class HealthDataNotifier extends StateNotifier<HealthData> {
 final healthDataProvider = StateNotifierProvider<HealthDataNotifier, HealthData>((ref) {
   return HealthDataNotifier();
 });
-
-enum WeightUnit {kg, lbs}

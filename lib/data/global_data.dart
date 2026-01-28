@@ -8,13 +8,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
+import '../api/food_api.dart';
 import 'global_data_state.dart';
 import 'health_data.dart';
+
+enum FoodSource { foodDatabase("food-database"), foodUpload("food-upload"), exercise("exercise"); final String value; const FoodSource(this.value);}
 
 final globalDataProvider =
 AsyncNotifierProvider<GlobalDataNotifier, GlobalDataState>(
   GlobalDataNotifier.new,
 );
+
+// This provider manages the stream and prevents it from restarting on every UI change
+final dailyEntriesProvider = StreamProvider.family<List<Map<String, dynamic>>, String>((ref, dateId) {
+  return ref.read(globalDataProvider.notifier).watchEntries(dateId);
+});
 
 class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _dailyLogSub;
@@ -38,6 +46,9 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   DocumentReference<Map<String, dynamic>> _dailyLogDoc(String uid, String date) =>
       _dailyLogsCol(uid).doc(date);
 
+  CollectionReference<Map<String, dynamic>> _savedFood(String uid) =>
+      _userDoc(uid).collection('savedFoods');
+
   @override
   FutureOr<GlobalDataState> build() {
     ref.onDispose(() {
@@ -53,7 +64,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   // -----------------------------
 
   Future<void> init() async {
-    // prevent double init
     if (state.asData?.value.isInitialized == true) return;
 
     state = const AsyncLoading();
@@ -62,24 +72,32 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       _syncFirebaseNameIntoUserProvider();
       await _loadUserProfileIntoUserProvider();
 
-      final hasGoals = await loadGoalsFromFirestore();
-      if (!hasGoals) {
-        await updateProfile();
-        await fetchGoals();
-      }
+      // ✅ READ ONLY — no API
+      await loadGoalsFromFirestore();
 
       await ensureDailyLogExists();
 
-      // Start live listeners
       listenToDailySummary(_todayId);
       listenToProgressLogs();
 
-      // mark initialized (do not reset other fields)
       final current = state.asData?.value ?? GlobalDataState.initial();
       state = AsyncData(current.copyWith(isInitialized: true));
     } catch (e, st) {
       state = AsyncError(e, st);
     }
+  }
+
+  Stream<List<Map<String, dynamic>>> watchEntries(String dateId) {
+    final uid = _uid;
+    if (uid == null) return const Stream.empty();
+
+    return _dailyLogDoc(uid, dateId)
+        .collection('entries')
+        .orderBy('timestamp', descending: true) // Newest items at the top
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => doc.data()).toList();
+    });
   }
 
   // -----------------------------
@@ -320,40 +338,137 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     );
   }
 
-  Future<void> logFoodEntry({
-    required String name,
-    required int calories,
-    required double p,
-    required double c,
-    required double f,
+  Future<void> logExerciseEntry({
+    int? id,
+    required double burnedCalories,
+    required double weightKg,
+    required String exerciseType,
+    required String intensity,
+    required int durationMins,
   }) async {
     final uid = _uid;
     if (uid == null) return;
 
     final dayRef = _dailyLogDoc(uid, _todayId);
+    final source = "exercise";
+
+    // Use provided ID or generate a string ID based on time
+    final entryId = id?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
+
     final batch = _db.batch();
 
-    batch.set(dayRef.collection('entries').doc(), {
-      'name': name,
-      'calories': calories,
-      'macros': {'p': p, 'c': c, 'f': f},
+    // ✅ 1) Save the specific exercise entry
+    final entryRef = dayRef.collection('entries').doc(entryId);
+
+    batch.set(entryRef, {
+      'id': entryId,
+      'source': source,
+      'exerciseType': exerciseType,
+      'intensity': intensity,
+      'durationMins': durationMins,
+      'caloriesBurned': burnedCalories,
+      'weightKg': weightKg,
       'timestamp': FieldValue.serverTimestamp(),
     });
 
-    // merge set avoids crash if doc doesn't exist
     batch.set(
       dayRef,
       {
-        'dailyProgress.caloriesEaten': FieldValue.increment(calories),
-        'dailyProgress.protein': FieldValue.increment(p),
-        'dailyProgress.carbs': FieldValue.increment(c),
-        'dailyProgress.fats': FieldValue.increment(f),
+        'dailyProgress': {
+          // OPTION A: Recommended - Track burned separately
+          'caloriesBurned': FieldValue.increment(burnedCalories),
+
+          // OPTION B: If you strictly want to subtract from eaten (Net Calories approach)
+          // 'caloriesEaten': FieldValue.increment(-burnedCalories),
+        },
         'updatedAt': FieldValue.serverTimestamp(),
       },
       SetOptions(merge: true),
     );
 
     await batch.commit();
+  }
+
+  Future<void> logFoodEntry({
+    String? id,
+    required String name,
+    required int calories,
+    required int p,
+    required int c,
+    required int f,
+    required int serving,
+    required FoodSource source,
+  }) async {
+    final uid = _uid;
+    if (uid == null) return;
+
+    final dayRef = _dailyLogDoc(uid, _todayId);
+
+    // ✅ generate entryId
+    final entryId = source == FoodSource.foodUpload
+        ? _makeEntryId(source: source, id: id)
+        : id;
+
+    if (entryId == null) {
+      throw Exception("Food ID is required for non-upload foods.");
+    }
+
+    final entryRef = dayRef.collection('entries').doc(entryId.toString());
+
+    // ✅ 1) get current dailyProgress (SAFE)
+    final snap = await dayRef.get();
+    final data = snap.data();
+
+    final dp = (data?['dailyProgress'] as Map<String, dynamic>?) ?? {};
+
+    double _num(dynamic v) => (v is num) ? v.toDouble() : 0.0;
+
+    final newDailyProgress = {
+      'caloriesEaten': _num(dp['caloriesEaten']) + calories,
+      'protein': _num(dp['protein']) + p,
+      'carbs': _num(dp['carbs']) + c,
+      'fats': _num(dp['fats']) + f,
+    };
+
+    final batch = _db.batch();
+
+    // ✅ 2) save entry
+    batch.set(entryRef, {
+      'id': entryId,
+      'source': source.value,
+      'name': name,
+      'serving': serving,
+      'calories': calories,
+      'macros': {'p': p, 'c': c, 'f': f},
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    // ✅ 3) write back the whole dailyProgress map (FIXED)
+    batch.set(
+      dayRef,
+      {
+        'dailyProgress': newDailyProgress,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+
+    await batch.commit();
+  }
+
+  String _makeEntryId({
+    required dynamic source,
+    String? id,
+  }) {
+    if (source == FoodSource.foodUpload || source == "exercise") {
+      return "00${DateTime.now().millisecondsSinceEpoch}";
+    }
+
+    if (id == null) {
+      throw Exception("Missing fdcId for API food.");
+    }
+
+    return id.toString();
   }
 
   // -----------------------------
@@ -398,6 +513,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
   Future<void> updateProfile() async {
     final uid = _uid;
+    debugPrint('updateProfile: $uid');
     if (uid == null) return;
 
     final user = ref.read(userProvider);
@@ -417,23 +533,46 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     );
   }
 
+  Future<void> saveFood(FoodSearchItem item) async {
+    final uid = _uid;
+    if (uid == null) return;
+
+    await _savedFood(uid).doc(item.fdcId.toString()).set(
+      {
+        ...item.toJson(),
+        'savedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+  }
+
   Future<void> fetchGoals() async {
+    final uid = _uid;
+    if (uid == null) return;
+
+    final doc = await _userDoc(uid).get();
+    if (doc.data()?['dailyGoals'] != null) {
+      debugPrint("Goals already exist — skipping API");
+      return;
+    }
+
     final user = ref.read(userProvider);
 
     try {
-      final response = await http.post(
-        Uri.parse('https://cal-ai-liard.vercel.app/calculate_goals'),
-        headers: const {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'age': _calculateAge(user.birthDay),
-          'gender': user.gender.value,
-          'height': user.height,
-          'weight': user.weight,
-          'activity_level': user.workOutPerWeek.value,
-          'goal': user.goal.value,
-        }),
+      final uri = Uri.https(
+        "cal-ai-liard.vercel.app",
+        "/calculate-goals",
+        {
+          "age": _calculateAge(user.birthDay).toString(),
+          "gender": user.gender.value,
+          "height": user.height.toString(),
+          "weight": user.weight.toString(),
+          "activity_level": user.workOutPerWeek.value,
+          "goal": user.goal.value,
+        },
       );
 
+      final response = await http.get(uri);
       if (response.statusCode < 200 || response.statusCode >= 300) return;
 
       final body = jsonDecode(response.body) as Map<String, dynamic>;
@@ -457,13 +596,10 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
       _applyGoalsToHealthState(dailyGoals);
 
-      final uid = _uid;
-      if (uid != null) {
-        await _userDoc(uid).set(
-          {'dailyGoals': dailyGoals},
-          SetOptions(merge: true),
-        );
-      }
+      await _userDoc(uid).set(
+        {'dailyGoals': dailyGoals},
+        SetOptions(merge: true),
+      );
     } catch (e, st) {
       debugPrint('fetchGoals API error: $e\n$st');
     }

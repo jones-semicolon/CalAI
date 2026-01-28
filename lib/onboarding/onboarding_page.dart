@@ -4,10 +4,16 @@ import 'package:calai/onboarding/steps_pages/step_13.dart';
 import 'package:calai/onboarding/steps_pages/step_14.dart';
 import 'package:calai/onboarding/steps_pages/step_15.dart';
 import 'package:calai/onboarding/steps_pages/step_16.dart';
+import 'package:calai/onboarding/steps_pages/step_17.dart';
+import 'package:calai/onboarding/steps_pages/step_18.dart';
+import 'package:calai/onboarding/steps_pages/step_9.1.dart';
+import 'package:calai/onboarding/steps_pages/step_9.2.dart';
+import 'package:calai/onboarding/steps_pages/step_9.3.dart';
+import 'package:calai/onboarding/steps_pages/step_9.4.dart';
+import 'package:calai/onboarding/steps_pages/step_9.5.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:calai/pages/shell/widget_tree.dart';
-import '../data/global_data.dart';
 import '../data/user_data.dart';
 import 'auth_entry/auth_entry_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,10 +39,12 @@ class OnboardingPage extends ConsumerStatefulWidget {
 }
 
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
+  final GlobalKey<OnboardingStep18State> _step18Key =
+  GlobalKey<OnboardingStep18State>();
   late PageController _pageController = PageController();
   late int _currentIndex;
 
-  List<Widget> _pages(String goal) {
+  List<Widget> _pages(Goal goal) {
     return [AuthEntryPage(onGetStarted: _nextPage),
 
       OnboardingStep1(nextPage: _nextPage),
@@ -47,6 +55,11 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       OnboardingStep6(nextPage: _nextPage),
       OnboardingStep7(nextPage: _nextPage),
       OnboardingStep8(nextPage: _nextPage),
+      if (goal != Goal.maintain) WeightPickerPage(nextPage: _nextPage),
+      if (goal != Goal.maintain) EncourageMessage(nextPage: _nextPage),
+      if (goal != Goal.maintain) ProgressSpeed(nextPage: _nextPage),
+      if (goal != Goal.maintain) Comparison(nextPage: _nextPage),
+      if (goal != Goal.maintain) Demotivated(nextPage: _nextPage),
       OnboardingStep9(nextPage: _nextPage),
       OnboardingStep10(nextPage: _nextPage),
       OnboardingStep11(nextPage: _nextPage),
@@ -55,13 +68,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       OnboardingStep14(nextPage: _nextPage),
       OnboardingStep15(nextPage: _nextPage),
       OnboardingStep16(nextPage: _nextPage),
+      OnboardingStep17(nextPage: _nextPage),
+      OnboardingStep18(
+      key: _step18Key,
+      nextPage: _nextPage,
+      ),
     ];
   }
 
   void _nextPage() async {
-    final goal = ref.watch(userProvider).goal;
+    final Goal goal = ref.watch(userProvider).goal;
 
-    final List<Widget> pages = _pages(goal.toString());
+    final List<Widget> pages = _pages(goal);
 
     if (_currentIndex < pages.length - 1) {
       _pageController.nextPage(
@@ -96,8 +114,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final goal = ref.watch(userProvider).goal;
-    final pages = _pages(goal.toString());
+    final Goal goal = ref.watch(userProvider).goal;
+    final pages = _pages(goal);
 
     final bool isAuthPage = _currentIndex == 0;
 
@@ -128,6 +146,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 controller: _pageController,
                 onPageChanged: (index) {
                   setState(() => _currentIndex = index);
+
+                  final goal = ref.read(userProvider).goal;
+                  final pages = _pages(goal);
+
+                  // ✅ Trigger Step 18 computation ONLY when it becomes visible
+                  if (pages[index] is OnboardingStep18) {
+                    _step18Key.currentState?.startComputation();
+                  }
                 },
                 children: pages,
               ),

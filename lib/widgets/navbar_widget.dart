@@ -15,7 +15,7 @@ class NavBarWidget extends StatelessWidget {
       builder: (context, page, child) {
         return IntrinsicHeight(
           child: Container(
-            color: Theme.of(context).scaffoldBackgroundColor,
+            // color: Theme.of(context).scaffoldBackgroundColor,
             padding: const EdgeInsets.only(bottom: 15, top: 15),
             child: Row(
               mainAxisSize: MainAxisSize.max,

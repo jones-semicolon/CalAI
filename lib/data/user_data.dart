@@ -20,6 +20,10 @@ enum Gender {
 
 enum HeightUnit { cm, ft }
 
+enum WeightUnit { kg("kg"), lbs("lbs"); final String value; const WeightUnit(this.value);}
+
+enum SpeedLevel { slow("slow"), recommended("recommended"), aggressive("aggressive"); final String value; const SpeedLevel(this.value); }
+
 enum WorkoutFrequency { low("low"), moderate("moderate"), high("high"); final String value; const WorkoutFrequency(this.value); }
 
 enum Goal { loseWeight("lose weight"), maintain("maintain"), gainWeight("gain weight"); final String value; const Goal(this.value); }
@@ -44,6 +48,8 @@ class UserData {
   final bool isAddCalorieBurn;
   final bool isRollover;
   final double weightGoal;
+  final double progressSpeed;
+  final String stoppingReachGoal;
 
   double get bmi {
     if (height <= 0) return 0.0;
@@ -67,6 +73,8 @@ class UserData {
     required this.isAddCalorieBurn,
     required this.weightGoal,
     required this.isRollover,
+    required this.progressSpeed,
+    required this.stoppingReachGoal,
   });
 
   factory UserData.initial() => UserData(
@@ -75,8 +83,8 @@ class UserData {
     workOutPerWeek: WorkoutFrequency.low, // FIXED: Changed '' to Enum value
     social: '',
     hasTriedOtherCalorieApps: false,
-    height: 0.0,
-    weight: 0.0,
+    height: 168,
+    weight: 54,
     weightGoal: 0.0,
     birthDay: DateTime(2001, 1, 1),
     goal: Goal.maintain,
@@ -85,6 +93,8 @@ class UserData {
     likeToAccomplish: GoalFocus.consistency,
     isAddCalorieBurn: false,
     isRollover: false,
+    progressSpeed: 0.8,
+    stoppingReachGoal: '',
   );
 
   UserData copyWith({
@@ -103,6 +113,8 @@ class UserData {
     GoalFocus? likeToAccomplish,
     bool? isAddCalorieBurn,
     bool? isRollover,
+    double? progressSpeed,
+    String? stoppingReachGoal,
   }) {
     return UserData(
       gender: gender ?? this.gender,
@@ -121,6 +133,8 @@ class UserData {
       likeToAccomplish: likeToAccomplish ?? this.likeToAccomplish,
       isAddCalorieBurn: isAddCalorieBurn ?? this.isAddCalorieBurn,
       isRollover: isRollover ?? this.isRollover,
+      progressSpeed: progressSpeed ?? this.progressSpeed,
+      stoppingReachGoal: stoppingReachGoal ?? this.stoppingReachGoal,
     );
   }
 }

@@ -27,9 +27,9 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
   void initState() {
     super.initState();
 
-    final goal = ref.read(userProvider).goal;
+    final Goal goal = ref.read(userProvider).goal;
 
-    final matchOption = options.indexWhere((i) => i.title == goal);
+    final matchOption = options.indexWhere((i) => i.value == goal);
     if (matchOption != -1) {
       selectedIndex = matchOption;
       isEnable = true;

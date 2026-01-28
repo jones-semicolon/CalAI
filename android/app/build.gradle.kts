@@ -10,7 +10,11 @@ plugins {
 
 android {
     namespace = "com.example.calai"
-    compileSdk = flutter.compileSdkVersion
+
+    // CHANGE THIS: Force compileSdk to 34 (Android 14) or higher
+    // flutter.compileSdkVersion might be too old (e.g. 33)
+    compileSdk = 36
+
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -23,11 +27,11 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.calai"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+
+        // KEEP THIS: 26 is good for the 'health' package
+        minSdk = 26
+
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

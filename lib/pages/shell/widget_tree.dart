@@ -1,7 +1,8 @@
+import 'package:calai/pages/auth/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Data Providers
 import '../../data/global_data.dart';
 
 // Global App Widgets
@@ -22,12 +23,23 @@ class WidgetTree extends ConsumerStatefulWidget {
 }
 
 class _WidgetTreeState extends ConsumerState<WidgetTree> {
+  bool _booted = false;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(globalDataProvider.notifier).init();
+
+    Future.microtask(() async {
+      if (_booted) return;
+      _booted = true;
+
+      // ✅ If no logged in user → fallback to guest
+      if (AuthService.getCurrentUser() == null) {
+        await AuthService.signInAsGuest();
+      }
+
+      // ✅ Now you always have a UID here
+      await ref.read(globalDataProvider.notifier).init();
     });
   }
 
@@ -39,10 +51,7 @@ class _WidgetTreeState extends ConsumerState<WidgetTree> {
         bottomNavigationBar: NavBarWidget(),
         body: CustomScrollView(
           slivers: [
-            // The app bar, which dynamically changes based on the selected page.
             WidgetTreeAppBar(),
-
-            // The main content area
             SliverToBoxAdapter(
               child: WidgetTreeContent(),
             ),

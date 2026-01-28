@@ -48,11 +48,12 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
             .map((e) => (e['calories'] as num).toDouble())
             .reduce((a, b) => a > b ? a : b);
 
-    final double interval = maxCalories / 4;
+    final double rawInterval = maxCalories / 4;
+    final double interval = rawInterval <= 0 ? 1 : rawInterval;
 
     // small padding so top bar doesn’t touch the line
-    final double minY = -interval * 0.01;
-    final double maxY = maxCalories + (interval * 0.10);
+    final double minY = 0;
+    final double maxY = max(maxCalories, interval * 4);
 
     return Column(
       children: [

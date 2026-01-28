@@ -56,7 +56,7 @@ class _NutrientCardsRow extends StatelessWidget {
             nutrients: health.fiberGoal, // Goal from HealthData
             progress: health.dailyFiber, // Intake from HealthData
             color: const Color.fromARGB(255, 163, 137, 211),
-            icon: Icons.favorite_border,
+            icon: Icons.grain,
             unit: "g",
             isTap: isTap,
           ),
@@ -68,7 +68,7 @@ class _NutrientCardsRow extends StatelessWidget {
             nutrients: health.sugarGoal,
             progress: health.dailySugar,
             color: const Color.fromARGB(255, 244, 143, 177),
-            icon: Icons.rice_bowl,
+            icon: Icons.bakery_dining,
             unit: "g",
             isTap: isTap,
           ),
@@ -80,7 +80,7 @@ class _NutrientCardsRow extends StatelessWidget {
             nutrients: health.sodiumGoal,
             progress: health.dailySodium,
             color: const Color.fromARGB(255, 231, 185, 110),
-            icon: Icons.grain,
+            icon: Icons.restaurant_menu,
             unit: "mg",
             isTap: isTap,
           ),

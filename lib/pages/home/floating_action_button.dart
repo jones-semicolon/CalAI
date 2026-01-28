@@ -1,4 +1,7 @@
+import 'package:calai/pages/home/floating_grid/log_exercise/log_exercise.dart';
 import 'package:flutter/material.dart';
+
+import 'floating_grid/food_database/food_database.dart';
 
 /// A widget that displays a 2x2 grid of action buttons.
 ///
@@ -10,24 +13,18 @@ class FloatingActionGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // AnimatedPadding automatically animates its child's position when the
-    // padding values change. Here, it reacts to the keyboard's height.
     return AnimatedPadding(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOut,
-      // `viewInsets.bottom` provides the height of the system keyboard.
-      // An additional 120 pixels of padding is added for spacing.
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 75,
       ),
-      child: const Align(
+      child: Align(
         alignment: Alignment.bottomCenter,
-        // The Material widget ensures that child widgets like InkWell or
-        // other Material components render correctly with proper theming.
         child: Material(
           color: Colors.transparent,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -37,24 +34,54 @@ class FloatingActionGrid extends StatelessWidget {
                     ActionGridButton(
                       icon: Icons.fitness_center,
                       label: "Log Exercise",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LogExercisePage(),
+                          ),
+                        );
+                      },
                     ),
                     ActionGridButton(
                       icon: Icons.bookmark_outline,
-                      label: "Save Foods",
+                      label: "Saved Foods",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const FoodDatabasePage(selectedTabIndex: 3),
+                          ),
+                        );                      },
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
+
                 /// --- Second Row of Buttons ---
                 _ActionRow(
                   children: [
                     ActionGridButton(
                       icon: Icons.search,
                       label: "Food Database",
+                      onTap: () {
+                        // debugPrint("Food Database tapped");
+
+                        // ✅ Example navigation
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const FoodDatabasePage(),
+                          ),
+                        );
+                      },
                     ),
                     ActionGridButton(
                       icon: Icons.qr_code_scanner,
                       label: "Scan Food",
+                      onTap: () {
+                        debugPrint("Scan Food tapped");
+                      },
                     ),
                   ],
                 ),
@@ -75,12 +102,19 @@ class _ActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      spacing: 12,
-      children: children.map((child) => Expanded(child: child)).toList(),
+      children: children
+          .map(
+            (child) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: child,
+          ),
+        ),
+      )
+          .toList(),
     );
   }
 }
-
 
 /// A styled button for use within the [FloatingActionGrid].
 ///
@@ -89,11 +123,13 @@ class _ActionRow extends StatelessWidget {
 class ActionGridButton extends StatelessWidget {
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 
   const ActionGridButton({
     super.key,
     required this.icon,
     required this.label,
+    this.onTap,
   });
 
   @override
@@ -101,44 +137,49 @@ class ActionGridButton extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 15),
-      decoration: BoxDecoration(
-        color: theme.appBarTheme.backgroundColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: theme.splashColor,
-          width: 2,
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        decoration: BoxDecoration(
+          color: theme.appBarTheme.backgroundColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: theme.splashColor,
+            width: 2,
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // The inner container provides a background for the icon.
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // The inner container provides a background for the icon.
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Icon(
+                icon,
+                size: 28,
+                color: colorScheme.primary,
+              ),
             ),
-            child: Icon(
-              icon,
-              size: 28,
-              color: colorScheme.primary,
+            const SizedBox(height: 6),
+
+            // The text label for the button.
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.primary,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
-          const SizedBox(height: 6),
-          // The text label for the button.
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.primary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -42,7 +42,7 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
     super.initState();
     final accomplish = ref.read(userProvider).likeToAccomplish;
 
-    final matchOption = options.indexWhere((i) => i.title == accomplish);
+    final matchOption = options.indexWhere((i) => i.value == accomplish);
     if (matchOption != -1) {
       selectedIndex = matchOption;
       isEnable = true;

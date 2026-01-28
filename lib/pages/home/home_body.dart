@@ -1,3 +1,5 @@
+import 'package:calai/api/exercise_api.dart';
+import 'package:calai/api/food_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:carousel_slider_plus/carousel_slider_plus.dart';
@@ -26,10 +28,12 @@ class _HomeBodyState extends ConsumerState<HomeBody> {
     final health = ref.watch(healthDataProvider);
 
     return globalAsync.when(
+      // ✅ skipLoadingOnRefresh: true prevents the whole screen from turning into
+      // a loading spinner when data updates in the background.
+      skipLoadingOnRefresh: true,
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text("Error: $e")),
       data: (global) {
-        // optional: if you still track "isInitialized"
         if (!global.isInitialized) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -54,13 +58,13 @@ class _HomeBodyState extends ConsumerState<HomeBody> {
                     ),
                   ),
 
+                  // Carousel UI logic isolated to HomeBody's setState
                   _CarouselView(
                     isTap: _isTap,
                     onTap: () => setState(() => _isTap = !_isTap),
                     health: health,
                     onWaterChange: (amount) {
-                      // ✅ if you want this to save to firestore, call global notifier here
-                      // ref.read(globalDataProvider.notifier).updateWater(amount);
+                      // Call your notifier if you have water update logic
                     },
                     currentIndex: _currentIndex,
                     onPageChanged: (index, _) =>
@@ -68,8 +72,11 @@ class _HomeBodyState extends ConsumerState<HomeBody> {
                   ),
 
                   const SizedBox(height: 30),
-                  const _RecentlyUploadedSection(),
-                  Container(height: 300),
+
+                  // ✅ Pass the active date to the section
+                  _RecentlyUploadedSection(dateId: global.activeDateId),
+
+                  const SizedBox(height: 300),
                 ],
               ),
             ),
@@ -80,7 +87,223 @@ class _HomeBodyState extends ConsumerState<HomeBody> {
   }
 }
 
-/// A private widget to encapsulate the Carousel and its indicator dots.
+// --- LOG CARD WIDGETS ---
+
+class _FoodLogCard extends StatelessWidget {
+  final Food food;
+  const _FoodLogCard({required this.food});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              image: food.imageUrl != null
+                  ? DecorationImage(image: NetworkImage(food.imageUrl!), fit: BoxFit.cover)
+                  : null,
+            ),
+            child: food.imageUrl == null
+                ? const Icon(Icons.restaurant, color: Colors.black, size: 24)
+                : null,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: Text(food.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), overflow: TextOverflow.ellipsis)),
+                    Text(food.formattedTime, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.local_fire_department, size: 16, color: Colors.black),
+                    const SizedBox(width: 4),
+                    Text("${food.calories} kcal", style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    _macro(Icons.egg_alt, "${food.protein}g", Colors.redAccent),
+                    const SizedBox(width: 10),
+                    _macro(Icons.rice_bowl, "${food.carbs}g", Colors.orangeAccent),
+                    const SizedBox(width: 10),
+                    _macro(Icons.fastfood_outlined, "${food.fats}g", Colors.blueAccent),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _macro(IconData icon, String label, Color color) => Row(children: [
+    Icon(icon, size: 12, color: color),
+    const SizedBox(width: 4),
+    Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+  ]);
+}
+
+class _ExerciseLogCard extends StatelessWidget {
+  final Exercise exercise;
+  const _ExerciseLogCard({required this.exercise});
+
+  @override
+  Widget build(BuildContext context) {
+    final type = ExerciseType.fromString(exercise.type);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48, height: 48,
+            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            child: Icon(type.icon, color: Colors.black, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(type.label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(exercise.formattedTime, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(children: [
+                  const Icon(Icons.local_fire_department, size: 16, color: Colors.black54),
+                  const SizedBox(width: 4),
+                  Text("${exercise.caloriesBurned} kcal", style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                ]),
+                const SizedBox(height: 6),
+                Row(children: [
+                  Icon(Icons.bolt, size: 14, color: Colors.grey[500]),
+                  const SizedBox(width: 4),
+                  Text(exercise.intensity.label, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                  const SizedBox(width: 12),
+                  Icon(Icons.access_time, size: 14, color: Colors.grey[500]),
+                  const SizedBox(width: 4),
+                  Text("${exercise.durationMins}m", style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                ]),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// --- RECENTLY LOGGED SECTION ---
+
+class _RecentlyUploadedSection extends ConsumerWidget {
+  final String dateId;
+  const _RecentlyUploadedSection({required this.dateId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ✅ Use ref.watch on our StreamProvider. This keeps the data
+    // cached even if HomeBody rebuilds.
+    final entriesAsync = ref.watch(dailyEntriesProvider(dateId));
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Recently logged", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 20),
+          entriesAsync.when(
+            // skipLoadingOnReload ensures we don't show a spinner every time a small change happens
+            skipLoadingOnReload: true,
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Text("Error loading logs: $e"),
+            data: (entries) {
+              if (entries.isEmpty) {
+                return _EmptyState();
+              }
+              return Column(
+                children: entries.map((data) => _buildItem(data)).toList(),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItem(Map<String, dynamic> data) {
+    final source = data['source'] ?? 'unknown';
+
+    if (source == 'exercise' || data.containsKey('caloriesBurned')) {
+      return _ExerciseLogCard(exercise: Exercise(
+        id: data['id']?.toString() ?? '',
+        type: data['exerciseType'] ?? 'Exercise',
+        intensity: Intensity.fromString(data['intensity'] ?? 'Low'),
+        durationMins: (data['durationMins'] ?? 0) as int,
+        caloriesBurned: (data['caloriesBurned'] ?? 0).toInt(),
+        timestamp: data['timestamp'] != null ? (data['timestamp'] as dynamic).toDate() : DateTime.now(),
+      ));
+    }
+
+    if (source == 'food-database' || source == 'food-upload') {
+      final macros = data['macros'] ?? {};
+      return _FoodLogCard(food: Food(
+        id: data['id'].toString(),
+        name: data['name'] ?? 'Food',
+        calories: (data['calories'] ?? 0).toInt(),
+        protein: (macros['p'] ?? 0).toInt(),
+        carbs: (macros['c'] ?? 0).toInt(),
+        fats: (macros['f'] ?? 0).toInt(),
+        timestamp: data['timestamp'] != null ? (data['timestamp'] as dynamic).toDate() : DateTime.now(),
+      ));
+    }
+    return const SizedBox.shrink();
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity, padding: const EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: Theme.of(context).appBarTheme.backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Theme.of(context).splashColor, width: 1),
+      ),
+      child: const Text("Tap + to add your first entry", textAlign: TextAlign.center),
+    );
+  }
+}
+
 class _CarouselView extends StatelessWidget {
   final bool isTap;
   final int currentIndex;
@@ -115,6 +338,7 @@ class _CarouselView extends StatelessWidget {
       CarouselActivity(
         waterIntakeMl: health.dailyWater,
         onWaterChange: onWaterChange,
+        health: health,
       ),
     ];
 
@@ -154,21 +378,6 @@ class _CarouselView extends StatelessWidget {
           }),
         ),
       ],
-    );
-  }
-}
-
-class _RecentlyUploadedSection extends StatelessWidget {
-  const _RecentlyUploadedSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Text(
-        "Recently uploaded",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
     );
   }
 }

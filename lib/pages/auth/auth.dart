@@ -22,6 +22,27 @@ class AuthService {
   }
 
   // ==========================================
+  // ANONYMOUS SIGN IN
+  // ==========================================
+
+  static Future<UserCredential> signInAsGuest() async {
+    try {
+      // 1. Authenticate anonymously
+      final UserCredential userCredential = await _auth.signInAnonymously();
+
+      // 2. Sync User to Firestore (so the user exists in your DB)
+      if (userCredential.user != null) {
+        await _syncUserToFirestore(userCredential.user!, 'anonymous');
+      }
+
+      return userCredential;
+    } catch (e) {
+      print('Anonymous Sign-In Error: $e');
+      rethrow;
+    }
+  }
+
+  // ==========================================
   // GOOGLE SIGN IN
   // ==========================================
 
@@ -141,7 +162,7 @@ class AuthService {
   // SHARED HELPERS
   // ==========================================
 
-  /// Syncs user data to Firestore (Works for Google & Magic Link)
+  /// Syncs user data to Firestore (Works for Google, Magic Link, & Anonymous)
   static Future<void> _syncUserToFirestore(User user, String provider) async {
     final userDoc =
     FirebaseFirestore.instance.collection('users').doc(user.uid);
@@ -154,7 +175,7 @@ class AuthService {
         'name': user.displayName ?? '',
         'email': user.email ?? '',
         'photoURL': user.photoURL ?? '',
-        'provider': provider, // 'google' or 'magic_link'
+        'provider': provider, // 'google', 'magic_link', or 'anonymous'
         'createdAt': FieldValue.serverTimestamp(),
       });
     }

@@ -41,7 +41,7 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
     final physicalActivity = ref.read(userProvider).workOutPerWeek;
 
     // Find index of option matching saved gender
-    final matchIndex = options.indexWhere((o) => o.title == physicalActivity);
+    final matchIndex = options.indexWhere((o) => o.value == physicalActivity);
 
     if (matchIndex != -1) {
       selectedIndex = matchIndex;

@@ -122,7 +122,7 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
                           context,
                           PageRouteBuilder(
                             opaque: false,
-                            pageBuilder: (_, __, ___) => const SignInPage(),
+                            pageBuilder: (_, _, _) => const SignInPage(),
                           ),
                         );
                       },

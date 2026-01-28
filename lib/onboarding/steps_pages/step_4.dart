@@ -31,7 +31,7 @@ class _OnboardingStep4State extends ConsumerState<OnboardingStep4> {
         .hasTriedOtherCalorieApps;
 
     final matchOption = options.indexWhere(
-      (i) => i.title == hasTriedOtherCalorieApps,
+      (i) => i.value == hasTriedOtherCalorieApps,
     );
 
     if (matchOption != -1) {

@@ -33,7 +33,7 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
     final savedGender = ref.read(userProvider).gender;
 
     // Find index of option matching saved gender
-    final matchIndex = options.indexWhere((o) => o.title == savedGender);
+    final matchIndex = options.indexWhere((o) => o.value == savedGender);
 
     if (matchIndex != -1) {
       selectedIndex = matchIndex;

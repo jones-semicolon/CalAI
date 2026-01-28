@@ -11,7 +11,7 @@ class CalorieCard extends StatelessWidget {
   final Color color;
   final IconData icon;
   final bool isTap;
-  final String unit;
+  final String? unit;
 
   const CalorieCard({
     super.key,
@@ -20,7 +20,7 @@ class CalorieCard extends StatelessWidget {
     required this.progress,
     required this.color,
     required this.icon,
-    required this.unit,
+    this.unit,
     this.isTap = false,
   });
 
@@ -41,7 +41,7 @@ class CalorieCard extends StatelessWidget {
     );
 
     return Container(
-      height: 145,
+      // height: 145,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Theme.of(context).appBarTheme.backgroundColor,
@@ -65,7 +65,7 @@ class CalorieCard extends StatelessWidget {
             overEat: overEat,
           ),
           // A fixed SizedBox is used to preserve the original spacing.
-          Spacer(),
+          SizedBox(height: 10),
           _ProgressIndicator(
             progress: progress,
             nutrients: nutrients,
@@ -85,14 +85,14 @@ class _Header extends StatelessWidget {
   final int valueInt;
   final bool isTap;
   final int nutrients;
-  final String unit;
+  final String? unit;
   final TextStyle valueStyle;
 
   const _Header({
     required this.valueInt,
     required this.isTap,
     required this.nutrients,
-    required this.unit,
+    this.unit,
     required this.valueStyle,
   });
 

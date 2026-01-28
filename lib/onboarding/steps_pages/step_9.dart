@@ -30,7 +30,7 @@ class _OnboardingStep9State extends ConsumerState<OnboardingStep9> {
     super.initState();
     final dietType = ref.read(userProvider).dietType;
 
-    final matchOption = options.indexWhere((i) => i.title == dietType);
+    final matchOption = options.indexWhere((i) => i.value == dietType);
     if (matchOption != -1) {
       selectedIndex = matchOption;
       isEnable = true;
