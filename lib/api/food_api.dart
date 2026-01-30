@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:calai/data/global_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -43,6 +45,7 @@ class FoodSearchItem {
   final String name;
   final Map<String, dynamic>? nutrients;
   final double baseGramWeight;
+  final int calories;
   final String? imageUrl;
   final List<OtherNutrient> otherNutrients;
   final DateTime? timestamp;
@@ -56,6 +59,7 @@ class FoodSearchItem {
     required this.fdcId,
     required this.name,
     required this.caloriesPer100g,
+    required this.calories,
     required this.portions,
     required this.otherNutrients,
     this.timestamp,
@@ -102,6 +106,28 @@ class FoodSearchItem {
 
     final cals = nutrients * (grams / 100.0);
     return cals;
+  }
+
+  // Inside your FoodSearchItem class
+  Food toFood({
+    int? convertedCalories,
+    int? convertedProteins,
+    int? convertedCarbs,
+    int? convertedFats,
+    String? portion,
+  }) {
+    return Food(
+      id: fdcId.toString(),
+      fdcId: fdcId.toString(),
+      name: name,
+      calories: convertedCalories ?? calories,
+      protein: convertedProteins ?? proteinG.round(),
+      carbs: convertedCarbs ?? carbsG.round(),
+      fats: convertedFats ?? fatG.round(),
+      servings: 1,
+      portion: portion ?? "100g", // Default reference portion
+      otherNutrients: otherNutrients, // Assuming types match
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -151,6 +177,10 @@ class FoodSearchItem {
           ((json['calories_kcal'] as Map<String, dynamic>?)?['amount'] as num?)
               ?.toDouble() ??
           0,
+      calories:
+          ((json['calories_kcal'] as Map<String, dynamic>?)?['amount'] as num?)
+              ?.toInt() ??
+          0,
 
       portions: unique.values.toList(),
       nutrients: nutrients,
@@ -169,6 +199,10 @@ class OtherNutrient {
     required this.amount,
     required this.unit,
   });
+
+  Map<String, dynamic> toJson() {
+    return {'name': name, 'amount': amount, 'unit': unit};
+  }
 
   factory OtherNutrient.fromJson(Map<String, dynamic> json) {
     return OtherNutrient(
@@ -212,43 +246,28 @@ class FoodPortionItem {
   static String _unitOnly(String raw) {
     var t = raw.toLowerCase().trim();
 
-    if (t.isEmpty) return "per100";
+    // 1. Handle the fallback case
+    if (t.isEmpty || t.contains("quantity not specified")) return "per100";
 
-    // ✅ remove leading numbers like "1", "2", "100"
-    t = t.replaceAll(RegExp(r'^\d+(\.\d+)?\s*'), '');
+    // 2. Remove leading numbers (1, 1.5, 1/2, 1 x)
+    t = t.replaceFirst(RegExp(r'^(\d+\s*[\/\.]?\d*\s*(x\s*)?)'), '').trim();
 
-    // ✅ common normalizations
-    if (t.contains("tablespoon")) return "tbsp";
-    if (t.contains("tbsp")) return "tbsp";
+    // 3. Keep specific shorthand for common small units if you like
+    if (t.startsWith("tablespoon")) t = t.replaceFirst("tablespoon", "Tbsp");
+    if (t.startsWith("teaspoon")) t = t.replaceFirst("teaspoon", "Tsp");
+    if (t.startsWith("grams")) t = t.replaceFirst("grams", "G");
 
-    if (t.contains("teaspoon")) return "tsp";
-    if (t.contains("tsp")) return "tsp";
+    // 4. Return the string with ONLY the first letter capitalized
+    if (t.isEmpty) return "Serving";
 
-    if (t.contains("cup")) return "cup";
-
-    if (t.contains("serving")) return "serving";
-
-    if (t.contains("slice")) return "slice";
-
-    if (t.contains("piece")) return "piece";
-
-    if (t.contains("large")) return "large";
-    if (t.contains("medium")) return "medium";
-    if (t.contains("small")) return "small";
-
-    // ✅ "quantity not specified"
-    if (t.contains("quantity not specified")) return "per100";
-
-    // ✅ fallback: first word only
-    final first = t.split(" ").first.trim();
-    if (first.isEmpty) return "serving";
-
-    return first;
+    // This preserves "Cup, mashed or pureed" instead of just "Cup"
+    return t[0].toUpperCase() + t.substring(1);
   }
 }
 
 class Food {
   final String id;
+  final String? fdcId;
   final String name;
   final int calories;
   final int protein;
@@ -256,9 +275,10 @@ class Food {
   final int fats;
   final String? imageUrl;
   final DateTime? timestamp;
-  final Map<String, dynamic>? nutrients;
   final List<OtherNutrient>? otherNutrients;
   final int servings;
+  final String? portion;
+  final FoodSource? source;
 
   Food({
     required this.id,
@@ -269,21 +289,89 @@ class Food {
     required this.fats,
     this.imageUrl,
     this.timestamp,
-    this.nutrients,
     this.otherNutrients,
     this.servings = 1,
+    this.portion,
+    this.fdcId,
+    this.source,
   });
 
   factory Food.fromDoc(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+
+    debugPrint("RAW DATA: $data");
+
+    // 1. Safe parsing helper for numbers
+    int _asInt(dynamic value) {
+      if (value is num) return value.round();
+      return 0;
+    }
+
+    // 2. Identify if there is a nested 'macros' map (as seen in image 2)
+    final Map<String, dynamic>? macros =
+        data['macros'] as Map<String, dynamic>?;
+
     return Food(
       id: doc.id,
-      name: data['name'],
-      calories: data['calories'],
-      protein: data['protein'],
-      carbs: data['carbs'],
-      fats: data['fats'],
+      name: data['name'] ?? 'Unknown',
+      calories: _asInt(data['calories']),
+      protein: _asInt(data['protein']),
+      carbs: _asInt(data['carbs'] ?? macros?['c']),
+      fats: _asInt(data['fats'] ?? macros?['f']),
+      servings: _asInt(data['servings'] ?? data['serving'] ?? 1),
+      portion: data['portion']?.toString() ?? '',
+      imageUrl: data['imageUrl'],
+      fdcId: data['fdcId']?.toString() ?? data['id']?.toString(),
+      timestamp: (data['timestamp'] as Timestamp?)?.toDate(),
+
+      otherNutrients: (data['otherNutrients'] as List<dynamic>?)
+          ?.map((n) => OtherNutrient.fromJson(n as Map<String, dynamic>))
+          .toList(),
+      source: data['source'] ?? '',
     );
+  }
+
+  factory Food.fromMap(Map<String, dynamic> data, {String? id}) {
+    int _asInt(dynamic v) => (v is num) ? v.round() : 0;
+
+    return Food(
+      id: id ?? data['id']?.toString() ?? '',
+      name: data['name'] ?? 'Food',
+      calories: _asInt(data['calories']),
+      protein: _asInt(data['protein']),
+      carbs: _asInt(data['carbs']),
+      fats: _asInt(data['fats']),
+      imageUrl: data['imageUrl'],
+      portion: data['portion']?.toString(),
+      servings: _asInt(data['servings'] ?? 1),
+      fdcId: data['fdcId']?.toString(),
+      timestamp: data['timestamp'] is Timestamp
+          ? (data['timestamp'] as Timestamp).toDate()
+          : DateTime.tryParse(data['timestamp']?.toString() ?? ''),
+      otherNutrients: (data['otherNutrients'] as List?)
+          ?.map((e) => OtherNutrient.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
+      source: null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'fdcId': fdcId,
+      'calories': calories,
+      'protein': protein,
+      'carbs': carbs,
+      'fats': fats,
+      'servings': servings,
+      'portion': portion,
+      'imageUrl': imageUrl,
+      // Convert DateTime to ISO8601 string or use FieldValue.serverTimestamp() when saving to Firestore
+      'timestamp': timestamp?.toIso8601String(),
+      // Ensure OtherNutrient also has a toJson() method
+      'otherNutrients': otherNutrients?.map((n) => n.toJson()).toList(),
+      'source': source?.value,
+    };
   }
 
   String get formattedTime => DateFormat.jm().format(timestamp!);
