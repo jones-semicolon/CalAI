@@ -1,71 +1,68 @@
 // server/utils/fooddatabase.js
 
-const NUTRIENT_IDS = {
-  carbs_g: 1005,
-  calories_kcal: 1008,
-  sugar_g: 2000,
-  sodium_mg: 1093,
-  protein_g: 1003,
-  fat_g: 1004,
+const findNutrientByName = (nutrients, keywords) => {
+  // Returns the actual nutrient item from the FDC array so we can track it
+  return (nutrients || []).find((n) => {
+    if (!n.nutrient || !n.nutrient.name) return false;
+    const name = n.nutrient.name.toLowerCase();
+    return keywords.some((key) => name.includes(key.toLowerCase()));
+  });
 };
 
-const EXCLUDED_NUTRIENT_IDS = new Set(Object.values(NUTRIENT_IDS));
-
-/**
- * Searches the foodNutrients array for a specific nutrient by its ID.
- *
- * @param {Array<Object>} foodNutrients - The array of nutrient objects from the FDC API response.
- * @param {number} nutrientId - The ID of the nutrient to find (e.g., 1008 for Energy).
- * @returns {Object | null} An object containing the nutrient's details (ID, name, amount, unit)
- * or null if the nutrient is not found.
- */
-const findNutrientById = (foodNutrients, nutrientId) => {
-  const nutrientItem = (foodNutrients || []).find(
-    (item) => item.nutrient && item.nutrient.id === nutrientId,
-  );
-
-  if (!nutrientItem) {
-    return null;
-  }
-
-  const { amount, nutrient } = nutrientItem;
-  const { id, name, unitName } = nutrient;
-
+// Helper to format the found nutrient for the response
+const formatNutrient = (item) => {
+  if (!item) return null;
   return {
-    id: id,
-    name: name,
-    amount: amount,
-    unit: unitName,
+    amount: item.amount,
+    unit: item.nutrient.unitName,
+    name: item.nutrient.name,
   };
 };
 
-/**
- * Transforms a single FoodData Central food object into the desired CalAI format.
- * * @param {object} food - A single food object from the FDC API response.
- * @returns {object} The transformed food object.
- */
 exports.foodtoCalAI = (food) => {
-  const foodNutrients = food.foodNutrients || [];
+  const allNutrients = food.foodNutrients || [];
+
+  // 1. Find the specific ones first
+  const calMatch = findNutrientByName(allNutrients, ["energy", "kcal"]);
+  const proMatch = findNutrientByName(allNutrients, ["protein"]);
+  const carbMatch = findNutrientByName(allNutrients, [
+    "carbohydrate, by difference",
+  ]);
+  const fatMatch = findNutrientByName(allNutrients, ["total lipid", "fat"]);
+  const sugarMatch = findNutrientByName(allNutrients, [
+    "sugars, total",
+    "sugar",
+  ]);
+  const fiberMatch = findNutrientByName(allNutrients, ["fiber, total dietary"]);
+  const magMatch = findNutrientByName(allNutrients, ["magnesium, mg"]);
+
+  // 2. Create a Set of "Used" names to filter out later
+  // We use the exact name from the USDA object for a perfect match
+  const usedNames = new Set(
+    [calMatch, proMatch, carbMatch, fatMatch, sugarMatch, fiberMatch, magMatch]
+      .filter(Boolean)
+      .map((n) => n.nutrient.name),
+  );
 
   return {
     fdcId: food.fdcId,
     name: food.description,
-    calories_kcal: findNutrientById(foodNutrients, NUTRIENT_IDS.calories_kcal),
-    foodPortions: food.foodPortions,
-    inputFoods: food.inputFoods,
+    portions: food.foodPortions,
+    input_foods: food.inputFoods,
     nutrients: {
-      protein_g: findNutrientById(foodNutrients, NUTRIENT_IDS.protein_g),
-      carbs_g: findNutrientById(foodNutrients, NUTRIENT_IDS.carbs_g),
-      fat_g: findNutrientById(foodNutrients, NUTRIENT_IDS.fat_g),
+      calories: formatNutrient(calMatch),
+      proteins: formatNutrient(proMatch),
+      carbs: formatNutrient(carbMatch),
+      fats: formatNutrient(fatMatch),
+      sugar: formatNutrient(sugarMatch),
+      fiber: formatNutrient(fiberMatch),
+      magnesium: formatNutrient(magMatch),
     },
-    // Filter out nutrients with zero amount, those missing a name, AND those in the excluded set
-    other: foodNutrients
+    // 3. Filter: Only include items NOT in the usedNames set
+    other_nutrients: allNutrients
       .filter(
         (i) =>
-          i.amount > 0 &&
-          i.nutrient &&
-          i.nutrient.name &&
-          !EXCLUDED_NUTRIENT_IDS.has(i.nutrient.id),
+          i.amount > 0 && i.nutrient?.name && !usedNames.has(i.nutrient.name), // <--- The Exclusion Logic
       )
       .map((i) => ({
         name: i.nutrient.name,
