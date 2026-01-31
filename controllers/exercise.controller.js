@@ -1,87 +1,85 @@
+// server/controllers/exerciseController.js
 const groq = require("../config/groq");
 
-// UPDATED: Use the latest Llama 3.3 model
+// Use a reliable, fast model
 const API_MODEL = "llama-3.3-70b-versatile";
 
-// Move constant data to code for reliability
-
-// FIXED: MET_TABLE updated with values from Omics Online Table 3
-// Source: https://www.omicsonline.org/articles-images/2157-7595-6-220-t003.html
+// ==========================================
+// 1. MET TABLE (Metabolic Equivalent of Task)
+// ==========================================
+// Source: Compendium of Physical Activities
 const MET_TABLE = {
-  // Source: "resistance training" (3.5), "calisthenics moderate" (3.8), "calisthenics vigorous" (8.0)
-  weightlifting: { low: 3.5, medium: 3.8, high: 8.0 },
-
-  // Source: "jogging, general" (7.0), "running jogging, in place" (8.0)
-  run: { low: 7.0, medium: 8.0, high: 9.0 },
-
-  // Source: "walking 1.7mph" (2.3), "walking 2.5mph" (2.9), "walking 3.4mph" (3.6)
-  walking: { low: 2.3, medium: 2.9, high: 3.6 },
-
-  // Source: "bicycling 50W" (3.0), "bicycling <10mph" (4.0), "bicycling 100W" (5.5)
-  cycling: { low: 3.0, medium: 4.0, high: 5.5 },
-
-  // Source: "water aerobics" (5.3). Table lacks "swimming laps", using aerobics as proxy.
-  swimming: { low: 5.3, medium: 5.3, high: 7.0 },
-
-  // Source: "rope jumping" (10.0)
-  jump_rope: { low: 8.0, medium: 10.0, high: 12.0 },
-
-  // Source: "yoga, Hatha" (3.0), "Pilates" (3.8)
-  yoga: { low: 2.0, medium: 3.0, high: 3.8 },
-
-  // Not explicitly in Table 3, keeping standard fallback or aligning with Walking High
-  hiking: { low: 4.0, medium: 5.0, high: 6.0 },
-
-  // Fallback for unknown activities
-  unknown: { low: 3.0, medium: 4.5, high: 6.0 },
+  weightlifting: { low: 3.5, medium: 3.8, high: 6.0 }, // Adjusted High based on intense powerlifting
+  run: { low: 6.0, medium: 8.0, high: 11.5 },
+  walking: { low: 2.5, medium: 3.5, high: 4.5 },
+  hiking: { low: 5.3, medium: 6.0, high: 7.5 },
+  cycling: { low: 4.0, medium: 8.0, high: 10.0 },
+  swimming: { low: 6.0, medium: 8.0, high: 10.0 },
+  jump_rope: { low: 8.8, medium: 11.0, high: 12.0 },
+  yoga: { low: 2.0, medium: 3.0, high: 4.0 },
+  sports: { low: 4.0, medium: 7.0, high: 10.0 }, // General sports (basketball, soccer)
+  unknown: { low: 3.0, medium: 5.0, high: 7.0 }, // Fallback
 };
 
 exports.log_exercise = async (req, res) => {
   try {
-    // 1. Switch to req.body for POST requests
     const { weight_kg, exercise_type, intensity, duration_mins, description } =
       req.body;
 
-    // 2. Fixed Validation Logic
-    // We need Weight + (Structure OR Description)
-    const hasStructure = exercise_type && duration_mins;
-    const hasDescription = !!description;
+    // ==========================================
+    // 2. INPUT VALIDATION
+    // ==========================================
 
-    if (!weight_kg || (!hasStructure && !hasDescription)) {
+    // Hard Fail: No weight provided
+    if (!weight_kg) {
       return res.status(400).json({
         success: false,
-        error:
-          "Missing required fields. Provide weight_kg AND (description OR exercise_type + duration_mins).",
+        error: "Weight (kg) is required to calculate calories.",
       });
     }
 
-    // 3. Simplified Prompt: Extraction Only (No Math)
+    // Hard Fail: No context provided (neither structured input nor description)
+    if (!description && (!exercise_type || !duration_mins)) {
+      return res.status(400).json({
+        success: false,
+        error:
+          "Please provide either a description (e.g., 'ran 30 mins') OR specific exercise details.",
+      });
+    }
+
+    // ==========================================
+    // 3. AI PARSING (Strict Mode)
+    // ==========================================
     const PROMPT = `
-    You are an exercise parser. Extract data from the user input.
+    You are a strict exercise data parser. Analyze the user's input.
     
-    INPUT:
+    USER INPUT:
     ${JSON.stringify({ exercise_type, intensity, duration_mins, description })}
 
     RULES:
-    - If specific fields are provided, use them. 
-    - If a description is provided, extract missing fields from it.
-    - Normalize "exercise_type" to one of: [weightlifting, run, walking, hiking, cycling, swimming, jump_rope, yoga, etc.].
-    - If the exercise doesn't fit those, use "unknown".
-    - Normalize "intensity" to: [low, medium, high]. Default to "medium".
-    - Convert all durations to integers in MINUTES.
-    
-    OUTPUT JSON format:
+    0. **SUBJECT CHECK**: ONLY extract actions performed by the USER ("I", "me", or implied "ran 5 miles"). IGNORE actions performed by others ("they", "he", "she", "my friend").
+       - Example: "They ran 30 mins" -> exercise_type: null
+       - Example: "I walked while they ran" -> exercise_type: "walking"
+    1. Detect the "exercise_type". Normalize to: [weightlifting, run, walking, hiking, cycling, swimming, jump_rope, yoga, sports].
+    2. If the input is nonsense (e.g., "hi", "test", "foo"), or non-physical (e.g., "sleeping", "watching tv"), set "exercise_type": null and "confidence": 0.
+   3. Detect "duration_mins". ONLY extract if the user explicitly states a time (e.g. "10 mins", "half hour").
+       - IF NO TIME IS STATED: Set "duration_mins": null. 
+       - DO NOT GUESS or hallucinate a default time.
+    4. Detect "intensity" (low, medium, high). Default to "medium".
+    5. Set "confidence" score (0 to 1). 1 = Clear data, 0 = Garbage input.
+
+    OUTPUT JSON ONLY:
     {
-      "exercise_type": "string",
-      "intensity": "low|medium|high",
-      "duration_mins": number, 
+      "exercise_type": "string" | null,
+      "intensity": "low" | "medium" | "high",
+      "duration_mins": number,
       "confidence": number
     }
     `;
 
     const completion = await groq.chat.completions.create({
       messages: [
-        { role: "system", content: "Return ONLY valid JSON. No markdown." },
+        { role: "system", content: "You output ONLY valid JSON. No Markdown." },
         { role: "user", content: PROMPT },
       ],
       model: API_MODEL,
@@ -89,48 +87,79 @@ exports.log_exercise = async (req, res) => {
     });
 
     const content = completion.choices?.[0]?.message?.content;
-    if (!content) throw new Error("Empty response from LLM");
+    if (!content) throw new Error("Empty response from AI");
 
-    // 4. Safe Parsing
     let extracted;
     try {
       extracted = JSON.parse(content);
     } catch (e) {
-      throw new Error("Failed to parse LLM JSON response");
+      throw new Error("AI response was not valid JSON");
     }
 
-    // 5. Perform Math in JavaScript (Deterministic & Accurate)
-    const finalType = extracted.exercise_type || "unknown";
+    // ==========================================
+    // 4. LOGIC GUARDRAILS
+    // ==========================================
+
+    // Guardrail 1: Reject garbage input (e.g. "hi")
+    if (!extracted.exercise_type || extracted.confidence < 0.5) {
+      return res.status(422).json({
+        success: false,
+        error:
+          "Could not identify a valid exercise. Try: 'I ran for 20 minutes'.",
+        debug_parsed: extracted, // Helpful for debugging why it failed
+      });
+    }
+
+    // Guardrail 2: Ensure valid duration
+    if (!extracted.duration_mins || extracted.duration_mins <= 0) {
+      return res.status(422).json({
+        success: false,
+        error:
+          "Could not determine duration. Please specify how long you exercised.",
+      });
+    }
+
+    // ==========================================
+    // 5. MATH CALCULATION
+    // ==========================================
+
+    // Normalize values
+    const finalType = MET_TABLE[extracted.exercise_type]
+      ? extracted.exercise_type
+      : "unknown";
     const finalIntensity = extracted.intensity || "medium";
-    const finalDuration = extracted.duration_mins || 0;
+    const finalDuration = extracted.duration_mins;
 
-    // Lookup MET
-    const exerciseMetData = MET_TABLE[finalType] || MET_TABLE.unknown;
-    const metValue = exerciseMetData[finalIntensity];
+    // Get MET value
+    const metValue = MET_TABLE[finalType][finalIntensity];
 
-    // Formula: MET * 3.5 * weight / 200 * duration
-    const calories = Math.round(
+    // Formula: Calories = (MET * 3.5 * Weight(kg) / 200) * Duration(mins)
+    const caloriesBurned = Math.round(
       ((metValue * 3.5 * Number(weight_kg)) / 200) * finalDuration,
     );
 
+    // ==========================================
+    // 6. SUCCESS RESPONSE
+    // ==========================================
     res.json({
       success: true,
       data: {
-        parsed_input: extracted,
-        calculation: {
-          weight_kg: Number(weight_kg),
-          met_used: metValue,
-          formula: "(MET * 3.5 * weight / 200) * mins",
-          calories_burned: calories,
+        exercise: finalType,
+        intensity: finalIntensity,
+        duration_mins: finalDuration,
+        calories_burned: caloriesBurned,
+        meta: {
+          weight_used: Number(weight_kg),
+          met_value: metValue,
+          confidence: extracted.confidence,
         },
       },
-      usage: completion.usage,
     });
   } catch (err) {
-    console.error("Error calculating calories:", err);
+    console.error("Log Exercise Error:", err);
     res.status(500).json({
       success: false,
-      error: "Internal server error.",
+      error: "Internal server error processing exercise.",
     });
   }
 };
