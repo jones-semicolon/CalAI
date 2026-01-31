@@ -157,18 +157,29 @@ exports.searchFoods = async (req, res) => {
 
   if (!q) {
     return res.status(400).json({
-      error:
-        "A search query parameter 'q' is required for the /search endpoint.",
+      error: "A search query parameter 'q' is required.",
       details: "Example: /search?q=apple",
     });
   }
 
-  const url = `${FOODCENTRAL_BASE_URL}search?api_key=${FOODCENTRAL_API_KEY}&query=${encodeURIComponent(q)}`;
+  // USDA Search Endpoint
+  const url = `${FOODCENTRAL_BASE_URL}search?api_key=${FOODCENTRAL_API_KEY}&query=${encodeURIComponent(q)}&requireAllWords=true`;
 
   try {
-    const data = await executeFetch(url);
-    // Send the raw data for search endpoint
-    return res.json(data);
+    const rawResponse = await executeFetch(url);
+
+    // 1. SAFETY CHECK: Ensure 'foods' array exists in the response
+    // The Search API wraps the results inside a "foods" property
+    const foodList = Array.isArray(rawResponse.foods) ? rawResponse.foods : [];
+
+    if (foodList.length === 0) {
+      return res.json([]); // Return empty list if no hits
+    }
+
+    // 2. TRANSFORM: Map the inner list using your helper
+    const transformedData = foodList.map((foodItem) => foodtoCalAI(foodItem));
+
+    return res.json(transformedData);
   } catch (error) {
     return sendErrorResponse(res, error);
   }
