@@ -56,7 +56,7 @@ exports.foodtoCalAI = (food) => {
     nutrients: {
       protein_g: findNutrientById(foodNutrients, NUTRIENT_IDS.protein_g),
       carbs_g: findNutrientById(foodNutrients, NUTRIENT_IDS.carbs_g),
-      fats_g: findNutrientById(foodNutrients, NUTRIENT_IDS.fat_g),
+      fat_g: findNutrientById(foodNutrients, NUTRIENT_IDS.fat_g),
     },
     // Filter out nutrients with zero amount, those missing a name, AND those in the excluded set
     other_nutrients: foodNutrients
