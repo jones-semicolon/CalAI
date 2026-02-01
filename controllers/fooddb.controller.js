@@ -178,8 +178,9 @@ exports.searchFoods = async (req, res) => {
 
     // 2. TRANSFORM: Map the inner list using your helper
     const transformedData = foodList.map((foodItem) => foodtoCalAI(foodItem));
+    rawResponse.foods = transformedData;
 
-    return res.json(transformedData);
+    return res.json(rawResponse);
   } catch (error) {
     return sendErrorResponse(res, error);
   }
