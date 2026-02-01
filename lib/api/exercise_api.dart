@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'package:calai/data/global_data.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -85,9 +84,10 @@ class ExerciseApi {
   // and updated arguments to match the POST route requirements.
   Future<Map<String, dynamic>> getBurnedCalories({
     required double weightKg,
-    required String exerciseType,
-    required String intensity,
-    required int durationMins,
+    String exerciseType = "run",
+    String intensity = "low",
+    int durationMins = 0,
+    String description = "",
   }) async {
     final uri = Uri.https(_host, '/log-exercise');
 
@@ -97,7 +97,7 @@ class ExerciseApi {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
+        body: durationMins == 0 ? jsonEncode({'weight_kg': weightKg, 'description': description}) : jsonEncode({
           'weight_kg': weightKg,
           'exercise_type': exerciseType,
           'intensity': intensity,
@@ -140,7 +140,7 @@ class Exercise {
   final Intensity intensity;   // e.g., Intensity.low
   final int durationMins;      // e.g., 30
   final int caloriesBurned;    // e.g., 221 (nullable if not calculated yet)
-  final DateTime timestamp;    // When it happened
+  final DateTime? timestamp;    // When it happened
 
   Exercise({
     required this.id,
@@ -154,14 +154,14 @@ class Exercise {
   // Factory constructor to create an instance from JSON
   factory Exercise.fromJson(Map<String, dynamic> json) {
     return Exercise(
-      id: json['id'] as String? ?? '', // Handle missing ID if creating new
-      type: json['exercise_type'] as String,
+      id: json['id'] as String? ?? '',
+      type: json['exerciseType'] ?? "",
       intensity: Intensity.fromString(json['intensity'] as String),
-      durationMins: json['duration_mins'] as int,
-      caloriesBurned: json['calories_burned'] as int? ?? 0,
-      timestamp: json['timestamp'] != null
-          ? DateTime.parse(json['timestamp'])
-          : DateTime.now(),
+      durationMins: (json['durationMins'] as num).toInt(),
+      caloriesBurned: (json['caloriesBurned'] as num).toInt(),
+      timestamp: json['timestamp'] is Timestamp
+          ? (json['timestamp'] as Timestamp).toDate()
+          : DateTime.tryParse(json['timestamp']?.toString() ?? ''),
     );
   }
 
@@ -171,7 +171,7 @@ class Exercise {
       'exercise_type': type,
       'intensity': intensity.label, // Sends "Low", "Medium", etc.
       'duration_mins': durationMins,
-      'timestamp': timestamp.toIso8601String(),
+      'timestamp': timestamp?.toIso8601String(),
     };
 
     // If sending to the /log_exercise endpoint, we need to inject weight
@@ -184,6 +184,7 @@ class Exercise {
 
   // UI Helper: Returns "9:42 AM"
   String get formattedTime {
-    return DateFormat.jm().format(timestamp);
+    if (timestamp == null) return '--:--'; // Or "Pending"
+    return DateFormat.jm().format(timestamp!);
   }
 }

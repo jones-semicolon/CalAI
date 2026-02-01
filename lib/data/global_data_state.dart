@@ -1,4 +1,7 @@
+import 'package:calai/models/food.dart';
 import 'package:flutter/foundation.dart';
+
+import '../api/food_api.dart';
 
 @immutable
 class GlobalDataState {
@@ -13,6 +16,7 @@ class GlobalDataState {
   final double calorieGoal;
   final Set<String> overDays;
   final Map<String, double> dailyCalories; // key = "YYYY-MM-DD"\
+  final List<Food> savedFoods;
 
 
   const GlobalDataState({
@@ -22,7 +26,7 @@ class GlobalDataState {
     required this.goalWeight,
     required this.progressDays,
     required this.calorieLogs,
-    required this.calorieGoal, required this.overDays, required this.dailyCalories,
+    required this.calorieGoal, required this.overDays, required this.dailyCalories, required this.savedFoods,
   });
 
   factory GlobalDataState.initial() => GlobalDataState(
@@ -35,6 +39,7 @@ class GlobalDataState {
     calorieGoal: 0,
     overDays: <String>{},
     dailyCalories: const {},
+    savedFoods: const [],
   );
 
 
@@ -48,9 +53,11 @@ class GlobalDataState {
     double? calorieGoal,
     Set<String>? overDays,
     Map<String, double>? dailyCalories,
+    List<Food>? savedFoods,
   }) {
     return GlobalDataState(
       isInitialized: isInitialized ?? this.isInitialized,
+      savedFoods: savedFoods ?? this.savedFoods,
       activeDateId: activeDateId ?? this.activeDateId,
       weightLogs: weightLogs ?? this.weightLogs,
       goalWeight: goalWeight ?? this.goalWeight,

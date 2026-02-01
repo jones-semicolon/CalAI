@@ -2,10 +2,10 @@ import 'dart:ui';
 
 import 'package:calai/widgets/radial_background/radial_background.dart';
 import 'package:flutter/material.dart';
-import '../../data/notifiers.dart';
-import 'widgets/app_title.dart';
-import 'widgets/generic_app_bar_title.dart';
-import 'widgets/streak_indicator_button.dart';
+import '../../../data/notifiers.dart';
+import 'app_title.dart';
+import 'generic_app_bar_title.dart';
+import 'streak_indicator_button.dart';
 
 /// A SliverAppBar that dynamically changes its title based on the selected page.
 ///

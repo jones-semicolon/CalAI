@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../data/notifiers.dart';
-import 'widgets/show_action_grid_dialog.dart'; // The new, clean dialog function
+import '../../../data/notifiers.dart';
+import 'show_action_grid_dialog.dart'; // The new, clean dialog function
 
 /// The main Floating Action Button for the application's widget tree.
 ///

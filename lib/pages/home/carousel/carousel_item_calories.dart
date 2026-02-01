@@ -1,8 +1,8 @@
 import 'package:calai/widgets/animated_number.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
-import '../../../data/health_data.dart'; // Import the new State
-import '../activity_card.dart';
+import '../../../data/health_data.dart';
+import '../widgets/activity_card.dart'; // Import the new State
 
 class CarouselCalories extends StatelessWidget {
   final bool isTap;

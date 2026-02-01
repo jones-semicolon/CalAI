@@ -1,40 +1,49 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// Update these paths to match your project structure
 import 'package:calai/api/food_api.dart';
-// Ensure this import path matches where your SelectedFoodPage is located
-import '../../../../data/global_data.dart';
+import 'package:calai/models/food.dart';
+import 'package:calai/data/global_data.dart';
+import '../../../../widgets/circle_back_button.dart';
 import 'selected_food_page.dart';
 
-class FoodDatabasePage extends StatefulWidget {
+class FoodDatabasePage extends ConsumerStatefulWidget {
   final int selectedTabIndex;
-  const FoodDatabasePage({super.key, this.selectedTabIndex = 0
-  });
+  const FoodDatabasePage({super.key, this.selectedTabIndex = 0});
 
   @override
-  State<FoodDatabasePage> createState() => _FoodDatabasePageState();
+  ConsumerState<FoodDatabasePage> createState() => _FoodDatabasePageState();
 }
 
-class _FoodDatabasePageState extends State<FoodDatabasePage> {
+class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
   // State
   final TextEditingController _searchController = TextEditingController();
   late int _selectedTabIndex = widget.selectedTabIndex;
   bool _isLoadingSuggestions = true;
-  List<FoodSearchItem> _suggestedFoods = [];
+  bool _isSearching = false;
+  List<Food> _suggestedFoods = [];
+  List<Food> _searchResults = [];
+
+  Timer? _debounce;
 
   // Constants
   static const List<String> _tabs = [
     "All",
     "My meals",
     "My foods",
-    "Saved scans"
+    "Saved scans",
   ];
-  static const List<int> _featuredFoodIds = [
-    2707537, // Peanut butter
-    2709223, // Avocado
-    2707152, // Egg
-    2709215, // Apples
-    2709614, // Spinach
+
+  // IDs are Strings in your new model
+  static const List<String> _featuredFoodIds = [
+    "2707537", // Peanut butter
+    "2709223", // Avocado
+    "2707152", // Egg
+    "2709215", // Apples
+    "2709614", // Spinach
   ];
 
   @override
@@ -46,23 +55,43 @@ class _FoodDatabasePageState extends State<FoodDatabasePage> {
   @override
   void dispose() {
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
-  }
-
-  Stream<List<Food>> _savedFoodsStream() {
-    return FirebaseFirestore.instance
-        .collection('savedFoods')
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) =>
-          snapshot.docs.map((doc) => Food.fromDoc(doc)).toList(),
-    );
   }
 
   // ===========================================================================
   // Logic & API
   // ===========================================================================
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    if (query.isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _isSearching = false;
+      });
+      return;
+    }
+
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      setState(() => _isSearching = true);
+
+      try {
+        final results = await FoodApi.search(query);
+
+        if (mounted) {
+          setState(() {
+            _searchResults = results;
+            _isSearching = false;
+          });
+        }
+      } catch (e) {
+        debugPrint("Search error: $e");
+        if (mounted) setState(() => _isSearching = false);
+      }
+    });
+  }
 
   Future<void> _fetchFeaturedSuggestions() async {
     setState(() => _isLoadingSuggestions = true);
@@ -84,16 +113,39 @@ class _FoodDatabasePageState extends State<FoodDatabasePage> {
     }
   }
 
-  void _onAddFood(FoodSearchItem item, int calories) {
-    GlobalDataNotifier().logFoodEntry(
-      id: item.fdcId.toString(),
-      name: item.name,
-      calories: calories,
-      p: item.nutrients?['protein_g']['amount'].toInt() ?? 0,
-      c: item.nutrients?['carbs_g']['amount'].toInt() ?? 0,
-      f: item.nutrients?['fat_g']['amount'].toInt() ?? 0,
-      serving: item.defaultPortion.gramWeight.toInt(),
-      source: FoodSource.foodDatabase,
+  FoodPortionItem _getDisplayPortion(Food item) {
+    // ✅ FIX: Don't call .fromJson() here.
+    // The model already parsed it. Just cast the list to the correct type.
+    final List<FoodPortionItem> portions = item.portions.cast<FoodPortionItem>();
+
+    if (portions.isEmpty) {
+      return const FoodPortionItem(label: "Serving", gramWeight: 100);
+    }
+
+    // Try to find a portion that isn't just "100g" or "Quantity not specified"
+    return portions.firstWhere(
+          (p) => !p.label.toLowerCase().contains("quantity not specified"),
+      orElse: () => portions.first,
+    );
+  }
+
+  void _onAddFood(Food item, FoodPortionItem portion) {
+    // ✅ Logic: Create the log using the Model's logic (Single Source of Truth)
+    // We assume quick-add uses 1 unit of the displayed portion
+    final logEntry = item.createLog(
+      amount: 1.0,
+      unit: portion.label,
+      gramWeight: portion.gramWeight,
+    );
+
+    // Save to global state
+    ref.read(globalDataProvider.notifier).logFoodEntry(
+      logEntry,
+      FoodSource.foodDatabase,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Added ${item.name} to log")),
     );
   }
 
@@ -102,12 +154,10 @@ class _FoodDatabasePageState extends State<FoodDatabasePage> {
     // TODO: Navigate to empty food log form
   }
 
-  void _navigateToFoodDetails(FoodSearchItem item) {
+  void _navigateToFoodDetails(Food item) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => SelectedFoodPage(foodId: item.fdcId),
-      ),
+      MaterialPageRoute(builder: (_) => SelectedFoodPage(foodId: item.id)),
     );
   }
 
@@ -118,6 +168,7 @@ class _FoodDatabasePageState extends State<FoodDatabasePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bool isShowingSearchResults = _searchController.text.isNotEmpty;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -140,138 +191,81 @@ class _FoodDatabasePageState extends State<FoodDatabasePage> {
                     onTap: _onLogEmptyFood,
                   ),
                   const SizedBox(height: 18),
-                  const Align(
+                  // Only show "Suggestions" title if not searching
+                  _selectedTabIndex == 0
+                      ? Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Suggestions",
-                      style:
-                      TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                      isShowingSearchResults ? "Search Results" : "Suggestions",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
-                  ),
+                  )
+                      : const SizedBox.shrink(),
                   const SizedBox(height: 10),
                 ],
               ),
             ),
-            _buildContentList(theme),
+            _buildContentList(theme, isShowingSearchResults),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildContentList(ThemeData theme) {
-    // 👉 Saved scans tab
+  Widget _buildContentList(ThemeData theme, bool isShowingSearchResults) {
     if (_selectedTabIndex == 3) {
       return _buildSavedScansList(theme);
+    }
+
+    // 👉 Handle Search State
+    if (isShowingSearchResults) {
+      if (_isSearching) {
+        return const Expanded(child: Center(child: CircularProgressIndicator()));
+      }
+      if (_searchResults.isEmpty) {
+        return const Expanded(child: Center(child: Text("No items found.")));
+      }
+      return _buildFoodList(_searchResults, theme);
     }
 
     // 👉 Default: API suggestions
     return _buildSuggestionsList(theme);
   }
 
-  Widget _buildSavedScansList(ThemeData theme) {
+  // ✅ Helper to keep code clean since Search and Suggestions look the same
+  Widget _buildFoodList(List<Food> items, ThemeData theme) {
     return Expanded(
-      child: StreamBuilder<List<Food>>(
-        stream: _savedFoodsStream(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 20),
+        physics: const BouncingScrollPhysics(),
+        itemCount: items.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final item = items[index];
 
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text(
-                "No saved scans yet",
-                style: TextStyle(fontSize: 16),
-              ),
-            );
-          }
+          // Use helper to get the "best" portion to display
+          final portion = _getDisplayPortion(item);
 
-          final foods = snapshot.data!;
+          // Calculate preview calories for 1 unit of this portion
+          final previewLog = item.createLog(
+              amount: 1,
+              unit: portion.label,
+              gramWeight: portion.gramWeight
+          );
 
-          return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(18, 0, 18, 20),
-            physics: const BouncingScrollPhysics(),
-            itemCount: foods.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final food = foods[index];
+          // debugPrint(previewLog.calories.toString());
 
-              return FoodTile(
-                name: food.name,
-                calories: food.calories,
-                onTap: () {
-                  // Optional: open saved food details
-                },
-                onAdd: () {
-                  GlobalDataNotifier().logFoodEntry(
-                    id: food.id,
-                    name: food.name,
-                    calories: food.calories,
-                    p: 0,
-                    c: 0,
-                    f: 0,
-                    serving: 0,
-                    source: FoodSource.foodDatabase,
-                  );
-                },
-              );
-            },
+          return FoodTile(
+            name: item.name,
+            calories: previewLog.calories,
+            unit: portion.unitOnly, // Use the getter from your FoodPortionItem
+            onAdd: () => _onAddFood(item, portion),
+            onTap: () => _navigateToFoodDetails(item),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        children: [
-          _CircleBackButton(onTap: () => Navigator.pop(context)),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Center(
-              child: Text(
-                "Food Database",
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 22,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 44), // Balances the back button width
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSearchBox(ThemeData theme) {
-    return _SearchInput(
-      controller: _searchController,
-      hint: "Describe what you ate",
-      onChanged: (value) {
-        // TODO: Implement search logic
-      },
-    );
-  }
-
-  Widget _buildTabs() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: List.generate(_tabs.length, (index) {
-          return Padding(
-            padding:
-            EdgeInsets.only(right: index == _tabs.length - 1 ? 0 : 22),
-            child: _TabItem(
-              label: _tabs[index],
-              isSelected: index == _selectedTabIndex,
-              onTap: () => setState(() => _selectedTabIndex = index),
-            ),
-          );
-        }),
       ),
     );
   }
@@ -287,26 +281,87 @@ class _FoodDatabasePageState extends State<FoodDatabasePage> {
       );
     }
 
-    return Expanded(
-      child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(18, 0, 18, 20),
-        physics: const BouncingScrollPhysics(),
-        itemCount: _suggestedFoods.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          final item = _suggestedFoods[index];
-          final portion = item.defaultPortion;
-          final calories =
-          item.nutrientsForPortion(portion, item.caloriesPer100g).round();
+    // Reuse the generic builder
+    return _buildFoodList(_suggestedFoods, theme);
+  }
 
-          return FoodTile(
-            name: item.name,
-            calories: calories,
-            unit: portion.unitOnly,
-            onAdd: () => _onAddFood(item, calories),
-            onTap: () => _navigateToFoodDetails(item),
+  Widget _buildSavedScansList(ThemeData theme) {
+    // 1. Watch the stream provider
+    final savedFoodsAsync = ref.watch(savedFoodsStreamProvider);
+
+    // 2. Loading State
+    if (savedFoodsAsync.isLoading) {
+      return const Expanded(child: Center(child: CircularProgressIndicator()));
+    }
+
+    // 3. Error State
+    if (savedFoodsAsync.hasError) {
+      return Expanded(
+        child: Center(child: Text("Error: ${savedFoodsAsync.error}")),
+      );
+    }
+
+    // 4. Extract data safely
+    final foods = savedFoodsAsync.value ?? [];
+
+    // 5. Empty State
+    if (foods.isEmpty) {
+      return const Expanded(
+        child: Center(
+          child: Text("No saved scans yet", style: TextStyle(fontSize: 16)),
+        ),
+      );
+    }
+
+    // 6. Success: Reuse generic builder
+    return _buildFoodList(foods, theme);
+  }
+
+  // ... (Header, SearchBox, Tabs, Reusable Widgets remain identical) ...
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          CircleBackButton(onTap: () => Navigator.pop(context)),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Center(
+              child: Text(
+                "Food Database",
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22),
+              ),
+            ),
+          ),
+          const SizedBox(width: 44),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBox(ThemeData theme) {
+    return _SearchInput(
+      controller: _searchController,
+      hint: "Describe what you ate",
+      onChanged: _onSearchChanged,
+    );
+  }
+
+  Widget _buildTabs() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: List.generate(_tabs.length, (index) {
+          return Padding(
+            padding: EdgeInsets.only(right: index == _tabs.length - 1 ? 0 : 22),
+            child: _TabItem(
+              label: _tabs[index],
+              isSelected: index == _selectedTabIndex,
+              onTap: () => setState(() => _selectedTabIndex = index),
+            ),
           );
-        },
+        }),
       ),
     );
   }
@@ -315,30 +370,6 @@ class _FoodDatabasePageState extends State<FoodDatabasePage> {
 // ===========================================================================
 // Reusable Widgets
 // ===========================================================================
-
-class _CircleBackButton extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _CircleBackButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(999),
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: theme.colorScheme.onTertiary.withOpacity(0.6),
-        ),
-        child: const Icon(Icons.arrow_back),
-      ),
-    );
-  }
-}
 
 class _SearchInput extends StatelessWidget {
   final TextEditingController controller;
@@ -474,15 +505,15 @@ class FoodTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.onTertiary.withOpacity(0.45),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.onTertiary.withOpacity(0.45),
+          borderRadius: BorderRadius.circular(18),
+        ),
         child: Row(
           children: [
             Expanded(
@@ -505,7 +536,7 @@ class FoodTile extends StatelessWidget {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          "$calories cal  ·  $unit",
+                          "$calories cal  ·  ${unit ?? 'Serving'}",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(

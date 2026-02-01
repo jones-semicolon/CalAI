@@ -1,7 +1,7 @@
 import 'package:calai/pages/home/floating_grid/log_exercise/log_exercise.dart';
 import 'package:flutter/material.dart';
 
-import 'floating_grid/food_database/food_database.dart';
+import '../floating_grid/food_database/food_database.dart';
 
 /// A widget that displays a 2x2 grid of action buttons.
 ///

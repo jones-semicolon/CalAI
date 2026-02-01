@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
-import '../../widgets/animated_number.dart';
+
+import '../../../widgets/animated_number.dart';
 
 /// A card widget to display a specific nutrient's status, including its
 /// current progress against a goal, shown with an animated circular indicator.

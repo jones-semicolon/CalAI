@@ -88,30 +88,33 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
               const SizedBox(height: 20),
               SizedBox(
                 height: 200,
-                child: BarChart(
-                    BarChartData(
-                      minY: minY,
-                      maxY: maxY,
-                      barGroups: logic.getBarGroups(),
-                      borderData: FlBorderData(show: false),
-                      gridData: FlGridData(
-                        drawVerticalLine: false,
-                        horizontalInterval: interval,
-                        checkToShowHorizontalLine: (value) {
-                          if (value == 0) return true;
-
-                          final ratio = value / interval;
-                          return (ratio - ratio.round()).abs() < 0.001;
-                        },
-                        getDrawingHorizontalLine: (_) => FlLine(
-                          dashArray: [6, 6],
-                          strokeWidth: 1.5,
-                          color: Theme.of(context).primaryColor,
+                child: ClipRect(
+                  child: BarChart(
+                      BarChartData(
+                        minY: minY,
+                        maxY: maxY * 1.15,
+                        alignment: BarChartAlignment.spaceAround,
+                        barGroups: logic.getBarGroups(),
+                        borderData: FlBorderData(show: false),
+                        gridData: FlGridData(
+                          drawVerticalLine: false,
+                          horizontalInterval: interval,
+                          checkToShowHorizontalLine: (value) {
+                            if (value == 0) return true;
+                  
+                            final ratio = value / interval;
+                            return (ratio - ratio.round()).abs() < 0.001;
+                          },
+                          getDrawingHorizontalLine: (_) => FlLine(
+                            dashArray: [6, 6],
+                            strokeWidth: 1.5,
+                            color: Theme.of(context).primaryColor,
+                          ),
                         ),
-                      ),
-                      titlesData: _buildTitlesData(interval),
-                      barTouchData: _buildTouchData(context, logic),
-                    )
+                        titlesData: _buildTitlesData(interval),
+                        barTouchData: _buildTouchData(context, logic),
+                      )
+                  ),
                 ),
               ),
               const SizedBox(height: 10),

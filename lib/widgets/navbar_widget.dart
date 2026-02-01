@@ -14,44 +14,40 @@ class NavBarWidget extends StatelessWidget {
       valueListenable: selectedPage,
       builder: (context, page, child) {
         return IntrinsicHeight(
-          child: Container(
-            // color: Theme.of(context).scaffoldBackgroundColor,
-            padding: const EdgeInsets.only(bottom: 15, top: 15),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: _NavItem(
-                    icon: Icons.home_outlined,
-                    selectedIcon: Icons.home,
-                    label: "Home",
-                    index: 0,
-                    selectedIndex: page,
-                  ),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: _NavItem(
+                  icon: Icons.home_outlined,
+                  selectedIcon: Icons.home,
+                  label: "Home",
+                  index: 0,
+                  selectedIndex: page,
                 ),
-                Expanded(
-                  child: _NavItem(
-                    icon: Icons.show_chart_outlined,
-                    selectedIcon: Icons.show_chart,
-                    label: "Progress",
-                    index: 1,
-                    selectedIndex: page,
-                  ),
+              ),
+              Expanded(
+                child: _NavItem(
+                  icon: Icons.show_chart_outlined,
+                  selectedIcon: Icons.show_chart,
+                  label: "Progress",
+                  index: 1,
+                  selectedIndex: page,
                 ),
-                Expanded(
-                  child: _NavItem(
-                    icon: Icons.settings_outlined,
-                    selectedIcon: Icons.settings,
-                    label: "Settings",
-                    index: 2,
-                    selectedIndex: page,
-                  ),
+              ),
+              Expanded(
+                child: _NavItem(
+                  icon: Icons.settings_outlined,
+                  selectedIcon: Icons.settings,
+                  label: "Settings",
+                  index: 2,
+                  selectedIndex: page,
                 ),
-                // This SizedBox creates the empty space for the FAB.
-                const SizedBox(width: 100),
-              ],
-            ),
+              ),
+              // This SizedBox creates the empty space for the FAB.
+              const SizedBox(width: 100),
+            ],
           ),
         );
       },
@@ -84,25 +80,28 @@ class _NavItem extends StatelessWidget {
         : Theme.of(context).colorScheme.onPrimary;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(10),
+      // borderRadius: BorderRadius.circular(10),
       onTap: () => selectedPage.value = index,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            isSelected ? selectedIcon : icon,
-            color: color,
-            size: 24,
-          ),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: TextStyle(
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isSelected ? selectedIcon : icon,
               color: color,
-              fontSize: 12,
+              size: 24,
             ),
-          ),
-        ],
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

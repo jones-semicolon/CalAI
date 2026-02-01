@@ -1,4 +1,6 @@
 import 'package:calai/pages/auth/auth.dart';
+import 'package:calai/pages/shell/widgets/widget_app_bar.dart';
+import 'package:calai/pages/shell/widgets/widget_content.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,9 +13,7 @@ import '../../widgets/navbar_widget.dart';
 import '../../widgets/radial_background/radial_background.dart';
 
 // Page-Specific Widgets
-import 'widget_app_bar.dart';
-import 'widget_content.dart';
-import 'widget_fab.dart';
+import 'widgets/widget_fab.dart';
 
 class WidgetTree extends ConsumerStatefulWidget {
   const WidgetTree({super.key});

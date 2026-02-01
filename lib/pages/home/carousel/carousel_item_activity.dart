@@ -9,13 +9,13 @@ import '../../../data/global_data.dart';
 import '../../../services/health_providers.dart';
 
 class CarouselActivity extends StatelessWidget {
-  final int waterIntakeMl;
+  final int waterIntake;
   final HealthData health;
   final Function(int) onWaterChange;
 
   const CarouselActivity({
     super.key,
-    required this.waterIntakeMl,
+    required this.waterIntake,
     required this.onWaterChange,
     required this.health,
   });
@@ -38,7 +38,7 @@ class CarouselActivity extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           _WaterIntakeSection(
-            waterIntakeMl: waterIntakeMl,
+            waterIntake: waterIntake,
             onWaterChange: onWaterChange,
           ),
         ],
@@ -226,7 +226,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
                     data['intensity'] ?? 'Low',
                   ),
                   durationMins: (data['durationMins'] ?? 0) as int,
-                  caloriesBurned: (data['caloriesBurned'] ?? 0).toInt(),
+                  caloriesBurned: (data['caloriesBurned'].round() ?? 0),
                   timestamp: data['timestamp'] != null
                       ? (data['timestamp'] as dynamic).toDate()
                       : DateTime.now(),
@@ -270,11 +270,11 @@ class _CaloriesBurnedCard extends ConsumerWidget {
 }
 
 class _WaterIntakeSection extends StatelessWidget {
-  final int waterIntakeMl;
+  final int waterIntake;
   final Function(int) onWaterChange;
 
   const _WaterIntakeSection({
-    required this.waterIntakeMl,
+    required this.waterIntake,
     required this.onWaterChange,
   });
 
@@ -304,7 +304,7 @@ class _WaterIntakeSection extends StatelessWidget {
             children: [
               Text("Water", style: Theme.of(context).textTheme.labelSmall),
               Text(
-                "$waterIntakeMl ml",
+                "$waterIntake fl oz",
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ],

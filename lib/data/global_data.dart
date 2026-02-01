@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:calai/data/user_data.dart';
+import 'package:calai/models/food.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -22,6 +23,12 @@ AsyncNotifierProvider<GlobalDataNotifier, GlobalDataState>(
 // This provider manages the stream and prevents it from restarting on every UI change
 final dailyEntriesProvider = StreamProvider.family<List<Map<String, dynamic>>, String>((ref, dateId) {
   return ref.read(globalDataProvider.notifier).watchEntries(dateId);
+});
+
+final savedFoodsStreamProvider = StreamProvider<List<Food>>((ref) {
+  // Access the notifier and return the stream
+  final notifier = ref.watch(globalDataProvider.notifier);
+  return notifier.savedFoodsStream();
 });
 
 class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
@@ -87,12 +94,49 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     }
   }
 
+  Stream<List<Food>> savedFoodsStream() {
+    final uid = _uid;
+    if (uid == null) return const Stream.empty();
+
+    // Use your new helper method here
+    return _savedFood(uid)
+        .orderBy('savedAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+
+        // Convert Firestore Timestamp to String for the JSON factory
+        if (data['savedAt'] is Timestamp) {
+          data['savedAt'] = (data['savedAt'] as Timestamp).toDate().toIso8601String();
+        }
+
+        return Food.fromDoc(data);
+      }).toList();
+    });
+  }
+
   Stream<List<Map<String, dynamic>>> watchEntries(String dateId) {
     final uid = _uid;
     if (uid == null) return const Stream.empty();
 
     return _dailyLogDoc(uid, dateId)
         .collection('entries')
+        .orderBy('timestamp', descending: true) // Newest items at the top
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => doc.data()).toList();
+    });
+  }
+
+  Stream<List<Map<String, dynamic>>> watchExerciseEntries(String dateId) {
+    final uid = _uid;
+    if (uid == null) return const Stream.empty();
+
+    return _dailyLogDoc(uid, dateId)
+        .collection('entries')
+        .where((data) => data.containsKey('caloriesBurned'))
         .orderBy('timestamp', descending: true) // Newest items at the top
         .snapshots()
         .map((snapshot) {
@@ -347,6 +391,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     required int durationMins,
   }) async {
     final uid = _uid;
+    debugPrint(uid.toString());
     if (uid == null) return;
 
     final dayRef = _dailyLogDoc(uid, _todayId);
@@ -389,61 +434,46 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     await batch.commit();
   }
 
-  Future<void> logFoodEntry({
-    String? id,
-    required String name,
-    required int calories,
-    required int p,
-    required int c,
-    required int f,
-    required int serving,
-    required FoodSource source,
-  }) async {
+  Future<void> logFoodEntry(FoodLog item, FoodSource source) async {
     final uid = _uid;
     if (uid == null) return;
 
     final dayRef = _dailyLogDoc(uid, _todayId);
 
-    // ✅ generate entryId
-    final entryId = source == FoodSource.foodUpload
-        ? _makeEntryId(source: source, id: id)
-        : id;
+    // Use the ID from the Food object or generate one
+    final entryId = _makeEntryId(source: source, id: item.id);
+    final entryRef = dayRef.collection('entries').doc(entryId);
 
-    if (entryId == null) {
-      throw Exception("Food ID is required for non-upload foods.");
-    }
-
-    final entryRef = dayRef.collection('entries').doc(entryId.toString());
-
-    // ✅ 1) get current dailyProgress (SAFE)
+    // 1) Get current dailyProgress to update totals
     final snap = await dayRef.get();
     final data = snap.data();
-
     final dp = (data?['dailyProgress'] as Map<String, dynamic>?) ?? {};
 
     double _num(dynamic v) => (v is num) ? v.toDouble() : 0.0;
 
     final newDailyProgress = {
-      'caloriesEaten': _num(dp['caloriesEaten']) + calories,
-      'protein': _num(dp['protein']) + p,
-      'carbs': _num(dp['carbs']) + c,
-      'fats': _num(dp['fats']) + f,
+      'caloriesEaten': _num(dp['caloriesEaten']) + item.calories,
+      'protein': _num(dp['protein']) + item.protein,
+      'carbs': _num(dp['carbs']) + item.carbs,
+      'fats': _num(dp['fats']) + item.fats,
+      'microProgress': {
+        'fiber': _num(dp['microProgress']?['fiber']) + item.fiber,
+        'sugar': _num(dp['microProgress']?['sugar']) + item.sugar,
+        'sodium': _num(dp['microProgress']?['sodium']) + item.sodium,
+      },
+      'waterMl': _num(dp['waterMl']) + item.water,
     };
 
     final batch = _db.batch();
 
-    // ✅ 2) save entry
-    batch.set(entryRef, {
-      'id': entryId,
-      'source': source.value,
-      'name': name,
-      'serving': serving,
-      'calories': calories,
-      'macros': {'p': p, 'c': c, 'f': f},
-      'timestamp': FieldValue.serverTimestamp(),
-    });
+    // 2) Save entry using the Food model's toJson
+    final foodData = item.toJson();
+    foodData['source'] = source.value; // Add source metadata
+    foodData['timestamp'] = FieldValue.serverTimestamp(); // Use server time
 
-    // ✅ 3) write back the whole dailyProgress map (FIXED)
+    batch.set(entryRef, foodData);
+
+    // 3) Update daily summary
     batch.set(
       dayRef,
       {
@@ -460,15 +490,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     required dynamic source,
     String? id,
   }) {
-    if (source == FoodSource.foodUpload || source == "exercise") {
-      return "00${DateTime.now().millisecondsSinceEpoch}";
-    }
-
-    if (id == null) {
-      throw Exception("Missing fdcId for API food.");
-    }
-
-    return id.toString();
+      return "${DateTime.now().millisecondsSinceEpoch}";
   }
 
   // -----------------------------
@@ -533,11 +555,18 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     );
   }
 
-  Future<void> saveFood(FoodSearchItem item) async {
+// Update your unsave logic to handle Firestore
+  Future<void> unsaveFood(String id) async {
+    final uid = _uid;
+    if (uid == null) return;
+    await _savedFood(uid).doc(id.toString()).delete();
+  }
+
+  Future<void> saveFood(Food item) async {
     final uid = _uid;
     if (uid == null) return;
 
-    await _savedFood(uid).doc(item.fdcId.toString()).set(
+    await _savedFood(uid).doc(item.id).set(
       {
         ...item.toJson(),
         'savedAt': FieldValue.serverTimestamp(),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
-import '../../home/floating_action_button.dart';
+import '../../home/widgets/floating_action_button.dart';
 
 /// Shows a custom dialog with a grid of floating action buttons.
 ///

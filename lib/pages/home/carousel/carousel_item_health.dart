@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
 import '../../../data/health_data.dart'; // Import the new State
-import '../activity_card.dart';
+import '../widgets/activity_card.dart';
 
 class CarouselHealth extends StatelessWidget {
   final bool isTap;

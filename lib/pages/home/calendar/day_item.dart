@@ -1,6 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+
+import 'calendar_provider.dart';
 
 // ----------------------------
 // Dashed Circle Painter
@@ -114,7 +117,7 @@ class _ProgressRingPainter extends CustomPainter {
 // DayItem Widget
 // ----------------------------
 
-class DayItem extends StatefulWidget {
+class DayItem extends ConsumerStatefulWidget {
   final Set<String> progressDays; // has any progress
   final Set<String> overDays; // exceeded goal
   final Map<String, double> dailyCalories; // calories per dateId
@@ -137,40 +140,21 @@ class DayItem extends StatefulWidget {
   });
 
   @override
-  State<DayItem> createState() => _DayItemState();
+  ConsumerState<DayItem> createState() => _DayItemState();
 }
 
-class _DayItemState extends State<DayItem> {
-  late final List<DateTime> _monthDays;
-  late final int _activeWeekIndex;
-
-  final PageController _weekController = PageController();
+class _DayItemState extends ConsumerState<DayItem> with AutomaticKeepAliveClientMixin {
+  late PageController _weekController;
   final double _dayContainerSize = 35;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    _initializeCalendar();
-  }
-
-  void _initializeCalendar() {
-    final now = DateTime.now();
-    final firstDay = DateTime(now.year, now.month, 1);
-    final lastDay = DateTime(now.year, now.month + 1, 0);
-
-    _monthDays = List.generate(
-      lastDay.day,
-          (i) => firstDay.add(Duration(days: i)),
-    );
-
-    // ✅ Jump to current week on first build
-    _activeWeekIndex = (now.day - 1) ~/ 7;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_weekController.hasClients) {
-        _weekController.jumpToPage(_activeWeekIndex);
-      }
-    });
+    final calendar = ref.read(calendarProvider);
+    _weekController = PageController(initialPage: calendar.initialWeekIndex);
   }
 
   @override
@@ -179,40 +163,23 @@ class _DayItemState extends State<DayItem> {
     super.dispose();
   }
 
-  bool _isPastDay(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final comparison = DateTime(date.year, date.month, date.day);
-    return comparison.isBefore(today);
-  }
-
-  bool _isToday(DateTime d) {
-    final now = DateTime.now();
-    return now.year == d.year && now.month == d.month && now.day == d.day;
-  }
-
-  bool _isFutureDay(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final comparison = DateTime(date.year, date.month, date.day);
-    return comparison.isAfter(today);
-  }
-
   String _toDateId(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
 
   @override
   Widget build(BuildContext context) {
-    final totalWeeks = (_monthDays.length / 7).ceil();
+    super.build(context);
+    final calendar = ref.watch(calendarProvider);
+    final totalWeeks = (calendar.monthDays.length / 7).ceil();
 
     return SizedBox(
       height: 70,
       child: PageView.builder(
         controller: _weekController,
         itemCount: totalWeeks,
-        itemBuilder: (_, weekIndex) {
+        physics: const BouncingScrollPhysics(),
+        itemBuilder: (context, weekIndex) {
           final start = weekIndex * 7;
-          final end = (start + 7).clamp(0, _monthDays.length);
-          final weekDays = _monthDays.sublist(start, end);
+          final weekDays = calendar.monthDays.sublist(start, start + 7);
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -220,35 +187,37 @@ class _DayItemState extends State<DayItem> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: weekDays.map((day) {
                 final dateId = _toDateId(day);
+                final isToday = calendar.today.year == day.year &&
+                    calendar.today.month == day.month &&
+                    calendar.today.day == day.day;
 
                 final isSelected = widget.selectedDateId == dateId;
-                final isFuture = _isFutureDay(day);
-                final isPast = _isPastDay(day);
-                final isToday = _isToday(day);
 
-                final hasProgress = widget.progressDays.contains(dateId);
-                final isOver = widget.overDays.contains(dateId);
+                // Styling: Fade out days not in the current month
+                final isCurrentMonth = day.month == calendar.today.month;
+                final isFuture = day.isAfter(calendar.today);
+                final isPast = day.isBefore(calendar.today) || isToday;
 
-                final calories = widget.dailyCalories[dateId] ?? 0;
-                final goal = widget.calorieGoal;
-
-                return IgnorePointer(
-                  ignoring: isFuture,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(15),
-                    onTap: () => widget.onDaySelected(dateId),
-                    child: _DayContainer(
-                      isActive: isSelected,
-                      child: _DayDisplay(
-                        day: day,
-                        isSelected: isSelected,
-                        isToday: isToday,
-                        isPast: isPast,
-                        containerSize: _dayContainerSize,
-                        hasProgress: hasProgress,
-                        isOver: isOver,
-                        calories: calories,
-                        goalCalories: goal,
+                return Opacity(
+                  opacity: isCurrentMonth ? 1.0 : 0.3,
+                  child: IgnorePointer(
+                    ignoring: isFuture,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(15),
+                      onTap: () => widget.onDaySelected(dateId),
+                      child: _DayContainer(
+                        isActive: isSelected,
+                        child: _DayDisplay(
+                          day: day,
+                          isSelected: isSelected,
+                          isToday: isToday,
+                          isPast: isPast,
+                          containerSize: _dayContainerSize,
+                          hasProgress: widget.progressDays.contains(dateId),
+                          isOver: widget.overDays.contains(dateId),
+                          calories: widget.dailyCalories[dateId] ?? 0,
+                          goalCalories: widget.calorieGoal,
+                        ),
                       ),
                     ),
                   ),

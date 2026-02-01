@@ -1,4 +1,4 @@
-import 'package:calai/pages/home/day_streak.dart';
+import 'package:calai/pages/home/widgets/day_streak.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

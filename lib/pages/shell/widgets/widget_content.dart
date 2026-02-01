@@ -1,7 +1,8 @@
+import 'package:calai/pages/shell/widgets/widget_pages.dart';
 import 'package:flutter/material.dart';
-import '../../data/notifiers.dart';
-import 'widget_pages.dart';
-import 'widgets/animated_page_switcher.dart'; // The new, clean switcher
+
+import '../../../data/notifiers.dart';
+import 'animated_page_switcher.dart';
 
 /// A widget that provides the main content for the `WidgetTree`.
 ///
