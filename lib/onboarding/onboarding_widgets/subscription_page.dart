@@ -24,7 +24,10 @@ class SubscriptionPage extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(
-                  icon: const Icon(Icons.close),
+                  icon: Icon(
+                    Icons.close,
+                    color: Theme.of(context).colorScheme.onTertiaryFixed,
+                  ),
                   onPressed: onFinished,
                 ),
               ),
@@ -49,7 +52,7 @@ class SubscriptionPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: onFinished,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: Theme.of(context).colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
