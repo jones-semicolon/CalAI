@@ -80,12 +80,3 @@ class AppTextStyles {
   );
 }
 
-/// -------------------------------------------------------------------------
-/// Shadows
-/// -------------------------------------------------------------------------
-class AppShadows {
-  static const List<BoxShadow> neumorphic = [
-    BoxShadow(color: Colors.black54, offset: Offset(4, 4), blurRadius: 6),
-    BoxShadow(color: Colors.white24, offset: Offset(-4, -4), blurRadius: 6),
-  ];
-}

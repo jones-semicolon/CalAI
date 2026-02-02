@@ -186,7 +186,6 @@ class _DailyRecommendationDashboardState
                   decoration: BoxDecoration(
                     color: AppColors.circularBg(context),
                     borderRadius: BorderRadius.circular(AppRadius.card),
-                    boxShadow: AppShadows.neumorphic,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -252,7 +251,6 @@ class _DailyRecommendationDashboardState
                 decoration: BoxDecoration(
                   color: AppColors.circularBg(context),
                   borderRadius: BorderRadius.circular(AppRadius.card),
-                  boxShadow: AppShadows.neumorphic,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -299,7 +297,6 @@ class _DailyRecommendationDashboardState
                 decoration: BoxDecoration(
                   color: AppColors.circularBg(context),
                   borderRadius: BorderRadius.circular(AppRadius.card),
-                  boxShadow: AppShadows.neumorphic,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -332,7 +329,8 @@ class _DailyRecommendationDashboardState
                     const SizedBox(height: AppSpacing.small),
                     HyperlinkText(
                       text: '• National Institutes of Health',
-                      url: 'https://www.nhlbi.nih.gov/files/docs/guidelines/ob_gdlns.pdf',
+                      url:
+                          'https://www.nhlbi.nih.gov/files/docs/guidelines/ob_gdlns.pdf',
                     ),
                   ],
                 ),

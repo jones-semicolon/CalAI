@@ -63,7 +63,6 @@ class Micronutrients {
   }
 }
 
-
 final goalsProvider = AsyncNotifierProvider<GoalsNotifier, Goals>(
   GoalsNotifier.new,
 );
@@ -78,6 +77,8 @@ class GoalsNotifier extends AsyncNotifier<Goals> {
 
   Future<Goals> _fetchGoals() async {
     final response = await http.get(Uri.parse(_endpoint));
+
+    // await Future.delayed(Duration(seconds: 10));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch goals');

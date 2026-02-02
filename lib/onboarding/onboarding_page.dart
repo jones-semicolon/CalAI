@@ -10,6 +10,7 @@ import 'onboarding_widgets/onboarding_appbar.dart';
 import 'steps_pages/step_1.dart';
 import 'steps_pages/step_16.dart';
 import 'steps_pages/step_18.dart';
+import 'steps_pages/step_19.dart';
 import 'steps_pages/step_2.dart';
 import 'steps_pages/step_3.dart';
 import 'steps_pages/step_4.dart';
@@ -105,6 +106,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       OnboardingStep16(nextPage: _nextPage),
       OnboardingStep17(nextPage: _nextPage),
       OnboardingStep18(nextPage: _nextPage),
+      OnboardingStep19(nextPage: _nextPage),
     ];
   }
 

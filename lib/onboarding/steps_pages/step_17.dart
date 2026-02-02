@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
-import '../onboarding_widgets/continue_button.dart';
 
-class OnboardingStep17 extends StatelessWidget {
+import '../onboarding_widgets/continue_button.dart';
+import '../onboarding_widgets/loading_widget/health_plan_loading_widget.dart';
+
+class OnboardingStep17 extends StatefulWidget {
   final VoidCallback nextPage;
+
   const OnboardingStep17({super.key, required this.nextPage});
+
+  @override
+  State<OnboardingStep17> createState() => _OnboardingStep17State();
+}
+
+class _OnboardingStep17State extends State<OnboardingStep17> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Column(
         children: [
-          Spacer(),
+          const Spacer(),
 
           Column(
             children: [
@@ -20,17 +30,17 @@ class OnboardingStep17 extends StatelessWidget {
                   Container(
                     width: 18,
                     height: 18,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.orange,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.check,
                       color: Colors.white,
-                      size: 18,
+                      size: 14,
                     ),
                   ),
-                  const SizedBox(width: 5),
+                  const SizedBox(width: 6),
                   Text(
                     "All done!",
                     style: TextStyle(
@@ -41,7 +51,7 @@ class OnboardingStep17 extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 5),
+              const SizedBox(height: 6),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -60,13 +70,40 @@ class OnboardingStep17 extends StatelessWidget {
 
           const Spacer(),
 
-          // Continue button
           SizedBox(
             width: double.infinity,
-            child: ContinueButton(enabled: true, onNext: nextPage ),// on tap calibrate the data and go to next page
+            child: ContinueButton(
+              enabled: !_isLoading,
+              onNext: _startCalibration,
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  /// SHOW LOADING
+  void _startCalibration() {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.6),
+      pageBuilder: (_, __, ___) {
+        return HealthPlanLoadingWidget(
+          onFinished: () {
+            if (!mounted) return;
+
+            Navigator.of(context).pop();
+            widget.nextPage();
+          },
+        );
+      },
     );
   }
 }
