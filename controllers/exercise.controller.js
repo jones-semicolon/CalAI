@@ -144,7 +144,7 @@ exports.log_exercise = async (req, res) => {
     res.json({
       success: true,
       data: {
-        exercise: finalType,
+        exercise_type: finalType,
         intensity: finalIntensity,
         duration_mins: finalDuration,
         calories_burned: caloriesBurned,
