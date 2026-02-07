@@ -36,7 +36,7 @@ class ProgressGraph extends StatelessWidget {
 
     final double interval = (maxY - minY) / 4;
 
-    String _monthName(int month) {
+    String monthName(int month) {
       const months = [
         'January',
         'February',
@@ -287,7 +287,7 @@ class ProgressGraph extends StatelessWidget {
                             final date = logs[index]['date'] as DateTime;
 
                             final formattedDate =
-                                '${_monthName(date.month)} ${date.day}, ${date.year}';
+                                '${monthName(date.month)} ${date.day}, ${date.year}';
 
                             return LineTooltipItem(
                               '${spot.y.toStringAsFixed(1)} kg',

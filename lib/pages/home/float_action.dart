@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'camera/scan_screen.dart';
+
 class FloatActionContent extends StatelessWidget {
   const FloatActionContent({super.key});
 
@@ -60,6 +62,14 @@ class FloatActionContent extends StatelessWidget {
                         context: context,
                         icon: Icons.qr_code_scanner,
                         label: "Scan Food",
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ScanScreen(),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -77,45 +87,47 @@ class FloatActionContent extends StatelessWidget {
     required IconData icon,
     required String label,
     required BuildContext context,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 15),
-      decoration: BoxDecoration(
-        color: Theme.of(
-          context,
-        ).appBarTheme.backgroundColor, // 🔥 White background added
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface, // Border
-          width: 2,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        decoration: BoxDecoration(
+          color: Theme.of(context).appBarTheme.backgroundColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.onSurface,
+            width: 2,
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12), // Responsive padding
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondary,
-              borderRadius: BorderRadius.circular(15), // Rounded circle
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Icon(
+                icon,
+                size: 28,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
-            child: Icon(
-              icon,
-              size: 28,
-              color: Theme.of(context).colorScheme.onPrimary,
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

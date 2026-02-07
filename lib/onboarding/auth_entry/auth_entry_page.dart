@@ -84,7 +84,7 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
                   height: 48,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
                         Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
