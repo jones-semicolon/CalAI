@@ -85,6 +85,8 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
         if (code != null && code.isNotEmpty) {
           debugPrint('Barcode data: $code');
           widget.onBarcodeCaptured?.call(code);
+          // APIpost: send image + barcode here.
+          // await _postToApi(image: image, barcode: code);
         }
         break;
 
@@ -93,10 +95,14 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
         if (text != null && text.trim().isNotEmpty) {
           debugPrint('Food label text: $text');
           widget.onFoodLabelCaptured?.call(text);
+          // APIpost: send image + label here.
+          // await _postToApi(image: image, label: text);
         }
         break;
 
       case ScanMode.scanFood:
+        // APIpost: send image only here.
+        // await _postToApi(image: image);
         break;
 
       case ScanMode.gallery:
@@ -107,6 +113,15 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
       widget.onImageCaptured?.call(image);
     }
   }
+
+  // Sample API method (placeholder):
+  // Future<void> _postToApi({
+  //   required XFile image,
+  //   String? barcode,
+  //   String? label,
+  // }) async {
+  //   // APIpost: build multipart/form-data and POST to your endpoint.
+  // }
 
   Future<void> _openGallery() async {
     final status = await Permission.photos.request();
