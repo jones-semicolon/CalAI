@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+// TODO integrate Firestore data weight_history collection
 class WeightHistoryView extends ConsumerStatefulWidget {
   const WeightHistoryView({super.key});
 

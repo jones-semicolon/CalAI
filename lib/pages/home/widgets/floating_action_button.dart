@@ -80,6 +80,7 @@ class FloatingActionGrid extends StatelessWidget {
                       icon: Icons.qr_code_scanner,
                       label: "Scan Food",
                       onTap: () {
+                        // TODO Camera page
                         debugPrint("Scan Food tapped");
                       },
                     ),

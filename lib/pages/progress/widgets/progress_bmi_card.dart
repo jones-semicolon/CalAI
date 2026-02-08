@@ -134,6 +134,7 @@ class ProgressBmiCard extends ConsumerWidget {
                       ),
                     ),
                   ),
+                  // TODO move it to BMI info page
                   GestureDetector(
                     onTap: () {
                       showDialog(

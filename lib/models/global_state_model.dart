@@ -17,7 +17,9 @@ class GlobalDataState {
   final List<WeightLog> weightLogs;
 
   // Graphs & Dashboard Fallbacks
+  //TODO repetition on NutritionGoals
   final double goalWeight;
+  //TODO repetition on NutritionGoals
   final double calorieGoal;
 
   // Metadata for Calendar dots and history

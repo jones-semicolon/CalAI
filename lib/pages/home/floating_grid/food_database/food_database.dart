@@ -215,6 +215,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
                   ),
                   const SizedBox(height: 18),
                   // Only show "Suggestions" title if not searching
+                  // TODO wrap the whole section based on selected category
                   _selectedTabIndex == 0
                       ? Align(
                     alignment: Alignment.centerLeft,

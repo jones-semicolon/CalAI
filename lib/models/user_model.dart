@@ -186,6 +186,7 @@ class UserGoal {
   final GoalFocus? motivation;
   final WorkoutFrequency? activityLevel;
   final DietType? dietType;
+  // TODO: Must be enum
   final String? maintenanceStrategy;
 
   // ✅ ADDED: This field holds your NutritionGoals (Calories, Protein, etc.)
@@ -225,6 +226,7 @@ class UserGoal {
       activityLevel: WorkoutFrequency.fromString(json['activityLevel'] ?? WorkoutFrequency.moderate.name),
       dietType: DietType.fromString(json['dietType'] ?? DietType.classic.name),
 
+      // TODO:: it should be converted to enum
       maintenanceStrategy: json['maintenanceStrategy'] ?? '',
 
       // ✅ Already looks good, but let's be extra safe
@@ -236,6 +238,7 @@ class UserGoal {
 
   UserGoal copyWith({
     Goal? type,
+    // TODO repetition on targets.weightGoal
     double? targetWeight,
     double? weeklyRate,
     GoalFocus? motivation,

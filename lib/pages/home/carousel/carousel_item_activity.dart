@@ -86,6 +86,8 @@ class _CaloriesBurnedCard extends ConsumerWidget {
             loading: () =>
                 Expanded(child: const Center(child: CupertinoActivityIndicator(radius: 10))),
             error: (err, _) => const SizedBox.shrink(),
+            // TODO 1 logged steps only, no repetition
+            // hidden if 0 or null
             data: (entries) {
               final exercises = entries
                   .where(
@@ -233,6 +235,7 @@ class _WaterIntakeSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Water", style: theme.textTheme.labelSmall),
+              // TODO wrap to Row and add setting button to change serving size
               Text(
                 "$waterIntake fl oz", // Unit update
                 style: const TextStyle(fontWeight: FontWeight.bold),

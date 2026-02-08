@@ -27,6 +27,7 @@ abstract class Nutrition {
 }
 
 class NutritionGoals extends Nutrition {
+  // TODO must be weightGoal
   final int targetWeight;
   final int rollover;
 
@@ -56,7 +57,9 @@ class NutritionGoals extends Nutrition {
       fiber: val('fiberGoal') ?? 0,
       sugar: val('sugarGoal') ?? 0,
       sodium: val('sodiumGoal') ?? 0,
+      // TODO must be 64
       water: val('waterGoal') ?? 70,
+      // TODO must be 10000
       steps: val('stepsGoal') ?? 1000,
       targetWeight: val('weightGoal') ?? 0 ,
       rollover: val('rollover') ?? 0,
