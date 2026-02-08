@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 
@@ -191,11 +192,29 @@ class _OnboardingStep13State extends State<OnboardingStep13>
             child: ContinueButton(
               enabled: true,
               //TODO: allow notifications
-              onNext: widget.nextPage,
+              onNext: _handleNotificationRequest,
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _handleNotificationRequest() async {
+    if (isAllowNotification) {
+      // This triggers the native iOS/Android "Allow Notifications?" system popup
+      PermissionStatus status = await Permission.notification.request();
+
+      if (status.isGranted) {
+        debugPrint("Notification permission granted");
+      } else if (status.isPermanentlyDenied) {
+        // User clicked "Don't Allow" multiple times or disabled in settings
+        // You could show a snackbar here if you really need them to turn it on
+      }
+    }
+
+    // Move to the next page regardless of the choice
+    // (Standard onboarding practice)
+    widget.nextPage();
   }
 }

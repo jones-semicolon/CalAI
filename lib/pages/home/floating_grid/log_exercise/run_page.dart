@@ -1,3 +1,5 @@
+import 'package:calai/services/calai_firestore_service.dart';
+import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,8 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // --- IMPORTS ---
 import 'package:calai/widgets/circle_back_button.dart';
 import '../../../../api/exercise_api.dart';
-import '../../../../data/global_data.dart';
-import '../../../../data/user_data.dart';
+import '../../../../enums/exercise_enums.dart';
+import '../../../../models/exercise_model.dart';
+import '../../../../providers/exercise_provider.dart';
+import '../../../../providers/user_provider.dart';
+import '../../../../widgets/confirmation_button_widget.dart';
 
 class RunExercisePage extends ConsumerStatefulWidget {
   const RunExercisePage({super.key});
@@ -20,17 +25,17 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
   final List<Map<String, dynamic>> _intensityOptions = [
     {
       'title': 'High',
-      'subtitle': 'Sprinting... 14 mph (4 minutes miles)',
+      'subtitle': 'Sprinting - 14 mph (4 minutes miles)',
       'value': Intensity.high,
     },
     {
       'title': 'Medium',
-      'subtitle': 'Jogging... 6 mph (10 minutes miles)',
+      'subtitle': 'Jogging - 6 mph (10 minutes miles)',
       'value': Intensity.medium,
     },
     {
       'title': 'Low',
-      'subtitle': 'Chill walk... 3 mph (20 minutes miles)',
+      'subtitle': 'Chill walk - 3 mph (20 minutes miles)',
       'value': Intensity.low,
     },
   ];
@@ -87,38 +92,48 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
   @override
   Widget build(BuildContext context) {
     final int activeIndex = _getCurrentZoneIndex();
+    ref.listen<ExerciseLogState>(exerciseLogProvider, (previous, next) {
+      if (next.status == ExerciseLogStatus.loading) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+      } else if (next.status == ExerciseLogStatus.success) {
+        Navigator.of(context, rootNavigator: true).pop(); // Close loading
+        Navigator.pop(context); // Close Page
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Exercise logged successfully!')),
+        );
+        ref.read(exerciseLogProvider.notifier).reset();
+      } else if (next.status == ExerciseLogStatus.error) {
+        Navigator.of(context, rootNavigator: true).pop(); // Close loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${next.errorMessage}')),
+        );
+      }
+    });
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   backgroundColor: Colors.white,
-      //   elevation: 0,
-      //   automaticallyImplyLeading: false,
-      //   leading: const Padding(
-      //     padding: EdgeInsets.all(5),
-      //     child: CircleBackButton(),
-      //   ),
-      //   title: Row(
-      //     mainAxisSize: MainAxisSize.min,
-      //     children: const [
-      //       Icon(Icons.directions_run, color: Colors.black, size: 24),
-      //       SizedBox(width: 5),
-      //       Text(
-      //         'Run',
-      //         style: TextStyle(
-      //           color: Colors.black,
-      //           fontWeight: FontWeight.bold,
-      //           fontSize: 18,
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      //   centerTitle: true,
-      // ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
+          CustomAppBar(title: Row(
+              mainAxisSize: MainAxisSize.min, // Keeps the row tight around the icon/text
+              children: [
+                Icon(Icons.directions_run, color: Theme.of(context).colorScheme.primary, size: 24),
+                const SizedBox(width: 5),
+                const Text(
+                  "Run",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+            ),
             const SizedBox(height: 10),
             // --- SCROLLABLE CONTENT ---
             Expanded(
@@ -141,10 +156,10 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
 
                     // --- MAIN SELECTION CARD ---
                     Container(
-                      height: 250,
+                      height: 225,
                       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF2F4F8),
+                        color: Theme.of(context).colorScheme.onTertiary.withOpacity(0.45),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
@@ -173,9 +188,9 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
                                         AnimatedDefaultTextStyle(
                                           duration: const Duration(milliseconds: 300),
                                           style: TextStyle(
-                                            fontSize: isSelected ? 24 : 16,
+                                            fontSize: isSelected ? 18 : 14,
                                             fontWeight: isSelected ? FontWeight.w900 : FontWeight.w500,
-                                            color: Colors.black,
+                                            color: Theme.of(context).colorScheme.primary,
                                           ),
                                           child: Text(
                                             _intensityOptions[index]['title'] as String,
@@ -187,9 +202,9 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
                                           opacity: isSelected ? 1.0 : 0.5,
                                           child: Text(
                                             _intensityOptions[index]['subtitle'] as String,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 12,
-                                              color: Colors.black87,
+                                              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
                                               height: 1.2,
                                             ),
                                           ),
@@ -299,7 +314,7 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               decoration: BoxDecoration(
-                                color: isSelected ? const Color(0xFF1A1C29) : Colors.transparent,
+                                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSecondaryContainer,
                                 borderRadius: BorderRadius.circular(30),
                                 border: Border.all(
                                   color: isSelected ? Colors.transparent : Colors.black26,
@@ -308,8 +323,9 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
                               child: Text(
                                 "${_durations[index]} mins",
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : Colors.black,
+                                  color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.w600,
+                                  fontSize: 12
                                 ),
                               ),
                             ),
@@ -323,7 +339,7 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF2F4F8),
+                        color: Theme.of(context).colorScheme.onTertiary.withOpacity(0.45),
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(color: Colors.black12),
                       ),
@@ -354,140 +370,29 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
             ),
 
             // --- FIXED BOTTOM BUTTON ---
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
-              child: SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: _onLogEntry,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A1C29),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text(
-                    'Add',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            ConfirmationButtonWidget(onConfirm: _onLogEntry, text: "Add")
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Stack(
-        alignment: Alignment.center, // This ensures the title stays dead-center
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: CircleBackButton(onTap: () => Navigator.pop(context)),
-          ),
-          const Row(
-            mainAxisSize: MainAxisSize.min, // Keeps the row tight around the icon/text
-            children: [
-              Icon(Icons.directions_run, color: Colors.black, size: 24),
-              SizedBox(width: 5),
-              Text(
-                "Run",
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 18,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   // --- INTEGRATED LOGIC ---
-  Future<void> _onLogEntry() async {
-    // 1. Validate Input
-    if (_durationController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a duration')),
-      );
-      return;
-    }
+  void _onLogEntry() async {
+    final String durationText = _durationController.text;
+    if (durationText.isEmpty) return;
 
-    final int duration = int.parse(_durationController.text);
+    final int duration = int.parse(durationText);
     if (duration <= 0) return;
 
-    // 2. Prepare Data
     final activeIndex = _getCurrentZoneIndex();
-    final Intensity intensityEnum = _intensityOptions[activeIndex]['value'] as Intensity;
-    final String intensityTitle = intensityEnum.label;
+    final Intensity intensityEnum = _intensityOptions[activeIndex]['value'];
 
-    final user = ref.read(userProvider);
-    final double weightKg = user.weight > 0 ? user.weight : 70.0;
-
-    // 3. Show Loading Dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+    // Call the provider
+    await ref.read(exerciseLogProvider.notifier).logExercise(
+      exerciseType: ExerciseType.run,
+      intensity: intensityEnum,
+      duration: duration,
     );
-
-    try {
-      // 4. API CALL
-      final apiResponse = await ExerciseApi().getBurnedCalories(
-        weightKg: weightKg,
-        exerciseType: ExerciseType.run.label,
-        intensity: intensityTitle,
-        durationMins: duration,
-      );
-
-      debugPrint("API Response: $apiResponse");
-
-      // 5. EXTRACT DATA
-      // Handle cases where 'data' might be null or format is different
-      final dynamic rawCalories = apiResponse['data']?['calories_burned'];
-      final double burnedCalories = (rawCalories is num) ? rawCalories.toDouble() : 0.0;
-
-      // 6. FIREBASE LOG
-      await ref.read(globalDataProvider.notifier).logExerciseEntry(
-        burnedCalories: burnedCalories,
-        weightKg: weightKg,
-        exerciseType: ExerciseType.run.label,
-        intensity: intensityTitle,
-        durationMins: duration,
-      );
-
-      // 7. Success & Close
-      if (mounted) {
-        // Close the Loading Dialog
-        Navigator.of(context, rootNavigator: true).pop();
-
-        // Close the Run Page
-        Navigator.pop(context);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Logged run: ${burnedCalories.toInt()} kcal burned!')),
-        );
-      }
-    } catch (e) {
-      debugPrint("Logging Error: $e");
-      if (mounted) {
-        // Close the Loading Dialog only
-        Navigator.of(context, rootNavigator: true).pop();
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    }
   }
 }

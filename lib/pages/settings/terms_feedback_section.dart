@@ -1,10 +1,12 @@
+import 'package:calai/enums/user_enums.dart';
 import 'package:flutter/material.dart';
 import '../../core/constants/app_sizes.dart';
 import 'settings_item.dart';
 import 'widgets/settings_divider.dart';
 
 class TermsFeedbackSection extends StatelessWidget {
-  const TermsFeedbackSection({super.key});
+  final UserProvider isAnonymous;
+  const TermsFeedbackSection({super.key, required this.isAnonymous});
 
   @override
   Widget build(BuildContext context) {
@@ -51,15 +53,17 @@ class TermsFeedbackSection extends StatelessWidget {
               print("Feature Request tapped");
             },
           ),
-          const SettingsDivider(),
-          SettingsItemTile(
-            icon: Icons.delete_outline,
-            label: "Delete Account?",
-            onTap: () {
-              // TODO: show delete confirmation
-              print("Delete tapped");
-            },
-          ),
+          if (isAnonymous != UserProvider.anonymous) ...[
+            const SettingsDivider(),
+            SettingsItemTile(
+              icon: Icons.delete_outline,
+              label: "Delete Account?",
+              onTap: () {
+                // TODO: show delete confirmation
+                print("Delete tapped");
+              },
+            ),
+          ],
         ],
       ),
     );

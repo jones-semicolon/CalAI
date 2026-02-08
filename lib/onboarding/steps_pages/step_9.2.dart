@@ -1,9 +1,9 @@
-import 'package:calai/data/health_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../enums/user_enums.dart';
+import '../../providers/user_provider.dart';
 import '../onboarding_widgets/continue_button.dart';
-import '../../data/user_data.dart';
 
 class EncourageMessage extends ConsumerWidget {
   final VoidCallback nextPage;
@@ -25,13 +25,13 @@ class EncourageMessage extends ConsumerWidget {
     final primary = theme.colorScheme.primary;
 
     final user = ref.watch(userProvider);
-    final unit = ref.watch(healthDataProvider).weightUnit;
+    final unit = user.body.weightUnit;
 
-    final goalText = _goalLabel(user.weight, user.targetWeight);
+    final goalText = _goalLabel(user.body.currentWeight, user.goal.targetWeight!);
 
     final double weightDiff = unit == WeightUnit.kg
-        ? (user.targetWeight - user.weight).abs()
-        : ((user.targetWeight - user.weight) * _lbPerKg).abs();
+        ? (user.goal.targetWeight! - user.body.currentWeight).abs()
+        : ((user.goal.targetWeight! - user.body.currentWeight) * _lbPerKg).abs();
 
     final unitLabel = unit.value;
 

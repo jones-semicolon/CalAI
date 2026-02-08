@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +7,6 @@ import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
-import '../../data/user_data.dart';
 
 class OnboardingStep3 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
@@ -31,22 +32,9 @@ class _OnboardingStep3State extends ConsumerState<OnboardingStep3> {
     OptionCard(title: 'X', icon: FontAwesomeIcons.xTwitter),
     OptionCard(title: 'Other', icon: Icons.dynamic_feed_outlined),
   ];
-  @override
-  void initState() {
-    super.initState();
-
-    final social = ref.read(userProvider).social;
-
-    final matchSocial = options.indexWhere((i) => i.title == social);
-    if (matchSocial != -1) {
-      isEnable = true;
-      selectedIndex = matchSocial;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final userData = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
@@ -102,12 +90,29 @@ class _OnboardingStep3State extends ConsumerState<OnboardingStep3> {
             width: double.infinity,
             child: ContinueButton(
               enabled: isEnable,
-              onNext: () {
+              onNext: () async {
                 if (selectedIndex != null) {
                   final selectedOption = options[selectedIndex!].title;
+                  final uid = FirebaseAuth.instance.currentUser?.uid;
 
-                  userData.update((s) => s.copyWith(social: selectedOption));
-                  debugPrint('Heard us from: $selectedOption');
+                  if (uid != null) {
+                    // ✅ DIRECT TO FIRESTORE: Save marketing data to a separate collection
+                    // We don't save this to the User model to keep the health data clean.
+                    try {
+                      await FirebaseFirestore.instance
+                          .collection('onboarding_surveys')
+                          .doc(uid)
+                          .set({
+                        'socialSource': selectedOption,
+                        'surveyStep': 3,
+                        'updatedAt': FieldValue.serverTimestamp(),
+                      }, SetOptions(merge: true));
+
+                      debugPrint('Successfully saved social source: $selectedOption');
+                    } catch (e) {
+                      debugPrint('Error saving social source: $e');
+                    }
+                  }
                 }
                 widget.nextPage();
               },

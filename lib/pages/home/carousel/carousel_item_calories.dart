@@ -1,23 +1,37 @@
 import 'package:calai/widgets/animated_number.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/core/constants/constants.dart';
-import '../../../data/health_data.dart';
-import '../widgets/activity_card.dart'; // Import the new State
+import '../../../enums/food_enums.dart';
+import '../../../models/global_state_model.dart';
+import '../../../providers/global_provider.dart';
+import '../../../providers/user_provider.dart';
+import '../../../models/nutrition_model.dart';
+import '../widgets/activity_card.dart';
 
-class CarouselCalories extends StatelessWidget {
+class CarouselCalories extends ConsumerWidget {
   final bool isTap;
   final VoidCallback onTap;
-  final HealthData health; // Rely on HealthData state
 
   const CarouselCalories({
     super.key,
     required this.isTap,
     required this.onTap,
-    required this.health,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 1. Get Today's Progress from Global State
+    final globalState = ref.watch(globalDataProvider).value;
+    final progress = globalState?.todayProgress ?? NutritionProgress.empty;
+
+    // 2. Get Targets from User Model
+    final user = ref.watch(userProvider);
+    final targets = user.goal.targets;
+
+    final bool isAddBurnEnabled = user.settings.isAddCalorieBurn ?? false;
+    final bool isRolloverEnabled = user.settings.isRollover ?? false;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       child: GestureDetector(
@@ -26,12 +40,17 @@ class CarouselCalories extends StatelessWidget {
           children: [
             _CaloriesCard(
               isTap: isTap,
-              health: health,
+              progress: progress,
+              targets: targets,
+              globalState: globalState, // ✅ Pass state to access getters
+              isAddBurnEnabled: isAddBurnEnabled,
+              isRolloverEnabled: isRolloverEnabled,
             ),
             const SizedBox(height: 20),
             _MacroNutrientCardsRow(
               isTap: isTap,
-              health: health,
+              progress: progress,
+              targets: targets,
             ),
           ],
         ),
@@ -44,11 +63,19 @@ class CarouselCalories extends StatelessWidget {
 
 class _CaloriesCard extends StatelessWidget {
   final bool isTap;
-  final HealthData health;
+  final NutritionProgress progress;
+  final NutritionGoals targets;
+  final GlobalDataState? globalState;
+  final bool isAddBurnEnabled;
+  final bool isRolloverEnabled;
 
   const _CaloriesCard({
     required this.isTap,
-    required this.health,
+    required this.progress,
+    required this.targets,
+    required this.globalState,
+    required this.isAddBurnEnabled,
+    required this.isRolloverEnabled,
   });
 
   @override
@@ -68,10 +95,18 @@ class _CaloriesCard extends StatelessWidget {
         children: [
           _CalorieInfo(
             isTap: isTap,
-            health: health,
+            progress: progress,
+            targets: targets,
+            globalState: globalState,
+            isAddBurnEnabled: isAddBurnEnabled,
+            isRolloverEnabled: isRolloverEnabled,
           ),
           _CalorieProgressIndicator(
-            health: health,
+            progress: progress,
+            targets: targets,
+            globalState: globalState,
+            isAddBurnEnabled: isAddBurnEnabled,
+            isRolloverEnabled: isRolloverEnabled,
           ),
         ],
       ),
@@ -81,18 +116,29 @@ class _CaloriesCard extends StatelessWidget {
 
 class _CalorieInfo extends StatelessWidget {
   final bool isTap;
-  final HealthData health;
+  final NutritionProgress progress;
+  final NutritionGoals targets;
+  final GlobalDataState? globalState; // ✅ Add this
+  final bool isAddBurnEnabled; // ✅ Add this
+  final bool isRolloverEnabled;
+
 
   const _CalorieInfo({
     required this.isTap,
-    required this.health,
+    required this.progress,
+    required this.targets,
+    required this.globalState, // ✅ Add this
+    required this.isAddBurnEnabled, // ✅ Add this
+    required this.isRolloverEnabled, // ✅ Add this
   });
 
   @override
   Widget build(BuildContext context) {
-    // Logic for "calories left" vs "eaten"
-    final int value = isTap ? health.dailyIntake : (health.calorieGoal - health.dailyIntake);
-
+    // Logic: Eaten vs Left
+    final int effectiveGoal = globalState?.effectiveCalorieGoal(isAddBurnEnabled, isRolloverEnabled) ?? targets.calories;
+    final int value = isTap
+        ? progress.calories
+        : (globalState?.caloriesRemaining(isAddBurnEnabled, isRolloverEnabled) ?? (targets.calories - progress.calories));
 
     final textStyle = TextStyle(
       fontSize: 32,
@@ -100,41 +146,56 @@ class _CalorieInfo extends StatelessWidget {
       color: Theme.of(context).colorScheme.primary,
     );
 
+    final valueString = value.toString();
+
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Row(
+          // 1. Wrap in AnimatedSize to make the Row expansion fluid
+          AnimatedSize(
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOutCubic,
+            alignment: Alignment.bottomLeft,
+            child: AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOutCubic,
+              style: textStyle,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
                 children: [
                   AnimatedSlideNumber(
-                    value: value.toString().split("").first,
+                    value: valueString.isNotEmpty ? valueString.characters.first : "0",
                     style: textStyle,
                     reverse: isTap,
                   ),
-                  Text(
-                    value.toString().split("").sublist(1).join(),
-                    style: textStyle,
+                  // 2. Use AnimatedSwitcher for the rest of the number
+                  if (valueString.length > 1)
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: Text(
+                        valueString.substring(1),
+                        key: ValueKey(valueString), // Animate when the number changes
+                      ),
+                    ),
+                  const SizedBox(width: 4),
+                  // 3. The Goal part slides in/out smoothly
+                  AnimatedSlideNumber(
+                    value: isTap ? " /$effectiveGoal" : "",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    reverse: isTap,
+                    inAnim: false,
                   )
                 ],
               ),
-              Baseline(
-                baseline: 28,
-                baselineType: TextBaseline.alphabetic,
-                child: AnimatedSlideNumber(
-                  value: isTap ? " /${health.calorieGoal}" : "",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
-                  reverse: isTap,
-                  inAnim: false,
-                ),
-              )
-            ],
+            ),
           ),
+          // 4. Smoothly swap "eaten" and "left"
           Row(
             children: [
               Text(
@@ -144,13 +205,15 @@ class _CalorieInfo extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-              Text(
-                isTap ? "eaten" : "left",
+              AnimatedSlideNumber(
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,
                 ),
+                value: isTap ? "eaten" : "left",
+                reverse: isTap,
+                inAnim: false,
               ),
             ],
           ),
@@ -161,18 +224,24 @@ class _CalorieInfo extends StatelessWidget {
 }
 
 class _CalorieProgressIndicator extends StatelessWidget {
-  final HealthData health;
+  final NutritionProgress progress;
+  final NutritionGoals targets;
+  final GlobalDataState? globalState;
+  final bool isAddBurnEnabled;
+  final bool isRolloverEnabled;
 
   const _CalorieProgressIndicator({
-    required this.health,
+    required this.progress,
+    required this.targets,
+    required this.globalState,
+    required this.isAddBurnEnabled,
+    required this.isRolloverEnabled
   });
 
   @override
   Widget build(BuildContext context) {
-    // Avoid division by zero
-    final double progressValue = health.calorieGoal > 0
-        ? (health.dailyIntake / health.calorieGoal).clamp(0.0, 1.0)
-        : 0.0;
+    final double progressValue = globalState?.calorieProgress(isAddBurnEnabled, isRolloverEnabled) ??
+        (targets.calories > 0 ? (progress.calories / targets.calories) : 0.0);
 
     return Center(
       child: SizedBox(
@@ -187,10 +256,7 @@ class _CalorieProgressIndicator extends StatelessWidget {
               child: TweenAnimationBuilder<double>(
                 duration: const Duration(milliseconds: 600),
                 curve: Curves.easeInOut,
-                tween: Tween<double>(
-                  begin: 0,
-                  end: progressValue,
-                ),
+                tween: Tween<double>(begin: 0, end: progressValue),
                 builder: (context, value, _) => CircularProgressIndicator(
                   value: value,
                   strokeWidth: 7,
@@ -207,10 +273,7 @@ class _CalorieProgressIndicator extends StatelessWidget {
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(AppSizes.cardRadius),
               ),
-              child: const Icon(
-                Icons.local_fire_department,
-                size: 25,
-              ),
+              child: const Icon(Icons.local_fire_department, size: 25),
             ),
           ],
         ),
@@ -221,11 +284,13 @@ class _CalorieProgressIndicator extends StatelessWidget {
 
 class _MacroNutrientCardsRow extends StatelessWidget {
   final bool isTap;
-  final HealthData health;
+  final NutritionProgress progress;
+  final NutritionGoals targets;
 
   const _MacroNutrientCardsRow({
     required this.isTap,
-    required this.health,
+    required this.progress,
+    required this.targets,
   });
 
   @override
@@ -234,11 +299,11 @@ class _MacroNutrientCardsRow extends StatelessWidget {
       children: [
         Expanded(
           child: CalorieCard(
-            title: "Protein",
-            nutrients: health.proteinGoal,
-            progress: health.dailyProtein,
-            color: const Color.fromARGB(255, 221, 105, 105),
-            icon: Icons.egg_alt,
+            title: NutritionType.protein.label,
+            nutrients: targets.protein,
+            progress: progress.protein,
+            color: NutritionType.protein.color,
+            icon: NutritionType.protein.icon,
             unit: "g",
             isTap: isTap,
           ),
@@ -246,11 +311,11 @@ class _MacroNutrientCardsRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: CalorieCard(
-            title: "Carbs",
-            nutrients: health.carbsGoal,
-            progress: health.dailyCarbs,
-            color: const Color.fromARGB(255, 222, 154, 105),
-            icon: Icons.rice_bowl,
+            title: NutritionType.carbs.label,
+            nutrients: targets.carbs,
+            progress: progress.carbs,
+            color: NutritionType.carbs.color,
+            icon: NutritionType.carbs.icon,
             unit: "g",
             isTap: isTap,
           ),
@@ -258,11 +323,11 @@ class _MacroNutrientCardsRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: CalorieCard(
-            title: "Fats",
-            nutrients: health.fatsGoal,
-            progress: health.dailyFats,
-            color: const Color.fromARGB(255, 105, 152, 222),
-            icon: Icons.fastfood,
+            title: NutritionType.fats.label,
+            nutrients: targets.fats,
+            progress: progress.fats,
+            color: NutritionType.fats.color,
+            icon: NutritionType.fats.icon,
             unit: "g",
             isTap: isTap,
           ),

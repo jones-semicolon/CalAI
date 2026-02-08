@@ -1,8 +1,8 @@
-import 'package:calai/data/health_data.dart';
-import 'package:calai/data/user_data.dart';
 import 'package:calai/onboarding/onboarding_widgets/calibration_result/hyper_link_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../enums/user_enums.dart';
+import '../../../providers/user_provider.dart';
 import 'app_constants.dart';
 import 'macro_card.dart';
 import 'health_score_card.dart';
@@ -42,7 +42,7 @@ class _ReachGoal extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.scaffoldBg(context),
         borderRadius: BorderRadius.circular(AppRadius.badge),
-        border: Border.all(color: AppColors.border(context), width: 1.5),
+        border: Border.all(color: AppColors.border(context), width: 1),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -62,8 +62,8 @@ class _ReachGoal extends StatelessWidget {
                 maxLines: null,
                 overflow: TextOverflow.visible,
                 style: AppTextStyles.title.copyWith(
-                  color: AppColors.onPrimary(context),
-                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary(context),
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -101,8 +101,8 @@ class _DailyRecommendationDashboardState
     extends ConsumerState<DailyRecommendationDashboard> {
   @override
   Widget build(BuildContext context) {
-    final weightGoal = ref.watch(userProvider);
-    final unit = ref.watch(healthDataProvider).weightUnit;
+    final weightGoal = ref.watch(userProvider).goal.type;
+    final unit = ref.watch(userProvider).body.weightUnit;
     final user = ref.watch(userProvider);
     final unitLabel = unit.value;
 
@@ -112,12 +112,12 @@ class _DailyRecommendationDashboardState
     final String formattedDate = DateFormat('dd MMMM').format(datePlus30);
     double weightDiff;
 
-    if (weightGoal.goal != Goal.maintain) {
-      final double diffKg = (user.targetWeight - user.weight).abs();
+    if (weightGoal != Goal.maintain) {
+      final double diffKg = (user.goal.targetWeight! - user.body.currentWeight).abs();
 
       weightDiff = unit == WeightUnit.kg ? diffKg : diffKg * 2.20462;
     } else {
-      weightDiff = unit == WeightUnit.kg ? user.weight : user.weight * 2.20462;
+      weightDiff = unit == WeightUnit.kg ? user.body.currentWeight : user.body.currentWeight * 2.20462;
     }
 
     return LayoutBuilder(
@@ -140,39 +140,39 @@ class _DailyRecommendationDashboardState
                     Icon(
                       Icons.check_circle,
                       size: 48,
-                      color: AppColors.onPrimary(context),
+                      color: AppColors.primary(context),
                     ),
                     const SizedBox(height: AppSpacing.small),
                     Text(
                       textAlign: TextAlign.center,
                       "Congratulations\n your custom plan is ready!",
                       style: AppTextStyles.value.copyWith(
-                        color: AppColors.onPrimary(context),
+                        color: AppColors.primary(context),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.large),
                     Text(
-                      'You should ${weightGoal.goal.value.split(' ')[0]}:',
+                      'You should ${weightGoal?.value.split(' ')[0]}:',
                       style: AppTextStyles.title.copyWith(
-                        color: AppColors.onPrimary(context),
-                        fontWeight: FontWeight.w900,
+                        color: AppColors.primary(context),
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.small),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xSmall,
-                        vertical: AppSpacing.xxxSmall,
+                        horizontal: AppSpacing.small,
+                        vertical: AppSpacing.xxSmall,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.circularBg(context),
+                        color: Theme.of(context).colorScheme.onTertiary,
                         borderRadius: BorderRadius.circular(AppRadius.card),
                       ),
                       child: Text(
                         '${weightDiff.toStringAsFixed(1)} $unitLabel by $formattedDate',
                         style: AppTextStyles.title.copyWith(
-                          color: AppColors.onPrimary(context),
-                          fontWeight: FontWeight.w900,
+                          color: AppColors.primary(context),
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -183,9 +183,8 @@ class _DailyRecommendationDashboardState
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.large),
                   decoration: BoxDecoration(
-                    color: AppColors.circularBg(context),
+                    color: Theme.of(context).colorScheme.onTertiary,
                     borderRadius: BorderRadius.circular(AppRadius.card),
-                    boxShadow: AppShadows.neumorphic,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -195,13 +194,13 @@ class _DailyRecommendationDashboardState
                       Text(
                         "Daily Recommendation",
                         style: AppTextStyles.headTitle.copyWith(
-                          color: AppColors.value(context),
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
                         ),
                       ),
                       Text(
                         "You can edit this any time",
                         style: AppTextStyles.title.copyWith(
-                          color: AppColors.value(context),
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
                           fontSize: 12,
                         ),
                       ),
@@ -249,9 +248,8 @@ class _DailyRecommendationDashboardState
                 width: double.infinity,
                 padding: const EdgeInsets.all(AppSpacing.large),
                 decoration: BoxDecoration(
-                  color: AppColors.circularBg(context),
+                  color: Theme.of(context).colorScheme.onTertiary,
                   borderRadius: BorderRadius.circular(AppRadius.card),
-                  boxShadow: AppShadows.neumorphic,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -260,7 +258,7 @@ class _DailyRecommendationDashboardState
                     Text(
                       "How to reach your goals:",
                       style: AppTextStyles.headTitle.copyWith(
-                        color: AppColors.onPrimary(context),
+                        color: AppColors.primary(context),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.large),
@@ -280,7 +278,7 @@ class _DailyRecommendationDashboardState
                     _ReachGoal(
                       title: 'Follow your daily calorie recommendation',
                       icon: Icons.local_fire_department,
-                      color: AppColors.onPrimary(context),
+                      color: AppColors.primary(context),
                     ),
                     const SizedBox(height: AppSpacing.medium),
                     _ReachGoal(
@@ -296,9 +294,8 @@ class _DailyRecommendationDashboardState
                 width: double.infinity,
                 padding: const EdgeInsets.all(AppSpacing.large),
                 decoration: BoxDecoration(
-                  color: AppColors.circularBg(context),
+                  color: Theme.of(context).colorScheme.onTertiary,
                   borderRadius: BorderRadius.circular(AppRadius.card),
-                  boxShadow: AppShadows.neumorphic,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -307,7 +304,7 @@ class _DailyRecommendationDashboardState
                     Text(
                       "Plan base on the following sources, among other peer-reviewed medical studies:",
                       style: AppTextStyles.title.copyWith(
-                        color: AppColors.onPrimary(context),
+                        color: AppColors.primary(context),
                         fontWeight: FontWeight.w900,
                       ),
                     ),

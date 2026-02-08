@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Added Riverpod
+import '../../providers/user_provider.dart';           // Import your provider
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/yes_no_button.dart';
 
-class OnboardingStep14 extends StatefulWidget {
+class OnboardingStep14 extends ConsumerWidget { // Changed to ConsumerStatefulWidget
   final VoidCallback nextPage;
   const OnboardingStep14({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep14> createState() => _OnboardingStep14State();
-}
-
-class _OnboardingStep14State extends State<OnboardingStep14> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
       child: Column(
         children: [
-          Header(title: 'Add calories burned back to your daily goal?'),
-          Spacer(),
+          const Header(title: 'Add calories burned back to your daily goal?'),
+          const Spacer(),
           NoYesButton(
-            onNo: widget.nextPage,
+            onNo: () {
+              ref.read(userProvider.notifier).setAddCaloriesBurned(false);
+              nextPage();
+            },
             onYes: () {
-              //TODO : trigger switch from settings calories burned
-              widget.nextPage();
+              // Complete the TODO: Trigger the switch in settings
+              ref.read(userProvider.notifier).setAddCaloriesBurned(true);
+              nextPage();
             },
           ),
         ],

@@ -3,6 +3,9 @@ import 'package:calai/pages/settings/widgets/settings_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
 
+import '../../../widgets/language_card.dart';
+import '../weight_history/weight_history_page.dart';
+
 /// A widget that groups a list of settings into an Apple-style list card.
 class SettingsGroup extends StatelessWidget {
   const SettingsGroup({super.key});
@@ -39,16 +42,34 @@ class SettingsGroup extends StatelessWidget {
           SettingsItemTile(
             icon: Icons.monitor_weight_outlined,
             label: "Weight History",
-            onTap: () => print("Weight History tapped"),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WeightHistoryView())),
           ),
           const SettingsDivider(),
           SettingsItemTile(
             icon: Icons.language_outlined,
             label: "Language",
-            onTap: () => print("Language tapped"),
+            onTap: () => _showLanguageDialog(context),
           ),
         ],
       ),
     );
   }
+}
+
+void _showLanguageDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    // This makes the background dark/blurred
+    barrierDismissible: true,
+    builder: (BuildContext context) {
+      // 1. We wrap it in a Dialog to handle basic system behaviors
+      return Dialog(
+        backgroundColor: Colors.transparent, // Let your Container handle color
+        insetPadding: EdgeInsets.zero,       // Use your widget's padding
+        child: LanguageCard(
+          onClose: () => Navigator.pop(context), // ✅ Close dialog
+        ),
+      );
+    },
+  );
 }

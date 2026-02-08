@@ -5,9 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/global_data.dart';
 
 // Global App Widgets
+import '../../providers/global_provider.dart';
 import '../../widgets/lower_end_fab_location.dart';
 import '../../widgets/navbar_widget.dart';
 import '../../widgets/radial_background/radial_background.dart';
@@ -49,14 +49,7 @@ class _WidgetTreeState extends ConsumerState<WidgetTree> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         bottomNavigationBar: NavBarWidget(),
-        body: CustomScrollView(
-          slivers: [
-            WidgetTreeAppBar(),
-            SliverToBoxAdapter(
-              child: WidgetTreeContent(),
-            ),
-          ],
-        ),
+        body: WidgetTreeContent(),
         floatingActionButton: WidgetTreeFAB(),
         floatingActionButtonLocation: LowerEndFloatFABLocation(30, -17),
       ),

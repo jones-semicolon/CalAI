@@ -5,13 +5,15 @@ import 'package:calai/pages/progress/widgets/bmi_linear_progress.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/global_data.dart';
-import '../../../data/user_data.dart';
+import '../../../enums/user_enums.dart';
+import '../../../providers/global_provider.dart';
+import '../../../providers/user_provider.dart';
 
 class ProgressBmiCard extends ConsumerWidget {
   const ProgressBmiCard({super.key});
 
-  int _calculateAge(DateTime birthDate) {
+  int _calculateAge(DateTime? birthDate) {
+    if (birthDate == null) return 0; // Guard for null birthDate
     final today = DateTime.now();
     var age = today.year - birthDate.year;
 
@@ -30,33 +32,40 @@ class ProgressBmiCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-
     final user = ref.watch(userProvider);
     final globalAsync = ref.watch(globalDataProvider);
 
-    // ✅ fallback weight = user profile weight
-    double weightKg = user.weight;
+    // ✅ MODIFIED GUARD: Only hide if we can't do the math (Weight/Height)
+    // We provide a fallback for gender/birthday so the card still shows.
+    if (user.body.height == 0 || user.body.currentWeight == 0) {
+      return const SizedBox.shrink();
+    }
 
-    // ✅ if progress logs exist, take the latest logged weight
+    // fallback weight
+    double weightKg = user.body.currentWeight;
+
+    // take latest logged weight if available
     globalAsync.whenData((global) {
       if (global.weightLogs.isNotEmpty) {
-        final last = global.weightLogs.last;
-        final w = last['weight'];
-        if (w is num) weightKg = w.toDouble();
+        weightKg = global.weightLogs.last.weight;
       }
     });
 
     final bmi = _calculateBmi(
       weightKg: weightKg,
-      heightCm: user.height.toDouble(),
+      heightCm: user.body.height.toDouble(),
     );
 
-    final age = _calculateAge(user.birthDay);
+    // Handle null age safely
+    final age = _calculateAge(user.profile.birthDate);
+
+    // Provide a default gender if null so BmiCalculator doesn't crash
+    final gender = user.profile.gender ?? Gender.other;
 
     final calculator = BmiCalculator(
       bmi: bmi,
       age: age,
-      gender: user.gender,
+      gender: gender,
     );
 
     return LayoutBuilder(
@@ -169,16 +178,25 @@ class ProgressBmiCard extends ConsumerWidget {
                 red: BmiCalculator.red,
               ),
               const SizedBox(height: 20),
-              const Wrap(
-                spacing: 5,
-                runSpacing: 8,
-                children: [
-                  BmiLegend(color: BmiCalculator.blue, label: 'Underweight'),
-                  BmiLegend(color: BmiCalculator.green, label: 'Healthy'),
-                  BmiLegend(color: BmiCalculator.orange, label: 'Overweight'),
-                  BmiLegend(color: BmiCalculator.red, label: 'Obese'),
-                ],
-              ),
+              SizedBox(
+                width: double.infinity,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown, // Shrinks the content only if it's too wide
+                  alignment: Alignment.centerLeft, // Keeps the legends starting from the left
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      BmiLegend(color: BmiCalculator.blue, label: 'Underweight'),
+                      const SizedBox(width: 8), // Replaces 'spacing' from Wrap
+                      BmiLegend(color: BmiCalculator.green, label: 'Healthy'),
+                      const SizedBox(width: 8),
+                      BmiLegend(color: BmiCalculator.orange, label: 'Overweight'),
+                      const SizedBox(width: 8),
+                      BmiLegend(color: BmiCalculator.red, label: 'Obese'),
+                    ],
+                  ),
+                ),
+              )
             ],
           ),
         );

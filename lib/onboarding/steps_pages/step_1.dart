@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../enums/user_enums.dart';
+import '../../providers/user_provider.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/user_data.dart';
 
 class OnboardingStep1 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
@@ -30,7 +31,7 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
     super.initState();
 
     // Get saved gender from UserData
-    final savedGender = ref.read(userProvider).gender;
+    final savedGender = ref.read(userProvider).profile.gender;
 
     // Find index of option matching saved gender
     final matchIndex = options.indexWhere((o) => o.value == savedGender);
@@ -103,8 +104,8 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
                   final selectedOption = options[selectedIndex!];
 
                   // Update UserData.gender in Riverpod
-                  ref.read(userProvider.notifier).update(
-                        (s) => s.copyWith(gender: selectedOption.value),
+                  ref.read(userProvider.notifier).updateLocal(
+                        (s) => s.copyWith(profile: s.profile.copyWith(gender: selectedOption.value)),
                   );
 
                   debugPrint(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/user_data.dart';
+import '../../providers/user_provider.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/birthday_picker_widget.dart';
@@ -23,7 +23,7 @@ class _OnboardingStep7State extends ConsumerState<OnboardingStep7> {
   void initState() {
     super.initState();
     // Load the existing birthday from the provider
-    selectedBirthday = ref.read(userProvider).birthDay;
+    selectedBirthday = ref.read(userProvider).profile.birthDate!;
   }
 
   @override
@@ -57,7 +57,7 @@ class _OnboardingStep7State extends ConsumerState<OnboardingStep7> {
               enabled: true, // Birthday is never null based on your provider default
               onNext: () {
                 // Finalize the selection in Riverpod
-                ref.read(userProvider.notifier).update((s) => s.copyWith(birthDay: selectedBirthday));
+                ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(profile: s.profile.copyWith(birthDay: selectedBirthday)));
                 
                 debugPrint(
                   'Birthday: ${selectedBirthday.toIso8601String()}',

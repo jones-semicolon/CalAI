@@ -13,12 +13,12 @@
     <key>CFBundleURLTypes</key>
     <array>
         <dict>
+            <key>PermissionGroupNotification</key>
+            <string>We use notifications to help you stay on track with your calorie goals.</string>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>CFBundleURLSchemes</key>
             <array>
-                <!-- TODO Replace this value: -->
-                <!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
                 <string>com.googleusercontent.apps.530467491766-53nb81qnsc5eds4eb0mbot0m0jrpin0g</string>
             </array>
         </dict>

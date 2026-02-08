@@ -81,22 +81,19 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
                         child: const Text('Referral Code'),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: TextField(
-                        controller: _controller,
-                        focusNode: _focusNode,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          isDense: true,
-                        ),
-                        style: TextStyle(
-                          color: colors.primary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textInputAction: TextInputAction.done,
-                        onSubmitted: (_) => _submit(),
+                    TextField(
+                      controller: _controller,
+                      focusNode: _focusNode,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        isDense: true,
                       ),
+                      style: TextStyle(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _submit(),
                     ),
                   ],
                 ),
@@ -116,7 +113,7 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
-                        vertical: 17,
+                        vertical: 10,
                       ),
                     ),
                     child: Text(

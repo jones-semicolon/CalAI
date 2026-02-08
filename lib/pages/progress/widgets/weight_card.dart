@@ -1,3 +1,4 @@
+import 'package:calai/pages/progress/screens/weight_picker_view.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
 import 'card_decorations.dart';
@@ -24,7 +25,7 @@ class WeightCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // TODO: Handle tap event, e.g., navigate to log weight page
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const WeightPickerView()));
       },
       child: Container(
         decoration: progressCardDecoration(context),
@@ -96,10 +97,15 @@ class _WeightInfo extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: LinearProgressIndicator(
-                value: (progressPercent / 100).clamp(0.0, 1.0),
-                backgroundColor: Colors.transparent,
-                color: colorScheme.primary,
+              child: TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeOutCubic,
+                tween: Tween<double>(begin: 0, end: (progressPercent / 100).clamp(0.0, 1.0)),
+                builder: (context, value, _) => LinearProgressIndicator(
+                  value: value,
+                  backgroundColor: Colors.transparent,
+                  color: colorScheme.primary,
+                ),
               ),
             ),
           ),
@@ -109,12 +115,7 @@ class _WeightInfo extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Goal',
-                style: TextStyle(fontSize: 12, color: colorScheme.primary),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                ' ${formatKg(goalWeight)}',
+                goalWeight > 0 ? 'Goal ${formatKg(goalWeight)}' : 'No Goal Set',
                 style: TextStyle(fontSize: 12, color: colorScheme.primary),
               ),
             ],
@@ -136,7 +137,7 @@ class _LogWeightButton extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      height: 40,
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: colorScheme.primary,
@@ -152,14 +153,14 @@ class _LogWeightButton extends StatelessWidget {
             Text(
               'Log Weight',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: theme.scaffoldBackgroundColor,
               ),
             ),
             Icon(
               Icons.arrow_forward_rounded,
-              size: 22,
+              size: 16,
               color: theme.scaffoldBackgroundColor,
             ),
           ],

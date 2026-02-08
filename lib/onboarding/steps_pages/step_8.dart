@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../enums/user_enums.dart';
+import '../../providers/user_provider.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
-import '../../data/user_data.dart';
 
 class OnboardingStep8 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
@@ -27,7 +28,7 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
   void initState() {
     super.initState();
 
-    final Goal goal = ref.read(userProvider).goal;
+    final Goal? goal = ref.read(userProvider).goal.type;
 
     final matchOption = options.indexWhere((i) => i.value == goal);
     if (matchOption != -1) {
@@ -38,7 +39,6 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
 
   @override
   Widget build(BuildContext context) {
-    final userGoal = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
@@ -100,10 +100,9 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
               onNext: () {
                 if (selectedIndex != null) {
                   final updateGoal = options[selectedIndex!];
-                  userGoal.update((s) => s.copyWith(goal: updateGoal.value));
+                  ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(type: updateGoal.value)));
                   debugPrint('Goal: $updateGoal');
                 }
-                // TODO : this will post to api
                 widget.nextPage();
               },
             ),

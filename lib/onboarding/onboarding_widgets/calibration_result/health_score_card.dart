@@ -28,7 +28,7 @@ class HealthScoreCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.scaffoldBg(context),
           borderRadius: BorderRadius.circular(AppRadius.card),
-          border: Border.all(color: AppColors.border(context), width: 1.5),
+          border: Border.all(color: AppColors.border(context).withOpacity(0.5), width: 1),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -60,13 +60,13 @@ class HealthScoreCard extends StatelessWidget {
                       Text(
                         'Health Score',
                         style: AppTextStyles.title.copyWith(
-                          color: AppColors.onPrimary(context),
+                          color: AppColors.primary(context),
                         ),
                       ),
                       Text(
                         '$score/$maxScore',
                         style: AppTextStyles.title.copyWith(
-                          color: AppColors.onPrimary(context),
+                          color: AppColors.primary(context),
                           fontWeight: FontWeight.w900,
                         ),
                       ),
@@ -82,8 +82,8 @@ class HealthScoreCard extends StatelessWidget {
                           AppRadius.progressBar,
                         ),
                         border: Border.all(
-                          color: AppColors.border(context),
-                          width: 2,
+                          color: AppColors.border(context).withOpacity(0.5),
+                          width: 1.5,
                         ),
                       ),
                       child: ClipRRect(

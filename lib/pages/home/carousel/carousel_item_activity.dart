@@ -1,23 +1,27 @@
-import 'package:calai/data/health_data.dart';
+import 'dart:async';
+
+import 'package:calai/providers/user_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:health/health.dart'; // ✅ Required for Google Fit / HealthKit
-import 'package:permission_handler/permission_handler.dart'; // Import this
 
-import '../../../api/exercise_api.dart';
-import '../../../data/global_data.dart';
-import '../../../services/health_providers.dart';
+import '../../../enums/food_enums.dart';
+import '../../../models/exercise_model.dart';
+import '../../../providers/global_provider.dart';
+import '../../../providers/entry_streams_provider.dart';
+import '../../../providers/health_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CarouselActivity extends StatelessWidget {
   final int waterIntake;
-  final HealthData health;
   final Function(int) onWaterChange;
+  final String dateId; // Changed from DateTime to String dateId
 
   const CarouselActivity({
     super.key,
     required this.waterIntake,
     required this.onWaterChange,
-    required this.health,
+    required this.dateId,
   });
 
   @override
@@ -32,7 +36,7 @@ class CarouselActivity extends StatelessWidget {
               children: [
                 const Expanded(child: _StepsTodayCard()),
                 const SizedBox(width: 10),
-                Expanded(child: _CaloriesBurnedCard(health: health)),
+                Expanded(child: _CaloriesBurnedCard(dateId: dateId)),
               ],
             ),
           ),
@@ -48,38 +52,252 @@ class CarouselActivity extends StatelessWidget {
 }
 
 // --- Private Helper Widgets --- //
+
+class _CaloriesBurnedCard extends ConsumerWidget {
+  final String dateId;
+
+  const _CaloriesBurnedCard({required this.dateId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    // 1. Watch progress from the Global Provider (Replacing HealthData)
+    final globalState = ref.watch(globalDataProvider).value;
+    final burned = globalState?.todayProgress.caloriesBurned ?? 0;
+
+    // 2. Watch the list of entries specifically for this date using your StreamProvider.family
+    final entriesAsync = ref.watch(dailyEntriesProvider(dateId));
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.splashColor, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildBurnedHeader(theme, burned), // Extracted for readability
+          const SizedBox(height: 15),
+
+          entriesAsync.when(
+            loading: () =>
+                Expanded(child: const Center(child: CupertinoActivityIndicator(radius: 10))),
+            error: (err, _) => const SizedBox.shrink(),
+            data: (entries) {
+              final exercises = entries
+                  .where(
+                    (data) =>
+                        data.containsKey('calories_burned') &&
+                        data['exercise_type'] != null &&
+                        data['source'] == SourceType.exercise.value, // Safety check
+                  )
+                  .map((data) => ExerciseLog.fromJson(data))
+                  .toList()
+                  .take(3)
+                  .toList();
+
+              if (exercises.isEmpty) {
+                return SizedBox.shrink();
+              }
+
+              return Column(
+                children: exercises.map((ex) {
+                  // ✅ FIX: Use localized labels or safe enums
+                  return _ActivityItemRow(
+                    title: ex.type.label,
+                    value: "+${ex.caloriesBurned} kcal",
+                    icon: ex.type.icon,
+                  );
+                }).toList(),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Widget _buildBurnedHeader(ThemeData theme, int burned) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 7.5),
+        child: Icon(
+          Icons.local_fire_department,
+          color: theme.colorScheme.primary,
+          size: 20,
+        ),
+      ),
+      const SizedBox(width: 5),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "$burned",
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+            Text(
+              "Calories Burned",
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
 class _StepsTodayCard extends ConsumerWidget {
   const _StepsTodayCard();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stepsAsync = ref.watch(stepsTodayProvider);
+    ref.watch(stepTrackerProvider);
+    final steps = ref.watch(stepsTodayProvider);
 
+    // 2. Wrap in GestureDetector so the user can actually tap to fix permissions
     return GestureDetector(
-      onTap: () => ref.refresh(stepsTodayProvider),
-      child: stepsAsync.when(
-        loading: () => const ActivityCard(
-          title: "Steps Today",
-          currentValue: 0,
-          goalValue: 10000,
-          icon: Icons.directions_walk,
+      onTap: () => _handlePermissionRequest(context, ref),
+      child: ActivityCard(
+        title: "Steps Today",
+        currentValue: steps,
+        icon: Icons.directions_walk,
+        color: Theme.of(context).colorScheme.primary, // Standard "Active" green
+      ),
+    );
+  }
+
+  Future<void> _handlePermissionRequest(BuildContext context, WidgetRef ref) async {
+    final status = await Permission.activityRecognition.request();
+
+    if (status.isGranted) {
+      // Invalidate the stream to force a fresh hardware connection
+      ref.invalidate(stepCountStreamProvider);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Step tracking active!')),
+        );
+      }
+    } else if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+  }
+}
+
+class _WaterIntakeSection extends StatelessWidget {
+  final int waterIntake;
+  final Function(int) onWaterChange;
+
+  const _WaterIntakeSection({
+    required this.waterIntake,
+    required this.onWaterChange,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.splashColor, width: 1),
+      ),
+      child: Row(
+        children: [
+          Container(
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Icon(Icons.water_drop_outlined),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Water", style: theme.textTheme.labelSmall),
+              Text(
+                "$waterIntake fl oz", // Unit update
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const Spacer(),
+          _ActionButton(
+            icon: Icons.remove,
+            onTap: () => onWaterChange(-250),
+            isPrimary: false,
+          ),
+          const SizedBox(width: 20),
+          _ActionButton(
+            icon: Icons.add,
+            onTap: () => onWaterChange(250),
+            isPrimary: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool isPrimary;
+
+  const _ActionButton({
+    required this.icon,
+    required this.onTap,
+    required this.isPrimary,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: isPrimary
+              ? theme.appBarTheme.foregroundColor
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            width: 1.5,
+            color: isPrimary ? Colors.transparent : theme.splashColor,
+          ),
         ),
-        error: (e, _) => ActivityCard(
-          title: "Steps Today",
-          currentValue: 0,
-          goalValue: 10000,
-          icon: Icons.directions_walk,
-        ),
-        data: (steps) => ActivityCard(
-          title: "Steps Today",
-          currentValue: steps,
-          goalValue: 10000,
-          icon: Icons.directions_walk,
+        child: Icon(
+          icon,
+          size: 20,
+          color: isPrimary
+              ? theme.colorScheme.onSecondary
+              : theme.iconTheme.color,
         ),
       ),
     );
   }
 }
+
+// --- Shared Components ---
 
 class _ActivityItemRow extends StatelessWidget {
   final String title;
@@ -98,7 +316,6 @@ class _ActivityItemRow extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Row(
         children: [
-          // 1. Black Circle Icon
           Container(
             height: 25,
             width: 25,
@@ -106,25 +323,20 @@ class _ActivityItemRow extends StatelessWidget {
               color: Colors.black,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              icon,
-              size: 15,
-              color: Colors.white,
-            ),
+            child: Icon(icon, size: 15, color: Colors.white),
           ),
           const SizedBox(width: 8),
-
-          // 2. Text Details
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black87,
                   ),
                 ),
                 Text(
@@ -132,7 +344,6 @@ class _ActivityItemRow extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 8,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
                   ),
                 ),
               ],
@@ -144,217 +355,10 @@ class _ActivityItemRow extends StatelessWidget {
   }
 }
 
-class _CaloriesBurnedCard extends ConsumerWidget {
-  final HealthData health;
-
-  const _CaloriesBurnedCard({required this.health});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final today = DateTime.now().toIso8601String().split('T').first;
-
-    final entriesStream = ref
-        .read(globalDataProvider.notifier)
-        .watchEntries(today);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.splashColor, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          // Header
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 7.5),
-                child: Icon(
-                  Icons.local_fire_department,
-                  color: theme.colorScheme.primary,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      health.dailyBurned.toString(),
-                      style: TextStyle(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                      ),
-                    ),
-                    Text(
-                      "Calories Burned",
-                      style: TextStyle(
-                        color: theme.colorScheme.primary,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 15),
-          // Stream Builder for Logs
-          StreamBuilder<List<Map<String, dynamic>>>(
-            stream: entriesStream,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const SizedBox.shrink();
-              }
-
-              final exercises = snapshot.data!
-                  .where((data) => data.containsKey('caloriesBurned'))
-                  .map((data) {
-                return Exercise(
-                  id: data['id']?.toString() ?? '',
-                  type: data['exerciseType'] ?? 'Exercise',
-                  intensity: Intensity.fromString(
-                    data['intensity'] ?? 'Low',
-                  ),
-                  durationMins: (data['durationMins'] ?? 0) as int,
-                  caloriesBurned: (data['caloriesBurned'].round() ?? 0),
-                  timestamp: data['timestamp'] != null
-                      ? (data['timestamp'] as dynamic).toDate()
-                      : DateTime.now(),
-                );
-              })
-                  .take(3)
-                  .toList();
-
-              if (exercises.isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Text(
-                      "",
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: theme.disabledColor,
-                      ),
-                    ),
-                  ),
-                );
-              }
-
-              return Column(
-                children: exercises
-                    .map(
-                        (ex) => _ActivityItemRow(
-                      title: ExerciseType.fromString(ex.type).label,
-                      value: "+${ex.caloriesBurned}",
-                      icon: ExerciseType.fromString(ex.type).icon,
-                    )
-                )
-                    .toList(),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _WaterIntakeSection extends StatelessWidget {
-  final int waterIntake;
-  final Function(int) onWaterChange;
-
-  const _WaterIntakeSection({
-    required this.waterIntake,
-    required this.onWaterChange,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).splashColor, width: 1),
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Icon(Icons.water_drop_outlined),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Water", style: Theme.of(context).textTheme.labelSmall),
-              Text(
-                "$waterIntake fl oz",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          const Spacer(),
-          // Decrement
-          GestureDetector(
-            onTap: () => onWaterChange(-250),
-            child: Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-                border: Border.all(
-                  width: 1.5,
-                  color: Theme.of(context).splashColor,
-                ),
-              ),
-              child: const Icon(Icons.remove, size: 20),
-            ),
-          ),
-          const SizedBox(width: 20),
-          // Increment
-          GestureDetector(
-            onTap: () => onWaterChange(250),
-            child: Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: Theme.of(context).appBarTheme.foregroundColor,
-                borderRadius: BorderRadius.circular(50),
-                border: Border.all(width: 1.5, color: Colors.transparent),
-              ),
-              child: Icon(
-                Icons.add,
-                size: 20,
-                color: Theme.of(context).colorScheme.onSecondary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// --- Reusable Activity Card --- //
-
-class ActivityCard extends StatelessWidget {
+// ✅ 1. Change to ConsumerWidget to access 'ref'
+class ActivityCard extends ConsumerWidget {
   final String title;
   final int currentValue;
-  final int goalValue;
   final IconData icon;
   final Color? color;
 
@@ -362,13 +366,16 @@ class ActivityCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.currentValue,
-    required this.goalValue,
     required this.icon,
     this.color,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ✅ 2. Get the user and extract the steps goal
+    final user = ref.watch(userProvider);
+    final int goalValue = user.goal.targets.steps;
+
     final double progress = (goalValue == 0) ? 0 : (currentValue / goalValue);
     final theme = Theme.of(context);
     final primaryColor = color ?? theme.colorScheme.primary;
@@ -376,7 +383,7 @@ class ActivityCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
+        color: theme.appBarTheme.backgroundColor, // Sync with your other cards
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: theme.splashColor, width: 1),
       ),
@@ -396,11 +403,11 @@ class ActivityCard extends StatelessWidget {
                   fontSize: 22,
                 ),
               ),
-              const SizedBox(width: 5),
+              const SizedBox(width: 4),
               Text(
                 "/$goalValue",
                 style: TextStyle(
-                  color: theme.colorScheme.secondary,
+                  color: theme.colorScheme.onSurfaceVariant, // Better visibility
                   fontSize: 14,
                 ),
               ),
@@ -420,7 +427,8 @@ class ActivityCard extends StatelessWidget {
                     width: 95,
                     child: CircularProgressIndicator(
                       value: progress.clamp(0.0, 1.0),
-                      strokeWidth: 7,
+                      strokeWidth: 8, // Slightly thicker for a premium feel
+                      strokeCap: StrokeCap.round, // Makes the progress bar look modern
                       backgroundColor: theme.splashColor,
                       color: primaryColor,
                     ),

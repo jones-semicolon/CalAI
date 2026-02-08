@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import '../onboarding_widgets/continue_button.dart';
+import '../onboarding_widgets/loading_widget/health_plan_loading_widget.dart';
 
-class OnboardingStep17 extends StatelessWidget {
+class OnboardingStep17 extends StatefulWidget {
   final VoidCallback nextPage;
   const OnboardingStep17({super.key, required this.nextPage});
 
+  @override
+  State<OnboardingStep17> createState() => _OnboardingStep17State();
+}
+
+class _OnboardingStep17State extends State<OnboardingStep17> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -63,10 +69,13 @@ class OnboardingStep17 extends StatelessWidget {
           // Continue button
           SizedBox(
             width: double.infinity,
-            child: ContinueButton(enabled: true, onNext: nextPage),
+            child: ContinueButton(enabled: true, onNext: widget.nextPage),
           ),
         ],
       ),
     );
   }
 }
+
+
+

@@ -6,4 +6,5 @@ class AppSizes {
   static const double xl = 32;
 
   static const double cardRadius = 20;
+  static const double maxContentWidth = 700;
 }

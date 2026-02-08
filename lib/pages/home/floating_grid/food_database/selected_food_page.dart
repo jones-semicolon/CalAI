@@ -1,11 +1,14 @@
+import 'package:calai/services/calai_firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Update these imports to match your file structure
 import 'package:calai/api/food_api.dart';
 import 'package:calai/core/constants/app_sizes.dart';
-import 'package:calai/data/global_data.dart';
-import 'package:calai/models/food.dart';
+import 'package:calai/models/food_model.dart';
+
+import '../../../../enums/food_enums.dart';
+import '../../../../providers/entry_streams_provider.dart';
 
 class SelectedFoodPage extends ConsumerStatefulWidget {
   final String? foodId;
@@ -85,9 +88,9 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
   // --- Actions ---
 
   void _onLogFood(FoodLog previewLog) {
-    ref.read(globalDataProvider.notifier).logFoodEntry(
+    ref.read(calaiServiceProvider).logFoodEntry(
       previewLog,
-      FoodSource.foodDatabase,
+      SourceType.foodDatabase,
     );
 
     // ScaffoldMessenger.of(context).showSnackBar(
@@ -230,7 +233,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
         const SizedBox(width: 10),
         GestureDetector(
           onTap: () {
-            final notifier = ref.read(globalDataProvider.notifier);
+            final notifier = ref.read(calaiServiceProvider);
             if (isSaved) {
               notifier.unsaveFood(_foodItem!.id);
             } else {
@@ -239,7 +242,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
           },
           child: Icon(
             isSaved ? Icons.bookmark : Icons.bookmark_outline,
-            color: isSaved ? Colors.black : Colors.grey,
+            color: isSaved ? Theme.of(context).colorScheme.primary : Colors.grey,
             size: 28,
           ),
         ),
@@ -295,11 +298,11 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
 
   Widget _buildMacroRow(FoodLog data) => Row(
     children: [
-      Expanded(child: _MacroTile(label: "Protein", value: "${data.protein}g", iconColor: Colors.redAccent, iconData: Icons.set_meal_outlined)),
+      Expanded(child: _MacroTile(nutrition: NutritionType.protein, value: "${data.protein}g")),
       const SizedBox(width: 8),
-      Expanded(child: _MacroTile(label: "Carbs", value: "${data.carbs}g", iconColor: Colors.orangeAccent, iconData: Icons.bubble_chart)),
+      Expanded(child: _MacroTile(nutrition: NutritionType.carbs, value: "${data.carbs}g")),
       const SizedBox(width: 8),
-      Expanded(child: _MacroTile(label: "Fats", value: "${data.fats}g", iconColor: Colors.blueAccent, iconData: Icons.oil_barrel)),
+      Expanded(child: _MacroTile(nutrition: NutritionType.fats, value: "${data.fats}g")),
     ],
   );
 
@@ -378,7 +381,7 @@ class _TabButton extends StatelessWidget {
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isActive ? Colors.black : Colors.grey.shade200,
+          color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSecondaryContainer,
           borderRadius: BorderRadius.circular(999),
         ),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -386,7 +389,7 @@ class _TabButton extends StatelessWidget {
           label,
           style: TextStyle(
             fontWeight: FontWeight.w800,
-            color: isActive ? Colors.white : Colors.grey.shade500,
+            color: isActive ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
           ),
         ),
       ),
@@ -486,12 +489,10 @@ class _ServingsInputBoxState extends State<_ServingsInputBox> {
 }
 
 class _MacroTile extends StatelessWidget {
-  final String label;
   final String value;
-  final IconData iconData;
-  final Color iconColor;
+  final NutritionType nutrition;
 
-  const _MacroTile({required this.label, required this.value, required this.iconData, required this.iconColor});
+  const _MacroTile({required this.nutrition, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -510,10 +511,10 @@ class _MacroTile extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(color: theme.cardColor, shape: BoxShape.circle),
                 padding: const EdgeInsets.all(5.0),
-                child: Icon(iconData, size: 18, color: iconColor),
+                child: Icon(nutrition.icon, size: 18, color: nutrition.color),
               ),
               const SizedBox(width: 5),
-              Text(label, style: TextStyle(color: theme.hintColor, fontSize: 12)),
+              Text(nutrition.label, style: TextStyle(color: theme.hintColor, fontSize: 12)),
             ],
           ),
           const SizedBox(height: 4),

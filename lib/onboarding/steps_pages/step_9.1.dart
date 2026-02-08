@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/weight_picker/weight_selection_view.dart';
-import '../../data/user_data.dart';
 
 class WeightPickerPage extends ConsumerWidget {
   final VoidCallback nextPage;
@@ -12,7 +11,6 @@ class WeightPickerPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final targetWeight = ref.watch(userProvider);
     return SafeArea(
       child: Column(
         children: [
@@ -28,7 +26,6 @@ class WeightPickerPage extends ConsumerWidget {
             child: ContinueButton(
               enabled: true,
               onNext: () {
-                debugPrint('${targetWeight.targetWeight}');
                 nextPage();
               },
             ),

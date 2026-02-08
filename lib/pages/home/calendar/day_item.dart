@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:calai/models/nutrition_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -119,8 +120,7 @@ class _ProgressRingPainter extends CustomPainter {
 
 class DayItem extends ConsumerStatefulWidget {
   final Set<String> progressDays; // has any progress
-  final Set<String> overDays; // exceeded goal
-  final Map<String, double> dailyCalories; // calories per dateId
+  final List<DailyNutrition> dailyCalories; // calories per dateId
   final double calorieGoal; // daily calorie goal
 
   /// ✅ controlled selected day ("YYYY-MM-DD")
@@ -132,7 +132,6 @@ class DayItem extends ConsumerStatefulWidget {
   const DayItem({
     super.key,
     required this.progressDays,
-    required this.overDays,
     required this.dailyCalories,
     required this.calorieGoal,
     required this.selectedDateId,
@@ -187,6 +186,12 @@ class _DayItemState extends ConsumerState<DayItem> with AutomaticKeepAliveClient
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: weekDays.map((day) {
                 final dateId = _toDateId(day);
+                final DailyNutrition? dayLog = widget.dailyCalories.cast<DailyNutrition?>().firstWhere(
+                      (log) => _toDateId(log!.date.toLocal()) == dateId,
+                  orElse: () => null,
+                );
+
+                final double calories = dayLog?.kc.toDouble() ?? 0;
                 final isToday = calendar.today.year == day.year &&
                     calendar.today.month == day.month &&
                     calendar.today.day == day.day;
@@ -200,24 +205,21 @@ class _DayItemState extends ConsumerState<DayItem> with AutomaticKeepAliveClient
 
                 return Opacity(
                   opacity: isCurrentMonth ? 1.0 : 0.3,
-                  child: IgnorePointer(
-                    ignoring: isFuture,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(15),
-                      onTap: () => widget.onDaySelected(dateId),
-                      child: _DayContainer(
-                        isActive: isSelected,
-                        child: _DayDisplay(
-                          day: day,
-                          isSelected: isSelected,
-                          isToday: isToday,
-                          isPast: isPast,
-                          containerSize: _dayContainerSize,
-                          hasProgress: widget.progressDays.contains(dateId),
-                          isOver: widget.overDays.contains(dateId),
-                          calories: widget.dailyCalories[dateId] ?? 0,
-                          goalCalories: widget.calorieGoal,
-                        ),
+                  child: InkWell(
+                    onTap: () => widget.onDaySelected(dateId),
+                    child: _DayContainer(
+                      isActive: isSelected,
+                      child: _DayDisplay(
+                        day: day,
+                        isSelected: isSelected,
+                        isToday: isToday,
+                        isPast: isPast,
+                        containerSize: _dayContainerSize,
+                        // Use dayLog to determine progress state
+                        hasProgress: calories > 0,
+                        isOver: calories > widget.calorieGoal && widget.calorieGoal > 0,
+                        calories: calories,
+                        goalCalories: widget.calorieGoal,
                       ),
                     ),
                   ),
@@ -289,13 +291,16 @@ class _DayDisplay extends StatelessWidget {
     // Over = red
     // Has progress = green
     // None = grey ring/dash
-    final ringColor = isToday
-        ? Colors.black
-        : isOver
+    final ringColor = isOver
         ? Colors.red
         : hasProgress
         ? Colors.green
+        : isToday
+        ? Colors.black
         : theme.shadowColor.withOpacity(0.4);
+
+// Progress calculation for the ring
+    final double progress = (goalCalories > 0) ? (calories / goalCalories) : 0;
 
     final textColor = isSelected ? theme.colorScheme.primary : theme.hintColor;
 

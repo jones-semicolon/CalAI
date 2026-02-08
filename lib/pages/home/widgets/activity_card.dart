@@ -102,46 +102,62 @@ class _Header extends StatelessWidget {
     // This widget's structure is identical to the original implementation.
     return SizedBox(
       width: double.infinity,
+      height: 30, // Keep this fixed to prevent the card from jumping
       child: FittedBox(
         fit: BoxFit.scaleDown,
         alignment: Alignment.centerLeft,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          mainAxisAlignment: MainAxisAlignment.start,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                AnimatedSlideNumber(
-                  value: valueInt.toString().split("").first,
-                  style: valueStyle,
-                  reverse: isTap,
-                ),
-                Text(
-                  isTap
-                      ? valueInt.toString().substring(1)
-                      : "${valueInt.toString().substring(1)}$unit",
-                  style: valueStyle,
-                ),
-              ],
-            ),
-            Baseline(
-              baseline: 18,
-              baselineType: TextBaseline.alphabetic,
-              child: AnimatedSlideNumber(
-                value: isTap ? " /$nutrients$unit" : "",
-                // TextStyle is preserved from the original code.
-                style: TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOutCubic,
+          style: valueStyle,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            mainAxisAlignment: MainAxisAlignment.start,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              // First digit slide
+              AnimatedSlideNumber(
+                value: valueInt.toString().split("").first,
+                style: valueStyle,
                 reverse: isTap,
-                inAnim: false,
               ),
-            ),
-          ],
+              // Use AnimatedSize HERE to smooth the width change of the text
+              AnimatedSize(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOutCubic,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  // LayoutBuilder keeps the Row from snapping width
+                  layoutBuilder: (currentChild, previousChildren) => Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [...previousChildren, if (currentChild != null) currentChild],
+                  ),
+                  child: Text(
+                    isTap
+                        ? valueInt.toString().substring(1)
+                        : "${valueInt.toString().substring(1)}$unit",
+                    key: ValueKey(isTap),
+                    // REMOVE style: valueStyle here.
+                    // Let it inherit from AnimatedDefaultTextStyle to enable font tweening.
+                  ),
+                ),
+              ),
+              Baseline(
+                baseline: 18,
+                baselineType: TextBaseline.alphabetic,
+                child: AnimatedSlideNumber(
+                  value: isTap ? " /$nutrients$unit" : "",
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  reverse: isTap,
+                  inAnim: true,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

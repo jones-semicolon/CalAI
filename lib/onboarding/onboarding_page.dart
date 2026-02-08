@@ -6,6 +6,7 @@ import 'package:calai/onboarding/steps_pages/step_15.dart';
 import 'package:calai/onboarding/steps_pages/step_16.dart';
 import 'package:calai/onboarding/steps_pages/step_17.dart';
 import 'package:calai/onboarding/steps_pages/step_18.dart';
+import 'package:calai/onboarding/steps_pages/step_19.dart';
 import 'package:calai/onboarding/steps_pages/step_9.1.dart';
 import 'package:calai/onboarding/steps_pages/step_9.2.dart';
 import 'package:calai/onboarding/steps_pages/step_9.3.dart';
@@ -14,7 +15,8 @@ import 'package:calai/onboarding/steps_pages/step_9.5.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:calai/pages/shell/widget_tree.dart';
-import '../data/user_data.dart';
+import '../enums/user_enums.dart';
+import '../providers/user_provider.dart';
 import 'auth_entry/auth_entry_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'onboarding_widgets/onboarding_appbar.dart';
@@ -39,14 +41,16 @@ class OnboardingPage extends ConsumerStatefulWidget {
 }
 
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
-  final GlobalKey<OnboardingStep18State> _step18Key =
-  GlobalKey<OnboardingStep18State>();
-  late PageController _pageController = PageController();
+  final GlobalKey<OnboardingStep18State> _step18Key = GlobalKey<OnboardingStep18State>();
+  late PageController _pageController;
   late int _currentIndex;
 
-  List<Widget> _pages(Goal goal) {
-    return [AuthEntryPage(onGetStarted: _nextPage),
+  // ✅ Helper to get the current goal safely
+  Goal get _currentGoal => ref.read(userProvider).goal.type ?? Goal.maintain;
 
+  List<Widget> _getPages(Goal goal) {
+    return [
+      AuthEntryPage(onGetStarted: _nextPage),
       OnboardingStep1(nextPage: _nextPage),
       OnboardingStep2(nextPage: _nextPage),
       OnboardingStep3(nextPage: _nextPage),
@@ -55,11 +59,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       OnboardingStep6(nextPage: _nextPage),
       OnboardingStep7(nextPage: _nextPage),
       OnboardingStep8(nextPage: _nextPage),
-      if (goal != Goal.maintain) WeightPickerPage(nextPage: _nextPage),
-      if (goal != Goal.maintain) EncourageMessage(nextPage: _nextPage),
-      if (goal != Goal.maintain) ProgressSpeed(nextPage: _nextPage),
-      if (goal != Goal.maintain) Comparison(nextPage: _nextPage),
-      if (goal != Goal.maintain) Demotivated(nextPage: _nextPage),
+      // ✅ Conditional logic for weight-specific goals
+      if (goal != Goal.maintain) ...[
+        WeightPickerPage(nextPage: _nextPage),
+        EncourageMessage(nextPage: _nextPage),
+        ProgressSpeed(nextPage: _nextPage),
+        Comparison(nextPage: _nextPage),
+        Demotivated(nextPage: _nextPage),
+      ],
       OnboardingStep9(nextPage: _nextPage),
       OnboardingStep10(nextPage: _nextPage),
       OnboardingStep11(nextPage: _nextPage),
@@ -70,16 +77,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       OnboardingStep16(nextPage: _nextPage),
       OnboardingStep17(nextPage: _nextPage),
       OnboardingStep18(
-      key: _step18Key,
-      nextPage: _nextPage,
+        key: _step18Key,
+        nextPage: _nextPage,
       ),
+      OnboardingStep19(nextPage:  _nextPage)
     ];
   }
 
   void _nextPage() async {
-    final Goal goal = ref.watch(userProvider).goal;
-
-    final List<Widget> pages = _pages(goal);
+    final pages = _getPages(_currentGoal);
 
     if (_currentIndex < pages.length - 1) {
       _pageController.nextPage(
@@ -87,14 +93,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         curve: Curves.easeInOut,
       );
     } else {
-      // Last page: finish onboarding
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('onboarding_completed', true);
 
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const WidgetTree()),
-            (route) => false, // This removes ALL previous routes
+            (route) => false,
       );
     }
   }
@@ -114,8 +119,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Goal goal = ref.watch(userProvider).goal;
-    final pages = _pages(goal);
+    // ✅ Watch the goal. If it changes, the list of pages updates dynamically
+    final goal = ref.watch(userProvider.select((u) => u.goal.type)) ?? Goal.maintain;
+    final pages = _getPages(goal);
 
     final bool isAuthPage = _currentIndex == 0;
 
@@ -124,10 +130,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       body: SafeArea(
         child: Column(
           children: [
-            /// APP BAR (ONLY AFTER AUTH PAGE)
             if (!isAuthPage)
               OnboardingAppBar(
-                currentIndex: _currentIndex - 1,
+                // ✅ Adjust index for the progress bar (doesn't count Auth page)
+                currentIndex: (_currentIndex - 1).clamp(0, pages.length - 2),
                 totalPages: pages.length - 1,
                 onBack: () {
                   if (_currentIndex > 0) {
@@ -139,7 +145,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 },
               ),
 
-            /// PAGES
             Expanded(
               child: PageView(
                 physics: const NeverScrollableScrollPhysics(),
@@ -147,11 +152,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 onPageChanged: (index) {
                   setState(() => _currentIndex = index);
 
-                  final goal = ref.read(userProvider).goal;
-                  final pages = _pages(goal);
-
-                  // ✅ Trigger Step 18 computation ONLY when it becomes visible
-                  if (pages[index] is OnboardingStep18) {
+                  // ✅ Trigger Step 18 calculation logic if we reached the last page
+                  if (pages[index] is OnboardingStep17) {
+                    // Note: Ensure startComputation is public in Step 18
                     _step18Key.currentState?.startComputation();
                   }
                 },

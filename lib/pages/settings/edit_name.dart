@@ -1,9 +1,11 @@
+import 'package:calai/services/calai_firestore_service.dart';
+import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/global_data.dart';
-import '../../data/user_data.dart';
-
+import '../../providers/global_provider.dart';
+import '../../providers/user_provider.dart';
 /// A page that allows the user to edit their name.
 ///
 /// This page is stateful to manage the text input controller and the enabled
@@ -23,9 +25,9 @@ class _EditNamePageState extends ConsumerState<EditNamePage> {
   void initState() {
     super.initState();
     // 1. Initialize with current name from Riverpod
-    final currentName = ref.read(userProvider).name;
+    final currentName = ref.read(userProvider).profile.name;
     _controller = TextEditingController(text: currentName);
-    _hasInput = currentName.trim().isNotEmpty;
+    _hasInput = currentName!.trim().isNotEmpty;
 
     _controller.addListener(_handleInputChange);
   }
@@ -53,7 +55,7 @@ class _EditNamePageState extends ConsumerState<EditNamePage> {
 
     // 3. Persist to Firestore using the updateProfile method in GlobalData
     // We already cleaned this method to save the 'name' field
-    await ref.read(globalDataProvider.notifier).updateProfile();
+    await ref.read(calaiServiceProvider).updateUserProfileField('name', newName);
 
     if (mounted) {
       Navigator.pop(context);
@@ -66,17 +68,19 @@ class _EditNamePageState extends ConsumerState<EditNamePage> {
     final isSaving = globalAsync.isLoading;
 
     return Scaffold(
-      appBar: const _EditNameAppBar(),
-      body: Column(
-        children: [
-          _PageBody(controller: _controller),
-          const Spacer(),
-          _DoneFooter(
-            hasInput: _hasInput && !isSaving,
-            onDone: _handleDone,
-            isSaving: isSaving,
-          ),
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            CustomAppBar(title: SizedBox.shrink()),
+            _PageBody(controller: _controller),
+            const Spacer(),
+            _DoneFooter(
+              hasInput: _hasInput && !isSaving,
+              onDone: _handleDone,
+              isSaving: isSaving,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -144,24 +148,40 @@ class _NameInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      // style: TextStyle(color: Theme.of(context).colorScheme.primary),
-      decoration: InputDecoration(
-        hintText: "Enter your name",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            width: 3,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onTertiary.withOpacity(0.45),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: TextInputType.name,
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(vertical: 16),
         ),
       ),
     );
+    // return TextField(
+    //   controller: controller,
+    //   // style: TextStyle(color: Theme.of(context).colorScheme.primary),
+    //   decoration: InputDecoration(
+    //     hintText: "Enter your name",
+    //     border: OutlineInputBorder(
+    //       borderRadius: BorderRadius.circular(12),
+    //       borderSide: const BorderSide(width: 1),
+    //     ),
+    //     focusedBorder: OutlineInputBorder(
+    //       borderRadius: BorderRadius.circular(12),
+    //       borderSide: BorderSide(
+    //         width: 3,
+    //         color: Theme.of(context).colorScheme.primary,
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 }
 

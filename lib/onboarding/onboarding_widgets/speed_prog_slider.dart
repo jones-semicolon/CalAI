@@ -1,9 +1,10 @@
 import 'dart:ui' as ui;
-import 'package:calai/data/health_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../data/user_data.dart';
+
+import '../../enums/user_enums.dart';
+import '../../providers/user_provider.dart';
 
 class ProgSpeedSlider extends ConsumerStatefulWidget {
   final double initialWeight;
@@ -44,9 +45,8 @@ class _ProgSpeedSliderState extends ConsumerState<ProgSpeedSlider> {
 
   @override
   Widget build(BuildContext context) {
-    final unit = ref.watch(healthDataProvider).weightUnit;
-    final speedKg = ref.watch(userProvider).progressSpeed;
-    final notifier = ref.read(userProvider.notifier);
+    final unit = ref.watch(userProvider).body.weightUnit;
+    final speedKg = ref.watch(userProvider).goal.weeklyRate ?? 0.8;
     final theme = Theme.of(context).colorScheme.primary;
 
     final speedLevel = _speedLevelFromKg(speedKg);
@@ -105,7 +105,7 @@ class _ProgSpeedSliderState extends ConsumerState<ProgSpeedSlider> {
 
           final clampedKg = kg.clamp(0.1, 1.5);
 
-          notifier.update((s) => s.copyWith(progressSpeed: clampedKg));
+          ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(weeklyRate: clampedKg)));
         },
       ),
     );
@@ -253,19 +253,3 @@ class _ThumbShape extends SliderComponentShape {
     );
   }
 }
-
-// Blurred pill blob
-Widget _pillBlob({required Color color, required double size}) =>
-    RepaintBoundary(
-      child: ImageFiltered(
-        imageFilter: ui.ImageFilter.blur(sigmaX: 60, sigmaY: 60),
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color.withOpacity(0.6),
-          ),
-        ),
-      ),
-    );

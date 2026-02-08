@@ -1,10 +1,6 @@
 import 'dart:convert';
-import 'package:calai/data/global_data.dart';
-import 'package:calai/models/food.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:calai/models/food_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 
 class FoodApi {
   static const _host = "cal-ai-liard.vercel.app";

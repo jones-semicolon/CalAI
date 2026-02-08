@@ -1,7 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/core/constants/constants.dart';
-import 'package:calai/data/user_data.dart'; // Ensure this points to your userProvider
+import '../../../providers/user_provider.dart';
 import '../edit_name.dart';
 
 class NameAgeCard extends ConsumerWidget {
@@ -25,8 +26,8 @@ class NameAgeCard extends ConsumerWidget {
 
     // 1. Watch the userProvider to get the current name and birthday
     final user = ref.watch(userProvider);
-    final String name = user.name;
-    final int age = _calculateAge(user.birthDay);
+    final String name = user.profile.name ?? "user";
+    final int age = _calculateAge(user.profile.birthDate!);
     final bool isNameEmpty = name.trim().isEmpty;
 
     return Container(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../data/user_data.dart';
+
+import '../../../enums/user_enums.dart';
 
 class UnitToggle extends StatelessWidget {
   final WeightUnit unit;
@@ -19,7 +20,7 @@ class UnitToggle extends StatelessWidget {
 
     final bgColor = theme.colorScheme.onTertiary.withOpacity(0.5);
     final thumbColor = Colors.white;
-    final selectedTextColor = theme.colorScheme.primary;
+    final selectedTextColor = theme.colorScheme.onSecondary;
     final unselectedTextColor = theme.colorScheme.primary;
 
     return Container(

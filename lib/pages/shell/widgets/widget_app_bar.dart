@@ -1,21 +1,21 @@
-import 'dart:ui';
-
-import 'package:calai/widgets/radial_background/radial_background.dart';
 import 'package:flutter/material.dart';
-import '../../../data/notifiers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Add this
+import 'package:calai/widgets/radial_background/radial_background.dart';
+// Import your navigation provider
+import '../../../providers/navigation_provider.dart';
+import '../../home/widgets/day_streak.dart';
 import 'app_title.dart';
 import 'generic_app_bar_title.dart';
 import 'streak_indicator_button.dart';
 
-/// A SliverAppBar that dynamically changes its title based on the selected page.
-///
-/// It listens to a [ValueNotifier] and switches between the main app title
-/// (with a streak button) and generic titles for other pages.
-class WidgetTreeAppBar extends StatelessWidget {
+class WidgetTreeAppBar extends ConsumerWidget { // Changed to ConsumerWidget
   const WidgetTreeAppBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the current page index from Riverpod
+    final pageIndex = ref.watch(selectedPageProvider);
+
     return SliverLayoutBuilder(
       builder: (context, constraints) {
         final bool isScrolled = constraints.scrollOffset > 0;
@@ -26,55 +26,48 @@ class WidgetTreeAppBar extends StatelessWidget {
           snap: true,
           backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false,
-
           flexibleSpace: isScrolled
               ? ClipRect(
-            // The BackdropFilter applies a blur to everything behind it.
             child: RadialBackground(
-              child: Container(
-                color: Colors.transparent,
-              ),
+              child: Container(color: Colors.transparent),
             ),
           )
               : null,
-
           elevation: 0,
           scrolledUnderElevation: 0,
           surfaceTintColor: Colors.transparent,
-
           centerTitle: false,
 
-          title: ValueListenableBuilder<int>(
-            valueListenable: selectedPage,
-            builder: (context, page, _) {
-              switch (page) {
-                case 0:
-                  return const _HomeAppBarTitle();
-                case 1:
-                  return const GenericAppBarTitle(title: 'Progress');
-                default:
-                  return const GenericAppBarTitle(title: 'Settings');
-              }
-            },
-          ),
+          // Simplified: No more ValueListenableBuilder
+          title: _getAppBarTitle(pageIndex),
         );
       },
     );
   }
+
+  Widget _getAppBarTitle(int index) {
+    switch (index) {
+      case 0:
+        return const _HomeAppBarTitle();
+      case 1:
+        return const GenericAppBarTitle(title: 'Progress');
+      case 2:
+        return const GenericAppBarTitle(title: 'Settings');
+      default:
+        return const SizedBox.shrink();
+    }
+  }
 }
 
-/// A private widget that defines the specific layout for the home page app bar title.
-///
-/// This includes the main app title and the streak indicator button.
 class _HomeAppBarTitle extends StatelessWidget {
   const _HomeAppBarTitle();
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        AppTitle(),
+        const AppTitle(),
         StreakIndicatorButton(),
       ],
     );

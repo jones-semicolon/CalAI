@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Added
+import '../../providers/user_provider.dart';           // Added
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/yes_no_button.dart';
 
-class OnboardingStep15 extends StatelessWidget {
+class OnboardingStep15 extends ConsumerWidget { // Changed to ConsumerWidget
   final VoidCallback nextPage;
   const OnboardingStep15({super.key, required this.nextPage});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) { // Added WidgetRef
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -19,7 +21,7 @@ class OnboardingStep15 extends StatelessWidget {
 
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              margin: EdgeInsetsGeometry.symmetric(horizontal: 25),
+              margin: const EdgeInsets.symmetric(horizontal: 25), // Fixed type
               decoration: BoxDecoration(
                 color: theme.colorScheme.onTertiary,
                 borderRadius: BorderRadius.circular(20),
@@ -36,10 +38,10 @@ class OnboardingStep15 extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    TextSpan(
+                    const TextSpan(
                       text: '200 cals',
                       style: TextStyle(
-                        color: const Color.fromARGB(255, 105, 152, 222),
+                        color: Color.fromARGB(255, 105, 152, 222),
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -51,11 +53,15 @@ class OnboardingStep15 extends StatelessWidget {
 
             const Spacer(),
 
-            // No/Yes Buttons
             NoYesButton(
-              onNo: nextPage,
+              onNo: () {
+                ref.read(userProvider.notifier).setRolloverCalories(false);
+                // TODO completed: Trigger settings rollover switch (false)
+                nextPage();
+              },
               onYes: () {
-                // TODO: Trigger settings rollover switch
+                // TODO completed: Trigger settings rollover switch
+                ref.read(userProvider.notifier).setRolloverCalories(true);
                 nextPage();
               },
             ),

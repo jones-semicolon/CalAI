@@ -1,55 +1,61 @@
-// ------------------------------------------------------------
-// FOOD LOG CARD
-// ------------------------------------------------------------
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_slidable/flutter_slidable.dart'; // ✅ Import this
 
 import '../../../api/exercise_api.dart';
-import '../../../models/food.dart';
+import '../../../enums/exercise_enums.dart';
+import '../../../enums/food_enums.dart';
+import '../../../models/exercise_model.dart';
+import '../../../models/food_model.dart';
 
 class FoodLogCard extends StatelessWidget {
   final FoodLog food;
-  const FoodLogCard({super.key, required this.food});
+  final VoidCallback? onDelete; // ✅ Added callback
 
+  const FoodLogCard({super.key, required this.food, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
-    // debugPrint("FoodLogCard: ${food.toJson()}");
     return _BaseLogCard(
+      onDelete: onDelete,
       leading: food.imageUrl != null
           ? CircleAvatar(backgroundImage: NetworkImage(food.imageUrl!))
-          : CircleAvatar(backgroundColor: Theme.of(context).cardColor, child: const Icon(Icons.restaurant)),
+          : CircleAvatar(
+        backgroundColor: Theme.of(context).cardColor,
+        child: const Icon(Icons.restaurant),
+      ),
       title: food.name,
       subtitle: DateFormat.jm().format(food.timestamp),
       calories: "${food.calories} calories",
       bottom: Row(
         children: [
-          _macro(Icons.egg_alt, "${food.protein}g", Colors.redAccent),
+          _macro(NutritionType.protein, "${food.protein}g"),
           const SizedBox(width: 10),
-          _macro(Icons.rice_bowl, "${food.carbs}g", Colors.orangeAccent),
+          _macro(NutritionType.carbs, "${food.carbs}g"),
           const SizedBox(width: 10),
-          _macro(Icons.fastfood_outlined, "${food.fats}g", Colors.blueAccent),
+          _macro(NutritionType.fats, "${food.fats}g"),
         ],
       ),
     );
   }
 }
 
-// ------------------------------------------------------------
-// EXERCISE LOG CARD
-// ------------------------------------------------------------
-
 class ExerciseLogCard extends StatelessWidget {
-  final Exercise exercise;
-  const ExerciseLogCard({super.key, required this.exercise});
+  final ExerciseLog exercise;
+  final VoidCallback? onDelete; // ✅ Added callback
+
+  const ExerciseLogCard({super.key, required this.exercise, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
-    final type = ExerciseType.fromString(exercise.type);
+    final type = exercise.type;
 
     return _BaseLogCard(
-      leading: CircleAvatar(backgroundColor: Theme.of(context).cardColor, child: Icon(type.icon)),
+      onDelete: onDelete,
+      leading: CircleAvatar(
+        backgroundColor: Theme.of(context).cardColor,
+        child: Icon(type.icon),
+      ),
       title: type.label,
       subtitle: exercise.formattedTime,
       calories: "${exercise.caloriesBurned} kcal",
@@ -68,16 +74,13 @@ class ExerciseLogCard extends StatelessWidget {
   }
 }
 
-// ------------------------------------------------------------
-// BASE CARD + EMPTY STATE
-// ------------------------------------------------------------
-
 class _BaseLogCard extends StatelessWidget {
   final Widget leading;
   final String title;
   final String subtitle;
   final String calories;
   final Widget bottom;
+  final VoidCallback? onDelete;
 
   const _BaseLogCard({
     required this.leading,
@@ -85,56 +88,90 @@ class _BaseLogCard extends StatelessWidget {
     required this.subtitle,
     required this.calories,
     required this.bottom,
+    this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).appBarTheme.backgroundColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Theme.of(context).splashColor, width: 0.5),
-      ),
-      child: Row(
-        children: [
-          SizedBox(width: 48, height: 48, child: leading),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    const double cardRadius = 24.0;
+    final cardColor = Theme.of(context).appBarTheme.backgroundColor;
+    final borderColor = Theme.of(context).splashColor;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      // ✅ 1. Wrap EVERYTHING in a ClipRRect to force the rounded shape
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(cardRadius),
+        child: Slidable(
+          key: ValueKey(title + subtitle),
+          endActionPane: ActionPane(
+            motion: const BehindMotion(),
+            extentRatio: 0.50,
+            dismissible: DismissiblePane(
+              onDismissed: () => onDelete?.call(),
+              // You can also add a confirmDismiss: () async => showDialog(...) if needed
+            ),
+            children: [
+              SlidableAction(
+                onPressed: (_) =>
+                  onDelete?.call(),
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                icon: Icons.delete_outline,
+                label: 'Delete',
+                // ✅ 2. Keep this for internal rounding logic
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(cardRadius),
+                  bottomRight: Radius.circular(cardRadius),
+                ),
+              ),
+            ],
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(cardRadius),
+              // ✅ 3. Add the border to the Container as usual
+              border: Border.all(color: borderColor, width: 0.5),
+            ),
+            child: Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                SizedBox(width: 48, height: 48, child: leading),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            subtitle,
+                            style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                          ),
+                        ],
                       ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: TextStyle(color: Colors.grey[500], fontSize: 12),
-                    ),
-                  ],
+                      const SizedBox(height: 6),
+                      Text(calories,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 6),
+                      bottom,
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  calories,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 6),
-                bottom,
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -165,10 +202,10 @@ class EmptyState extends StatelessWidget {
 // HELPERS
 // ------------------------------------------------------------
 
-Widget _macro(IconData icon, String label, Color color) {
+Widget _macro(NutritionType nutrition, String label) {
   return Row(
     children: [
-      Icon(icon, size: 12, color: color),
+      Icon(nutrition.icon, size: 12, color: nutrition.color),
       const SizedBox(width: 4),
       Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
     ],

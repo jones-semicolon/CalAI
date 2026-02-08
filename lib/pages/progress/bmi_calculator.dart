@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/user_data.dart';
+import '../../enums/user_enums.dart';
 /// A developer-friendly class to encapsulate all BMI calculation and interpretation logic.
 ///
 /// This class takes raw BMI data and provides clean, ready-to-use outputs

@@ -2,9 +2,9 @@ import 'package:calai/onboarding/onboarding_widgets/header.dart';
 import 'package:calai/onboarding/onboarding_widgets/speed_prog_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/health_data.dart';
+import '../../enums/user_enums.dart';
+import '../../providers/user_provider.dart';
 import '../onboarding_widgets/continue_button.dart';
-import '../../data/user_data.dart';
 
 class ProgressSpeed extends ConsumerWidget {
   final VoidCallback nextPage;
@@ -18,15 +18,20 @@ class ProgressSpeed extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context).colorScheme.primary;
-    final unit = ref.watch(healthDataProvider).weightUnit;
     final userData = ref.watch(userProvider);
+    debugPrint(userData.goal.weeklyRate.toString());
+    final unit = userData.body.weightUnit;
+    final weeklyRate = userData.goal.weeklyRate ?? 0.8; // Fallback to 0.0 if null
+    final targetWeight = userData.goal.targetWeight ?? userData.body.currentWeight;
 
-    // Display speed in selected unit
     final double displaySpeed = unit == WeightUnit.kg
-        ? userData.progressSpeed
-        : userData.progressSpeed * _lbPerKg;
+        ? weeklyRate
+        : weeklyRate * _lbPerKg;
+
     final unitLabel = unit.value;
-    final weightLabel = _goalLabel(userData.weight, userData.targetWeight);
+
+    // 3. Compare safely
+    final weightLabel = _goalLabel(userData.body.currentWeight, targetWeight);
 
     return SafeArea(
       child: Column(

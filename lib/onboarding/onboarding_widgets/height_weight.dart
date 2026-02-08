@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/health_data.dart';
-import '../../data/user_data.dart';
+import '../../enums/user_enums.dart';
+import '../../providers/user_provider.dart';
 
 class HeightWeightPickerWidget extends ConsumerStatefulWidget {
   const HeightWeightPickerWidget({super.key});
@@ -37,10 +37,10 @@ class _HeightWeightPickerWidgetState
     final user = ref.read(userProvider);
 
     // Calculate initial positions from current provider state
-    int totalInches = (user.height / 2.54).round();
+    int totalInches = (user.body.height / 2.54).round();
     int initialFt = totalInches ~/ 12;
     int initialIn = totalInches % 12;
-    int initialLb = (user.weight / 0.453592).round();
+    int initialLb = (user.body.currentWeight / 0.453592).round();
 
     _ftController = FixedExtentScrollController(
       initialItem: feetRange.indexOf(initialFt).clamp(0, 7),
@@ -52,10 +52,10 @@ class _HeightWeightPickerWidgetState
       initialItem: weightLbRange.indexOf(initialLb).clamp(0, 760),
     );
     _cmController = FixedExtentScrollController(
-      initialItem: cmRange.indexOf(user.height.round()).clamp(0, 182),
+      initialItem: cmRange.indexOf(user.body.height.round()).clamp(0, 182),
     );
     _kgController = FixedExtentScrollController(
-      initialItem: weightKgRange.indexOf(user.weight.round()).clamp(0, 480),
+      initialItem: weightKgRange.indexOf(user.body.currentWeight.round()).clamp(0, 480),
     );
   }
 
@@ -78,16 +78,16 @@ class _HeightWeightPickerWidgetState
     if (isMetric) {
       if (_cmController.hasClients) {
         _cmController.jumpToItem(
-          cmRange.indexOf(user.height.round()).clamp(0, 182),
+          cmRange.indexOf(user.body.height.round()).clamp(0, 182),
         );
       }
       if (_kgController.hasClients) {
         _kgController.jumpToItem(
-          weightKgRange.indexOf(user.weight.round()).clamp(0, 480),
+          weightKgRange.indexOf(user.body.currentWeight.round()).clamp(0, 480),
         );
       }
     } else {
-      int totalIn = (user.height / 2.54).round();
+      int totalIn = (user.body.height / 2.54).round();
       if (_ftController.hasClients) {
         _ftController.jumpToItem(feetRange.indexOf(totalIn ~/ 12).clamp(0, 7));
       }
@@ -98,7 +98,7 @@ class _HeightWeightPickerWidgetState
       }
       if (_lbController.hasClients) {
         _lbController.jumpToItem(
-          weightLbRange.indexOf((user.weight / 0.453592).round()).clamp(0, 760),
+          weightLbRange.indexOf((user.body.currentWeight / 0.453592).round()).clamp(0, 760),
         );
       }
     }
@@ -114,10 +114,10 @@ class _HeightWeightPickerWidgetState
     const double pickerH = itemH * 7;
 
     // Derived values for Imperial display from single source of truth (CM/KG)
-    int totalInches = (user.height / 2.54).round();
+    int totalInches = (user.body.height / 2.54).round();
     int currentFt = totalInches ~/ 12;
     int currentIn = totalInches % 12;
-    int currentLb = (user.weight / 0.453592).round();
+    int currentLb = (user.body.currentWeight / 0.453592).round();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -140,7 +140,7 @@ class _HeightWeightPickerWidgetState
             children: [
               _individualWheel(
                 cmRange,
-                user.height.round(),
+                user.body.height.round(),
                 (v) => ref.read(userProvider.notifier).setHeight(cm: v.toDouble(), unit: HeightUnit.cm),
                 "cm",
                 _cmController,
@@ -150,7 +150,7 @@ class _HeightWeightPickerWidgetState
               const SizedBox(width: 30),
               _individualWheel(
                 weightKgRange,
-                user.weight.round(),
+                user.body.currentWeight.round(),
                 (v) => ref.read(userProvider.notifier).setWeight(v.toDouble(), WeightUnit.kg),
                 "kg",
                 _kgController,

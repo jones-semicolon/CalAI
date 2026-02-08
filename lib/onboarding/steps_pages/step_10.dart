@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../enums/user_enums.dart';
+import '../../providers/user_provider.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../data/user_data.dart';
 
 class OnboardingStep10 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
@@ -25,7 +26,7 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
       icon: FontAwesomeIcons.appleWhole,
       value: GoalFocus.healthier,
     ),
-    OptionCard(title: 'Boost my energy and mood', icon: FontAwesomeIcons.sun),
+    OptionCard(title: 'Boost my energy and mood', icon: FontAwesomeIcons.sun, value: GoalFocus.energy),
     OptionCard(
       title: 'Stay motivated and consistent',
       icon: FontAwesomeIcons.personRunning,
@@ -40,7 +41,7 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
   @override
   void initState() {
     super.initState();
-    final accomplish = ref.read(userProvider).likeToAccomplish;
+    final accomplish = ref.read(userProvider).goal.motivation;
 
     final matchOption = options.indexWhere((i) => i.value == accomplish);
     if (matchOption != -1) {
@@ -51,7 +52,7 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
 
   @override
   Widget build(BuildContext context) {
-    final accomplishData = ref.read(userProvider.notifier);
+    final userNotifier = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
@@ -110,7 +111,7 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
               onNext: () {
                 if (selectedIndex != null) {
                   final data = options[selectedIndex!];
-                  accomplishData.update((s) => s.copyWith(likeToAccomplish: data.value));
+                  userNotifier.updateLocal((s) => s.copyWith(goal: s.goal.copyWith(motivation: data.value)));
                   debugPrint('Like to accomplish: $data');
                 }
                 // TODO : this will post to api

@@ -83,11 +83,6 @@ class AppTheme {
     hintColor: const Color.fromARGB(255, 210, 210, 212),
     highlightColor: const Color.fromARGB(255, 202, 196, 208),
     splashColor: const Color.fromARGB(255, 58, 58, 60),
-    dialogTheme: const DialogThemeData(
-      backgroundColor: Color.fromARGB(255, 42, 39, 48),
-      barrierColor: Color.fromARGB(255, 132, 224, 125),
-      surfaceTintColor: Color.fromARGB(255, 39, 36, 45),
-    ),
     appBarTheme: const AppBarTheme(
       backgroundColor: Color.fromARGB(255, 29, 26, 35),
       foregroundColor: Colors.white,

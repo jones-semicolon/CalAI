@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:calai/data/health_data.dart';
-import '../../../data/user_data.dart';
+import '../../../enums/user_enums.dart';
+import '../../../providers/user_provider.dart';
 import 'unit_toggle.dart';
 
 class WeightSelectionView extends ConsumerStatefulWidget {
@@ -53,12 +53,12 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
     final user = ref.read(userProvider);
 
     double initial;
-    if (user.goal == Goal.loseWeight) {
-      initial = (user.weight - 5).clamp(_minKg, _maxKg);
-    } else if (user.goal == Goal.gainWeight) {
-      initial = (user.weight + 5).clamp(_minKg, _maxKg);
+    if (user.goal.type == Goal.loseWeight) {
+      initial = (user.body.currentWeight - 5).clamp(_minKg, _maxKg);
+    } else if (user.goal.type == Goal.gainWeight) {
+      initial = (user.body.currentWeight + 5).clamp(_minKg, _maxKg);
     } else {
-      initial = user.weight.clamp(_minKg, _maxKg);
+      initial = user.body.currentWeight.clamp(_minKg, _maxKg);
     }
 
     _displayedWeightKg = ValueNotifier<double>(initial);
@@ -151,7 +151,7 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
 
   @override
   Widget build(BuildContext context) {
-    final unit = ref.watch(healthDataProvider).weightUnit;
+    final unit = ref.watch(userProvider).body.weightUnit;
     final user = ref.watch(userProvider);
 
     final width = MediaQuery.of(context).size.width;
@@ -229,12 +229,14 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        UnitToggle(
-          unit: unit,
-          onChanged: (u) {
-            ref.read(healthDataProvider.notifier).update((s) => s.copyWith(weightUnit: u));
-          },
-        ),
+      UnitToggle(
+      unit: unit,
+      onChanged: (u) {
+          ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(
+            body: s.body.copyWith(weightUnit: u), // ✅ Correct: Returns User
+          ));
+        },
+      ),
 
         const SizedBox(height: 30),
 
@@ -245,7 +247,7 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
             return Column(
               children: [
                 Text(
-                  _goalLabel(user.weight, valueKg),
+                  _goalLabel(user.body.currentWeight, valueKg),
                   style: TextStyle(
                     fontSize: 16,
                     color: theme.colorScheme.primary,
@@ -283,7 +285,7 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
                   return listPadding + _offsetFromKg(kg) + (_tickSpacing / 2) - scrollOffset;
                 }
 
-                final currentWeightCenter = getTickCenter(user.weight);
+                final currentWeightCenter = getTickCenter(user.body.currentWeight);
                 final indicatorCenter = width / 2; // Fixed center of screen
 
                 final gradientLeft = math.min(currentWeightCenter, indicatorCenter);
@@ -347,7 +349,7 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
                       top: rulerHeight + 6,
                       child: Center(
                         child: Text(
-                          '${_format(user.weight, unit)} ${unit.value}',
+                          '${_format(user.body.currentWeight, unit)} ${unit.value}',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,

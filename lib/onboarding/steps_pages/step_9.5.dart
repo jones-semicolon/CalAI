@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/user_data.dart';
+import '../../providers/user_provider.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/dynamic_card.dart';
@@ -9,7 +9,6 @@ import '../onboarding_widgets/header.dart';
 
 class Demotivated extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
-
   const Demotivated({super.key, required this.nextPage});
 
   @override
@@ -29,14 +28,15 @@ class _DemotivatedState extends ConsumerState<Demotivated> {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Watch the user state
     final user = ref.watch(userProvider);
     final userNotifier = ref.read(userProvider.notifier);
 
-    // ✅ if user already has saved value, auto select it
-    if (selectedIndex == null && user.stoppingReachGoal.isNotEmpty) {
-      final matchIndex =
-      choices.indexWhere((c) => c.title == user.stoppingReachGoal);
+    // ✅ Match using the new nested path: user.goal.maintenanceStrategy
+    final currentStrategy = user.goal.maintenanceStrategy;
 
+    if (selectedIndex == null && currentStrategy != null && currentStrategy.isNotEmpty) {
+      final matchIndex = choices.indexWhere((c) => c.title == currentStrategy);
       if (matchIndex != -1) {
         selectedIndex = matchIndex;
       }
@@ -64,7 +64,6 @@ class _DemotivatedState extends ConsumerState<Demotivated> {
                       child: OptionCard(
                         icon: item.icon,
                         title: item.title,
-                        subtitle: item.subtitle,
                         isSelected: selectedIndex == index,
                         onTap: () {
                           setState(() => selectedIndex = index);
@@ -83,13 +82,11 @@ class _DemotivatedState extends ConsumerState<Demotivated> {
               enabled: isEnable,
               onNext: () {
                 if (selectedIndex != null) {
-                  final selectedOption = choices[selectedIndex!];
+                  final selectedTitle = choices[selectedIndex!].title;
 
-                  userNotifier.update((value) => value.copyWith(
-                    stoppingReachGoal: selectedOption.title,
-                  ));
-
-                  debugPrint('stoppingReachGoal: ${selectedOption.title}');
+                  // ✅ FIXED: Update using the nested copyWith path
+                  userNotifier.setMaintenanceStrategy(selectedTitle);
+                  debugPrint('Goal Obstacle: $selectedTitle');
                 }
 
                 widget.nextPage();

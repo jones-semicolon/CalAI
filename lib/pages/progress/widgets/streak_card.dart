@@ -33,16 +33,10 @@ class _StreakIcon extends StatelessWidget {
 
   const _StreakIcon({required this.dayStreak});
 
-  int _todayIndexSunFirst() {
-    // Dart weekday: Mon=1 ... Sun=7
-    // We want: Sun=0 ... Sat=6
-    return DateTime.now().weekday % 7;
-  }
-
   int _calculateStreakFromToday(List<bool> streakWeek) {
     if (streakWeek.length != 7) return 0;
 
-    final today = _todayIndexSunFirst();
+    final today = DateTime.now().weekday % 7;
 
     int streak = 0;
     for (int i = today; i >= 0; i--) {
@@ -123,6 +117,8 @@ class _WeeklyStreakView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    // ✅ Calculate today's index once (0 for Sunday, 6 for Saturday)
+    final int todayIndex = DateTime.now().weekday % 7;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -130,6 +126,7 @@ class _WeeklyStreakView extends StatelessWidget {
         return _DayIndicator(
           day: days[i],
           isDone: dayStreak[i],
+          isToday: i == todayIndex, // ✅ New parameter
         );
       }),
     );
@@ -140,12 +137,19 @@ class _WeeklyStreakView extends StatelessWidget {
 class _DayIndicator extends StatelessWidget {
   final String day;
   final bool isDone;
+  final bool isToday; // ✅ Added this
 
-  const _DayIndicator({required this.day, required this.isDone});
+  const _DayIndicator({
+    required this.day,
+    required this.isDone,
+    this.isToday = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     const activeColor = Color.fromARGB(255, 249, 149, 11);
+    // You can choose any color for "Today" (e.g., Blue or a stronger shade of your primary)
+    final todayColor = activeColor;
     final inactiveColor = Theme.of(context).colorScheme.onTertiary;
 
     return Column(
@@ -154,20 +158,20 @@ class _DayIndicator extends StatelessWidget {
           day,
           style: TextStyle(
             fontSize: 11,
-            color: isDone ? activeColor : Theme.of(context).primaryColor,
+            fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+            color: isToday
+                ? todayColor // ✅ Highlight if today
+                : (isDone ? activeColor : Theme.of(context).primaryColor),
           ),
         ),
         const SizedBox(height: 4),
         CircleAvatar(
           radius: 8,
+          // We keep the circle logic based on progress (isDone)
           backgroundColor: isDone ? activeColor : inactiveColor,
+          // But maybe add a border if it is today but not done?
           child: isDone
-              ? const Icon(
-            Icons.check,
-            size: 12,
-            color: Colors.white,
-          )
-              : null,
+              ? const Icon(Icons.check, size: 12, color: Colors.white): null,
         ),
       ],
     );

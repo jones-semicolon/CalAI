@@ -1,28 +1,25 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import '../../../models/nutrition_model.dart';
 
 /// Defines the time range options for the progress bar graph.
 enum WeekRange { thisWeek, lastWeek, twoWeeksAgo, threeWeeksAgo }
 
-/// A developer-friendly class to encapsulate all the business logic for the
-/// ProgressBarGraph widget.
-///
-/// This class takes the raw log data and the selected time range, and provides
-/// clean, ready-to-use outputs for the UI, such as filtered logs, total calories,
-/// and the data groups required by the chart library.
 class ProgressBarGraphLogic {
-  final List<Map<String, dynamic>> allLogs;
+  // ✅ UPDATED: Use your new DailyNutrition model
+  final List<DailyNutrition> allLogs;
   final WeekRange selectedRange;
 
   ProgressBarGraphLogic({required this.allLogs, required this.selectedRange});
 
   // --- Core Data Processing --- //
 
-  /// Filters the raw logs to include only the data for the selected week.
-  List<Map<String, dynamic>> get filteredLogs {
+  List<DailyNutrition> get filteredLogs {
     final now = DateTime.now();
-    // Use Sunday as the start of the week (weekday % 7).
-    final startOfWeek = now.subtract(Duration(days: now.weekday % 7));
+    final todayMidnight = DateTime(now.year, now.month, now.day);
+
+    // Calculate start of current week (Sunday as 0)
+    final startOfWeek = todayMidnight.subtract(Duration(days: todayMidnight.weekday % 7));
 
     DateTime start;
     DateTime end;
@@ -46,43 +43,54 @@ class ProgressBarGraphLogic {
         break;
     }
 
-    return allLogs.where((e) {
-      final d = e['date'] as DateTime;
-      return !d.isBefore(start) && d.isBefore(end);
+    // 1. Filter by date range
+    final rangeFiltered = allLogs.where((e) {
+      final d = DateTime(e.date.year, e.date.month, e.date.day);
+      return (d.isAfter(start) || d.isAtSameMomentAs(start)) && d.isBefore(end);
     }).toList();
+
+    // 2. DEDUPLICATION: Ensure one entry per day
+    final Map<String, DailyNutrition> dailyMap = {};
+    for (var log in rangeFiltered) {
+      final String dateKey = "${log.date.year}-${log.date.month}-${log.date.day}";
+      dailyMap[dateKey] = log;
+    }
+
+    return dailyMap.values.toList();
   }
 
   // --- Computed Properties for the UI --- //
 
-  /// Calculates the total calories from the filtered logs.
   double get totalCalories =>
-      filteredLogs.fold(0.0, (s, e) => s + (e['calories'] as num).toDouble());
+      filteredLogs.fold(0.0, (s, e) => s + e.kc.toDouble());
 
-  /// Calculates the percentage of the weekly calorie target that has been met.
   double percentageOfTarget(double dailyGoal) {
     final weeklyTarget = dailyGoal * 7;
     if (weeklyTarget == 0) return 0;
     return (totalCalories / weeklyTarget) * 100;
   }
 
-  /// Generates the list of [BarChartGroupData] needed to render the bar chart.
   List<BarChartGroupData> getBarGroups() {
     return List.generate(7, (i) {
       final log = _getLogForDay(i);
-      if (log.isEmpty) {
-        return BarChartGroupData(x: i, barRods: []);
-      }
 
-      final double calories = (log['calories'] as num).toDouble();
-      final double protein = (log['protein'] as num).toDouble();
-      final double carbs = (log['carbs'] as num).toDouble();
-      final double fats = (log['fats'] as num).toDouble();
+      final double calories = log?.kc.toDouble() ?? 0.0;
+      final double protein = log?.p.toDouble() ?? 0.0;
+      final double carbs = log?.c.toDouble() ?? 0.0;
+      final double fats = log?.f.toDouble() ?? 0.0;
+
       final double macroTotal = protein + carbs + fats;
 
-      if (macroTotal == 0) {
-        return BarChartGroupData(x: i, barRods: []);
+      if (calories == 0 || macroTotal == 0) {
+        return BarChartGroupData(
+          x: i,
+          barRods: [
+            BarChartRodData(toY: 0, width: 20, color: Colors.transparent)
+          ],
+        );
       }
 
+      // Proportional macro stacking relative to total calories
       final double fatsHeight = calories * (fats / macroTotal);
       final double carbsHeight = calories * (carbs / macroTotal);
       final double proteinHeight = calories * (protein / macroTotal);
@@ -110,29 +118,18 @@ class ProgressBarGraphLogic {
 
   // --- Private Helpers --- //
 
-  /// Finds the log entry for a specific day of the week index (0=Sun, 1=Mon, etc.).
-  Map<String, dynamic> _getLogForDay(int dayIndex) {
-    return filteredLogs.firstWhere(
-      (e) => ((e['date'] as DateTime).weekday % 7) == dayIndex,
-      orElse: () => {},
-    );
+  DailyNutrition? _getLogForDay(int weekdayIndex) {
+    try {
+      return filteredLogs.firstWhere(
+            (log) => log.date.weekday % 7 == weekdayIndex,
+        orElse: () => throw 'not_found',
+      );
+    } catch (_) {
+      return null;
+    }
   }
 
-  /// Gets the protein for a specific day index, used by the chart's tooltip.
-  double getDayProtein(int dayIndex) {
-    final log = _getLogForDay(dayIndex);
-    return log.isEmpty ? 0 : (log['protein'] as num).toDouble();
-  }
-
-  /// Gets the carbs for a specific day index.
-  double getDayCarbs(int dayIndex) {
-    final log = _getLogForDay(dayIndex);
-    return log.isEmpty ? 0 : (log['carbs'] as num).toDouble();
-  }
-
-  /// Gets the fats for a specific day index.
-  double getDayFats(int dayIndex) {
-    final log = _getLogForDay(dayIndex);
-    return log.isEmpty ? 0 : (log['fats'] as num).toDouble();
-  }
+  double getDayProtein(int dayIndex) => _getLogForDay(dayIndex)?.p.toDouble() ?? 0.0;
+  double getDayCarbs(int dayIndex) => _getLogForDay(dayIndex)?.c.toDouble() ?? 0.0;
+  double getDayFats(int dayIndex) => _getLogForDay(dayIndex)?.f.toDouble() ?? 0.0;
 }

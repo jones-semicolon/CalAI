@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../enums/user_enums.dart';
+import '../../providers/user_provider.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../data/user_data.dart';
 
 class OnboardingStep9 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
@@ -28,7 +29,7 @@ class _OnboardingStep9State extends ConsumerState<OnboardingStep9> {
   @override
   void initState() {
     super.initState();
-    final dietType = ref.read(userProvider).dietType;
+    final dietType = ref.read(userProvider).goal.dietType;
 
     final matchOption = options.indexWhere((i) => i.value == dietType);
     if (matchOption != -1) {
@@ -39,7 +40,7 @@ class _OnboardingStep9State extends ConsumerState<OnboardingStep9> {
 
   @override
   Widget build(BuildContext context) {
-    final dietData = ref.read(userProvider.notifier);
+    final userNotifier = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
@@ -99,10 +100,9 @@ class _OnboardingStep9State extends ConsumerState<OnboardingStep9> {
                 if (selectedIndex != null) {
                   final data = options[selectedIndex!];
 
-                  dietData.update((s) => s.copyWith(dietType: data.value));
+                  userNotifier.setDietType(data.value);
                   debugPrint('Diet type: $data');
                 }
-                // TODO : this will post to api
                 widget.nextPage();
               },
             ),

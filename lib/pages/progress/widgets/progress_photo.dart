@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../screens/progress_photo/progress_photo_view.dart';
+
 /// A card widget that prompts the user to upload progress photos.
 ///
 /// It displays an invitation message and an "Upload a Photo" button, and is
@@ -11,7 +13,12 @@ class ProgressPhoto extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // TODO: Implement navigation to a new scaffold for photos.
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ProgressPhotoView(),
+          ),
+        );
       },
       child: Container(
         // The styling for the main container is preserved.

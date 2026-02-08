@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../enums/user_enums.dart';
+import '../../providers/user_provider.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
-import '../../data/user_data.dart';
 
 class OnboardingStep2 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
@@ -38,7 +39,7 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
     super.initState();
 
     // Get saved gender from UserData
-    final physicalActivity = ref.read(userProvider).workOutPerWeek;
+    final physicalActivity = ref.read(userProvider).goal.activityLevel;
 
     // Find index of option matching saved gender
     final matchIndex = options.indexWhere((o) => o.value == physicalActivity);
@@ -51,7 +52,6 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
 
   @override
   Widget build(BuildContext context) {
-    final userData = ref.read(userProvider.notifier);
     return SafeArea(
       child: Column(
         children: [
@@ -115,7 +115,7 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
                   final selectedOption = options[selectedIndex!];
 
                   // Update UserData.gender in Riverpod
-                  userData.update((s) => s.copyWith(workOutPerWeek: selectedOption.value));
+                  ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(activityLevel: selectedOption.value)));
 
                   debugPrint(
                     'WorkoutPerWeek: ${selectedOption.value}',

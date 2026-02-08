@@ -22,7 +22,7 @@ class HyperlinkText extends StatelessWidget {
       text: TextSpan(
         text: text,
         style: AppTextStyles.headTitle.copyWith(
-          color: AppColors.onPrimary(context),
+          color: AppColors.primary(context),
           decoration: TextDecoration.underline,
           fontWeight: FontWeight.normal,
           wordSpacing: 2.0,

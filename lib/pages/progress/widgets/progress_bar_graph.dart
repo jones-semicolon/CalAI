@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:calai/enums/food_enums.dart';
 import 'package:calai/pages/progress/widgets/progress_bar_graph_logic.dart';
 import 'package:calai/pages/progress/widgets/graph_card_decoration.dart';
 import 'package:calai/pages/progress/widgets/graph_header.dart';
@@ -9,18 +10,20 @@ import 'package:calai/pages/progress/widgets/time_range_selector.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../../models/nutrition_model.dart';
+
 /// A widget that displays a bar graph of the user's calorie intake over time.
 ///
 /// This widget is purely for presentation. It uses a [ProgressBarGraphLogic]
 /// class to handle all data processing and chart generation, and then lays out
 /// the UI using smaller, focused sub-widgets.
 class ProgressBarGraph extends StatefulWidget {
-  final List<Map<String, dynamic>> calorieLogs;
+  final List<DailyNutrition> dailyNutrition;
   final double caloriesIntakePerDay;
 
   const ProgressBarGraph({
     super.key,
-    required this.calorieLogs,
+    required this.dailyNutrition,
     required this.caloriesIntakePerDay,
   });
 
@@ -34,26 +37,29 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
   @override
   Widget build(BuildContext context) {
     final logic = ProgressBarGraphLogic(
-      allLogs: widget.calorieLogs,
+      allLogs: widget.dailyNutrition,
       selectedRange: _selectedRange,
     );
 
     final filteredLogs = logic.filteredLogs;
     final percentage = logic.percentageOfTarget(widget.caloriesIntakePerDay);
 
-    // Determine the max Y value for the chart.
-    final double maxCalories = filteredLogs.isEmpty
-        ? widget.caloriesIntakePerDay
-        : filteredLogs
-            .map((e) => (e['calories'] as num).toDouble())
-            .reduce((a, b) => a > b ? a : b);
+    // 1. Safe Max Calculation using fold
+    final double maxCaloriesFromLogs = filteredLogs.fold<double>(
+        0.0,
+            (maxVal, e) => e.kc > maxVal ? e.kc.toDouble() : maxVal
+    );
 
-    final double rawInterval = maxCalories / 4;
-    final double interval = rawInterval <= 0 ? 1 : rawInterval;
+    // 2. Determine max Y - Ensure we never have a 0 max to avoid division errors
+    final double targetCals = widget.caloriesIntakePerDay > 0 ? widget.caloriesIntakePerDay : 2000;
+    final double maxYValue = max(maxCaloriesFromLogs, targetCals);
 
-    // small padding so top bar doesn’t touch the line
+    // 3. Ensure interval is at least 1
+    final double rawInterval = maxYValue / 4;
+    final double interval = rawInterval <= 0 ? 500 : rawInterval;
+
     final double minY = 0;
-    final double maxY = max(maxCalories, interval * 4);
+    final double maxY = max(maxYValue, interval * 4);
 
     return Column(
       children: [

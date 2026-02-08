@@ -2,32 +2,23 @@ import 'package:calai/pages/home/widgets/day_streak.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:calai/data/global_data.dart';
+import '../../../providers/global_provider.dart';
+
 /// A button widget that shows the user's current day streak and opens a
 /// dialog with more details on tap.
 class StreakIndicatorButton extends ConsumerWidget {
-  const StreakIndicatorButton({super.key});
+  final bool? isDisabled; // ✅ Added callback
+  const StreakIndicatorButton({super.key, this.isDisabled});
 
-  String _toDateId(DateTime d) {
-    final y = d.year.toString().padLeft(4, '0');
-    final m = d.month.toString().padLeft(2, '0');
-    final day = d.day.toString().padLeft(2, '0');
-    return '$y-$m-$day';
-  }
+  int _calculateStreak(List<bool> streakWeek) {
+    if (streakWeek.length != 7) return 0;
 
-  int _calculateStreak(Set<String> progressDays) {
+    final today = DateTime.now().weekday % 7;
+
     int streak = 0;
-
-    final now = DateTime.now();
-    // ✅ normalize date (remove time)
-    DateTime cursor = DateTime(now.year, now.month, now.day);
-
-    while (true) {
-      final id = _toDateId(cursor);
-
-      if (progressDays.contains(id)) {
+    for (int i = today; i >= 0; i--) {
+      if (streakWeek[i] == true) {
         streak++;
-        cursor = cursor.subtract(const Duration(days: 1));
       } else {
         break;
       }
@@ -56,11 +47,13 @@ class StreakIndicatorButton extends ConsumerWidget {
         colorScheme: colorScheme,
       ),
       data: (global) {
-        final streak = _calculateStreak(global.progressDays);
+        final streak = _calculateStreak(_buildWeekStreak(global.progressDays));
 
         return _buildUI(
           context,
           streak: streak,
+          progressDays: _buildWeekStreak(global.progressDays),
+          isDisabled: isDisabled,
           colorScheme: colorScheme,
         );
       },
@@ -71,15 +64,18 @@ class StreakIndicatorButton extends ConsumerWidget {
       BuildContext context, {
         required int streak,
         required ColorScheme colorScheme,
+        List<bool>? progressDays,
+        bool? isDisabled = false, // ✅ Use the passed callback
         bool isLoading = false,
       }) {
     return GestureDetector(
       onTap: () {
+        if (isDisabled == true) return;
         showDialog(
           context: context,
           barrierDismissible: true,
           barrierColor: Colors.black26,
-          builder: (_) => const DayStreakDialog(),
+          builder: (_) => DayStreakDialog(dayStreak: progressDays!),
         );
       },
       child: Container(
@@ -92,7 +88,7 @@ class StreakIndicatorButton extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.local_fire_department, color: Colors.orange),
-            const SizedBox(width: 6),
+            const SizedBox(width: 3),
             Text(
               isLoading ? '0' : '$streak',
               style: TextStyle(
@@ -106,4 +102,23 @@ class StreakIndicatorButton extends ConsumerWidget {
       ),
     );
   }
+}
+
+
+List<bool> _buildWeekStreak(Set<String> progressDays) {
+  final daysOrder = [
+    'sunday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday'
+  ];
+
+  return List.generate(7, (i) {
+    final dayName = daysOrder[i];
+
+    return progressDays.contains(dayName);
+  });
 }

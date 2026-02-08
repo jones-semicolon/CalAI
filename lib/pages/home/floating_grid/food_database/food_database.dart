@@ -5,10 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Update these paths to match your project structure
 import 'package:calai/api/food_api.dart';
-import 'package:calai/models/food.dart';
-import 'package:calai/data/global_data.dart';
+import 'package:calai/models/food_model.dart';
+import '../../../../enums/food_enums.dart';
+import '../../../../providers/global_provider.dart';
 import '../../../../widgets/circle_back_button.dart';
+import '../../../../widgets/header_widget.dart';
 import 'selected_food_page.dart';
+import '../../../../providers/entry_streams_provider.dart'; // Ensure correct path
+import '../../../../services/calai_firestore_service.dart'; // Ensure correct path
 
 class FoodDatabasePage extends ConsumerStatefulWidget {
   final int selectedTabIndex;
@@ -129,24 +133,41 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
     );
   }
 
-  void _onAddFood(Food item, FoodPortionItem portion) {
-    // ✅ Logic: Create the log using the Model's logic (Single Source of Truth)
-    // We assume quick-add uses 1 unit of the displayed portion
+  void _onAddFood(Food item, FoodPortionItem portion) async {
+    // 1. Get the date the user is currently viewing on the dashboard
+    final activeDateId = ref.read(globalDataProvider).value?.activeDateId;
+
+    // 2. Create the log entry using your model's logic
     final logEntry = item.createLog(
       amount: 1.0,
       unit: portion.label,
       gramWeight: portion.gramWeight,
     );
 
-    // Save to global state
-    ref.read(globalDataProvider.notifier).logFoodEntry(
-      logEntry,
-      FoodSource.foodDatabase,
-    );
+    try {
+      // 3. Use the Service (Source of Truth for DB Writes)
+      await ref.read(calaiServiceProvider).logFoodEntry(
+        logEntry,
+        SourceType.foodDatabase,
+        dateId: activeDateId, // ✅ Pass the viewed date
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Added ${item.name} to log")),
-    );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Added ${item.name} to $activeDateId"),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error adding food: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to add food. Try again.")),
+        );
+      }
+    }
   }
 
   void _onLogEmptyFood() {
@@ -169,13 +190,15 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bool isShowingSearchResults = _searchController.text.isNotEmpty;
-
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
+            CustomAppBar(
+              title: const Text("Food Database"),
+              onBackTap: () => Navigator.pop(context),
+            ),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -198,7 +221,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
                     child: Text(
                       isShowingSearchResults ? "Search Results" : "Suggestions",
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -252,7 +275,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
           // Calculate preview calories for 1 unit of this portion
           final previewLog = item.createLog(
               amount: 1,
-              unit: portion.label,
+              unit: portion.unitOnly,
               gramWeight: portion.gramWeight
           );
 
@@ -431,9 +454,9 @@ class _TabItem extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: isSelected ? FontWeight.w900 : FontWeight.w500,
-          color: isSelected ? Colors.black : Colors.grey.shade400,
+          color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onPrimary,
         ),
       ),
     );
@@ -529,19 +552,19 @@ class FoodTile extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
                   Row(
                     children: [
                       const Icon(Icons.local_fire_department, size: 20),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 5),
                       Expanded(
                         child: Text(
                           "$calories cal  ·  ${unit ?? 'Serving'}",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
                             color: theme.colorScheme.primary.withOpacity(0.8),
                           ),
                         ),

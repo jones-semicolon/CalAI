@@ -1,19 +1,24 @@
 import 'dart:math';
+import 'package:calai/enums/food_enums.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
 import 'package:intl/intl.dart';
 
-import '../progress_data_provider.dart';
+import '../../../models/exercise_model.dart';
+import '../../../providers/progress_data_provider.dart';
 import 'package:calai/pages/progress/widgets/goal_progress_header.dart';
 import 'package:calai/pages/progress/widgets/graph_card_decoration.dart';
 import 'package:calai/pages/progress/widgets/progress_message_pill.dart';
 import 'package:calai/pages/progress/widgets/time_range_selector.dart';
 
+import '../screens/goal_picker_view.dart';
+import '../screens/weight_picker_view.dart';
+
 class ProgressGraph extends StatefulWidget {
   final TimeRange selectedRange;
   final ValueChanged<TimeRange> onRangeChanged;
-  final List<Map<String, dynamic>> logs;
+  final List<WeightLog> logs;
   final double startedWeight;
   final double goalWeight;
   final double progressPercent;
@@ -61,11 +66,14 @@ class _ProgressGraphState extends State<ProgressGraph> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.logs.isEmpty) {
-      return const Center(child: Text("No data available to display."));
-    }
+    // ✅ 1. Check if we have real data
+    final bool hasNoData = widget.logs.isEmpty;
 
-    final weights = widget.logs.map<double>((e) => (e['weight'] as num).toDouble()).toList();
+    // ✅ 2. Create placeholder values if empty
+    final List<double> weights = hasNoData
+        ? [widget.goalWeight, widget.goalWeight] // Use Goal as baseline
+        : widget.logs.map<double>((e) => (e.weight as num).toDouble()).toList();
+
     final minWeight = weights.reduce((a, b) => a < b ? a : b);
     final maxWeight = weights.reduce((a, b) => a > b ? a : b);
 
@@ -103,12 +111,34 @@ class _ProgressGraphState extends State<ProgressGraph> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GoalProgressHeader(progressPercent: widget.progressPercent),
+              GoalProgressHeader(
+                  progressPercent: widget.progressPercent,
+                  onEdit: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GoalPickerView()))
+              ),
               const SizedBox(height: 16),
+              // ✅ 3. Stack the Chart with a "No Data" label if needed
               SizedBox(
                 height: 250,
-                child: LineChart(
-                  _buildChartData(context, chartMin, chartMax),
+                child: Stack(
+                  children: [
+                    LineChart(
+                      _buildChartData(context, chartMin, chartMax, hasNoData),
+                    ),
+                    if (hasNoData)
+                      Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor.withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Text(
+                            "Waiting for your first log...",
+                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
@@ -122,7 +152,7 @@ class _ProgressGraphState extends State<ProgressGraph> {
     );
   }
 
-  LineChartData _buildChartData(BuildContext context, double minY, double maxY) {
+  LineChartData _buildChartData(BuildContext context, double minY, double maxY, bool hasNoData) {
     final isSinglePoint = widget.logs.length <= 1;
     final yStep = _niceStep(minY, maxY, lines: 5);
     final yMin = (minY / yStep).floor() * yStep;
@@ -146,9 +176,9 @@ class _ProgressGraphState extends State<ProgressGraph> {
           color: Theme.of(context).colorScheme.onTertiary,
         ),
       ),
-      titlesData: _buildTitlesData(context, yStep),
+      titlesData: _buildTitlesData(context, yStep, hasNoData),
       lineTouchData: _buildTouchData(context),
-      lineBarsData: _buildLineBarsData(context),
+      lineBarsData: _buildLineBarsData(context, hasNoData),
     );
   }
 
@@ -204,7 +234,7 @@ class _ProgressGraphState extends State<ProgressGraph> {
             int index = spot.x.toInt();
             if (widget.logs.length == 1) index = 0;
 
-            final date = widget.logs[index]['date'] as DateTime;
+            final date = widget.logs[index].date;
             final formattedDate = '${_monthName(date.month)} ${date.day}, ${date.year}';
 
             return LineTooltipItem(
@@ -232,28 +262,33 @@ class _ProgressGraphState extends State<ProgressGraph> {
     );
   }
 
-  List<LineChartBarData> _buildLineBarsData(BuildContext context) {
-    final isSinglePoint = widget.logs.length <= 1;
+  List<LineChartBarData> _buildLineBarsData(BuildContext context, bool hasNoData) {
+    final Color activeColor = hasNoData
+        ? Colors.grey.withOpacity(0.5) // Grey line if no data
+        : (_isTouched ? Colors.green : Theme.of(context).colorScheme.primary);
 
-    // ✅ Dynamic color based on touch state
-    final Color activeColor = _isTouched ? Colors.green : Theme.of(context).colorScheme.primary;
-
-    final spots = isSinglePoint
-        ? [
-      FlSpot(0, (widget.logs[0]['weight'] as num).toDouble()),
-      FlSpot(1, (widget.logs[0]['weight'] as num).toDouble()),
-    ]
-        : List.generate(
-      widget.logs.length,
-          (i) => FlSpot(i.toDouble(), (widget.logs[i]['weight'] as num).toDouble()),
-    );
+    List<FlSpot> spots;
+    if (hasNoData) {
+      // Create a flat line across the chart
+      spots = [FlSpot(0, widget.goalWeight), FlSpot(6, widget.goalWeight)];
+    } else if (widget.logs.length <= 1) {
+      spots = [
+        FlSpot(0, (widget.logs[0].weight as num).toDouble()),
+        FlSpot(1, (widget.logs[0].weight as num).toDouble()),
+      ];
+    } else {
+      spots = List.generate(
+        widget.logs.length,
+            (i) => FlSpot(i.toDouble(), (widget.logs[i].weight as num).toDouble()),
+      );
+    }
 
     return [
       LineChartBarData(
         spots: spots,
-        isCurved: !isSinglePoint,
+        isCurved: !hasNoData && widget.logs.length > 1,
         barWidth: 3,
-        color: activeColor, // ✅ Applied the dynamic color here
+        color: activeColor,
         dotData: const FlDotData(show: false),
         belowBarData: BarAreaData(
           show: true,
@@ -270,7 +305,7 @@ class _ProgressGraphState extends State<ProgressGraph> {
     ];
   }
 
-  FlTitlesData _buildTitlesData(BuildContext context, double yStep) {
+  FlTitlesData _buildTitlesData(BuildContext context, double yStep, bool hasNoData) {
     final int totalLogs = widget.logs.length;
 
     final int skipInterval = switch (totalLogs) {
@@ -297,21 +332,18 @@ class _ProgressGraphState extends State<ProgressGraph> {
       ),
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
-          showTitles: true,
+          showTitles: !hasNoData, // ✅ Only show date labels if we have logs
           interval: 1,
           reservedSize: 42,
           getTitlesWidget: (v, meta) {
             final int i = v.round();
-
-            if (i < 0 || i >= widget.logs.length) {
-              return const SizedBox.shrink();
-            }
+            if (i < 0 || i >= widget.logs.length) return const SizedBox.shrink();
 
             if (i % skipInterval != 0) {
               return const SizedBox.shrink();
             }
 
-            final d = widget.logs[i]['date'] as DateTime;
+            final d = widget.logs[i].date;
 
             return SideTitleWidget(
               meta: meta,

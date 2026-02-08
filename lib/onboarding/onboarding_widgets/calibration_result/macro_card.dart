@@ -58,8 +58,8 @@ class MacroCard extends StatelessWidget {
               color: AppColors.scaffoldBg(context),
               borderRadius: BorderRadius.circular(AppRadius.card),
               border: Border.all(
-                color: AppColors.border(context),
-                width: 1.5,
+                color: AppColors.border(context).withOpacity(0.5),
+                width: 1,
               ),
             ),
             child: Column(
@@ -72,7 +72,7 @@ class MacroCard extends StatelessWidget {
                     CircleAvatar(
                       radius: AppRadius.badge,
                       backgroundColor:
-                          AppColors.circularBg(context),
+                          Theme.of(context).colorScheme.onTertiary,
                       child: Icon(
                         icon,
                         size: 16,
@@ -86,7 +86,7 @@ class MacroCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.title.copyWith(
-                          color: AppColors.onPrimary(context),
+                          color: AppColors.primary(context),
                         ),
                       ),
                     ),
@@ -107,7 +107,7 @@ class MacroCard extends StatelessWidget {
                           painter: _RingPainter(
                             progress: 1,
                             color:
-                                AppColors.circularBg(context),
+                                Theme.of(context).colorScheme.onTertiary,
                             strokeWidth: strokeWidth,
                           ),
                         ),
@@ -126,7 +126,7 @@ class MacroCard extends StatelessWidget {
                             fontSize:
                                 max(12, 16 - shrink * 0.05),
                             color:
-                                AppColors.onPrimary(context),
+                                AppColors.primary(context),
                           ),
                         ),
                       ],
@@ -140,7 +140,7 @@ class MacroCard extends StatelessWidget {
                   child: Icon(
                     Icons.edit,
                     size: 16,
-                    color: AppColors.onPrimary(context),
+                    color: AppColors.primary(context),
                   ),
                 ),
               ],

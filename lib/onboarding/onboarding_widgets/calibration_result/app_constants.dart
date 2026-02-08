@@ -13,6 +13,10 @@ class AppColors {
   static Color onPrimary(BuildContext context) =>
       Theme.of(context).colorScheme.onPrimary;
 
+  static Color primary(BuildContext context) =>
+      Theme.of(context).colorScheme.primary;
+
+
   static Color border(BuildContext context) => Theme.of(context).dividerColor;
 
   static Color value(BuildContext context) => Theme.of(context).highlightColor;
@@ -84,8 +88,8 @@ class AppTextStyles {
 /// Shadows
 /// -------------------------------------------------------------------------
 class AppShadows {
-  static const List<BoxShadow> neumorphic = [
-    BoxShadow(color: Colors.black54, offset: Offset(4, 4), blurRadius: 6),
-    BoxShadow(color: Colors.white24, offset: Offset(-4, -4), blurRadius: 6),
+  static final List<BoxShadow> neumorphic = [
+    BoxShadow(color: Colors.black.withOpacity(0.2), offset: const Offset(0.5, 0.5), blurRadius: 1),
+    const BoxShadow(color: Colors.white24, offset: Offset(-0.5, -0.5), blurRadius: 1),
   ];
 }

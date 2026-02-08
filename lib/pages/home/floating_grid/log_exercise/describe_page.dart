@@ -1,10 +1,14 @@
 import 'package:calai/widgets/circle_back_button.dart';
+import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../api/exercise_api.dart';
-import '../../../../data/global_data.dart';
-import '../../../../data/user_data.dart';
+import '../../../../enums/exercise_enums.dart';
+import '../../../../providers/exercise_provider.dart';
+import '../../../../providers/user_provider.dart';
+import '../../../../services/calai_firestore_service.dart';
 
 class DescribePage extends ConsumerStatefulWidget {
   const DescribePage({super.key});
@@ -14,137 +18,97 @@ class DescribePage extends ConsumerStatefulWidget {
 }
 
 class _DescribePageState extends ConsumerState<DescribePage> {
-  // 1. Initialize the Controller
   final TextEditingController _descriptionController = TextEditingController();
 
   @override
   void dispose() {
-    // 2. Clean up the controller when the widget is disposed
     _descriptionController.dispose();
     super.dispose();
   }
 
-  void _onAdd() async {
+  Future<void> _onLogEntry() async {
     final String description = _descriptionController.text.trim();
+    if (description.isEmpty) return;
 
-    // Optional: Basic validation to prevent empty API calls
-    if (description.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please describe your exercise.')),
-      );
-      return;
-    }
-
-    final user = ref.read(userProvider);
-    final double weightKg = user.weight > 0 ? user.weight : 70.0;
-
-    try {
-      // 4. API CALL
-      final apiResponse = await ExerciseApi().getBurnedCalories(
-        weightKg: weightKg,
-        description: description, // TODO FIXED: Passed description from controller
-      );
-
-      debugPrint(apiResponse.toString());
-
-      // 5. EXTRACT DATA
-      final dynamic rawCalories = apiResponse['data']['calories_burned'];
-
-      final double burnedCalories = (rawCalories is num) ? rawCalories.toDouble() : 0.0;
-
-      // 6. FIREBASE LOG
-      await ref.read(globalDataProvider.notifier).logExerciseEntry(
-        burnedCalories: burnedCalories,
-        weightKg: weightKg,
-        exerciseType: apiResponse['data']['exercise'],
-        intensity: apiResponse['data']['intensity'],
-        durationMins: apiResponse['data']['duration_mins'],
-      );
-
-      // 7. Success & Close
-      if (mounted) {
-        Navigator.pop(context); // Close the current page
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('Logged exercise: ${burnedCalories.toInt()} kcal!')),
-        // );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    }
+    // Use the provider logic for "Natural Language" logging
+    // We pass duration 0 so the API knows to parse the description instead
+    await ref.read(exerciseLogProvider.notifier).logExerciseDescription(
+      description: description, // Pass the new description field
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        leading: const Padding(
-          padding: EdgeInsets.all(5),
-          child: CircleBackButton(),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Describe Exercise',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
+    // 1. Listen for state changes (Loading/Success/Error)
+    ref.listen<ExerciseLogState>(exerciseLogProvider, (previous, next) {
+      if (next.status == ExerciseLogStatus.loading) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+      } else if (next.status == ExerciseLogStatus.success) {
+        Navigator.of(context, rootNavigator: true).pop(); // Close loading
+        Navigator.pop(context); // Close DescribePage
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Exercise parsed and logged!')),
+        );
+        ref.read(exerciseLogProvider.notifier).reset();
+      } else if (next.status == ExerciseLogStatus.error) {
+        Navigator.of(context, rootNavigator: true).pop(); // Close loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${next.errorMessage}')),
+        );
+      }
+    });
 
-                // --- INPUT ---
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFF2F4F8),
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CustomAppBar(title: SizedBox.shrink()),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Describe Exercise',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.onTertiary.withOpacity(0.45),
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.black12)),
-                  child: TextField(
-                    controller: _descriptionController, // 3. Link the controller here
-                    maxLines: null, // Allows text to wrap
-                    decoration: const InputDecoration(
+                      border: Border.all(color: Colors.black12),
+                    ),
+                    child: TextField(
+                      controller: _descriptionController,
+                      decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'What did you do?',
-                        contentPadding: EdgeInsets.symmetric(vertical: 16)),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                        hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10,),
-                const Text('Example: Outdoor hiking for 5 hours, felt exhausted',
-                    style: TextStyle(fontSize: 12, color: Colors.grey))
-              ],
-            ),
-
-            // --- BUTTON ---
-            SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: ElevatedButton(
-                onPressed: _onAdd,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1A1C29),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                ),
-                child: const Text('Add',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white)),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Example: Outdoor hiking for 5 hours, felt exhausted',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          // --- BUTTON ---
+          ConfirmationButtonWidget(onConfirm: _onLogEntry)
+        ],
       ),
     );
   }

@@ -69,6 +69,7 @@ class SegmentedSelector<T> extends StatelessWidget {
                               color: Theme.of(context)
                                   .colorScheme
                                   .primary,
+                              fontSize: 12,
                             ),
                           ),
                         ),
