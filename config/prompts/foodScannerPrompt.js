@@ -12,8 +12,8 @@ const RESPONSE_SCHEMA = {
   nutrients: {
     protein: 45,
     carbs: 50,
-    fat: 10,
-    fiber: 5, 
+    fats: 10,
+    fibers: 5, 
     sugar: 2, 
     sodium: 150,
     calories: 200,
