@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:calai/core/constants/constants.dart';
 
 import '../../../widgets/animated_number.dart';
 
@@ -117,7 +116,7 @@ class _Header extends StatelessWidget {
             children: [
               // First digit slide
               AnimatedSlideNumber(
-                value: valueInt.toString().split("").first,
+                value: valueInt.abs().toString().split("").first,
                 style: valueStyle,
                 reverse: isTap,
               ),
@@ -134,8 +133,8 @@ class _Header extends StatelessWidget {
                   ),
                   child: Text(
                     isTap
-                        ? valueInt.toString().substring(1)
-                        : "${valueInt.toString().substring(1)}$unit",
+                        ? valueInt.abs().toString().substring(1)
+                        : "${valueInt.abs().toString().substring(1)}$unit",
                     key: ValueKey(isTap),
                     // REMOVE style: valueStyle here.
                     // Let it inherit from AnimatedDefaultTextStyle to enable font tweening.

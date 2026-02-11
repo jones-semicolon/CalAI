@@ -56,11 +56,9 @@ class OnboardingStep15 extends ConsumerWidget { // Changed to ConsumerWidget
             NoYesButton(
               onNo: () {
                 ref.read(userProvider.notifier).setRolloverCalories(false);
-                // TODO completed: Trigger settings rollover switch (false)
                 nextPage();
               },
               onYes: () {
-                // TODO completed: Trigger settings rollover switch
                 ref.read(userProvider.notifier).setRolloverCalories(true);
                 nextPage();
               },

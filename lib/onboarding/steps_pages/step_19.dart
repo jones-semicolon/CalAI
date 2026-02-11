@@ -19,8 +19,6 @@ class _OnboardingStep19State extends State<OnboardingStep19> {
   bool _subscriptionOpened = false;
   bool _isLoading = false;
   late final AnimationController _controller;
-  late final Animation<Offset> _slideAnimation;
-  late final Animation<double> _fadeAnimation;
 
   Future<void> _handleAction() async {
     // Skip subscription if already opened once

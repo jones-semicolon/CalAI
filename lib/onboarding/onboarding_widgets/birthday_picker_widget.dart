@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class BirthdayPickerWidget extends StatefulWidget {
   final ValueChanged<DateTime>? onChanged;
@@ -42,6 +43,7 @@ class _BirthdayPickerWidgetState extends State<BirthdayPickerWidget> {
       list.contains(value) ? list.indexOf(value) : 0;
 
   void _emit() {
+    HapticFeedback.selectionClick();
     widget.onChanged?.call(DateTime(year, month, day));
   }
 

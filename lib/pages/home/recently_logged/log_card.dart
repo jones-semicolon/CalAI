@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart'; // ✅ Import this
-
-import '../../../api/exercise_api.dart';
-import '../../../enums/exercise_enums.dart';
 import '../../../enums/food_enums.dart';
 import '../../../models/exercise_model.dart';
 import '../../../models/food_model.dart';
+import 'logged_view/logged_food_view.dart';
 
 class FoodLogCard extends StatelessWidget {
   final FoodLog food;
@@ -17,9 +15,10 @@ class FoodLogCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _BaseLogCard(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LoggedFoodView(foodLog: food))),
       onDelete: onDelete,
       leading: food.imageUrl != null
-          ? CircleAvatar(backgroundImage: NetworkImage(food.imageUrl!))
+          ? Image(image: NetworkImage(food.imageUrl!), fit: BoxFit.cover)
           : CircleAvatar(
         backgroundColor: Theme.of(context).cardColor,
         child: const Icon(Icons.restaurant),
@@ -81,6 +80,7 @@ class _BaseLogCard extends StatelessWidget {
   final String calories;
   final Widget bottom;
   final VoidCallback? onDelete;
+  final VoidCallback? onTap; // ✅ Added onTap
 
   const _BaseLogCard({
     required this.leading,
@@ -89,6 +89,7 @@ class _BaseLogCard extends StatelessWidget {
     required this.calories,
     required this.bottom,
     this.onDelete,
+    this.onTap, // ✅ Added to constructor
   });
 
   @override
@@ -99,7 +100,6 @@ class _BaseLogCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      // ✅ 1. Wrap EVERYTHING in a ClipRRect to force the rounded shape
       child: ClipRRect(
         borderRadius: BorderRadius.circular(cardRadius),
         child: Slidable(
@@ -127,48 +127,51 @@ class _BaseLogCard extends StatelessWidget {
               ),
             ],
           ),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(cardRadius),
-              // ✅ 3. Add the border to the Container as usual
-              border: Border.all(color: borderColor, width: 0.5),
-            ),
-            child: Row(
-              children: [
-                SizedBox(width: 48, height: 48, child: leading),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              title,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16),
-                              overflow: TextOverflow.ellipsis,
+          child: InkWell( // ✅ Added InkWell for ripple effect
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(cardRadius),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(cardRadius),
+                border: Border.all(color: borderColor, width: 0.5),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(width: 48, height: 48, child: leading),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                title,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                          Text(
-                            subtitle,
-                            style: TextStyle(color: Colors.grey[500], fontSize: 12),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(calories,
-                          style: const TextStyle(fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 6),
-                      bottom,
-                    ],
+                            Text(
+                              subtitle,
+                              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(calories,
+                            style: const TextStyle(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 6),
+                        bottom,
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

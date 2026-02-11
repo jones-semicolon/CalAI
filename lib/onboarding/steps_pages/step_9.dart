@@ -1,3 +1,4 @@
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../enums/user_enums.dart';
@@ -92,21 +93,14 @@ class _OnboardingStep9State extends ConsumerState<OnboardingStep9> {
             ),
           ),
 
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(
-              enabled: isEnable,
-              onNext: () {
-                if (selectedIndex != null) {
-                  final data = options[selectedIndex!];
+          ConfirmationButtonWidget(onConfirm: () {
+            if (selectedIndex != null) {
+              final data = options[selectedIndex!];
 
-                  userNotifier.setDietType(data.value);
-                  debugPrint('Diet type: $data');
-                }
-                widget.nextPage();
-              },
-            ),
-          ),
+              userNotifier.updateLocal((s) => s.copyWith(goal: s.goal.copyWith(dietType: data.value)));
+            }
+            widget.nextPage();
+          }, enabled: isEnable,)
         ],
       ),
     );

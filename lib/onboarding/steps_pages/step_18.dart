@@ -253,7 +253,7 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                       ),
                     ),
                   ],
-                  healthScoreProgress: 0.8,
+                  healthScoreProgress: 0.7,
                   healthScore: 5,
                   onHealthScoreTap: () {},
                 ),

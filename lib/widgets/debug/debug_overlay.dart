@@ -1,30 +1,34 @@
 import 'dart:convert';
 import 'package:calai/providers/global_provider.dart';
+import 'package:calai/models/food_model.dart'; // Ensure this is imported
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/user_provider.dart';
 
 class DebugOverlay extends ConsumerStatefulWidget {
-  const DebugOverlay({super.key});
+  final Food? food; // ✅ Add the food parameter
+
+  const DebugOverlay({super.key, this.food});
 
   @override
   ConsumerState<DebugOverlay> createState() => _DebugOverlayState();
 }
 
+// 0 = User, 1 = Global, 2 = Food
+enum DebugView { user, global, food }
+
 class _DebugOverlayState extends ConsumerState<DebugOverlay> {
   bool _isExpanded = false;
-  bool _showGlobal = true; // Toggle between User and Global data
+  DebugView _currentView = DebugView.global;
 
   @override
   Widget build(BuildContext context) {
-    // 1. WATCH both providers
     final user = ref.watch(userProvider);
     final globalAsync = ref.watch(globalDataProvider);
 
-    // 2. Format JSON strings
+    // 1. Format JSON strings
     final userJson = const JsonEncoder.withIndent('  ').convert(user.toJson());
 
-    // Handle Global Data (it's an AsyncValue)
     String globalJson = "Loading...";
     globalAsync.when(
       data: (state) => globalJson = const JsonEncoder.withIndent('  ').convert(state.toJson()),
@@ -32,8 +36,27 @@ class _DebugOverlayState extends ConsumerState<DebugOverlay> {
       loading: () => globalJson = "Loading Global State...",
     );
 
+    // ✅ Format the passed Food object
+    final foodJson = widget.food != null
+        ? const JsonEncoder.withIndent('  ').convert(widget.food!.toJson())
+        : "No Food Selected";
+
+    // Dynamic coloring based on view
+    final accentColor = _currentView == DebugView.global
+        ? Colors.cyanAccent
+        : _currentView == DebugView.user
+        ? Colors.greenAccent
+        : Colors.orangeAccent;
+
+    String activeJson;
+    switch (_currentView) {
+      case DebugView.user: activeJson = userJson; break;
+      case DebugView.global: activeJson = globalJson; break;
+      case DebugView.food: activeJson = foodJson; break;
+    }
+
     return Positioned(
-      top: 100, // Lowered slightly
+      top: 100,
       right: 0,
       child: Material(
         type: MaterialType.transparency,
@@ -42,11 +65,8 @@ class _DebugOverlayState extends ConsumerState<DebugOverlay> {
           height: _isExpanded ? 500 : 50,
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(0.85),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              bottomLeft: Radius.circular(12),
-            ),
-            border: Border.all(color: _showGlobal ? Colors.cyanAccent : Colors.greenAccent, width: 1.5),
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), bottomLeft: Radius.circular(12)),
+            border: Border.all(color: accentColor, width: 1.5),
           ),
           child: Column(
             children: [
@@ -58,23 +78,19 @@ class _DebugOverlayState extends ConsumerState<DebugOverlay> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(
-                          _isExpanded ? Icons.terminal : Icons.bug_report,
-                          color: _showGlobal ? Colors.cyanAccent : Colors.greenAccent,
-                          size: 20
-                      ),
+                      Icon(_isExpanded ? Icons.terminal : Icons.bug_report, color: accentColor, size: 20),
                       if (_isExpanded) ...[
                         Text(
-                          _showGlobal ? "GLOBAL STATE" : "USER MASTER",
-                          style: TextStyle(
-                            color: _showGlobal ? Colors.cyanAccent : Colors.greenAccent,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
+                          _currentView.name.toUpperCase(),
+                          style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 12),
                         ),
                         IconButton(
                           icon: const Icon(Icons.swap_horiz, color: Colors.white, size: 20),
-                          onPressed: () => setState(() => _showGlobal = !_showGlobal),
+                          onPressed: () => setState(() {
+                            // Cycle through the three views
+                            int next = (_currentView.index + 1) % DebugView.values.length;
+                            _currentView = DebugView.values[next];
+                          }),
                         ),
                       ],
                     ],
@@ -94,9 +110,9 @@ class _DebugOverlayState extends ConsumerState<DebugOverlay> {
                     ),
                     child: SingleChildScrollView(
                       child: Text(
-                        _showGlobal ? globalJson : userJson,
+                        activeJson,
                         style: TextStyle(
-                          color: _showGlobal ? Colors.cyanAccent.withOpacity(0.9) : Colors.greenAccent.withOpacity(0.9),
+                          color: accentColor.withOpacity(0.9),
                           fontSize: 11,
                           fontFamily: 'monospace',
                         ),

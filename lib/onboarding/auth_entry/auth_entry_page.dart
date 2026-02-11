@@ -53,7 +53,7 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
                               Text('🇺🇸', style: TextStyle(fontSize: 11)),
                               SizedBox(width: 4),
                               Text(
-                                'EN',  // TODO: store in storage connected to settings language
+                                'EN',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 11,
@@ -95,7 +95,7 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
                       style: TextStyle(
                         letterSpacing: 1,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSecondary,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                     ),
                   ),

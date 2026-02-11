@@ -56,7 +56,7 @@ class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClie
                   child: DayItem(
                     progressDays: global?.progressDays ?? {},
                     dailyCalories: global?.dailyNutrition ?? [],
-                    calorieGoal: global?.calorieGoal ?? 0,
+                    calorieGoal: global?.todayGoal.calories.toDouble() ?? 0,
                     selectedDateId: global?.activeDateId ?? '',
                     onDaySelected: (dateId) {
                       if (global != null) {

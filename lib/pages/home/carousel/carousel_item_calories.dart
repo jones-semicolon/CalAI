@@ -146,7 +146,7 @@ class _CalorieInfo extends StatelessWidget {
       color: Theme.of(context).colorScheme.primary,
     );
 
-    final valueString = value.toString();
+    final valueString = value.abs().toString();
 
     return Expanded(
       child: Column(

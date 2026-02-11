@@ -1,3 +1,4 @@
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../enums/user_enums.dart';
@@ -106,26 +107,19 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
             ),
           ),
 
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(
-              enabled: isEnable,
-              onNext: () {
-                if (selectedIndex != null) {
-                  final selectedOption = options[selectedIndex!];
+          ConfirmationButtonWidget(onConfirm: () {
+            if (selectedIndex != null) {
+              final selectedOption = options[selectedIndex!];
 
-                  // Update UserData.gender in Riverpod
-                  ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(activityLevel: selectedOption.value)));
+              // Update UserData.gender in Riverpod
+              ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(activityLevel: selectedOption.value)));
 
-                  debugPrint(
-                    'WorkoutPerWeek: ${selectedOption.value}',
-                  );
-                }
-                // TODO : this will post to api
-                widget.nextPage();
-              },
-            ),
-          ),
+              debugPrint(
+                'WorkoutPerWeek: ${selectedOption.value}',
+              );
+            }
+            widget.nextPage();
+          },enabled: isEnable)
         ],
       ),
     );

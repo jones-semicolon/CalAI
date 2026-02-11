@@ -1,3 +1,4 @@
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
@@ -44,8 +45,6 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
 
   @override
   Widget build(BuildContext context) {
-    final userNotifier = ref.read(userProvider.notifier);
-
     return SafeArea(
       child: Column(
         children: [
@@ -95,27 +94,25 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
             ),
           ),
 
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(
-              enabled: isEnable,
-              onNext: () {
-                if (selectedIndex != null) {
-                  final selectedOption = options[selectedIndex!];
+          ConfirmationButtonWidget(
+            onConfirm: () {
+              if (selectedIndex != null) {
+                final selectedOption = options[selectedIndex!];
 
-                  // Update UserData.gender in Riverpod
-                  ref.read(userProvider.notifier).updateLocal(
-                        (s) => s.copyWith(profile: s.profile.copyWith(gender: selectedOption.value)),
-                  );
-
-                  debugPrint(
-                    'Gender: ${selectedOption.value}',
-                  );
-                }
-
-                widget.nextPage();
-              },
-            ),
+                ref
+                    .read(userProvider.notifier)
+                    .updateLocal(
+                      (s) => s.copyWith(
+                        profile: s.profile.copyWith(
+                          gender: selectedOption.value,
+                        ),
+                      ),
+                    );
+                debugPrint('Gender: ${selectedOption.value}');
+              }
+              widget.nextPage();
+            },
+            enabled: isEnable,
           ),
         ],
       ),

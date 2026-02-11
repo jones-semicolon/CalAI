@@ -35,6 +35,7 @@ class FoodLog extends FoodBase {
   final String portion;
   final DateTime timestamp;
   final String? imageUrl;
+  final int? healthScore;
 
   const FoodLog({
     required this.id,
@@ -51,7 +52,9 @@ class FoodLog extends FoodBase {
     required super.sugar,
     required super.sodium,
     required super.water,
+    super.ingredients,
     this.imageUrl,
+    this.healthScore,
     super.otherNutrients,
   });
 
@@ -122,6 +125,46 @@ class FoodLog extends FoodBase {
     }
     return DateTime.now(); // Fallback
   }
+
+  FoodLog copyWith({
+    String? id,
+    String? foodId,
+    double? amount,
+    String? portion,
+    DateTime? timestamp,
+    String? name,
+    int? calories,
+    int? protein,
+    int? carbs,
+    int? fats,
+    int? fiber,
+    int? sugar,
+    int? sodium,
+    int? water,
+    String? imageUrl,
+    int? healthScore,
+    List<OtherNutrient>? otherNutrients,
+  }) {
+    return FoodLog(
+      id: id ?? this.id,
+      foodId: foodId ?? this.foodId,
+      amount: amount ?? this.amount,
+      portion: portion ?? this.portion,
+      timestamp: timestamp ?? this.timestamp,
+      name: name ?? this.name,
+      calories: calories ?? this.calories,
+      protein: protein ?? this.protein,
+      carbs: carbs ?? this.carbs,
+      fats: fats ?? this.fats,
+      fiber: fiber ?? this.fiber,
+      sugar: sugar ?? this.sugar,
+      sodium: sodium ?? this.sodium,
+      water: water ?? this.water,
+      imageUrl: imageUrl ?? this.imageUrl,
+      healthScore: healthScore ?? this.healthScore,
+      otherNutrients: otherNutrients ?? this.otherNutrients,
+    );
+  }
 }
 
 // 2. The Database Reference: A food template (e.g. "Banana - 100g")
@@ -132,6 +175,7 @@ class Food extends FoodBase {
   final String? parentFoodId;
   final String? ownerId;
   final Timestamp timestamp;
+  final int? healthScore;
 
   const Food({
     required this.id,
@@ -139,6 +183,7 @@ class Food extends FoodBase {
     this.parentFoodId,
     this.ownerId,
     this.imageUrl,
+    this.healthScore,
     required this.timestamp,
     required super.name,
     required super.calories,
@@ -194,39 +239,95 @@ class Food extends FoodBase {
     );
   }
 
-  factory Food.fromJson(Map<String, dynamic> json) {
-    final nutrients = json['nutrients'];
+  factory Food.fromFoodFact(Map<String, dynamic> json) {
+    final nutrients = json['nutrients'] ?? {};
+
+    // Helper to safely handle Null, int, and double
+    double toDouble(dynamic value) {
+      if (value == null) return 0.0;
+      if (value is num) return value.toDouble();
+      return 0.0;
+    }
 
     return Food(
-      // 1. Handle ID: Check 'id' (Firestore) OR 'fdcId' (USDA API)
-      id: json['id']?.toString() ?? json['fdcId']?.toString() ?? '',
+      id: json['barcode']?.toString() ?? '',
+      source: 'foodfacts',
+      timestamp: Timestamp.now(),
+      name: json['name']?.toString() ?? 'Unknown Food',
+      // ✅ Using the helper for all numeric fields
+      calories: toDouble(nutrients['calories']).toInt(),
+      protein: toDouble(nutrients['protein']).toInt(),
+      carbs: toDouble(nutrients['carbs']).toInt(),
+      fats: toDouble(nutrients['fats']).toInt(),
+      fiber: toDouble(nutrients['fibers']).toInt(),
+      sugar: toDouble(nutrients['sugar']).toInt(),
+      sodium: toDouble(nutrients['sodium']).toInt(),
+      water: toDouble(nutrients['water']).toInt(),
+      imageUrl: json['image_url']?.toString(),
+      healthScore: json['health_score'] as int?,
+      portions: [
+        FoodPortionItem(
+          label: json['serving_size']?.toString() ?? "Serving",
+          gramWeight: toDouble(json['servings_per_container']) > 0
+              ? toDouble(json['servings_per_container'])
+              : 100.0, // Fallback to 100g if missing
+        )
+      ],
+      // ingredients: json['ingredients'] ?? {},
+    );
+  }
+
+  factory Food.fromJson(Map<String, dynamic> json) {
+    // The backend now provides a flattened nutrients map
+    final nutrients = json['nutrients'] ?? {};
+
+    // Helper to safely convert any numeric type (int/double) to a double
+    double getValue(dynamic entry) {
+      if (entry == null) return 0.0;
+
+      // If it's a Map (like FDC data), look for 'amount'
+      if (entry is Map && entry.containsKey('amount')) {
+        final amt = entry['amount'];
+        return amt is num ? amt.toDouble() : 0.0;
+      }
+
+      // If it's already a number (like your Node.js scan/barcode data)
+      if (entry is num) {
+        return entry.toDouble();
+      }
+
+      return 0.0;
+    }
+
+    return Food(
+      // Handle Firestore 'id', barcode from Node.js, or USDA 'fdcId'
+      id: json['id']?.toString() ?? json['barcode']?.toString() ?? json['fdcId']?.toString() ?? '',
 
       source: json['source']?.toString() ?? 'unknown',
       parentFoodId: json['parentFoodId']?.toString() ?? '',
       ownerId: json['ownerId']?.toString(),
-      imageUrl: json['imageUrl']?.toString(),
+      imageUrl: json['image_url']?.toString() ?? json['imageUrl']?.toString(),
       name: json['name']?.toString() ?? 'Unknown Food',
 
-      // Nutrients with safety checks
-      calories: (nutrients['calories']?['amount'] as num?)?.toInt() ?? 0,
-      protein: (nutrients['proteins']?['amount'] as num?)?.toInt() ?? 0,
-      carbs: (nutrients['carbs']?['amount'] as num?)?.toInt() ?? 0,
-      fats: (nutrients['fats']?['amount'] as num?)?.toInt() ?? 0,
-      fiber: (nutrients['fiber']?['amount'] as num?)?.toInt() ?? 0,
-      sugar: (nutrients['sugar']?['amount'] as num?)?.toInt() ?? 0,
-      sodium: (nutrients['sodium']?['amount'] as num?)?.toInt() ?? 0,
-      water: (nutrients['water']?['amount'] as num?)?.toInt() ?? 0,
+      calories: getValue(nutrients['calories']).toInt(),
+      protein: getValue(nutrients['proteins'] ?? nutrients['protein']).toInt(),
+      carbs: getValue(nutrients['carbs'] ?? nutrients['carbohydrates']).toInt(),
+      fats: getValue(nutrients['fats'] ?? nutrients['fat']).toInt(),
+      fiber: getValue(nutrients['fibers'] ?? nutrients['fiber']).toInt(),
+      sugar: getValue(nutrients['sugar'] ?? nutrients['sugars']).toInt(),
+      sodium: getValue(nutrients['sodium']).toInt(),
+      water: getValue(nutrients['water']).toInt(),
 
       otherNutrients: json['other_nutrients'] != null
           ? (json['other_nutrients'] as List).map((e) => OtherNutrient.fromJson(e)).toList()
           : [],
 
-      // 2. Handle Portions: Your API returns 'portions', make sure to parse it!
       portions: json['portions'] != null
           ? (json['portions'] as List).map((e) => FoodPortionItem.fromJson(e)).toList()
           : [],
 
-      // 3. Fix Timestamp: If missing, default to Now
+      healthScore: json['health_score'] as int?,
+
       timestamp: json['timestamp'] != null
           ? Timestamp.fromDate(DateTime.parse(json['timestamp']))
           : Timestamp.now(),
@@ -250,9 +351,10 @@ class Food extends FoodBase {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       foodId: id,
       amount: amount,
-      portion: "$amount x $unit",
+      portion: unit,
       timestamp: DateTime.now(),
       name: name,
+      imageUrl: imageUrl,
       calories: scale(calories),
       protein: scale(protein),
       carbs: scale(carbs),
@@ -297,6 +399,18 @@ class OtherNutrient {
       name: (json['name'] ?? '').toString(),
       amount: (json['amount'] as num?)?.toDouble() ?? 0,
       unit: (json['unitName'] ?? json['unit'] ?? '').toString(),
+    );
+  }
+
+  OtherNutrient copyWith({
+    String? name,
+    double? amount,
+    String? unit,
+  }) {
+    return OtherNutrient(
+      name: name ?? this.name,
+      amount: amount ?? this.amount,
+      unit: unit ?? this.unit,
     );
   }
 }

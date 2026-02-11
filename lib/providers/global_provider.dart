@@ -257,7 +257,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
         'date': _service.todayId,
         'dailyGoals': {
           ...masterTargets.toJson(),
-          'weightGoal': masterTargets.targetWeight,
+          'weightGoal': masterTargets.weightGoal,
           'rollover': rolloverAmount,
         },
         'dailyProgress': {

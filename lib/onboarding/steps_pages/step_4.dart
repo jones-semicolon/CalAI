@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -69,37 +70,38 @@ class _OnboardingStep4State extends ConsumerState<OnboardingStep4> {
             ),
           ),
 
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(
-              enabled: isEnable,
-              onNext: () async {
-                if (selectedIndex != null) {
-                  final bool hasTried = options[selectedIndex!].value as bool;
-                  final uid = FirebaseAuth.instance.currentUser?.uid;
-
-                  if (uid != null) {
-                    // ✅ DIRECT TO FIRESTORE: Keep marketing data separate
-                    try {
-                      await FirebaseFirestore.instance
-                          .collection('onboarding_surveys')
-                          .doc(uid)
-                          .set({
-                        'hasTriedOtherApps': hasTried,
-                        'surveyStep': 4,
-                        'updatedAt': FieldValue.serverTimestamp(),
-                      }, SetOptions(merge: true));
-
-                      debugPrint('Survey Saved: Has tried apps = $hasTried');
-                    } catch (e) {
-                      debugPrint('Error saving survey step 4: $e');
-                    }
-                  }
-                }
-                widget.nextPage();
-              },
-            ),
-          ),
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: ContinueButton(
+          //     enabled: isEnable,
+          //     onNext: () async {
+          //       // if (selectedIndex != null) {
+          //       //   final bool hasTried = options[selectedIndex!].value as bool;
+          //       //   final uid = FirebaseAuth.instance.currentUser?.uid;
+          //       //
+          //       //   if (uid != null) {
+          //       //     // ✅ DIRECT TO FIRESTORE: Keep marketing data separate
+          //       //     try {
+          //       //       await FirebaseFirestore.instance
+          //       //           .collection('onboarding_surveys')
+          //       //           .doc(uid)
+          //       //           .set({
+          //       //         'hasTriedOtherApps': hasTried,
+          //       //         'surveyStep': 4,
+          //       //         'updatedAt': FieldValue.serverTimestamp(),
+          //       //       }, SetOptions(merge: true));
+          //       //
+          //       //       debugPrint('Survey Saved: Has tried apps = $hasTried');
+          //       //     } catch (e) {
+          //       //       debugPrint('Error saving survey step 4: $e');
+          //       //     }
+          //       //   }
+          //       // }
+          //       widget.nextPage();
+          //     },
+          //   ),
+          // ),
+          ConfirmationButtonWidget(onConfirm: widget.nextPage, enabled: isEnable,)
         ],
       ),
     );

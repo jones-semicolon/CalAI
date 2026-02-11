@@ -1,9 +1,9 @@
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
-import '../onboarding_widgets/continue_button.dart';
 
 class EncourageMessage extends ConsumerWidget {
   final VoidCallback nextPage;
@@ -26,12 +26,14 @@ class EncourageMessage extends ConsumerWidget {
 
     final user = ref.watch(userProvider);
     final unit = user.body.weightUnit;
+    final weightGoal = user.goal.targets.weightGoal;
+    final currentWeight = user.body.currentWeight;
 
-    final goalText = _goalLabel(user.body.currentWeight, user.goal.targetWeight!);
+    final goalText = _goalLabel(currentWeight, weightGoal.toDouble());
 
     final double weightDiff = unit == WeightUnit.kg
-        ? (user.goal.targetWeight! - user.body.currentWeight).abs()
-        : ((user.goal.targetWeight! - user.body.currentWeight) * _lbPerKg).abs();
+        ? (weightGoal - currentWeight).abs()
+        : ((weightGoal - currentWeight) * _lbPerKg).abs();
 
     final unitLabel = unit.value;
 
@@ -80,11 +82,8 @@ class EncourageMessage extends ConsumerWidget {
           ),
 
           const Spacer(),
-
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(enabled: true, onNext: nextPage),
-          ),
+          
+          ConfirmationButtonWidget(onConfirm: () => nextPage())
         ],
       ),
     );

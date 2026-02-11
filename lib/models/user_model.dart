@@ -181,7 +181,7 @@ class UserBiometrics {
 @immutable
 class UserGoal {
   final Goal? type;
-  final double? targetWeight; // This is a number (e.g. 75.0 kg)
+  // final double? targetWeight; // This is a number (e.g. 75.0 kg)
   final double? weeklyRate;
   final GoalFocus? motivation;
   final WorkoutFrequency? activityLevel;
@@ -194,7 +194,7 @@ class UserGoal {
 
   const UserGoal({
     this.type,
-    this.targetWeight,
+    // this.targetWeight,
     this.weeklyRate,
     this.motivation,
     this.activityLevel,
@@ -205,7 +205,7 @@ class UserGoal {
 
   Map<String, dynamic> toJson() => {
     'type': type?.name,
-    'weightGoal': targetWeight,
+    // 'weightGoal': targetWeight,
     'weeklyRate': weeklyRate,
     'motivation': motivation?.name,
     'activityLevel': activityLevel?.name,
@@ -219,7 +219,7 @@ class UserGoal {
       // ✅ Fix: Add ?? '' or a default value for every enum/string
       type: Goal.fromString(json['type'] ?? Goal.maintain.name),
 
-      targetWeight: (json['weightGoal'] as num?)?.toDouble(),
+      // targetWeight: (json['weightGoal'] as num?)?.toDouble(),
       weeklyRate: (json['weeklyRate'] as num?)?.toDouble() ?? 0.8,
 
       motivation: GoalFocus.fromString(json['motivation'] ?? GoalFocus.healthier.name),
@@ -249,7 +249,7 @@ class UserGoal {
   }) {
     return UserGoal(
       type: type ?? this.type,
-      targetWeight: targetWeight ?? this.targetWeight,
+      // targetWeight: targetWeight ?? this.targetWeight,
       weeklyRate: weeklyRate ?? this.weeklyRate,
       motivation: motivation ?? this.motivation,
       activityLevel: activityLevel ?? this.activityLevel,

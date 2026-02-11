@@ -1,3 +1,4 @@
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/user_provider.dart';
@@ -51,22 +52,32 @@ class _OnboardingStep7State extends ConsumerState<OnboardingStep7> {
 
           const Spacer(),
 
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(
-              enabled: true, // Birthday is never null based on your provider default
-              onNext: () {
-                // Finalize the selection in Riverpod
-                ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(profile: s.profile.copyWith(birthDay: selectedBirthday)));
-                
-                debugPrint(
-                  'Birthday: ${selectedBirthday.toIso8601String()}',
-                );
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: ContinueButton(
+          //     enabled: true, // Birthday is never null based on your provider default
+          //     onNext: () {
+          //       // Finalize the selection in Riverpod
+          //       ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(profile: s.profile.copyWith(birthDay: selectedBirthday)));
+          //
+          //       debugPrint(
+          //         'Birthday: ${selectedBirthday.toIso8601String()}',
+          //       );
+          //
+          //       widget.nextPage();
+          //     },
+          //   ),
+          // ),
+          ConfirmationButtonWidget(onConfirm: () {
+            // Finalize the selection in Riverpod
+            ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(profile: s.profile.copyWith(birthDay: selectedBirthday)));
 
-                widget.nextPage();
-              },
-            ),
-          ),
+            debugPrint(
+              'Birthday: ${selectedBirthday.toIso8601String()}',
+            );
+
+            widget.nextPage();
+          },)
         ],
       ),
     );

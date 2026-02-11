@@ -1,3 +1,4 @@
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -76,23 +77,17 @@ class _DemotivatedState extends ConsumerState<Demotivated> {
             ),
           ),
 
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(
-              enabled: isEnable,
-              onNext: () {
-                if (selectedIndex != null) {
-                  final selectedTitle = choices[selectedIndex!].title;
+          ConfirmationButtonWidget(onConfirm: () {
+            if (selectedIndex != null) {
+              final selectedTitle = choices[selectedIndex!].title;
 
-                  // ✅ FIXED: Update using the nested copyWith path
-                  userNotifier.setMaintenanceStrategy(selectedTitle);
-                  debugPrint('Goal Obstacle: $selectedTitle');
-                }
+              // ✅ FIXED: Update using the nested copyWith path
+              userNotifier.updateLocal((s) => s.copyWith(goal: s.goal.copyWith(maintenanceStrategy: selectedTitle)));
+              debugPrint('Goal Obstacle: $selectedTitle');
+            }
 
-                widget.nextPage();
-              },
-            ),
-          ),
+            widget.nextPage();
+          }, enabled: isEnable,)
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/confirmation_button_widget.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/weight_charts.dart';
@@ -12,7 +13,6 @@ class OnboardingStep5 extends StatefulWidget {
 }
 
 class _OnboardingStep5State extends State<OnboardingStep5> {
-  bool isEnable = false;
   int? selectedIndex;
 
   @override
@@ -42,15 +42,16 @@ class _OnboardingStep5State extends State<OnboardingStep5> {
             ),
           ),
 
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(
-              enabled: true,
-              onNext: () {
-                widget.nextPage();
-              },
-            ),
-          ),
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: ContinueButton(
+          //     enabled: true,
+          //     onNext: () {
+          //       widget.nextPage();
+          //     },
+          //   ),
+          // ),
+          ConfirmationButtonWidget(onConfirm: widget.nextPage)
         ],
       ),
     );

@@ -113,7 +113,7 @@ class _DailyRecommendationDashboardState
     double weightDiff;
 
     if (weightGoal != Goal.maintain) {
-      final double diffKg = (user.goal.targetWeight! - user.body.currentWeight).abs();
+      final double diffKg = (user.goal.targets.weightGoal - user.body.currentWeight).abs();
 
       weightDiff = unit == WeightUnit.kg ? diffKg : diffKg * 2.20462;
     } else {

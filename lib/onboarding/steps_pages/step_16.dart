@@ -1,4 +1,5 @@
 import 'package:calai/onboarding/onboarding_widgets/header.dart';
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../onboarding_widgets/continue_button.dart';
@@ -26,10 +27,7 @@ class OnboardingStep16 extends ConsumerWidget {
           ReferralCodeInput(onSubmit: _handleReferral),
 
           const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(enabled: true, onNext: nextPage),
-          ),
+          ConfirmationButtonWidget(onConfirm: nextPage)
         ],
       ),
     );

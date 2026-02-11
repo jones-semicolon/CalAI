@@ -21,7 +21,6 @@ class OnboardingStep14 extends ConsumerWidget { // Changed to ConsumerStatefulWi
               nextPage();
             },
             onYes: () {
-              // Complete the TODO: Trigger the switch in settings
               ref.read(userProvider.notifier).setAddCaloriesBurned(true);
               nextPage();
             },

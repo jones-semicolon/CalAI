@@ -140,6 +140,7 @@ class UserNotifier extends StateNotifier<User> {
   // -----------------------------------------------------------------------------
 
   Future<void> setTargetWeight(double target) async {
+    debugPrint(target.toString());
     if (target <= 20 || target > 500) return;
 
     final currentWeight = state.body.currentWeight;
@@ -263,7 +264,6 @@ final _initialUser = User(
     weightUnit: WeightUnit.kg,
   ),
   goal: const UserGoal( // Ensure this matches NutritionGoals.empty
-    targetWeight: 0,
     targets: NutritionGoals.empty,
     // Add other defaults if your constructor requires them
   ),

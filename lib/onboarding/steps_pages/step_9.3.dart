@@ -1,5 +1,6 @@
 import 'package:calai/onboarding/onboarding_widgets/header.dart';
 import 'package:calai/onboarding/onboarding_widgets/speed_prog_slider.dart';
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../enums/user_enums.dart';
@@ -22,7 +23,7 @@ class ProgressSpeed extends ConsumerWidget {
     debugPrint(userData.goal.weeklyRate.toString());
     final unit = userData.body.weightUnit;
     final weeklyRate = userData.goal.weeklyRate ?? 0.8; // Fallback to 0.0 if null
-    final targetWeight = userData.goal.targetWeight ?? userData.body.currentWeight;
+    final targetWeight = userData.goal.targets.weightGoal;
 
     final double displaySpeed = unit == WeightUnit.kg
         ? weeklyRate
@@ -31,7 +32,7 @@ class ProgressSpeed extends ConsumerWidget {
     final unitLabel = unit.value;
 
     // 3. Compare safely
-    final weightLabel = _goalLabel(userData.body.currentWeight, targetWeight);
+    final weightLabel = _goalLabel(userData.body.currentWeight, targetWeight.toDouble());
 
     return SafeArea(
       child: Column(
@@ -68,10 +69,8 @@ class ProgressSpeed extends ConsumerWidget {
           ),
 
           const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(enabled: true, onNext: nextPage),
-          ),
+
+          ConfirmationButtonWidget(onConfirm: () => nextPage())
         ],
       ),
     );

@@ -36,7 +36,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                   data: (global) {
                     // --- DATA PREPARATION ---
                     final progress = global.todayProgress;
-                    final calorieGoal = global.calorieGoal;
+                    final calorieGoal = global.todayGoal.calories;
 
                     // Targets from User Profile (Ratios)
                     final targets = user.goal.targets;

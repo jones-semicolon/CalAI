@@ -26,14 +26,7 @@ class NoYesButton extends StatelessWidget {
           bottom: 20,
         ),
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              offset: const Offset(0, -4),
-              blurRadius: 6,
-            ),
-          ],
+          color: Colors.transparent,
         ),
         child: Row(
           children: [

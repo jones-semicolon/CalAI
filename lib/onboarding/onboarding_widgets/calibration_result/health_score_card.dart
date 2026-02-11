@@ -37,7 +37,7 @@ class HealthScoreCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.medium),
               decoration: BoxDecoration(
-                color: AppColors.circularBg(context),
+                color: Theme.of(context).colorScheme.onTertiary,
                 borderRadius: BorderRadius.circular(AppRadius.badge),
               ),
               child: Icon(
@@ -64,7 +64,7 @@ class HealthScoreCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '$score/$maxScore',
+                        '${(progress * 10).toStringAsFixed(0)}/$maxScore',
                         style: AppTextStyles.title.copyWith(
                           color: AppColors.primary(context),
                           fontWeight: FontWeight.w900,

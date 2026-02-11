@@ -51,7 +51,7 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
 
             // 3. Extract and Process Data using the provider's logic methods
             final weightLogs = global.weightLogs;
-            final goalWeight = global.goalWeight;
+            final goalWeight = global.todayGoal.weightGoal.toDouble();
 
             // Math & Filtering operations (Pure Logic)
             final filteredWeightLogs = provider.getFilteredLogs(weightLogs, _selectedRange);
@@ -92,7 +92,6 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
                     const SizedBox(height: 25),
 
                     // --- WEIGHT GRAPH (Line) ---
-                    //
                     ProgressGraph(
                       selectedRange: _selectedRange,
                       onRangeChanged: (r) => setState(() => _selectedRange = r),
@@ -107,10 +106,9 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
                     const SizedBox(height: 25),
 
                     // --- NUTRITION GRAPH (Bar) ---
-                    //
                     ProgressBarGraph(
                       dailyNutrition: global.dailyNutrition,
-                      caloriesIntakePerDay: global.calorieGoal,
+                      caloriesIntakePerDay: global.todayGoal.calories.toDouble(),
                     ),
 
                     const SizedBox(height: 25),

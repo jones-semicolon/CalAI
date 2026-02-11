@@ -23,7 +23,7 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
 
   // UI ruler config
   static const double _scale = 0.8;
-  static const double _baseTickSpacing = 12.0;
+  static const double _baseTickSpacing = 8.0;
 
   static const double _shortTickHeight = 16.0;
   static const double _tallTickHeight = 32.0;
@@ -129,7 +129,7 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
     _displayedWeightKg.value = snappedKg;
 
     // ✅ update provider only once
-    ref.read(userProvider.notifier).setTargetWeight(snappedKg);
+    ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(targetWeight: snappedKg)));
 
     // ✅ optional haptic (only after snap)
     HapticFeedback.selectionClick();
@@ -154,7 +154,8 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
     final unit = ref.watch(userProvider).body.weightUnit;
     final user = ref.watch(userProvider);
 
-    final width = MediaQuery.of(context).size.width;
+    final horizontalPadding = 24.0;
+    final width = MediaQuery.of(context).size.width - (horizontalPadding * 2);
     final totalHeight = 110.0;
     final rulerHeight = totalHeight / 1.5;
 
@@ -226,144 +227,147 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
       ),
     );
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-      UnitToggle(
-      unit: unit,
-      onChanged: (u) {
-          ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(
-            body: s.body.copyWith(weightUnit: u), // ✅ Correct: Returns User
-          ));
-        },
-      ),
-
-        const SizedBox(height: 30),
-
-        // ✅ ONLY THIS TEXT REBUILDS (smooth)
-        ValueListenableBuilder<double>(
-          valueListenable: _displayedWeightKg,
-          builder: (_, valueKg, _) {
-            return Column(
-              children: [
-                Text(
-                  _goalLabel(user.body.currentWeight, valueKg),
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '${_format(valueKg, unit)} ${unit.value}',
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ],
-            );
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+        UnitToggle(
+        unit: unit,
+        onChanged: (u) {
+            ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(
+              body: s.body.copyWith(weightUnit: u), // ✅ Correct: Returns User
+            ));
           },
         ),
 
-        const SizedBox(height: 20),
+          const SizedBox(height: 30),
 
-        SizedBox(
-          height: totalHeight,
-          width: double.infinity,
-          // ✅ FIXED: AnimatedBuilder ensures overlay elements move exactly with scroll
-          child: AnimatedBuilder(
-              animation: _scrollCtrl,
-              child: rulerList, // Pass the expensive list as a child
-              builder: (context, child) {
-                final scrollOffset = _scrollCtrl.hasClients ? _scrollCtrl.offset : 0.0;
+          // ✅ ONLY THIS TEXT REBUILDS (smooth)
+          ValueListenableBuilder<double>(
+            valueListenable: _displayedWeightKg,
+            builder: (_, valueKg, _) {
+              return Column(
+                children: [
+                  Text(
+                    _goalLabel(user.body.currentWeight, valueKg),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '${_format(valueKg, unit)} ${unit.value}',
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
 
-                // Helper to find the CENTER of a tick slot
-                double getTickCenter(double kg) {
-                  // Start of the list content + offset to specific Kg + half a tick width (center) - scrolled amount
-                  return listPadding + _offsetFromKg(kg) + (_tickSpacing / 2) - scrollOffset;
-                }
+          const SizedBox(height: 20),
 
-                final currentWeightCenter = getTickCenter(user.body.currentWeight);
-                final indicatorCenter = width / 2; // Fixed center of screen
+          SizedBox(
+            height: totalHeight,
+            width: double.infinity,
+            // ✅ FIXED: AnimatedBuilder ensures overlay elements move exactly with scroll
+            child: AnimatedBuilder(
+                animation: _scrollCtrl,
+                child: rulerList, // Pass the expensive list as a child
+                builder: (context, child) {
+                  final scrollOffset = _scrollCtrl.hasClients ? _scrollCtrl.offset : 0.0;
 
-                final gradientLeft = math.min(currentWeightCenter, indicatorCenter);
-                final gradientWidth = (indicatorCenter - currentWeightCenter).abs();
+                  // Helper to find the CENTER of a tick slot
+                  double getTickCenter(double kg) {
+                    // Start of the list content + offset to specific Kg + half a tick width (center) - scrolled amount
+                    return listPadding + _offsetFromKg(kg) + (_tickSpacing / 2) - scrollOffset;
+                  }
 
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    SizedBox(
-                      height: rulerHeight,
-                      width: double.infinity,
-                      child: ClipRect(
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // gradient current ↔ target
-                            if (gradientWidth > 0)
-                              Positioned(
-                                left: gradientLeft,
-                                bottom: 0,
-                                child: SizedBox(
-                                  width: gradientWidth,
-                                  height: _tallTickHeight * _scale + 30,
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          theme.colorScheme.primary.withOpacity(0.25),
-                                          Colors.transparent,
-                                        ],
+                  final currentWeightCenter = getTickCenter(user.body.currentWeight);
+                  final indicatorCenter = width / 2; // Fixed center of screen
+
+                  final gradientLeft = math.min(currentWeightCenter, indicatorCenter);
+                  final gradientWidth = (indicatorCenter - currentWeightCenter).abs();
+
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      SizedBox(
+                        height: rulerHeight,
+                        width: double.infinity,
+                        child: ClipRect(
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // gradient current ↔ target
+                              if (gradientWidth > 0)
+                                Positioned(
+                                  left: gradientLeft,
+                                  bottom: 0,
+                                  child: SizedBox(
+                                    width: gradientWidth,
+                                    height: _tallTickHeight * _scale + 30,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            theme.colorScheme.primary.withOpacity(0.25),
+                                            Colors.transparent,
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
+
+                              // Ruler List (passed from child to avoid rebuilds)
+                              child!,
+
+                              // center indicator
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Container(
+                                  height: (_tallTickHeight + _indicatorTopExtra) * _scale + 30,
+                                  width: 2.5,
+                                  color: theme.colorScheme.primary,
+                                ),
                               ),
-
-                            // Ruler List (passed from child to avoid rebuilds)
-                            child!,
-
-                            // center indicator
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Container(
-                                height: (_tallTickHeight + _indicatorTopExtra) * _scale + 30,
-                                width: 2.5,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // current label
-                    // ✅ FIXED: Accurately centered on the tick line using SizedBox + Center
-                    Positioned(
-                      left: currentWeightCenter - 50, // Center a 100px wide box on the tick
-                      width: 100,
-                      top: rulerHeight + 6,
-                      child: Center(
-                        child: Text(
-                          '${_format(user.body.currentWeight, unit)} ${unit.value}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary,
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              }
+
+                      // current label
+                      // ✅ FIXED: Accurately centered on the tick line using SizedBox + Center
+                      Positioned(
+                        left: currentWeightCenter - 50, // Center a 100px wide box on the tick
+                        width: 100,
+                        top: rulerHeight + 6,
+                        child: Center(
+                          child: Text(
+                            '${_format(user.body.currentWeight, unit)} ${unit.value}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

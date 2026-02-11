@@ -1,3 +1,4 @@
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
@@ -18,15 +19,8 @@ class _OnboardingStep11State extends State<OnboardingStep11> {
         children: [
           Header(title: 'You have great potential to crush your goal'),
           Spacer(), // Animation
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(
-              enabled: true,
-              onNext: () {
-                widget.nextPage();
-              },
-            ),
-          ),
+          
+          ConfirmationButtonWidget(onConfirm: () => widget.nextPage())
         ],
       ),
     );

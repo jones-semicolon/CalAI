@@ -27,8 +27,7 @@ abstract class Nutrition {
 }
 
 class NutritionGoals extends Nutrition {
-  // TODO must be weightGoal
-  final int targetWeight;
+  final int weightGoal;
   final int rollover;
 
   const NutritionGoals({
@@ -40,8 +39,8 @@ class NutritionGoals extends Nutrition {
     super.sugar,
     super.sodium,
     super.water,
-    super.steps = 1000,
-    this.targetWeight = 0, // ✅ Make it optional with a default
+    super.steps = 10000,
+    this.weightGoal = 0, // ✅ Make it optional with a default
     this.rollover = 0,
   });
 
@@ -57,11 +56,9 @@ class NutritionGoals extends Nutrition {
       fiber: val('fiberGoal') ?? 0,
       sugar: val('sugarGoal') ?? 0,
       sodium: val('sodiumGoal') ?? 0,
-      // TODO must be 64
-      water: val('waterGoal') ?? 70,
-      // TODO must be 10000
-      steps: val('stepsGoal') ?? 1000,
-      targetWeight: val('weightGoal') ?? 0 ,
+      water: val('waterGoal') ?? 64,
+      steps: val('stepsGoal') ?? 10000,
+      weightGoal: val('weightGoal') ?? 0 ,
       rollover: val('rollover') ?? 0,
     );
   }
@@ -76,7 +73,7 @@ class NutritionGoals extends Nutrition {
     'sodiumGoal': sodium,
     'waterGoal': water,
     'stepsGoal': steps,
-    'weightGoal': targetWeight,
+    'weightGoal': weightGoal,
     'rollover': rollover,
   };
 
@@ -105,7 +102,7 @@ class NutritionGoals extends Nutrition {
       sodium: sodium ?? this.sodium,
       water: water ?? this.water,
       steps: steps ?? this.steps,
-      targetWeight: targetWeight ?? this.targetWeight,
+      weightGoal: targetWeight ?? this.weightGoal,
       rollover: rollover ?? this.rollover,
     );
   }

@@ -1,3 +1,4 @@
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/loading_widget/health_plan_loading_widget.dart';
@@ -67,10 +68,7 @@ class _OnboardingStep17State extends State<OnboardingStep17> {
           const Spacer(),
 
           // Continue button
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(enabled: true, onNext: widget.nextPage),
-          ),
+          ConfirmationButtonWidget(onConfirm: widget.nextPage)
         ],
       ),
     );

@@ -107,24 +107,21 @@ class CalaiFirestoreService {
     // 1. Update Master Profile
     batch.update(userDoc, {
       'body.currentWeight': weight,
-      if (newTargetWeight != null) 'goal.targetWeight': newTargetWeight,
+      if (newTargetWeight != null)
+        'goal.dailyGoals.weightGoal': newTargetWeight,
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
     // 2. Update Today's Daily Log
-    batch.set(dailyLogDoc(dateKey), {
-      'dailyProgress': {'weight': weight},
-      if (newTargetWeight != null) 'dailyGoals': {'weightGoal': newTargetWeight},
+    batch.update(dailyLogDoc(dateKey), {
+      'dailyProgress.weight': weight,
+      if (newTargetWeight != null) 'dailyGoals.weightGoal': newTargetWeight,
       'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+    });
 
     final Map<String, dynamic> historyUpdate = {
-      'history': {
-        dateKey: {
-          'w': weight,
-          'date': dateKey,
-        },
-      },
+      'history.$dateKey.w': weight,
+      'history.$dateKey.date': dateKey,
       'lastUpdated': FieldValue.serverTimestamp(),
     };
 
@@ -132,7 +129,8 @@ class CalaiFirestoreService {
       historyUpdate['targetWeight'] = newTargetWeight;
     }
 
-    batch.set(weightHistory, historyUpdate, SetOptions(merge: true));
+    // Use update or set with merge for history
+    batch.update(weightHistory, historyUpdate);
 
     await batch.commit();
   }
@@ -233,6 +231,67 @@ class CalaiFirestoreService {
     await batch.commit();
   }
 
+  Future<void> updateFoodEntry(FoodLog oldItem, FoodLog newItem) async {
+    if (uid == null) return;
+
+    final DateTime targetDate = newItem.timestamp;
+    final String dateString = DateFormat('yyyy-MM-dd').format(targetDate);
+    final dayRef = dailyLogDoc(dateString);
+
+    final String weekId = getWeekId(targetDate);
+    final String dayName = getDayName(targetDate);
+
+    final batch = _db.batch();
+    final entryRef = dayRef.collection('entries').doc(newItem.id);
+
+    // 1. Calculate the Delta (Difference)
+    // If you ate 500kcal before and now it's 300kcal, we increment by -200.
+    final int diffCalories = newItem.calories - oldItem.calories;
+    final int diffProtein = newItem.protein - oldItem.protein;
+    final int diffCarbs = newItem.carbs - oldItem.carbs;
+    final int diffFats = newItem.fats - oldItem.fats;
+    final int diffSodium = newItem.sodium - oldItem.sodium;
+    final int diffSugar = newItem.sugar - oldItem.sugar;
+    final int diffFiber = newItem.fiber - oldItem.fiber;
+    final int diffWater = newItem.water - oldItem.water;
+
+    // 2. Update the specific entry document
+    batch.update(entryRef, {
+      ...newItem.toJson(),
+      'timestamp': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    // 3. Adjust Daily Totals using the Delta
+    batch.set(dayRef, {
+      'dailyProgress': {
+        'caloriesEaten': FieldValue.increment(diffCalories),
+        'protein': FieldValue.increment(diffProtein),
+        'carbs': FieldValue.increment(diffCarbs),
+        'fats': FieldValue.increment(diffFats),
+        'sodium': FieldValue.increment(diffSodium),
+        'sugar': FieldValue.increment(diffSugar),
+        'fiber': FieldValue.increment(diffFiber),
+        'water': FieldValue.increment(diffWater),
+      },
+    }, SetOptions(merge: true));
+
+    // 4. Adjust Weekly Stats using the Delta
+    batch.set(weeklyNutritionDoc, {
+      weekId: {
+        dayName: {
+          'p': FieldValue.increment(diffProtein),
+          'c': FieldValue.increment(diffCarbs),
+          'f': FieldValue.increment(diffFats),
+          'kc': FieldValue.increment(diffCalories),
+        },
+      },
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    await batch.commit();
+  }
+
   Future<void> logExerciseEntry({
     required ExerciseLog exercise,
     String? dateId,
@@ -324,17 +383,16 @@ class CalaiFirestoreService {
 
     final batch = _db.batch();
 
-    // 1. Update Root (Nested under goal)
+    // 1. Update Root (Using Dot Notation to preserve other goal fields)
     batch.update(userDoc, {
-      'goal.targetWeight': weight, // ✅ Nested Correctly
-      'goal.type': goalType.name, // ✅ Enum -> String
+      'goal.type': goalType.name,       // ✅ And here
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
     // 2. Update Today's Log
-    batch.set(dailyLogDoc(todayId), {
-      'goal.dailyGoals': {'weightGoal': weight},
-    }, SetOptions(merge: true));
+    batch.update(dailyLogDoc(todayId), {
+      'dailyGoals.weightGoal': weight,
+    });
 
     await batch.commit();
   }
@@ -362,7 +420,7 @@ class CalaiFirestoreService {
     if (dailyGoals != null) {
       debugPrint("🔍 Calculated Goals: $dailyGoals");
 
-      dailyGoals['weightGoal'] = user.goal.targetWeight;
+      dailyGoals['weightGoal'] = user.goal.targets.weightGoal;
 
       if (save) {
         // We save this to 'dailyGoals' so it is easily accessible
@@ -452,7 +510,7 @@ class CalaiFirestoreService {
 
     final goalData = data['goal'] as Map<String, dynamic>?;
     final target =
-        goalData?['targetWeight'] ?? data['dailyGoals']?['weightGoal'];
+        goalData?['weightGoal'] ?? data['dailyGoals']?['weightGoal'];
 
     return target != null ? (target as num).toDouble() : null;
   }

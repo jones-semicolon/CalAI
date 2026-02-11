@@ -38,7 +38,7 @@ class _WeightPickerState extends ConsumerState<WeightPicker> {
 
   // UI ruler config
   static const double _scale = 0.8;
-  static const double _baseTickSpacing = 12.0;
+  static const double _baseTickSpacing = 8.0;
 
   static const double _shortTickHeight = 16.0;
   static const double _tallTickHeight = 32.0;
@@ -104,6 +104,7 @@ class _WeightPickerState extends ConsumerState<WeightPicker> {
 
   // ✅ snap ONCE after scroll ends (no jitter)
   void _snapToNearestTick() {
+    HapticFeedback.selectionClick();
     if (!_scrollCtrl.hasClients) return;
     final tick = _tickFromOffset(_scrollCtrl.offset);
     final snappedKg = _kgFromTick(tick);
@@ -111,7 +112,6 @@ class _WeightPickerState extends ConsumerState<WeightPicker> {
     _scrollCtrl.animateTo(tick * _tickSpacing, duration: const Duration(milliseconds: 200), curve: Curves.easeOutCubic);
     _displayedWeightKg.value = snappedKg;
     widget.onWeightChanged(snappedKg);
-    HapticFeedback.selectionClick();
   }
   // ----------------------------
   // UI
@@ -121,7 +121,9 @@ class _WeightPickerState extends ConsumerState<WeightPicker> {
   Widget build(BuildContext context) {
     final unit = widget.unit;
 
-    final width = MediaQuery.of(context).size.width;
+    final double horizontalPadding = 24;
+
+    final width = MediaQuery.of(context).size.width - (horizontalPadding * 2);
     final totalHeight = 110.0;
     final rulerHeight = totalHeight / 1.5;
 
@@ -196,141 +198,144 @@ class _WeightPickerState extends ConsumerState<WeightPicker> {
       ),
     );
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        UnitToggle(
-          unit: unit,
-          onChanged: (u) {
-            ref.read(userProvider.notifier).updateLocal(
-                  (state) => state.copyWith(
-                body: state.body.copyWith(weightUnit: u),
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 30),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          UnitToggle(
+            unit: unit,
+            onChanged: (u) {
+              ref.read(userProvider.notifier).updateLocal(
+                    (state) => state.copyWith(
+                  body: state.body.copyWith(weightUnit: u),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 30),
 
-        // ✅ ONLY THIS TEXT REBUILDS (smooth)
-        ValueListenableBuilder<double>(
-          valueListenable: _displayedWeightKg,
-          builder: (_, valueKg, __) {
-            return Column(
-              children: [
-                if (widget.labelBuilder != null)
+          // ✅ ONLY THIS TEXT REBUILDS (smooth)
+          ValueListenableBuilder<double>(
+            valueListenable: _displayedWeightKg,
+            builder: (_, valueKg, __) {
+              return Column(
+                children: [
+                  if (widget.labelBuilder != null)
+                    Text(
+                      widget.labelBuilder!(widget.referenceWeight, valueKg),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   Text(
-                    widget.labelBuilder!(widget.referenceWeight, valueKg),
+                    '${_format(valueKg)} ${widget.unit.value}',
                     style: TextStyle(
-                      fontSize: 16,
-                      color: theme.colorScheme.primary,
+                      fontSize: 36,
                       fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
                     ),
                   ),
-                Text(
-                  '${_format(valueKg)} ${widget.unit.value}',
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+                ],
+              );
+            },
+          ),
 
-        const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-        SizedBox(
-          height: totalHeight,
-          width: double.infinity,
-          // ✅ FIXED: AnimatedBuilder ensures overlay elements move exactly with scroll
-          child: AnimatedBuilder(
-            animation: _scrollCtrl,
-            child: rulerList,
-              builder: (context, child) {
-                final scrollOffset = _scrollCtrl.hasClients ? _scrollCtrl.offset : _offsetFromKg(widget.initialWeight);
+          SizedBox(
+            height: totalHeight,
+            width: double.infinity,
+            // ✅ FIXED: AnimatedBuilder ensures overlay elements move exactly with scroll
+            child: AnimatedBuilder(
+              animation: _scrollCtrl,
+              child: rulerList,
+                builder: (context, child) {
+                  final scrollOffset = _scrollCtrl.hasClients ? _scrollCtrl.offset : _offsetFromKg(widget.initialWeight);
 
-                // 1. Calculate the horizontal position of any KG value on the screen
-                double getPositionOfKg(double kg) {
-                  return listPadding + _offsetFromKg(kg) + (_tickSpacing / 2) - scrollOffset;
-                }
+                  // 1. Calculate the horizontal position of any KG value on the screen
+                  double getPositionOfKg(double kg) {
+                    return listPadding + _offsetFromKg(kg) + (_tickSpacing / 2) - scrollOffset;
+                  }
 
-                // 2. The positions we care about
-                final referenceX = getPositionOfKg(widget.referenceWeight); // The 72.7 kg tick
-                final needleX = width / 2;                                   // The center red/black line
+                  // 2. The positions we care about
+                  final referenceX = getPositionOfKg(widget.referenceWeight); // The 72.7 kg tick
+                  final needleX = width / 2;                                   // The center red/black line
 
-                // 3. Define the shadow box
-                final gradientWidth = (needleX - referenceX).abs();
-                final gradientLeft = math.min(referenceX, needleX);
+                  // 3. Define the shadow box
+                  final gradientWidth = (needleX - referenceX).abs();
+                  final gradientLeft = math.min(referenceX, needleX);
 
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    SizedBox(
-                      height: rulerHeight,
-                      child: ClipRect(
-                        child: Stack(
-                          children: [
-                            // ✅ THE FIXED SHADOW
-                            if (widget.showReferenceLine && gradientWidth > 1)
-                              Positioned(
-                                left: gradientLeft,
-                                bottom: 0,
-                                child: Container(
-                                  width: gradientWidth,
-                                  height: rulerHeight,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        theme.colorScheme.primary.withOpacity(0.15),
-                                        Colors.transparent,
-                                      ],
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      SizedBox(
+                        height: rulerHeight,
+                        child: ClipRect(
+                          child: Stack(
+                            children: [
+                              // ✅ THE FIXED SHADOW
+                              if (widget.showReferenceLine && gradientWidth > 1)
+                                Positioned(
+                                  left: gradientLeft,
+                                  bottom: 0,
+                                  child: Container(
+                                    width: gradientWidth,
+                                    height: rulerHeight,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          theme.colorScheme.primary.withOpacity(0.15),
+                                          Colors.transparent,
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
+
+                              child!, // The Ruler List
+
+                              // Center Needle
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Container(
+                                  height: (_tallTickHeight + _indicatorTopExtra) * _scale + 30,
+                                  width: 2.5,
+                                  color: theme.colorScheme.primary,
+                                ),
                               ),
-
-                            child!, // The Ruler List
-
-                            // Center Needle
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Container(
-                                height: (_tallTickHeight + _indicatorTopExtra) * _scale + 30,
-                                width: 2.5,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // Reference Label (72.7 kg)
-                    if (widget.showReferenceLine)
-                      Positioned(
-                        left: referenceX - 50,
-                        width: 100,
-                        top: rulerHeight + 6,
-                        child: Center(
-                          child: Text(
-                            '${_format(widget.referenceWeight)} ${widget.unit.value}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary,
-                            ),
+                            ],
                           ),
                         ),
                       ),
-                  ],
-                );
-              }          ),
-        ),
-      ],
+
+                      // Reference Label (72.7 kg)
+                      if (widget.showReferenceLine)
+                        Positioned(
+                          left: referenceX - 50,
+                          width: 100,
+                          top: rulerHeight + 6,
+                          child: Center(
+                            child: Text(
+                              '${_format(widget.referenceWeight)} ${widget.unit.value}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                }          ),
+          ),
+        ],
+      ),
     );
   }
 }

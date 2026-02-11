@@ -16,12 +16,6 @@ class GlobalDataState {
   final List<DailyNutrition> dailyNutrition;
   final List<WeightLog> weightLogs;
 
-  // Graphs & Dashboard Fallbacks
-  //TODO repetition on NutritionGoals
-  final double goalWeight;
-  //TODO repetition on NutritionGoals
-  final double calorieGoal;
-
   // Metadata for Calendar dots and history
   final Set<String> progressDays;
 
@@ -30,10 +24,8 @@ class GlobalDataState {
     required this.activeDateId,
     required this.todayProgress,
     required this.weightLogs,
-    required this.goalWeight,
     required this.progressDays,
     required this.dailyNutrition, // ✅ Updated field
-    required this.calorieGoal,
     required this.todayGoal,
   });
 
@@ -42,10 +34,8 @@ class GlobalDataState {
     activeDateId: DateTime.now().toIso8601String().split('T').first,
     todayProgress: NutritionProgress.empty,
     weightLogs: const [],
-    goalWeight: 0,
     progressDays: const {},
     dailyNutrition: const [], // ✅ Updated field
-    calorieGoal: 0,
     todayGoal: NutritionGoals.empty,
   );
 
@@ -53,7 +43,7 @@ class GlobalDataState {
 
   int effectiveCalorieGoal(bool isAddCalorieBurnEnabled, bool isRolloverEnabled) {
     // Prioritizes today's log goal, falls back to master profile goal
-    final int baseGoal = (todayGoal.calories > 0) ? todayGoal.calories : calorieGoal.toInt();
+    final int baseGoal = (todayGoal.calories > 0) ? todayGoal.calories : 0;
 
     int total = baseGoal;
     if (isRolloverEnabled) total += todayGoal.rollover;
@@ -80,10 +70,8 @@ class GlobalDataState {
       'activeDateId': activeDateId,
       'todayProgress': todayProgress.toJson(),
       'weightLogs': weightLogs.map((e) => e.toJson()).toList(),
-      'goalWeight': goalWeight,
       'progressDays': progressDays.toList(),
       'dailyNutrition': dailyNutrition.map((e) => e.toJson()).toList(), // ✅ Updated
-      'calorieGoal': calorieGoal,
       'todayGoal': todayGoal.toJson(),
     };
   }
@@ -104,10 +92,8 @@ class GlobalDataState {
       activeDateId: activeDateId ?? this.activeDateId,
       todayProgress: todayProgress ?? this.todayProgress,
       weightLogs: weightLogs ?? this.weightLogs,
-      goalWeight: goalWeight ?? this.goalWeight,
       progressDays: progressDays ?? this.progressDays,
       dailyNutrition: dailyNutrition ?? this.dailyNutrition,
-      calorieGoal: calorieGoal ?? this.calorieGoal,
       todayGoal: todayGoal ?? this.todayGoal,
     );
   }

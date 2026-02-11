@@ -1,3 +1,4 @@
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../onboarding_widgets/continue_button.dart';
@@ -186,15 +187,7 @@ class _OnboardingStep13State extends State<OnboardingStep13>
 
           const Spacer(),
 
-          /// Continue button
-          SizedBox(
-            width: double.infinity,
-            child: ContinueButton(
-              enabled: true,
-              //TODO: allow notifications
-              onNext: _handleNotificationRequest,
-            ),
-          ),
+          ConfirmationButtonWidget(onConfirm: _handleNotificationRequest)
         ],
       ),
     );

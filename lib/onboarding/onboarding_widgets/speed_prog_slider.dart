@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -104,6 +105,7 @@ class _ProgSpeedSliderState extends ConsumerState<ProgSpeedSlider> {
           final kg = unit == WeightUnit.kg ? snapped : snapped / widget.lbPerKg;
 
           final clampedKg = kg.clamp(0.1, 1.5);
+          HapticFeedback.selectionClick();
 
           ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(weeklyRate: clampedKg)));
         },

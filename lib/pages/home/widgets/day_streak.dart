@@ -112,7 +112,7 @@ class DayStreakDialog extends StatelessWidget {
               Positioned(
                 top: 16,
                 right: 16,
-                child: StreakIndicatorButton(isDisabled: !isStreakActive),
+                child: StreakIndicatorButton(isDisabled: isStreakActive),
               ),
             ],
           ),

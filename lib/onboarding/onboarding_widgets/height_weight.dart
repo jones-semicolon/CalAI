@@ -12,9 +12,7 @@ class HeightWeightPickerWidget extends ConsumerStatefulWidget {
       _HeightWeightPickerWidgetState();
 }
 
-class _HeightWeightPickerWidgetState
-    extends ConsumerState<HeightWeightPickerWidget> {
-  // Local UI state for unit toggle only
+class _HeightWeightPickerWidgetState extends ConsumerState<HeightWeightPickerWidget> {
   bool isMetric = false;
 
   // Ranges
@@ -24,7 +22,6 @@ class _HeightWeightPickerWidgetState
   final cmRange = List.generate(183, (i) => i + 60);
   final weightKgRange = List.generate(481, (i) => i + 20);
 
-  // Controllers
   late FixedExtentScrollController _ftController,
       _inController,
       _lbController,
@@ -36,32 +33,23 @@ class _HeightWeightPickerWidgetState
     super.initState();
     final user = ref.read(userProvider);
 
-    // Calculate initial positions from current provider state
+    // Initial Unit Detection
+    isMetric = user.body.weightUnit == WeightUnit.kg;
+
     int totalInches = (user.body.height / 2.54).round();
     int initialFt = totalInches ~/ 12;
     int initialIn = totalInches % 12;
     int initialLb = (user.body.currentWeight / 0.453592).round();
 
-    _ftController = FixedExtentScrollController(
-      initialItem: feetRange.indexOf(initialFt).clamp(0, 7),
-    );
-    _inController = FixedExtentScrollController(
-      initialItem: inchesRange.indexOf(initialIn).clamp(0, 11),
-    );
-    _lbController = FixedExtentScrollController(
-      initialItem: weightLbRange.indexOf(initialLb).clamp(0, 760),
-    );
-    _cmController = FixedExtentScrollController(
-      initialItem: cmRange.indexOf(user.body.height.round()).clamp(0, 182),
-    );
-    _kgController = FixedExtentScrollController(
-      initialItem: weightKgRange.indexOf(user.body.currentWeight.round()).clamp(0, 480),
-    );
+    _ftController = FixedExtentScrollController(initialItem: feetRange.indexOf(initialFt).clamp(0, 7));
+    _inController = FixedExtentScrollController(initialItem: inchesRange.indexOf(initialIn).clamp(0, 11));
+    _lbController = FixedExtentScrollController(initialItem: weightLbRange.indexOf(initialLb).clamp(0, 760));
+    _cmController = FixedExtentScrollController(initialItem: cmRange.indexOf(user.body.height.round()).clamp(0, 182));
+    _kgController = FixedExtentScrollController(initialItem: weightKgRange.indexOf(user.body.currentWeight.round()).clamp(0, 480));
   }
 
   @override
   void dispose() {
-    // Dispose all controllers to prevent memory leaks
     _ftController.dispose();
     _inController.dispose();
     _lbController.dispose();
@@ -70,50 +58,44 @@ class _HeightWeightPickerWidgetState
     super.dispose();
   }
 
-  /// Syncs physical wheel positions to current Riverpod state
+  // Helper to update height from Imperial Wheels
+  void _updateHeightImperial() {
+    final ft = feetRange[_ftController.selectedItem];
+    final inch = inchesRange[_inController.selectedItem];
+    final double totalCm = ((ft * 12) + inch) * 2.54;
+
+    ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(
+      body: s.body.copyWith(
+        height: totalCm,
+        heightUnit: HeightUnit.ft,
+      ),
+    ));
+  }
+
   void _syncWheels() {
     if (!mounted) return;
     final user = ref.read(userProvider);
 
     if (isMetric) {
-      if (_cmController.hasClients) {
-        _cmController.jumpToItem(
-          cmRange.indexOf(user.body.height.round()).clamp(0, 182),
-        );
-      }
-      if (_kgController.hasClients) {
-        _kgController.jumpToItem(
-          weightKgRange.indexOf(user.body.currentWeight.round()).clamp(0, 480),
-        );
-      }
+      if (_cmController.hasClients) _cmController.jumpToItem(cmRange.indexOf(user.body.height.round()).clamp(0, 182));
+      if (_kgController.hasClients) _kgController.jumpToItem(weightKgRange.indexOf(user.body.currentWeight.round()).clamp(0, 480));
     } else {
       int totalIn = (user.body.height / 2.54).round();
-      if (_ftController.hasClients) {
-        _ftController.jumpToItem(feetRange.indexOf(totalIn ~/ 12).clamp(0, 7));
-      }
-      if (_inController.hasClients) {
-        _inController.jumpToItem(
-          inchesRange.indexOf(totalIn % 12).clamp(0, 11),
-        );
-      }
-      if (_lbController.hasClients) {
-        _lbController.jumpToItem(
-          weightLbRange.indexOf((user.body.currentWeight / 0.453592).round()).clamp(0, 760),
-        );
-      }
+      if (_ftController.hasClients) _ftController.jumpToItem(feetRange.indexOf(totalIn ~/ 12).clamp(0, 7));
+      if (_inController.hasClients) _inController.jumpToItem(inchesRange.indexOf(totalIn % 12).clamp(0, 11));
+      if (_lbController.hasClients) _lbController.jumpToItem(weightLbRange.indexOf((user.body.currentWeight / 0.453592).round()).clamp(0, 760));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
+    final userDataProvider = ref.read(userProvider.notifier);
     final theme = Theme.of(context);
 
-    // Constants for layout
     const double itemH = 40.0;
     const double pickerH = itemH * 7;
 
-    // Derived values for Imperial display from single source of truth (CM/KG)
     int totalInches = (user.body.height / 2.54).round();
     int currentFt = totalInches ~/ 12;
     int currentIn = totalInches % 12;
@@ -122,18 +104,14 @@ class _HeightWeightPickerWidgetState
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 1. Toggle Switch
         _buildToggleRow(theme),
         const SizedBox(height: 30),
-
-        // 2. Headers
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [_header("Height", theme), _header("Weight", theme)],
         ),
         const SizedBox(height: 16),
 
-        // 3. The Pickers
         if (isMetric)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -141,21 +119,19 @@ class _HeightWeightPickerWidgetState
               _individualWheel(
                 cmRange,
                 user.body.height.round(),
-                (v) => ref.read(userProvider.notifier).setHeight(cm: v.toDouble(), unit: HeightUnit.cm),
+                    (v) => userDataProvider.updateLocal((s) => s.copyWith(body: s.body.copyWith(height: v.toDouble(), heightUnit: HeightUnit.cm))),
                 "cm",
                 _cmController,
-                itemH,
-                pickerH,
+                itemH, pickerH,
               ),
               const SizedBox(width: 30),
               _individualWheel(
                 weightKgRange,
                 user.body.currentWeight.round(),
-                (v) => ref.read(userProvider.notifier).setWeight(v.toDouble(), WeightUnit.kg),
+                    (v) => userDataProvider.updateLocal((s) => s.copyWith(body: s.body.copyWith(currentWeight: v.toDouble(), weightUnit: WeightUnit.kg))),
                 "kg",
                 _kgController,
-                itemH,
-                pickerH,
+                itemH, pickerH,
               ),
             ],
           )
@@ -163,52 +139,17 @@ class _HeightWeightPickerWidgetState
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // ... inside your build method, in the Imperial Row:
-
-              _individualWheel(
-                feetRange,
-                currentFt,
-                    (v) {
-                  // When Feet changes, get the current Inches from the other wheel
-                  final currentInches = inchesRange[_inController.selectedItem];
-                  ref.read(userProvider.notifier).setHeight(
-                    unit: HeightUnit.ft,
-                    ft: v,
-                    inches: currentInches.toDouble(),
-                  );
-                },
-                "ft",
-                _ftController,
-                itemH,
-                pickerH,
-              ),
+              _individualWheel(feetRange, currentFt, (_) => _updateHeightImperial(), "ft", _ftController, itemH, pickerH),
               const SizedBox(width: 8),
-              _individualWheel(
-                inchesRange,
-                currentIn = (totalInches % 12),
-                    (v) {
-                  // When Inches changes, get the current Feet from the other wheel
-                  final currentFeet = feetRange[_ftController.selectedItem];
-                  ref.read(userProvider.notifier).setHeight(
-                    unit: HeightUnit.ft,
-                    ft: currentFeet,
-                    inches: v.toDouble(),
-                  );
-                },
-                "in",
-                _inController,
-                itemH,
-                pickerH,
-              ),
+              _individualWheel(inchesRange, currentIn, (_) => _updateHeightImperial(), "in", _inController, itemH, pickerH),
               const SizedBox(width: 20),
               _individualWheel(
                 weightLbRange,
                 currentLb,
-                (v) => ref.read(userProvider.notifier).setWeight(v.toDouble(), WeightUnit.lbs),
+                    (v) => userDataProvider.updateLocal((s) => s.copyWith(body: s.body.copyWith(currentWeight: v * 0.453592, weightUnit: WeightUnit.lbs))),
                 "lb",
                 _lbController,
-                itemH,
-                pickerH,
+                itemH, pickerH,
               ),
             ],
           ),
@@ -216,56 +157,31 @@ class _HeightWeightPickerWidgetState
     );
   }
 
-  Widget _individualWheel(
-    List<int> items,
-    int selected,
-    ValueChanged<int> onSet,
-    String unit,
-    FixedExtentScrollController ctrl,
-    double itemH,
-    double pickerH,
-  ) {
+  Widget _individualWheel(List<int> items, int selected, ValueChanged<int> onSet, String unit, FixedExtentScrollController ctrl, double itemH, double pickerH) {
     final theme = Theme.of(context);
-
     return SizedBox(
       width: 85,
       height: pickerH,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Individual centered selector background
-          Container(
-            height: itemH,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.secondary.withOpacity(0.25),
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
+          Container(height: itemH, decoration: BoxDecoration(color: theme.colorScheme.secondary.withOpacity(0.25), borderRadius: BorderRadius.circular(12))),
           ListWheelScrollView.useDelegate(
             controller: ctrl,
             itemExtent: itemH,
             physics: const FixedExtentScrollPhysics(),
-            perspective: 0.007,
-            onSelectedItemChanged: (i) {
-              onSet(items[i]);
-            },
+            onSelectedItemChanged: (i) => onSet(items[i]),
             childDelegate: ListWheelChildBuilderDelegate(
               childCount: items.length,
               builder: (context, i) {
                 final isSel = items[i] == selected;
                 return Center(
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 200),
-                    opacity: isSel ? 1.0 : 1.0,
-                    child: Text(
-                      "${items[i]} $unit",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: isSel
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.secondary.withOpacity(0.25),
-                      ),
+                  child: Text(
+                    "${items[i]} $unit",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: isSel ? theme.colorScheme.primary : theme.colorScheme.secondary.withOpacity(0.25),
                     ),
                   ),
                 );
@@ -330,12 +246,5 @@ class _HeightWeightPickerWidgetState
     );
   }
 
-  Widget _header(String t, ThemeData theme) => Text(
-    t,
-    style: TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.bold,
-      color: theme.colorScheme.onPrimary,
-    ),
-  );
+  Widget _header(String t, ThemeData theme) => Text(t, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface));
 }

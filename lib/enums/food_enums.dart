@@ -2,7 +2,7 @@ import 'package:calai/models/nutrition_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-enum SourceType { foodDatabase("foodDatabase"), foodUpload("foodUpload"), exercise("exercise"); final String value; const SourceType(this.value);}
+enum SourceType { foodDatabase("foodDatabase"), foodUpload("foodUpload"), exercise("exercise"), foodFacts("foodFacts"), vision("vision"); final String value; const SourceType(this.value);}
 enum NutritionType {
   protein,
   carbs,

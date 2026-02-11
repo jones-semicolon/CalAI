@@ -65,6 +65,8 @@ class _CaloriesBurnedCard extends ConsumerWidget {
     // 1. Watch progress from the Global Provider (Replacing HealthData)
     final globalState = ref.watch(globalDataProvider).value;
     final burned = globalState?.todayProgress.caloriesBurned ?? 0;
+    // TODO: it should be caloriesBurnedPerSteps
+    final stepsToday = globalState?.todayProgress.steps;
 
     // 2. Watch the list of entries specifically for this date using your StreamProvider.family
     final entriesAsync = ref.watch(dailyEntriesProvider(dateId));
@@ -83,37 +85,41 @@ class _CaloriesBurnedCard extends ConsumerWidget {
           const SizedBox(height: 15),
 
           entriesAsync.when(
-            loading: () =>
-                Expanded(child: const Center(child: CupertinoActivityIndicator(radius: 10))),
+            loading: () => const SizedBox(
+              height: 50,
+              child: Center(child: CupertinoActivityIndicator(radius: 10)),
+            ),
             error: (err, _) => const SizedBox.shrink(),
-            // TODO 1 logged steps only, no repetition
-            // hidden if 0 or null
             data: (entries) {
-              final exercises = entries
-                  .where(
-                    (data) =>
-                        data.containsKey('calories_burned') &&
-                        data['exercise_type'] != null &&
-                        data['source'] == SourceType.exercise.value, // Safety check
-                  )
+              // Extract exercise logs from database entries
+              // We filter out anything that looks like a "steps" log to avoid repetition
+              final List<ExerciseLog> exercises = entries
+                  .where((data) =>
+              data.containsKey('calories_burned') &&
+                  data['exercise_type'] != null &&
+                  data['source'] == SourceType.exercise.value)
                   .map((data) => ExerciseLog.fromJson(data))
-                  .toList()
-                  .take(3)
                   .toList();
 
-              if (exercises.isEmpty) {
-                return SizedBox.shrink();
-              }
-
               return Column(
-                children: exercises.map((ex) {
-                  // ✅ FIX: Use localized labels or safe enums
-                  return _ActivityItemRow(
+                children: [
+                  // ✅ LOGGED STEPS: Always at the top, only one, hidden if 0
+                  if (stepsToday! > 0)
+                    _ActivityItemRow(
+                      title: "Steps",
+                      value: "+$stepsToday cal",
+                      icon: Icons.directions_walk,
+                    ),
+
+                  // Map the remaining exercises (take top 2 if steps exist, or 3 if not)
+                  ...exercises
+                      .take(stepsToday > 0 ? 2 : 3)
+                      .map((ex) => _ActivityItemRow(
                     title: ex.type.label,
                     value: "+${ex.caloriesBurned} kcal",
                     icon: ex.type.icon,
-                  );
-                }).toList(),
+                  )),
+                ],
               );
             },
           ),
@@ -236,9 +242,18 @@ class _WaterIntakeSection extends StatelessWidget {
             children: [
               Text("Water", style: theme.textTheme.labelSmall),
               // TODO wrap to Row and add setting button to change serving size
-              Text(
-                "$waterIntake fl oz", // Unit update
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  Text(
+                    "$waterIntake fl oz", // Unit update
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(width: 5),
+                  GestureDetector(
+                    onTap: () => {},
+                    child: Icon(Icons.settings, color: theme.colorScheme.onPrimary, size: 16),
+                  )
+                ],
               ),
             ],
           ),

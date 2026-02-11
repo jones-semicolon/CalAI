@@ -1,6 +1,7 @@
 import 'package:calai/pages/home/floating_grid/log_exercise/log_exercise.dart';
 import 'package:flutter/material.dart';
 
+import '../floating_grid/camera/scan_screen.dart';
 import '../floating_grid/food_database/food_database.dart';
 
 /// A widget that displays a 2x2 grid of action buttons.
@@ -80,8 +81,12 @@ class FloatingActionGrid extends StatelessWidget {
                       icon: Icons.qr_code_scanner,
                       label: "Scan Food",
                       onTap: () {
-                        // TODO Camera page
-                        debugPrint("Scan Food tapped");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ScanScreen(),
+                          ),
+                        );
                       },
                     ),
                   ],

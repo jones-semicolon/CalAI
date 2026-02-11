@@ -26,7 +26,7 @@ class _GoalPickerViewState extends ConsumerState<GoalPickerView> {
     final goal = user.goal;
 
     // Initialize with the existing target weight
-    _selectedGoalWeight ??= goal.targetWeight;
+    _selectedGoalWeight ??= goal.targets.weightGoal.toDouble();
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -37,7 +37,7 @@ class _GoalPickerViewState extends ConsumerState<GoalPickerView> {
           const Spacer(),
           WeightPicker(
             // ✅ Start the picker at the current Target Weight
-            initialWeight: goal.targets.targetWeight.toDouble(),
+            initialWeight: goal.targets.weightGoal.toDouble(),
             // ✅ Use Current Weight as the static reference line
             referenceWeight: body.currentWeight,
             unit: body.weightUnit,
