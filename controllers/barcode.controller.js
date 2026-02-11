@@ -34,7 +34,7 @@ exports.scanBarcode = async (req, res) => {
 
   try {
     // Construct the URL using constants, making the fields list manageable
-    const apiUrl = `${OPENFOODFACTS_BASE_URL}/${barcode}?fields=${PRODUCT_FIELDS}`;
+    const apiUrl = `${OPENFOODFACTS_BASE_URL}/${barcode}`;
 
     // 1. Fetch data and check HTTP response status
     const response = await fetch(apiUrl);
