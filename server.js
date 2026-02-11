@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path"); // ✅ Added missing import
 require("dotenv").config();
 
 const testRoute = require("./routes/test.route");
@@ -16,6 +17,16 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+/** * ✅ VERCEL FIX: 
+ * Static file serving from /uploads won't work on Vercel because the 
+ * file system is read-only. We can leave it for local development, 
+ * but since we are using memoryStorage for Multer now, we won't 
+ * actually be saving files there anymore.
+ */
+if (process.env.NODE_ENV !== 'production') {
+  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+}
 
 // Routes
 app.use("/test", testRoute);

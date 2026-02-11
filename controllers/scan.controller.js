@@ -9,91 +9,69 @@
 const groq = require("../config/groq");
 const { SYSTEM_PROMPT } = require("../config/prompts/foodScannerPrompt");
 
-// Constants for API configuration
-const API_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct";
-const RESPONSE_TYPE = "json_object";
-const ERROR_MESSAGE_MISSING_URL = "image_url is required in the request body.";
+const API_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct"; 
 const ERROR_MESSAGE_INTERNAL = "Internal server error during food scanning.";
-const FALLBACK_SYSTEM_PROMPT = "You are an assistant that analyzes images.";
 
-/**
- * Scans a food image provided via URL using the Groq Vision model.
- * @param {number} req.body.image_url - base64 Image URL of the food
- * @returns {Promise<void>} Sends a JSON response containing the calculated goals or an error.
- */
 exports.scanFood = async (req, res) => {
-  const { image_url } = req.query;
-
-  // 1. Input Validation
-  if (!image_url) {
-    return res.status(400).json({
-      success: false,
-      error: ERROR_MESSAGE_MISSING_URL,
-    });
-  }
-
   try {
-    // 2. Prepare the API Call
-    const systemInstruction = SYSTEM_PROMPT || FALLBACK_SYSTEM_PROMPT;
+    // 1. Validate the file exists in memory
+    if (!req.file) {
+      return res.status(400).json({ error: "No image file provided" });
+    }
 
+    // ✅ Convert Buffer to Base64 Data URL
+    // This allows you to pass the image data without saving it to a disk
+    const base64Image = req.file.buffer.toString('base64');
+    const dataUrl = `data:${req.file.mimetype};base64,${base64Image}`;
+
+    // 2. Call Groq API
     const completion = await groq.chat.completions.create({
       model: API_MODEL,
       messages: [
         {
-          role: "system",
-          content: systemInstruction,
-        },
-        {
           role: "user",
           content: [
-            {
-              type: "image_url",
-              image_url: { url: image_url },
+            { type: "text", text: SYSTEM_PROMPT },
+            { 
+              type: "image_url", 
+              image_url: { url: dataUrl } // ✅ Pass the Data URL here
             },
           ],
         },
       ],
-      response_format: { type: RESPONSE_TYPE },
+      response_format: { type: "json_object" }, 
+      temperature: 0.1,
     });
 
-    // 3. Process the API Response
+    // 3. Process Response
     const responseContent = completion.choices?.[0]?.message?.content;
 
     if (!responseContent) {
-      // Handle case where API returns a completion object but no message content
-      return res.status(500).json({
-        success: false,
-        error: "API returned an empty response.",
-      });
+      throw new Error("API returned empty content");
     }
 
-    // Attempt to parse the expected JSON output
+    // 4. Parse JSON
     let parsedData = {};
     try {
       parsedData = JSON.parse(responseContent);
     } catch (parseError) {
-      console.error("JSON Parse Error:", parseError);
+      console.error("JSON Parse Fail:", responseContent);
       return res.status(500).json({
         success: false,
-        error: "Failed to parse API response content as JSON.",
-        rawResponse: responseContent,
+        error: "AI generation failed to produce valid JSON.",
       });
     }
 
-    // 4. Send Success Response
+    // 5. Success
     res.json({
       success: true,
       data: parsedData,
       usage: completion.usage,
     });
+
   } catch (err) {
-    // 5. Global Error Handling
-    console.error("Food Scan Controller Error:", err.message);
-
-    // Check if the error is an API error (e.g., bad request, rate limit)
-    const status = err.status || 500;
-
-    res.status(status).json({
+    console.error("Food Scan Error:", err);
+    res.status(500).json({
       success: false,
       error: ERROR_MESSAGE_INTERNAL,
       details: err.message,
