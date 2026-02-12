@@ -17,11 +17,11 @@ class OnboardingStep14 extends ConsumerWidget { // Changed to ConsumerStatefulWi
           const Spacer(),
           NoYesButton(
             onNo: () {
-              ref.read(userProvider.notifier).setAddCaloriesBurned(false);
+              ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(settings: s.settings.copyWith(isAddCalorieBurn: false)));
               nextPage();
             },
             onYes: () {
-              ref.read(userProvider.notifier).setAddCaloriesBurned(true);
+              ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(settings: s.settings.copyWith(isAddCalorieBurn: true)));
               nextPage();
             },
           ),

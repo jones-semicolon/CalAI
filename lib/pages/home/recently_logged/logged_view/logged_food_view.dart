@@ -1,4 +1,5 @@
 import 'package:calai/models/nutrition_model.dart';
+import 'package:calai/widgets/edit_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +11,7 @@ import 'package:calai/enums/food_enums.dart';
 import 'package:calai/providers/entry_streams_provider.dart';
 
 class LoggedFoodView extends ConsumerStatefulWidget {
-  final FoodLog foodLog; // Removed nullability since we are editing a log
+  final FoodLog foodLog;
 
   const LoggedFoodView({super.key, required this.foodLog});
 
@@ -20,21 +21,53 @@ class LoggedFoodView extends ConsumerStatefulWidget {
 
 class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   late double _servingsCount;
+  late FoodLog _tempLog = widget.foodLog;
 
   @override
   void initState() {
     super.initState();
-    // Initialize the UI with the values from the existing log
-    _servingsCount = widget.foodLog.amount;
+    _servingsCount = _tempLog.amount;
+
+    _tempLog = _tempLog;
+  }
+
+  void onCaloriesChanged(double newVal) {
+    setState(() {
+      _tempLog = _tempLog.copyWith(calories: newVal);
+    });
   }
 
   void _onUpdateLog(FoodLog updatedLog) {
-    // Pass the original log and the modified log to calculate the delta in Firestore
     ref.read(calaiServiceProvider).updateFoodEntry(
       widget.foodLog,
       updatedLog,
     );
     Navigator.pop(context);
+  }
+
+  void _showEditModal({
+    required String title,
+    required double initialValue,
+    required Function(double) onSave,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) => EditModal(
+        initialValue: initialValue,
+        title: title,
+        label: title,
+        color: Theme.of(context).colorScheme.primary,
+        onDone: (newValue) {
+          onSave(newValue);
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 
   String _capitalize(String text) {
@@ -50,7 +83,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
         children: [
           // We display the portion saved in the FoodLog as the primary tab
           _TabButton(
-            label: _capitalize(widget.foodLog.portion),
+            label: _capitalize(_tempLog.portion),
             isActive: true, // Always active since it's the only available context
             onTap: () {
               // Logic stays here as it's the fixed reference point
@@ -64,24 +97,24 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasImage = widget.foodLog.imageUrl != null;
+    final hasImage = _tempLog.imageUrl != null;
 
     // 1. Calculate the Ratio
     // If original amount was 100 and new is 200, ratio is 2.0
-    final double ratio = _servingsCount / (widget.foodLog.amount > 0 ? widget.foodLog.amount : 1.0);
+    final double ratio = _servingsCount / (_tempLog.amount > 0 ? _tempLog.amount : 1.0);
 
     // 2. Create the Preview Log with recalculated macros
-    final previewLog = widget.foodLog.copyWith(
+    final previewLog = _tempLog.copyWith(
       amount: _servingsCount,
-      calories: (widget.foodLog.calories * ratio).toInt(),
-      protein: (widget.foodLog.protein * ratio).toInt(),
-      carbs: (widget.foodLog.carbs * ratio).toInt(),
-      fats: (widget.foodLog.fats * ratio).toInt(),
-      sugar: (widget.foodLog.sugar * ratio).toInt(),
-      fiber: (widget.foodLog.fiber * ratio).toInt(),
-      sodium: (widget.foodLog.sodium * ratio).toInt(),
+      calories: (_tempLog.calories * ratio),
+      protein: (_tempLog.protein * ratio),
+      carbs: (_tempLog.carbs * ratio),
+      fats: (_tempLog.fats * ratio),
+      sugar: (_tempLog.sugar * ratio),
+      fiber: (_tempLog.fiber * ratio),
+      sodium: (_tempLog.sodium * ratio),
       // Recalculate other nutrients list if it exists
-      otherNutrients: widget.foodLog.otherNutrients.map((n) => n.copyWith(
+      otherNutrients: _tempLog.otherNutrients.map((n) => n.copyWith(
         amount: n.amount * ratio,
       )).toList(),
     );
@@ -95,7 +128,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
             Positioned(
               top: 0, left: 0, right: 0,
               height: MediaQuery.of(context).size.height * 0.45,
-              child: Image.network(widget.foodLog.imageUrl!, fit: BoxFit.cover),
+              child: Image.network(_tempLog.imageUrl!, fit: BoxFit.cover),
             ),
 
           // Content Card
@@ -125,13 +158,13 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
                     _buildServingsRow(theme),
 
                     const SizedBox(height: 22),
-                    _buildCaloriesCard(theme, previewLog),
+                    _buildCaloriesCard(context, previewLog),
                     const SizedBox(height: 18),
                     _buildMacroRow(previewLog),
 
-                    if (widget.foodLog.healthScore != null) ...[
+                    if (_tempLog.healthScore != null) ...[
                       const SizedBox(height: 18),
-                      _buildHealthScore(widget.foodLog.healthScore!)
+                      _buildHealthScore(_tempLog.healthScore!)
                     ],
 
                     const SizedBox(height: 26),
@@ -171,7 +204,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        DateFormat.jm().format(widget.foodLog.timestamp),
+        DateFormat.jm().format(_tempLog.timestamp),
         style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey),
       ),
     );
@@ -179,7 +212,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 
   Widget _buildFoodTitle() {
     return Text(
-      widget.foodLog.name,
+      _tempLog.name,
       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5),
     );
   }
@@ -195,7 +228,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     ],
   );
 
-  Widget _buildHealthScore(int score) {
+  Widget _buildHealthScore(double score) {
     final color = score >= 8 ? Colors.green : (score >= 5 ? Colors.orange : Colors.red);
     return Container(
       padding: const EdgeInsets.all(16),
@@ -225,23 +258,50 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     );
   }
 
-  Widget _buildCaloriesCard(ThemeData theme, FoodLog data) {
+  Widget _buildCaloriesCard(BuildContext context, FoodLog data) {
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.grey[50],
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
+      child: Stack(
         children: [
-          const Icon(Icons.local_fire_department, color: Colors.orange, size: 28),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              const Text("CALORIES", style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
-              Text("${data.calories}", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+              const Icon(Icons.local_fire_department, color: Colors.black, size: 28),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Calories",
+                      style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)
+                  ),
+                  // ✅ This now displays the local state value
+                  Text("${data.calories.round()}",
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)
+                  ),
+                ],
+              ),
             ],
+          ),
+
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: () => _showEditModal(
+                title: 'Calories',
+                initialValue: data.calories,
+                onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(calories: val)),
+              ),
+              child: Icon(
+                  Icons.edit,
+                  size: 16,
+                  color: Colors.grey[400]
+              ),
+            ),
           ),
         ],
       ),
@@ -250,24 +310,24 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 
   Widget _buildMacroRow(FoodLog data) => Row(
     children: [
-      Expanded(child: _MacroTile(value: "${data.protein}g", nutritionType: NutritionType.protein)),
+      Expanded(child: _MacroTile(value: "${data.protein.round()}g", nutritionType: NutritionType.protein, )),
       const SizedBox(width: 8),
-      Expanded(child: _MacroTile(value: "${data.carbs}g", nutritionType: NutritionType.carbs)),
+      Expanded(child: _MacroTile(value: "${data.carbs.round()}g", nutritionType: NutritionType.carbs)),
       const SizedBox(width: 8),
-      Expanded(child: _MacroTile(value: "${data.fats}g", nutritionType: NutritionType.fats)),
+      Expanded(child: _MacroTile(value: "${data.fats.round()}g", nutritionType: NutritionType.fats)),
     ],
   );
 
   Widget _buildDetailedNutritionList(FoodLog data) => Column(
     children: [
-      _NutriRow("Sugar", "${data.sugar}g"),
-      _NutriRow("Fiber", "${data.fiber}g"),
-      _NutriRow("Sodium", "${data.sodium}mg"),
-      for (var n in data.otherNutrients) _NutriRow(n.name, "${n.amount.toStringAsFixed(1)}${n.unit}"),
+      _nutriRow("Sugar", "${data.sugar.toStringAsFixed(2)}g"),
+      _nutriRow("Fiber", "${data.fiber.toStringAsFixed(2)}g"),
+      _nutriRow("Sodium", "${data.sodium.toStringAsFixed(2)}mg"),
+      for (var n in data.otherNutrients) _nutriRow(n.name, "${n.amount.toStringAsFixed(1)}${n.unit}"),
     ],
   );
 
-  Widget _NutriRow(String name, String value) => Padding(
+  Widget _nutriRow(String name, String value) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 12),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -324,33 +384,72 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 class _MacroTile extends StatelessWidget {
   final String value;
   final NutritionType nutritionType;
-  const _MacroTile({required this.value, required this.nutritionType});
+  final VoidCallback? onEdit; // Added callback for the pencil tap
+
+  const _MacroTile({
+    required this.value,
+    required this.nutritionType,
+    this.onEdit,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+    return Stack( // ✅ Use Stack to pin the icon to the corner
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center, // Align text to start
             children: [
-              Container(
-                padding: EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onTertiary,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(nutritionType.icon, color: nutritionType.color, size: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.onTertiary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(nutritionType.icon, color: nutritionType.color, size: 12),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    nutritionType.label,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 10),
-              Text(nutritionType.label, style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ],
-      ),
+        ),
+
+        // ✅ The Positioned Pencil Icon
+        Positioned(
+          bottom: 8,
+          right: 8,
+          child: GestureDetector(
+            onTap: onEdit,
+            child: Icon(
+              Icons.edit,
+              size: 12, // Slightly smaller for the macro tiles
+              color: Colors.grey[400],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

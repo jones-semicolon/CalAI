@@ -2,9 +2,9 @@ import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
 import '../onboarding_widgets/animated_option_card.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/header.dart';
 
@@ -17,77 +17,63 @@ class Demotivated extends ConsumerStatefulWidget {
 }
 
 class _DemotivatedState extends ConsumerState<Demotivated> {
-  int? selectedIndex;
-
-  final List<OptionCard> choices = const [
-    OptionCard(title: 'Lack of consistency', icon: Icons.bar_chart),
-    OptionCard(title: 'Unhealthy eating habits', icon: Icons.fastfood),
-    OptionCard(title: 'Lack of supports', icon: Icons.group),
-    OptionCard(title: 'Busy schedule', icon: Icons.calendar_month),
-    OptionCard(title: 'Lack of meal inspiration', icon: Icons.food_bank),
-  ];
+  // Track the enum type instead of an index
+  ObstacleType? selectedObstacle;
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Watch the user state
     final user = ref.watch(userProvider);
     final userNotifier = ref.read(userProvider.notifier);
 
-    // ✅ Match using the new nested path: user.goal.maintenanceStrategy
+    // Sync initial state from provider if available
     final currentStrategy = user.goal.maintenanceStrategy;
-
-    if (selectedIndex == null && currentStrategy != null && currentStrategy.isNotEmpty) {
-      final matchIndex = choices.indexWhere((c) => c.title == currentStrategy);
-      if (matchIndex != -1) {
-        selectedIndex = matchIndex;
+    if (selectedObstacle == null && currentStrategy != null) {
+      // Try to find the enum matching the saved string
+      try {
+        selectedObstacle = ObstacleType.values.firstWhere(
+                (e) => e.title == currentStrategy
+        );
+      } catch (_) {
+        // Handle case where string doesn't match any enum
       }
     }
-
-    final isEnable = selectedIndex != null;
 
     return SafeArea(
       child: Column(
         children: [
           const Header(title: "What's stopping you from reaching your goals?"),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(choices.length, (index) {
-                  final item = choices[index];
-
+                children: ObstacleType.values.map((type) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: AnimatedOptionCard(
-                      index: index,
+                      index: type.index, // Using enum's built-in index for animation
                       child: OptionCard(
-                        icon: item.icon,
-                        title: item.title,
-                        isSelected: selectedIndex == index,
-                        onTap: () {
-                          setState(() => selectedIndex = index);
-                        },
+                        icon: type.icon,
+                        title: type.title,
+                        isSelected: selectedObstacle == type,
+                        onTap: () => setState(() => selectedObstacle = type),
                       ),
                     ),
                   );
-                }),
+                }).toList(),
               ),
             ),
           ),
-
-          ConfirmationButtonWidget(onConfirm: () {
-            if (selectedIndex != null) {
-              final selectedTitle = choices[selectedIndex!].title;
-
-              // ✅ FIXED: Update using the nested copyWith path
-              userNotifier.updateLocal((s) => s.copyWith(goal: s.goal.copyWith(maintenanceStrategy: selectedTitle)));
-              debugPrint('Goal Obstacle: $selectedTitle');
-            }
-
-            widget.nextPage();
-          }, enabled: isEnable,)
+          ConfirmationButtonWidget(
+            enabled: selectedObstacle != null,
+            onConfirm: () {
+              if (selectedObstacle != null) {
+                userNotifier.updateLocal((s) => s.copyWith(
+                  goal: s.goal.copyWith(maintenanceStrategy: ObstacleType.fromString(selectedObstacle!.title)),
+                ));
+              }
+              widget.nextPage();
+            },
+          )
         ],
       ),
     );

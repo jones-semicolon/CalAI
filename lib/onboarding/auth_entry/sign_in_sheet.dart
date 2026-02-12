@@ -77,7 +77,7 @@ class _SignInPageState extends State<SignInPage>
             .get();
 
         final bool hasCompletedOnboarding =
-            userDoc.exists && userDoc.data()?['dailyGoals'] != null;
+            userDoc.exists && userDoc.data()?['goal'] != null && userDoc.data()?['goal']['dailyGoals'] != null;
 
         if (!mounted) return;
         await _controller.reverse();

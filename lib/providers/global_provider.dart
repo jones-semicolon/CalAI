@@ -27,6 +27,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   StreamSubscription? _dailyLogSub;
   StreamSubscription? _historySub; // Consolidates weekly nutrition and weight
   StreamSubscription? _weightSub;
+  StreamSubscription? _userSub;
 
   // Access the extracted service for DB operations
   CalaiFirestoreService get _service => ref.read(calaiServiceProvider);
@@ -38,6 +39,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       _dailyLogSub?.cancel();
       _historySub?.cancel();
       _weightSub?.cancel();
+      _userSub?.cancel();
     });
     return GlobalDataState.initial();
   }
@@ -56,10 +58,12 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       _syncFirebaseNameIntoUserProvider();
 
       await _ensureDailyLogExists();
+      // await _ensureStatsExists();
 
       listenToDailySummary(_service.todayId);
       listenToHistory();
       listenToWeightHistory();
+      listenToUserProfile();
 
       // STEP 4: Finalize initialization state
       final current = state.asData?.value ?? GlobalDataState.initial();
@@ -98,42 +102,44 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     if (_service.uid == null) return;
 
     _weightSub?.cancel();
-    _weightSub = _service.weightHistory.snapshots().listen((snapshot) {
-      if (!snapshot.exists) return;
+    _weightSub = _service.weightHistory.snapshots().listen((snapshot) async {
+      // ✅ If the document doesn't exist, initialize it
+      if (!snapshot.exists) {
+        debugPrint("Weight history doc missing. Initializing...");
+
+        // Get current weight from the user provider state
+        final currentWeight = ref.read(userProvider).body.currentWeight;
+        final targetWeight = ref.read(userProvider).goal.targets.weightGoal;
+
+        // Log the initial entry (this creates the document)
+        await _service.logWeightEntry(
+            currentWeight,
+            newTargetWeight: targetWeight.toDouble()
+        );
+        return;
+      }
 
       final data = snapshot.data()!;
       final List<WeightLog> logs = [];
 
-
-      // ✅ FIX: Ensure we are accessing the 'history' field as a Map
       final historyData = data['history'];
-      debugPrint(data['targetWeight'].toString());
-
       if (historyData is Map<String, dynamic>) {
         historyData.forEach((dateKey, value) {
-          // 1. Parse the date from the Map key ("2026-02-07")
           final date = DateTime.tryParse(dateKey);
-
-          // 2. Extract the weight from the nested map value
-          // Since weightValue is {date: 2026-02-07, w: 67.8...}
           final nestedMap = value as Map<String, dynamic>;
           final weight = (nestedMap['w'] as num?)?.toDouble() ?? 0.0;
 
           if (date != null) {
-            logs.add(WeightLog(
-              date: date,
-              weight: weight,
-            ));
+            logs.add(WeightLog(date: date, weight: weight));
           }
         });
       }
-      // Sort chronologically for the graph
+
       logs.sort((a, b) => a.date.compareTo(b.date));
 
       final current = state.asData?.value ?? GlobalDataState.initial();
       state = AsyncData(current.copyWith(
         weightLogs: logs,
-        // Correctly pull targetWeight from the document
         goalWeight: (data['targetWeight'] as num?)?.toDouble() ?? 0.0,
       ));
     });
@@ -237,6 +243,45 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       userNotifier.updateNutritionGoals(NutritionGoals.fromJson(data['dailyGoals']));
     }
   }
+
+  void listenToUserProfile() {
+    if (_service.uid == null) return;
+
+    _userSub?.cancel();
+    _userSub = _service.userDoc.snapshots().listen((doc) {
+      final data = doc.data();
+      if (data == null) return;
+
+      final userNotifier = ref.read(userProvider.notifier);
+
+      // 1. Sync the Provider Status (Crucial for Settings UI)
+      if (data['profile'] != null) {
+        final providerString = data['profile']['provider'] as String?;
+
+        // Map string back to Enum
+        final providerEnum = UserProvider.values.firstWhere(
+              (e) => e.value == providerString,
+          orElse: () => UserProvider.anonymous,
+        );
+
+        // Update the local provider state
+        userNotifier.updateLocal((s) => s.copyWith(
+          profile: s.profile.copyWith(provider: providerEnum),
+        ));
+      }
+    });
+  }
+
+  // Future<void> _ensureStatsExists() async {
+  //   final user = ref.read(userProvider);
+  //   final statsSub = _service.stats;
+  //
+  //   final doc = await statsSub.get();
+  //   final existingData = doc.docs.isNotEmpty;
+  //   if (!existingData) {
+  //     await statsSub.add(_service.weightHistory);
+  //   }
+  // }
 
   Future<void> _ensureDailyLogExists() async {
     final user = ref.read(userProvider);

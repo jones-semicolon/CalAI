@@ -41,23 +41,23 @@ class GlobalDataState {
 
   // --- Dynamic Dashboard Logic ---
 
-  int effectiveCalorieGoal(bool isAddCalorieBurnEnabled, bool isRolloverEnabled) {
+  num effectiveCalorieGoal(bool isAddCalorieBurnEnabled, bool isRolloverEnabled) {
     // Prioritizes today's log goal, falls back to master profile goal
-    final int baseGoal = (todayGoal.calories > 0) ? todayGoal.calories : 0;
+    final num baseGoal = (todayGoal.calories > 0) ? todayGoal.calories : 0;
 
-    int total = baseGoal;
+    num total = baseGoal;
     if (isRolloverEnabled) total += todayGoal.rollover;
     if (isAddCalorieBurnEnabled) total += todayProgress.caloriesBurned;
 
     return total;
   }
 
-  int caloriesRemaining(bool isAddCalorieBurnEnabled, bool isRolloverEnabled) {
+  num caloriesRemaining(bool isAddCalorieBurnEnabled, bool isRolloverEnabled) {
     return effectiveCalorieGoal(isAddCalorieBurnEnabled, isRolloverEnabled) - todayProgress.calories;
   }
 
   double calorieProgress(bool isAddCalorieBurnEnabled, bool isRolloverEnabled) {
-    final int target = effectiveCalorieGoal(isAddCalorieBurnEnabled, isRolloverEnabled);
+    final num target = effectiveCalorieGoal(isAddCalorieBurnEnabled, isRolloverEnabled);
     if (target == 0) return 0.0;
     return (todayProgress.calories / target).clamp(0.0, 1.0);
   }

@@ -5,7 +5,7 @@ import 'widgets/input_field.dart';
 import 'widgets/bottom_actions.dart';
 
 class EditGoalScreen extends StatefulWidget {
-  final int initialValue;
+  final num initialValue;
   final String title;
   final IconData icon;
   final Color color; // accent color
@@ -24,7 +24,7 @@ class EditGoalScreen extends StatefulWidget {
 
 class _EditGoalScreenState extends State<EditGoalScreen> {
   late final TextEditingController _controller;
-  late int _value;
+  late num _value;
 
   @override
   void initState() {

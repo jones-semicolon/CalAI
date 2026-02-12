@@ -8,7 +8,7 @@ abstract class Exercise {
   final ExerciseType type;           // e.g., "Run"
   final Intensity intensity;   // e.g., Intensity.low
   final int durationMins;      // e.g., 30
-  final int caloriesBurned;    // e.g., 221 (nullable if not calculated yet)
+  final double caloriesBurned;    // e.g., 221 (nullable if not calculated yet)
 
   Exercise({
     required this.type,
@@ -49,7 +49,7 @@ class ExerciseModel extends Exercise {
       intensity: Intensity.fromString(json['intensity']?.toString() ?? "Low"),
       // ✅ Use num? casting to prevent Null crashes
       durationMins: (json['duration_mins'] as num?)?.toInt() ?? 0,
-      caloriesBurned: (json['calories_burned'] as num?)?.toInt() ?? 0,
+      caloriesBurned: (json['calories_burned'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -87,7 +87,7 @@ class ExerciseLog extends Exercise {
       intensity: Intensity.fromString(json['intensity']?.toString() ?? "Low"),
       // ✅ Safe numeric parsing
       durationMins: (json['duration_mins'] as num?)?.toInt() ?? 0,
-      caloriesBurned: (json['calories_burned'] as num?)?.toInt() ?? 0,
+      caloriesBurned: (json['calories_burned'] as num?)?.toDouble() ?? 0.0,
       timestamp: json['timestamp'] is Timestamp
           ? (json['timestamp'] as Timestamp).toDate()
           : (json['timestamp'] != null
@@ -112,6 +112,26 @@ class ExerciseLog extends Exercise {
   String get formattedTime {
     if (timestamp == null) return '--:--'; // Or "Pending"
     return DateFormat.jm().format(timestamp!);
+  }
+
+  ExerciseLog copyWith({
+    String? id,
+    ExerciseType? type,
+    Intensity? intensity,
+    int? durationMins,
+    double? caloriesBurned,
+    DateTime? timestamp,
+    double? weightKg,
+  }) {
+    return ExerciseLog(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      intensity: intensity ?? this.intensity,
+      durationMins: durationMins ?? this.durationMins,
+      caloriesBurned: caloriesBurned ?? this.caloriesBurned,
+      timestamp: timestamp ?? this.timestamp,
+      weightKg: weightKg ?? this.weightKg,
+    );
   }
 }
 

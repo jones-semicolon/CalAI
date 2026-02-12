@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SummaryCard extends StatelessWidget {
-  final int value;
+  final num value;
   final IconData icon;
   final Color color; // accent color
 

@@ -1,4 +1,5 @@
 import 'package:calai/services/calai_firestore_service.dart';
+import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -161,7 +162,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildAppBar(context),
+            CustomAppBar(title: Text("Selected food", style: TextStyle(fontWeight: FontWeight.w700)), actions: [_CircleButton(icon: Icons.more_horiz, onTap: () => debugPrint("Options"))],),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -202,7 +203,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
         children: [
           _CircleButton(icon: Icons.arrow_back, onTap: () => Navigator.pop(context)),
           const SizedBox(width: 12),
-          const Expanded(child: Center(child: Text("Selected food", style: TextStyle(fontWeight: FontWeight.w700)))),
+          const Expanded(child: Center(child: Text("Nutrients", style: TextStyle(fontWeight: FontWeight.w700)))),
           const SizedBox(width: 12),
           _CircleButton(icon: Icons.more_horiz, onTap: () => debugPrint("Options")),
         ],
@@ -287,7 +288,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Calories", style: TextStyle(fontSize: 12, color: theme.hintColor, fontWeight: FontWeight.w600)),
-              Text("${data.calories}",
+              Text("${data.calories.round()}",
                   style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
             ],
           ),
@@ -298,11 +299,11 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
 
   Widget _buildMacroRow(FoodLog data) => Row(
     children: [
-      Expanded(child: _MacroTile(nutrition: NutritionType.protein, value: "${data.protein}g")),
+      Expanded(child: _MacroTile(nutrition: NutritionType.protein, value: "${data.protein.round()}g")),
       const SizedBox(width: 8),
-      Expanded(child: _MacroTile(nutrition: NutritionType.carbs, value: "${data.carbs}g")),
+      Expanded(child: _MacroTile(nutrition: NutritionType.carbs, value: "${data.carbs.round()}g")),
       const SizedBox(width: 8),
-      Expanded(child: _MacroTile(nutrition: NutritionType.fats, value: "${data.fats}g")),
+      Expanded(child: _MacroTile(nutrition: NutritionType.fats, value: "${data.fats.round()}g")),
     ],
   );
 
@@ -350,8 +351,8 @@ class _CircleButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(999),
       child: Container(
-        width: 44,
-        height: 44,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: theme.colorScheme.onTertiary.withOpacity(0.6),

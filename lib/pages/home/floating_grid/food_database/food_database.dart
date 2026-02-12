@@ -197,7 +197,6 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
           children: [
             CustomAppBar(
               title: const Text("Food Database"),
-              onBackTap: () => Navigator.pop(context),
             ),
             const SizedBox(height: 8),
             Padding(
@@ -511,7 +510,7 @@ class _OutlinedPillButton extends StatelessWidget {
 
 class FoodTile extends StatelessWidget {
   final String name;
-  final int calories;
+  final num calories;
   final String? unit;
   final VoidCallback onAdd;
   final VoidCallback onTap;
@@ -560,7 +559,7 @@ class FoodTile extends StatelessWidget {
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          "$calories cal  ·  ${unit ?? 'Serving'}",
+                          "${calories.round()} cal  ·  ${unit ?? 'Serving'}",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(

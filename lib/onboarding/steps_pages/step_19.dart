@@ -15,10 +15,40 @@ class OnboardingStep19 extends StatefulWidget {
   State<OnboardingStep19> createState() => _OnboardingStep19State();
 }
 
-class _OnboardingStep19State extends State<OnboardingStep19> {
+class _OnboardingStep19State extends State<OnboardingStep19> with SingleTickerProviderStateMixin {
   bool _subscriptionOpened = false;
   bool _isLoading = false;
   late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controller (needed for your reverse() call later)
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+
+    // Check for existing session immediately
+    _checkLoginStatus();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  // ✅ NEW METHOD: Check if user exists and skip
+  Future<void> _checkLoginStatus() async {
+    final user = AuthService.getCurrentUser(); // Assuming this is sync or returns User?
+
+    if (!user!.isAnonymous) {
+      // Use addPostFrameCallback to ensure navigation happens AFTER the build
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          widget.nextPage();
+        }
+      });
+    }
+  }
 
   Future<void> _handleAction() async {
     // Skip subscription if already opened once
@@ -44,44 +74,40 @@ class _OnboardingStep19State extends State<OnboardingStep19> {
 
   Future<void> _handleGoogleSignIn() async {
     if (!mounted) return;
-
     setState(() => _isLoading = true);
 
     try {
-      final userCredential = await AuthService.signInWithGoogle();
+      final currentUser = AuthService.getCurrentUser();
+
+      // ✅ Check if we are currently anonymous
+      if (currentUser != null && currentUser.isAnonymous) {
+        // 1. Link the account to keep existing data
+        await AuthService.linkGoogleAccount();
+        debugPrint("Anonymous account linked to Google successfully.");
+      } else {
+        // 2. Fresh sign in (Fallback)
+        await AuthService.signInWithGoogle();
+        debugPrint("Performed a fresh Google Sign-In.");
+      }
 
       if (!mounted) return;
 
-      if (userCredential != null && userCredential.user != null) {
+      // Proceed to subscription or next page
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SubscriptionPage(onFinished: () => Navigator.pop(context)),
+        ),
+      );
 
-        if (!mounted) return;
-        await _controller.reverse();
-
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                SubscriptionPage(onFinished: () => Navigator.pop(context)),
-          ),
-        );
-
-        // Mark as completed after returning
-        setState(() {
-          _subscriptionOpened = true;
-        });
-      } else {
-        setState(() => _isLoading = false);
-      }
+      setState(() => _subscriptionOpened = true);
     } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Sign in failed: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      // Handle "credential-already-in-use" error specifically here!
+      // This happens if their Google account is already registered.
+      // _handleAuthError(e);
+      debugPrint("Google Sign-In Error: $e");
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

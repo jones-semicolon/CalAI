@@ -1,26 +1,32 @@
 import 'package:calai/enums/user_enums.dart';
 import 'package:calai/pages/settings/terms_feedback_section.dart';
+import 'package:calai/providers/global_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✅ Add this
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/pages/settings/preference_selection.dart';
-import 'package:calai/providers/user_provider.dart'; // ✅ Add your user provider
+import 'package:calai/providers/user_provider.dart';
+import '../auth/auth.dart';
 import '../shell/widgets/widget_app_bar.dart';
 import 'logout_section.dart';
 import 'widgets/name_age_card.dart';
 import 'widgets/invite_friends_item.dart';
 import 'widgets/settings_group.dart';
 
-// ✅ Change to ConsumerWidget
-class SettingsPage extends ConsumerWidget {
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // ✅ Watch the user's anonymous status
-    final isAnonymous = ref.watch(userProvider.select((u) => u.profile.provider));
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends ConsumerState<SettingsPage> {
+  @override
+  Widget build(BuildContext context) {
+    final isAnonymous = ref.watch(userProvider.select((u) => u.profile.provider))
+        ?? UserProvider.anonymous;
 
     return CustomScrollView(
-      key: const PageStorageKey('settings_scroll'),
       slivers: [
         const WidgetTreeAppBar(),
         SliverToBoxAdapter(
@@ -43,7 +49,6 @@ class SettingsPage extends ConsumerWidget {
             TermsFeedbackSection(isAnonymous: isAnonymous),
             const SizedBox(height: 16),
 
-            // ✅ Conditional Rendering
             if (isAnonymous != UserProvider.anonymous) ...[
               const LogoutSection(),
               const SizedBox(height: 16),
@@ -69,7 +74,6 @@ class _LinkAccountButton extends ConsumerWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          // Using a subtle primary color tint to make it stand out from regular settings
           color: theme.scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
@@ -77,8 +81,23 @@ class _LinkAccountButton extends ConsumerWidget {
           ),
         ),
         child: InkWell(
-          onTap: () {
-            // TODO: Trigger your Auth Link logic (e.g., Google Sign-In)
+          onTap: () async {
+            try {
+              final result = await AuthService.linkGoogleAccount();
+
+              // ✅ Check if the widget is still in the tree before using context
+              if (!context.mounted) return;
+
+              if (result != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Account successfully backed up!")),
+                );
+              }
+            } catch (e) {
+              // ✅ Check mounted again before calling error handler
+              if (!context.mounted) return;
+              _handleLinkingError(context, e);
+            }
           },
           borderRadius: BorderRadius.circular(16),
           child: Padding(
@@ -117,4 +136,15 @@ class _LinkAccountButton extends ConsumerWidget {
       ),
     );
   }
+}
+
+void _handleLinkingError(BuildContext context, dynamic e) {
+  String message = "Failed to link account.";
+
+  if (e is FirebaseAuthException && e.code == 'credential-already-in-use') {
+    message = "This Google account is already linked to another Cal AI profile.";
+    // TODO: Show a dialog asking if they want to switch accounts instead
+  }
+
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 }

@@ -35,7 +35,7 @@ class FoodLog extends FoodBase {
   final String portion;
   final DateTime timestamp;
   final String? imageUrl;
-  final int? healthScore;
+  final double? healthScore;
 
   const FoodLog({
     required this.id,
@@ -93,14 +93,14 @@ class FoodLog extends FoodBase {
       timestamp: _parseTimestamp(json['timestamp']),
 
       name: json['name']?.toString() ?? 'Unknown Food',
-      calories: (json['calories'] as num?)?.toInt() ?? 0,
-      protein: (json['protein'] as num?)?.toInt() ?? 0,
-      carbs: (json['carbs'] as num?)?.toInt() ?? 0,
-      fats: (json['fats'] as num?)?.toInt() ?? 0,
-      fiber: (json['fiber'] as num?)?.toInt() ?? 0,
-      sugar: (json['sugar'] as num?)?.toInt() ?? 0,
-      sodium: (json['sodium'] as num?)?.toInt() ?? 0,
-      water: (json['water'] as num?)?.toInt() ?? 0,
+      calories: (json['calories'] as num?)?.toDouble() ?? 0,
+      protein: (json['protein'] as num?)?.toDouble() ?? 0,
+      carbs: (json['carbs'] as num?)?.toDouble() ?? 0,
+      fats: (json['fats'] as num?)?.toDouble() ?? 0,
+      fiber: (json['fiber'] as num?)?.toDouble() ?? 0,
+      sugar: (json['sugar'] as num?)?.toDouble() ?? 0,
+      sodium: (json['sodium'] as num?)?.toDouble() ?? 0,
+      water: (json['water'] as num?)?.toDouble() ?? 0,
       imageUrl: json['imageUrl']?.toString(),
 
       // ✅ FIX: Restore otherNutrients parsing
@@ -133,16 +133,16 @@ class FoodLog extends FoodBase {
     String? portion,
     DateTime? timestamp,
     String? name,
-    int? calories,
-    int? protein,
-    int? carbs,
-    int? fats,
-    int? fiber,
-    int? sugar,
-    int? sodium,
-    int? water,
+    double? calories,
+    double? protein,
+    double? carbs,
+    double? fats,
+    double? fiber,
+    double? sugar,
+    double? sodium,
+    double? water,
     String? imageUrl,
-    int? healthScore,
+    double? healthScore,
     List<OtherNutrient>? otherNutrients,
   }) {
     return FoodLog(
@@ -227,14 +227,14 @@ class Food extends FoodBase {
       ownerId: json['ownerId']?.toString(),
       imageUrl: json['imageUrl']?.toString(),
       name: json['name']?.toString() ?? 'Unknown Food',
-      calories: (json['calories'] as num?)?.toInt() ?? 0,
-      protein: (json['protein'] as num?)?.toInt() ?? 0,
-      carbs: (json['carbs'] as num?)?.toInt() ?? 0,
-      fats: (json['fats'] as num?)?.toInt() ?? 0,
-      fiber: (json['fiber'] as num?)?.toInt() ?? 0,
-      sugar: (json['sugar'] as num?)?.toInt() ?? 0,
-      sodium: (json['sodium'] as num?)?.toInt() ?? 0,
-      water: (json['water'] as num?)?.toInt() ?? 0,
+      calories: (json['calories'] as num?)?.toDouble() ?? 0,
+      protein: (json['protein'] as num?)?.toDouble() ?? 0,
+      carbs: (json['carbs'] as num?)?.toDouble() ?? 0,
+      fats: (json['fats'] as num?)?.toDouble() ?? 0,
+      fiber: (json['fiber'] as num?)?.toDouble() ?? 0,
+      sugar: (json['sugar'] as num?)?.toDouble() ?? 0,
+      sodium: (json['sodium'] as num?)?.toDouble() ?? 0,
+      water: (json['water'] as num?)?.toDouble() ?? 0,
       timestamp: Timestamp.fromDate(DateTime.parse(json['timestamp'])),
     );
   }
@@ -255,14 +255,14 @@ class Food extends FoodBase {
       timestamp: Timestamp.now(),
       name: json['name']?.toString() ?? 'Unknown Food',
       // ✅ Using the helper for all numeric fields
-      calories: toDouble(nutrients['calories']).toInt(),
-      protein: toDouble(nutrients['protein']).toInt(),
-      carbs: toDouble(nutrients['carbs']).toInt(),
-      fats: toDouble(nutrients['fats']).toInt(),
-      fiber: toDouble(nutrients['fibers']).toInt(),
-      sugar: toDouble(nutrients['sugar']).toInt(),
-      sodium: toDouble(nutrients['sodium']).toInt(),
-      water: toDouble(nutrients['water']).toInt(),
+      calories: toDouble(nutrients['calories']).toDouble(),
+      protein: toDouble(nutrients['protein']).toDouble(),
+      carbs: toDouble(nutrients['carbs']).toDouble(),
+      fats: toDouble(nutrients['fats']).toDouble(),
+      fiber: toDouble(nutrients['fibers']).toDouble(),
+      sugar: toDouble(nutrients['sugar']).toDouble(),
+      sodium: toDouble(nutrients['sodium']).toDouble(),
+      water: toDouble(nutrients['water']).toDouble(),
       imageUrl: json['image_url']?.toString(),
       healthScore: json['health_score'] as int?,
       portions: [
@@ -309,14 +309,14 @@ class Food extends FoodBase {
       imageUrl: json['image_url']?.toString() ?? json['imageUrl']?.toString(),
       name: json['name']?.toString() ?? 'Unknown Food',
 
-      calories: getValue(nutrients['calories']).toInt(),
-      protein: getValue(nutrients['proteins'] ?? nutrients['protein']).toInt(),
-      carbs: getValue(nutrients['carbs'] ?? nutrients['carbohydrates']).toInt(),
-      fats: getValue(nutrients['fats'] ?? nutrients['fat']).toInt(),
-      fiber: getValue(nutrients['fibers'] ?? nutrients['fiber']).toInt(),
-      sugar: getValue(nutrients['sugar'] ?? nutrients['sugars']).toInt(),
-      sodium: getValue(nutrients['sodium']).toInt(),
-      water: getValue(nutrients['water']).toInt(),
+      calories: getValue(nutrients['calories']).toDouble(),
+      protein: getValue(nutrients['proteins'] ?? nutrients['protein']).toDouble(),
+      carbs: getValue(nutrients['carbs'] ?? nutrients['carbohydrates']).toDouble(),
+      fats: getValue(nutrients['fats'] ?? nutrients['fat']).toDouble(),
+      fiber: getValue(nutrients['fibers'] ?? nutrients['fiber']).toDouble(),
+      sugar: getValue(nutrients['sugar'] ?? nutrients['sugars']).toDouble(),
+      sodium: getValue(nutrients['sodium']).toDouble(),
+      water: getValue(nutrients['water']).toDouble(),
 
       otherNutrients: json['other_nutrients'] != null
           ? (json['other_nutrients'] as List).map((e) => OtherNutrient.fromJson(e)).toList()
@@ -345,7 +345,7 @@ class Food extends FoodBase {
     final double totalMultiplier = (amount * gramWeight) / weight;
 
     // Helper to scale and round
-    int scale(num val) => (val * totalMultiplier).round();
+    double scale(num val) => (val * totalMultiplier);
 
     return FoodLog(
       id: DateTime.now().millisecondsSinceEpoch.toString(),

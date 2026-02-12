@@ -55,11 +55,11 @@ class OnboardingStep15 extends ConsumerWidget { // Changed to ConsumerWidget
 
             NoYesButton(
               onNo: () {
-                ref.read(userProvider.notifier).setRolloverCalories(false);
+                ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(settings: s.settings.copyWith(isRollover: false)));
                 nextPage();
               },
               onYes: () {
-                ref.read(userProvider.notifier).setRolloverCalories(true);
+                ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(settings: s.settings.copyWith(isRollover: true)));
                 nextPage();
               },
             ),

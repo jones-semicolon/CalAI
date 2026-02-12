@@ -1,3 +1,4 @@
+import 'package:calai/pages/settings/screens/edit_goals.dart';
 import 'package:calai/pages/settings/settings_item.dart';
 import 'package:calai/pages/settings/widgets/settings_divider.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class SettingsGroup extends StatelessWidget {
           SettingsItemTile(
             icon: Icons.pie_chart_outline,
             label: "Adjust Macronutrients",
-            onTap: () => print("Adjust Macro tapped"),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditGoalsView())),
           ),
           const SettingsDivider(),
           SettingsItemTile(

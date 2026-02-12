@@ -1,4 +1,5 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/widgets/edit_value_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -65,24 +66,30 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
 
   Future<void> _editValue({
     required String title,
-    required int initialValue,
+    required num initialValue,
     required Color color,
     required IconData icon,
-    required ValueChanged<int> onSaved,
+    required ValueChanged<double> onSaved,
   }) async {
-    final result = await Navigator.of(context).push<int>(
-      PushPageRoute(
-        page: EditGoalScreen(
-          title: title,
-          initialValue: initialValue,
-          icon: icon,
-          color: color,
-        ),
+    final double? newValue = await showModalBottomSheet<double>(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) => EditModal(
+        initialValue: initialValue.toDouble(),
+        title: title,
+        label: title,
+        color: color,
+        onDone: (val) {
+          // ✅ ONLY POP HERE to return the value to this function
+          Navigator.pop(context, val);
+        },
       ),
     );
 
-    if (result != null) {
-      setState(() => onSaved(result));
+    // ✅ DO NOT call Navigator.pop(context) here!
+    // If you do, it pops the Onboarding screen, leaving you with a blank screen.
+    if (newValue != null && mounted) {
+      onSaved(newValue);
     }
   }
 
@@ -150,13 +157,13 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                   macros: [
                     MacroData(
                       title: 'Calories',
-                      value: targets?.calories?.toString() ?? '0',
+                      value: targets.calories.round().toString(),
                       progress: 0.5,
                       color: Theme.of(context).colorScheme.primary,
                       icon: Icons.local_fire_department,
                       onTap: () => _editValue(
                         title: 'Calories',
-                        initialValue: targets?.calories ?? 0,
+                        initialValue: targets.calories,
                         icon: Icons.local_fire_department,
                         color: Theme.of(context).colorScheme.primary,
                         onSaved: (v) {
@@ -176,13 +183,13 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                     ),
                     MacroData(
                       title: 'Carbs',
-                      value: '${targets?.carbs ?? 0}g',
+                      value: '${targets.carbs.round()}g',
                       progress: 0.5, // Logic can be refined later
                       color: NutritionType.carbs.color,
                       icon: NutritionType.carbs.icon,
                       onTap: () => _editValue(
                         title: 'Carbs',
-                        initialValue: targets?.carbs ?? 0,
+                        initialValue: targets.carbs,
                         icon: NutritionType.carbs.icon,
                         color: Theme.of(context).colorScheme.primary,
                         onSaved: (v) {
@@ -202,13 +209,13 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                     ),
                     MacroData(
                       title: 'Protein',
-                      value: '${targets?.protein ?? 0}g',
+                      value: '${targets.protein.round()}g',
                       progress: 0.5,
                       color: NutritionType.protein.color,
                       icon: NutritionType.protein.icon,
                       onTap: () => _editValue(
                         title: 'Protein',
-                        initialValue: targets?.protein ?? 0,
+                        initialValue: targets.protein,
                         icon: NutritionType.protein.icon,
                         color: Theme.of(context).colorScheme.primary,
                         onSaved: (v) {
@@ -228,13 +235,13 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                     ),
                     MacroData(
                       title: 'Fats',
-                      value: '${targets?.fats ?? 0}g',
+                      value: '${targets.fats.round()}g',
                       progress: 0.5,
                       color: NutritionType.fats.color,
                       icon: NutritionType.fats.icon,
                       onTap: () => _editValue(
                         title: 'Fats',
-                        initialValue: targets?.fats ?? 0,
+                        initialValue: targets.fats,
                         icon: NutritionType.fats.icon,
                         color: Theme.of(context).colorScheme.primary,
                         onSaved: (v) {
@@ -261,7 +268,10 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
             ],
           ),
         ),
-        ConfirmationButtonWidget(enabled: true, onConfirm: widget.nextPage),
+        ConfirmationButtonWidget(enabled: true, onConfirm: () {
+          ref.read(userProvider.notifier).updateNutritionGoals(user.goal.targets);
+          widget.nextPage();
+        }),
       ],
     );
   }

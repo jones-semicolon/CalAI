@@ -3,15 +3,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class Nutrition {
-  final int calories;
-  final int protein;
-  final int carbs;
-  final int fats;
-  final int fiber;
-  final int sugar;
-  final int sodium;
-  final int water;
-  final int steps;
+  final double calories;
+  final double protein;
+  final double carbs;
+  final double fats;
+  final double fiber;
+  final double sugar;
+  final double sodium;
+  final double water;
+  final double steps;
 
   const Nutrition({
     this.calories = 0,
@@ -27,8 +27,8 @@ abstract class Nutrition {
 }
 
 class NutritionGoals extends Nutrition {
-  final int weightGoal;
-  final int rollover;
+  final double weightGoal;
+  final double rollover;
 
   const NutritionGoals({
     super.calories,
@@ -46,7 +46,7 @@ class NutritionGoals extends Nutrition {
 
   factory NutritionGoals.fromJson(Map<String, dynamic> map) {
     // Use a nullable return type here
-    int? val(String key) => (map[key] as num?)?.toInt();
+    double? val(String key) => (map[key] as num?)?.toDouble();
 
     return NutritionGoals(
       calories: val('calorieGoal') ?? 0,
@@ -58,7 +58,7 @@ class NutritionGoals extends Nutrition {
       sodium: val('sodiumGoal') ?? 0,
       water: val('waterGoal') ?? 64,
       steps: val('stepsGoal') ?? 10000,
-      weightGoal: val('weightGoal') ?? 0 ,
+      weightGoal: val('weightGoal') ?? 0,
       rollover: val('rollover') ?? 0,
     );
   }
@@ -80,17 +80,17 @@ class NutritionGoals extends Nutrition {
   static const empty = NutritionGoals();
 
   NutritionGoals copyWith({
-    int? calories,
-    int? protein,
-    int? carbs,
-    int? fats,
-    int? fiber,
-    int? sugar,
-    int? sodium,
-    int? water,
-    int? steps,
-    int? targetWeight,
-    int? rollover,
+    double? calories,
+    double? protein,
+    double? carbs,
+    double? fats,
+    double? fiber,
+    double? sugar,
+    double? sodium,
+    double? water,
+    double? steps,
+    double? targetWeight,
+    double? rollover,
   }) {
     return NutritionGoals(
       calories: calories ?? this.calories,
@@ -144,7 +144,7 @@ class NutritionLog extends Nutrition {
   factory NutritionLog.fromSnapshot(DateTime date, Map<String, dynamic> data) {
     final dp = data['dailyProgress'] as Map<String, dynamic>? ?? {};
 
-    int val(Map m, String k) => (m[k] as num?)?.toInt() ?? 0;
+    double val(Map m, String k) => (m[k] as num?)?.toDouble() ?? 0;
 
     return NutritionLog(
       date: date,
@@ -162,7 +162,7 @@ class NutritionLog extends Nutrition {
 }
 
 class NutritionProgress extends Nutrition {
-  final int caloriesBurned;
+  final double caloriesBurned;
 
   const NutritionProgress({
     super.calories, super.protein, super.carbs, super.fats,
@@ -188,7 +188,7 @@ class NutritionProgress extends Nutrition {
   factory NutritionProgress.fromDailyLog(Map<String, dynamic> data) {
     final dp = data['dailyProgress'] as Map<String, dynamic>? ?? {};
 
-    int val(Map m, String k) => (m[k] as num?)?.toInt() ?? 0;
+    double val(Map m, String k) => (m[k] as num?)?.toDouble() ?? 0;
 
     return NutritionProgress(
       calories: val(dp, 'caloriesEaten'),

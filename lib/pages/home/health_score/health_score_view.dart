@@ -7,6 +7,8 @@ import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../settings/screens/edit_goals.dart';
+
 class HealthScoreView extends ConsumerStatefulWidget {
   final double score;
   const HealthScoreView({super.key, required this.score});
@@ -71,15 +73,15 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                                                 children: [
                                                   Text("Calories", style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                                                   Text(
-                                                      "${progress.calories} / ${calorieGoal.round()} kcal",
+                                                      "${progress.calories.round()} / ${calorieGoal.round()} kcal",
                                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)
                                                   )
                                                 ]
                                             )
                                         ),
                                         _ProgressIndicator(
-                                          progress: progress.calories.toDouble(),
-                                          target: calorieGoal.toDouble(),
+                                          progress: progress.calories,
+                                          target: calorieGoal,
                                           color: theme.colorScheme.primary,
                                           child: const Icon(Icons.local_fire_department),
                                         )
@@ -105,9 +107,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
 
                                   const SizedBox(height: 5),
                                   ConfirmationButtonWidget(
-                                    onConfirm: (){
-                                      // TODO: Navigate to Edit Goals Page
-                                    },
+                                    onConfirm: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const EditGoalsView())),
                                     padding: EdgeInsets.zero,
                                     decoration: BoxDecoration(
                                       border: Border.all(color: theme.colorScheme.secondary, width: 1.5),
@@ -134,14 +134,14 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                                         Text("Water", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                         const SizedBox(height: 4),
                                         Text(
-                                            "${progress.water} / ${user.goal.targets.water} fl oz",
+                                            "${progress.water.round()} / ${user.goal.targets.water.round()} fl oz",
                                             style: TextStyle(color: Colors.grey[600])
                                         )
                                       ]
                                   ),
                                   _ProgressIndicator(
-                                      progress: progress.water.toDouble(),
-                                      target: user.goal.targets.water.toDouble(),
+                                      progress: progress.water,
+                                      target: user.goal.targets.water,
                                       color: Colors.lightBlue,
                                       child: const Icon(Icons.water_drop_outlined, color: Colors.lightBlue)
                                   )
@@ -172,7 +172,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                                             ),
                                           ],
                                         ),
-                                        _ProgressIndicator(progress: widget.score, target: 10, color: Colors.red, child: Text("${widget.score.toInt()}/10"))
+                                        _ProgressIndicator(progress: widget.score, target: 10, color: Colors.red, child: Text("${widget.score.round()}/10"))
                                       ],
                                     ),
                                     const SizedBox(height: 20),

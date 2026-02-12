@@ -61,28 +61,31 @@ class _CarouselViewState extends ConsumerState<CarouselView> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    // 1. Get the current progress from the global provider
-    final globalState = ref.watch(globalDataProvider).value;
+    // ✅ FIX 1: Only watch the specific data needed for this level (the ID)
+    // This prevents a rebuild of the whole Carousel if water/calories change!
+    final activeDateId = ref.watch(globalDataProvider.select((async) => async.value?.activeDateId ?? ''));
 
-    // 2. Extract the dateId for the Activity card
-    final dateId = widget.date.toIso8601String().split('T').first;
+    // ✅ FIX 2: Watch water separately using select
+    final currentWater = ref.watch(globalDataProvider.select((async) => async.value?.todayProgress.water ?? 0));
 
     final pages = [
       CarouselCalories(
+        key: const ValueKey('calories_page'), // ✅ FIX 3: Add Stable Keys
         isTap: widget.isTap,
         onTap: widget.onTap,
-        // ✅ No longer passing 'health' object; the widget watches providers itself
       ),
       CarouselHealth(
+        key: const ValueKey('health_page'), // ✅ FIX 3: Add Stable Keys
         isTap: widget.isTap,
         onTap: widget.onTap,
       ),
       CarouselActivity(
-        // ✅ Pull water directly from the new todayProgress model
-        waterIntake: globalState?.todayProgress.water ?? 0,
+        key: const ValueKey('activity_page'), // ✅ FIX 3: Add Stable Keys
+        waterIntake: currentWater,
         onWaterChange: widget.onWaterChange,
-        dateId: dateId,
+        dateId: activeDateId,
       ),
     ];
 
@@ -95,6 +98,7 @@ class _CarouselViewState extends ConsumerState<CarouselView> {
             controller: _controller,
             physics: const BouncingScrollPhysics(),
             onPageChanged: widget.onPageChanged,
+            allowImplicitScrolling: true,
             children: pages,
           ),
         ),

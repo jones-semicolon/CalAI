@@ -33,13 +33,13 @@ class RecentlyUploadedSection extends ConsumerWidget {
                 "Recently logged",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              TextButton(
-                onPressed: () {
-                  // TODO: Navigate to your full history view
-                  debugPrint("Navigating to all logs for $dateId");
-                },
-                child: Text("See all"),
-              ),
+              // TextButton(
+              //   onPressed: () {
+              //     // TODO: Navigate to your full history view
+              //     debugPrint("Navigating to all logs for $dateId");
+              //   },
+              //   child: Text("See all"),
+              // ),
             ]
           ),
           const SizedBox(height: 20),

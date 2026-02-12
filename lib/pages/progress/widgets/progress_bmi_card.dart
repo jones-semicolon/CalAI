@@ -8,9 +8,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../enums/user_enums.dart';
 import '../../../providers/global_provider.dart';
 import '../../../providers/user_provider.dart';
+import '../screens/bmi_info_view.dart';
 
 class ProgressBmiCard extends ConsumerWidget {
-  const ProgressBmiCard({super.key});
+  final BoxDecoration? decoration;
+  final bool? hasPadding;
+  const ProgressBmiCard({super.key, this.decoration, this.hasPadding = true});
 
   int _calculateAge(DateTime? birthDate) {
     if (birthDate == null) return 0; // Guard for null birthDate
@@ -76,8 +79,8 @@ class ProgressBmiCard extends ConsumerWidget {
         final bmiSize = isSmall ? 24.0 : 28.0;
 
         return Container(
-          padding: EdgeInsets.all(padding),
-          decoration: BoxDecoration(
+          padding: EdgeInsets.all(hasPadding! ? padding : 0),
+          decoration: decoration ?? BoxDecoration(
             color: theme.scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(25),
             boxShadow: [
@@ -100,76 +103,55 @@ class ProgressBmiCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 8,
-                runSpacing: 6,
-                children: [
-                  Text(
-                    bmi.isFinite ? bmi.toStringAsFixed(2) : "0.00",
-                    style: TextStyle(
-                      fontSize: bmiSize,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  Text(
-                    'Your weight is',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.shadowColor,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                      color: calculator.color,
-                    ),
-                    child: Text(
-                      calculator.label,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
+              FittedBox(
+                fit: BoxFit.scaleDown, // Ensures it only scales down if it overflows
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center, // Aligns items vertically
+                  children: [
+                    Text(
+                      bmi.isFinite ? bmi.toStringAsFixed(2) : "0.00",
+                      style: TextStyle(
+                        fontSize: bmiSize,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
-                  ),
-                  // TODO move it to BMI info page
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: const Text("BMI Information"),
-                          content: const Text(
-                            "BMI is an estimate of body fat based on height and weight.\n\n"
-                                "Underweight: < 18.5\n"
-                                "Healthy: 18.5 – 24.9\n"
-                                "Overweight: 25 – 29.9\n"
-                                "Obese: 30+",
-                          ),
-                        ),
-                      );
-                    },
-                    child: Icon(
-                      Icons.help_outline,
-                      size: 22,
-                      color: theme.colorScheme.primary,
+                    const SizedBox(width: 8), // Replaces Wrap spacing
+                    Text(
+                      'Your weight is',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: theme.shadowColor,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8), // Replaces Wrap spacing
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+                        color: calculator.color,
+                      ),
+                      child: Text(
+                        calculator.label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8), // Replaces Wrap spacing
+                    // TODO move it to BMI info page
+                    GestureDetector(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BmiInfoView())),
+                      child: Icon(
+                        Icons.help_outline,
+                        size: 22,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-
-              // // ✅ show the weight used (optional, remove if you want)
-              // Text(
-              //   "Based on: ${weightKg.toStringAsFixed(1)} kg",
-              //   style: const TextStyle(
-              //     fontSize: 12,
-              //     color: Color.fromARGB(255, 137, 137, 139),
-              //   ),
-              // ),
-
               const SizedBox(height: 14),
               BmiLinearProgress(
                 value: calculator.indicatorValue,

@@ -25,7 +25,7 @@ class User {
   });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
+    'uid': id,
     'profile': profile.toJson(),
     'body': body.toJson(),
     'goal': goal.toJson(),
@@ -34,7 +34,7 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] ?? '',
+      id: json['uid'] ?? '',
       profile: UserProfile.fromJson(json['profile'] ?? {}),
       body: UserBiometrics.fromJson(json['body'] ?? {}),
       goal: UserGoal.fromJson(json['goal'] ?? json),
@@ -68,20 +68,20 @@ class UserProfile {
   final String? name;
   final Gender? gender;
   final DateTime? birthDate;
-  final UserProvider provider;
+  final UserProvider? provider;
 
   const UserProfile({
     this.name,      // Nullable, optional
     this.gender,    // Nullable, optional
     required this.birthDate,  // Nullable, optional
-    required this.provider,  // Required
+    this.provider,  // Required
   });
 
   Map<String, dynamic> toJson() => {
     'name': name,
     'gender': gender?.name ?? "male",
     'birthDate': birthDate?.toIso8601String(),
-    'provider': provider.name,
+    'provider': provider?.name ?? UserProvider.anonymous.name,
   };
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -95,13 +95,13 @@ class UserProfile {
     );
   }
 
-  UserProfile copyWith({String? name, Gender? gender, DateTime? birthDay, UserProvider? provider}) {
+  UserProfile copyWith({String? name, Gender? gender, DateTime? birthDate, UserProvider? provider}) {
     return UserProfile(
       // We check explicit null logic if you want to clear fields,
       // but for simple updates this standard pattern works:
       name: name ?? this.name,
       gender: gender ?? this.gender,
-      birthDate: birthDay ?? this.birthDate,
+      birthDate: birthDate ?? this.birthDate,
       provider: provider ?? this.provider,
     );
   }
@@ -186,8 +186,7 @@ class UserGoal {
   final GoalFocus? motivation;
   final WorkoutFrequency? activityLevel;
   final DietType? dietType;
-  // TODO: Must be enum
-  final String? maintenanceStrategy;
+  final ObstacleType? maintenanceStrategy;
 
   // ✅ ADDED: This field holds your NutritionGoals (Calories, Protein, etc.)
   final NutritionGoals targets;
@@ -210,7 +209,7 @@ class UserGoal {
     'motivation': motivation?.name,
     'activityLevel': activityLevel?.name,
     'dietType': dietType?.name,
-    'maintenanceStrategy': maintenanceStrategy,
+    'maintenanceStrategy': maintenanceStrategy?.name,
     'dailyGoals': targets.toJson(),
   };
 
@@ -219,15 +218,15 @@ class UserGoal {
       // ✅ Fix: Add ?? '' or a default value for every enum/string
       type: Goal.fromString(json['type'] ?? Goal.maintain.name),
 
-      // targetWeight: (json['weightGoal'] as num?)?.toDouble(),
       weeklyRate: (json['weeklyRate'] as num?)?.toDouble() ?? 0.8,
 
       motivation: GoalFocus.fromString(json['motivation'] ?? GoalFocus.healthier.name),
       activityLevel: WorkoutFrequency.fromString(json['activityLevel'] ?? WorkoutFrequency.moderate.name),
       dietType: DietType.fromString(json['dietType'] ?? DietType.classic.name),
 
-      // TODO:: it should be converted to enum
-      maintenanceStrategy: json['maintenanceStrategy'] ?? '',
+      maintenanceStrategy: ObstacleType.fromString(
+          json['maintenanceStrategy'] ?? ObstacleType.consistency.name
+      ),
 
       // ✅ Already looks good, but let's be extra safe
       targets: json['dailyGoals'] != null
@@ -238,18 +237,15 @@ class UserGoal {
 
   UserGoal copyWith({
     Goal? type,
-    // TODO repetition on targets.weightGoal
-    double? targetWeight,
     double? weeklyRate,
     GoalFocus? motivation,
     WorkoutFrequency? activityLevel,
     DietType? dietType,
-    String? maintenanceStrategy,
+    ObstacleType? maintenanceStrategy,
     NutritionGoals? targets, // ✅ ADDED
   }) {
     return UserGoal(
       type: type ?? this.type,
-      // targetWeight: targetWeight ?? this.targetWeight,
       weeklyRate: weeklyRate ?? this.weeklyRate,
       motivation: motivation ?? this.motivation,
       activityLevel: activityLevel ?? this.activityLevel,

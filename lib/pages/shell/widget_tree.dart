@@ -24,7 +24,6 @@ class WidgetTree extends ConsumerStatefulWidget {
 
 class _WidgetTreeState extends ConsumerState<WidgetTree> {
   bool _booted = false;
-  // TODO Fix scrolling and navigating bug
 
   @override
   void initState() {

@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart'; // ✅ Import this
 import '../../../enums/food_enums.dart';
 import '../../../models/exercise_model.dart';
 import '../../../models/food_model.dart';
+import 'logged_view/logged_exercise_view.dart';
 import 'logged_view/logged_food_view.dart';
 
 class FoodLogCard extends StatelessWidget {
@@ -25,14 +26,14 @@ class FoodLogCard extends StatelessWidget {
       ),
       title: food.name,
       subtitle: DateFormat.jm().format(food.timestamp),
-      calories: "${food.calories} calories",
+      calories: "${food.calories.round()} calories",
       bottom: Row(
         children: [
-          _macro(NutritionType.protein, "${food.protein}g"),
+          _macro(NutritionType.protein, "${food.protein.round()}g"),
           const SizedBox(width: 10),
-          _macro(NutritionType.carbs, "${food.carbs}g"),
+          _macro(NutritionType.carbs, "${food.carbs.round()}g"),
           const SizedBox(width: 10),
-          _macro(NutritionType.fats, "${food.fats}g"),
+          _macro(NutritionType.fats, "${food.fats.round()}g"),
         ],
       ),
     );
@@ -51,13 +52,14 @@ class ExerciseLogCard extends StatelessWidget {
 
     return _BaseLogCard(
       onDelete: onDelete,
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => EditExercisePage(exercise: exercise))),
       leading: CircleAvatar(
         backgroundColor: Theme.of(context).cardColor,
         child: Icon(type.icon),
       ),
       title: type.label,
       subtitle: exercise.formattedTime,
-      calories: "${exercise.caloriesBurned} kcal",
+      calories: "${exercise.caloriesBurned.round()} kcal",
       bottom: Row(
         children: [
           Icon(Icons.bolt, size: 14, color: Colors.grey[500]),

@@ -129,7 +129,7 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
     _displayedWeightKg.value = snappedKg;
 
     // ✅ update provider only once
-    ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(targetWeight: snappedKg)));
+    ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(targets: s.goal.targets.copyWith(targetWeight: snappedKg))));
 
     // ✅ optional haptic (only after snap)
     HapticFeedback.selectionClick();

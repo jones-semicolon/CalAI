@@ -30,12 +30,15 @@ class EncourageMessage extends ConsumerWidget {
     final currentWeight = user.body.currentWeight;
 
     final goalText = _goalLabel(currentWeight, weightGoal.toDouble());
-
     final double weightDiff = unit == WeightUnit.kg
         ? (weightGoal - currentWeight).abs()
         : ((weightGoal - currentWeight) * _lbPerKg).abs();
 
     final unitLabel = unit.value;
+
+    debugPrint('Current Weight: $currentWeight');
+    debugPrint('Weight Goal: $weightGoal');
+
 
     return SafeArea(
       child: Column(

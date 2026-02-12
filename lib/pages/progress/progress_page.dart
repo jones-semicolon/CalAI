@@ -35,7 +35,6 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
     final globalAsync = ref.watch(globalDataProvider);
 
     return CustomScrollView(
-      key: const PageStorageKey('progress_scroll_view'),
       slivers: [
         const WidgetTreeAppBar(),
         globalAsync.when(

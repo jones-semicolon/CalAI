@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum Gender {
   male("male"),
   female("female"),
@@ -138,6 +140,25 @@ enum UserProvider {
     return UserProvider.values.firstWhere(
           (e) => e.value == val,
       orElse: () => UserProvider.anonymous,
+    );
+  }
+}
+
+enum ObstacleType {
+  consistency('Lack of consistency', Icons.bar_chart),
+  unhealthyEating('Unhealthy eating habits', Icons.fastfood),
+  lackOfSupport('Lack of supports', Icons.group),
+  busySchedule('Busy schedule', Icons.calendar_month),
+  mealInspiration('Lack of meal inspiration', Icons.food_bank);
+
+  final String title;
+  final IconData icon;
+  const ObstacleType(this.title, this.icon);
+
+  static ObstacleType fromString(String val) {
+    return ObstacleType.values.firstWhere(
+          (e) => e.title == val,
+      orElse: () => ObstacleType.consistency,
     );
   }
 }

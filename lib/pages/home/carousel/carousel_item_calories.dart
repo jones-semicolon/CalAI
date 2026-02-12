@@ -135,8 +135,8 @@ class _CalorieInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Logic: Eaten vs Left
-    final int effectiveGoal = globalState?.effectiveCalorieGoal(isAddBurnEnabled, isRolloverEnabled) ?? targets.calories;
-    final int value = isTap
+    final num effectiveGoal = globalState?.effectiveCalorieGoal(isAddBurnEnabled, isRolloverEnabled) ?? targets.calories;
+    final num value = isTap
         ? progress.calories
         : (globalState?.caloriesRemaining(isAddBurnEnabled, isRolloverEnabled) ?? (targets.calories - progress.calories));
 
@@ -146,7 +146,7 @@ class _CalorieInfo extends StatelessWidget {
       color: Theme.of(context).colorScheme.primary,
     );
 
-    final valueString = value.abs().toString();
+    final valueString = value.abs().round().toString();
 
     return Expanded(
       child: Column(
@@ -182,7 +182,7 @@ class _CalorieInfo extends StatelessWidget {
                   const SizedBox(width: 4),
                   // 3. The Goal part slides in/out smoothly
                   AnimatedSlideNumber(
-                    value: isTap ? " /$effectiveGoal" : "",
+                    value: isTap ? " /${effectiveGoal.round()}" : "",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,

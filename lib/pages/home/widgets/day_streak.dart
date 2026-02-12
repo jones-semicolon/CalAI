@@ -112,7 +112,7 @@ class DayStreakDialog extends StatelessWidget {
               Positioned(
                 top: 16,
                 right: 16,
-                child: StreakIndicatorButton(isDisabled: isStreakActive),
+                child: StreakIndicatorButton(isDisabled: true),
               ),
             ],
           ),
@@ -122,8 +122,6 @@ class DayStreakDialog extends StatelessWidget {
   }
 }
 
-// ... _WeeklyStreakView and _DayIndicator remain the same ...
-// (Ensure you keep the classes you provided in your snippet)
 class _WeeklyStreakView extends StatelessWidget {
   final List<bool> dayStreak;
 
@@ -169,7 +167,7 @@ class _DayIndicator extends StatelessWidget {
             fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
             color: isToday
                 ? todayColor
-                : (isDone ? activeColor : Theme.of(context).primaryColor),
+                : (isDone ? activeColor : Theme.of(context).colorScheme.onPrimary),
           ),
         ),
         const SizedBox(height: 6),

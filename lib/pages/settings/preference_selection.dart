@@ -64,27 +64,25 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
   void _updateSettings({bool? isAddCalorieBurn, bool? isRollover}) async {
     final userNotifier = ref.read(userProvider.notifier);
 
-    // 1. Update local state via your notifier's helper
-    // (Using the _update method we created in the previous turn)
-    // userNotifier.update((state) => state.copyWith(
-    //   settings: state.settings.copyWith(
-    //     isAddCalorieBurn: isAddCalorieBurn ?? state.settings.isAddCalorieBurn,
-    //     isRollover: isRollover ?? state.settings.isRollover,
-    //   ),
-    // ));
+    // 1. Update only the specific field that was changed.
+    // We don't check the value of the other setting here.
+    if (isAddCalorieBurn != null) {
+      userNotifier.setAddCaloriesBurned(isAddCalorieBurn);
+    }
 
-    userNotifier.setAddCaloriesBurned(isAddCalorieBurn ?? false);
-    userNotifier.setRolloverCalories(isRollover ?? false);
+    if (isRollover != null) {
+      userNotifier.setRolloverCalories(isRollover);
+    }
 
-    // 2. Sync to Firestore
-    // We read the latest state after the update above
-    final updatedSettings = ref.read(userProvider).settings;
-
+    // 2. Sync the updated settings object to Firestore
     try {
+      // We read the state after the notifier has updated it
+      final updatedSettings = ref.read(userProvider).settings;
       await ref.read(calaiServiceProvider).updateUserSettings(updatedSettings);
+
+      debugPrint("✅ Settings synced: Burned: ${updatedSettings.isAddCalorieBurn}, Rollover: ${updatedSettings.isRollover}");
     } catch (e) {
-      debugPrint("Failed to sync settings: $e");
-      // Optional: Revert local state if sync fails
+      debugPrint("❌ Failed to sync settings: $e");
     }
   }
 

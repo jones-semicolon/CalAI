@@ -1,3 +1,4 @@
+import 'package:calai/enums/user_enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -21,6 +22,62 @@ class AuthService {
     }
   }
 
+  /// Deletes the user document and related sub-collections
+  Future<void> deleteUserDocumentAndData() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    final userRef = FirebaseFirestore.instance.collection('users').doc(uid);
+    final batch = FirebaseFirestore.instance.batch();
+
+    // List of all your sub-collections
+    final subCollections = ['dailyLogs', 'stats', 'savedFood'];
+
+    for (var collectionName in subCollections) {
+      final collectionRef = userRef.collection(collectionName);
+      final snapshots = await collectionRef.get();
+
+      for (var doc in snapshots.docs) {
+        batch.delete(doc.reference);
+      }
+    }
+
+    // Finally, delete the parent user document itself
+    batch.delete(userRef);
+
+    await batch.commit();
+  }
+
+  /// Deletes the Firebase Auth account
+  Future<void> deleteAuthAccount() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      // 1. Attempt initial delete
+      await user.delete();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        // 2. Identify the provider (Google, etc.)
+        // Since your app heavily uses Google Sign-In:
+        final googleProvider = GoogleAuthProvider();
+
+        try {
+          // 3. Force re-auth (This shows the Google picker again)
+          await user.reauthenticateWithProvider(googleProvider);
+
+          // 4. Try deleting again now that the session is "fresh"
+          await user.delete();
+
+        } catch (reAuthError) {
+          throw Exception("Authentication failed. Please log out and back in to delete.");
+        }
+      } else {
+        rethrow;
+      }
+    }
+  }
+
   // ==========================================
   // ANONYMOUS SIGN IN
   // ==========================================
@@ -32,7 +89,7 @@ class AuthService {
 
       // 2. Sync User to Firestore (so the user exists in your DB)
       if (userCredential.user != null) {
-        await _syncUserToFirestore(userCredential.user!, 'anonymous');
+        await _syncUserToFirestore(userCredential.user!, UserProvider.anonymous.value);
       }
 
       return userCredential;
@@ -87,7 +144,7 @@ class AuthService {
 
       // 7. Sync User to Firestore
       if (userCredential.user != null) {
-        await _syncUserToFirestore(userCredential.user!, 'google');
+        await _syncUserToFirestore(userCredential.user!, UserProvider.google.value);
       }
 
       return userCredential;
@@ -109,7 +166,6 @@ class AuthService {
       // 2. Use the default Firebase domain instead of page.link
       const String url = 'https://$projectId.firebaseapp.com/verify';
       // Configuration for where to redirect the user
-      // TODO: Replace with your actual Bundle ID and Package Name
       var acs = ActionCodeSettings(
         // This URL must be whitelisted in Firebase Console > Authentication > Settings > Authorized Domains
         url: url,
@@ -130,6 +186,46 @@ class AuthService {
       print("Magic link sent to $email");
     } catch (e) {
       print("Error sending magic link: $e");
+      rethrow;
+    }
+  }
+
+  static Future<UserCredential?> linkGoogleAccount() async {
+    await initSignIn();
+
+    final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+    final idToken = googleUser.authentication.idToken;
+    final authorizationClient = googleUser.authorizationClient;
+
+    var authorization = await authorizationClient.authorizationForScopes(['email', 'profile']);
+    var accessToken = authorization?.accessToken;
+
+    if (accessToken == null) {
+      final retry = await authorizationClient.authorizationForScopes(['email', 'profile']);
+      accessToken = retry?.accessToken;
+      if (accessToken == null) throw Exception("Token error");
+    }
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: accessToken,
+      idToken: idToken,
+    );
+
+    try {
+      final userCredential = await _auth.currentUser!.linkWithCredential(credential);
+
+      if (userCredential.user != null) {
+        await _syncUserToFirestore(userCredential.user!, UserProvider.google.value);
+      }
+      return userCredential;
+
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'credential-already-in-use') {
+        // This Google account is already linked to another user UID.
+        // You must decide: do you sign into that old account, or force merge?
+        print('This google account already exists as a separate user.');
+        rethrow;
+      }
       rethrow;
     }
   }
@@ -164,19 +260,27 @@ class AuthService {
 
   /// Syncs user data to Firestore (Works for Google, Magic Link, & Anonymous)
   static Future<void> _syncUserToFirestore(User user, String provider) async {
-    final userDoc =
-    FirebaseFirestore.instance.collection('users').doc(user.uid);
-
+    final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
     final docSnapshot = await userDoc.get();
 
     if (!docSnapshot.exists) {
+      // Brand new user (Anonymous or first-time Google)
       await userDoc.set({
         'uid': user.uid,
-        'name': user.displayName ?? '',
-        'email': user.email ?? '',
-        'photoURL': user.photoURL ?? '',
-        'provider': provider, // 'google', 'magic_link', or 'anonymous'
+        'profile': {
+          'provider': provider,
+          'photoURL': user.photoURL ?? '',
+          'email': user.email ?? '',
+          'name': user.displayName ?? '',
+        },
         'createdAt': FieldValue.serverTimestamp(),
+      });
+    } else {
+      await userDoc.update({
+        'profile.provider': provider,
+        'profile.photoURL': user.photoURL ?? '',
+        'profile.email': user.email ?? '',
+        'profile.name': user.displayName ?? '',
       });
     }
   }

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-// TODO integrate Firestore data weight_history collection
+import '../../../providers/global_provider.dart';
+
 class WeightHistoryView extends ConsumerStatefulWidget {
   const WeightHistoryView({super.key});
 
@@ -14,87 +15,102 @@ class WeightHistoryView extends ConsumerStatefulWidget {
 class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
   @override
   Widget build(BuildContext context) {
-    // --- SAMPLE DATA ---
-    // Using a list of Maps to simulate what might come from Firestore
-    final List<Map<String, dynamic>> sampleEntries = [
-      {"date": DateTime(2026, 2, 5), "weight": 70.0},
-      {"date": DateTime(2026, 2, 3), "weight": 71.2},
-      {"date": DateTime(2026, 1, 28), "weight": 72.5},
-      {"date": DateTime(2026, 1, 15), "weight": 74.0},
-    ];
+    // 1. Watch the global data
+    final globalAsync = ref.watch(globalDataProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            CustomAppBar(title: Text("Weight History")),
+            const CustomAppBar(title: Text("Weight History")),
+
+            // 2. Handle Loading/Error/Data states
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.all(16),
-                itemCount: sampleEntries.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final entry = sampleEntries[index];
+              child: globalAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, _) => Center(child: Text("Error: $error")),
+                data: (global) {
+                  // 3. Get logs and Sort them (Newest first)
+                  final logs = global.weightLogs;
 
-                  // ✅ Extract and cast values safely
-                  final DateTime dateValue = entry['date'] as DateTime;
-                  final double weightValue = (entry['weight'] as num).toDouble();
+                  if (logs.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "No weight history recorded yet.",
+                        style: TextStyle(color: Theme.of(context).hintColor),
+                      ),
+                    );
+                  }
 
-                  // ✅ Format Date: Feb, 05 2026
-                  final String formattedDate = DateFormat('MMM, dd yyyy').format(dateValue);
+                  // Create a sorted copy to avoid mutating the original list
+                  final sortedLogs = List.of(logs)
+                    ..sort((a, b) => b.date.compareTo(a.date));
 
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).appBarTheme.backgroundColor,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Weight on the left
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            Text(
-                              "$weightValue",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                  return ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: sortedLogs.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final log = sortedLogs[index];
+
+                      // 4. Format real data
+                      final String formattedDate = DateFormat('MMM, dd yyyy').format(log.date);
+
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).appBarTheme.backgroundColor,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
-                            const SizedBox(width: 4),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Weight Value
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  // Ensure uniform decimal places (e.g., 70.0)
+                                  log.weight.toStringAsFixed(1),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "kg",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Theme.of(context).colorScheme.secondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            // Date Label
                             Text(
-                              "kg",
+                              formattedDate,
                               style: TextStyle(
-                                fontSize: 12,
-                                color: Theme.of(context).colorScheme.secondary,
+                                fontSize: 14,
+                                color: Theme.of(context).hintColor,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
-
-                        // Date on the right
-                        Text(
-                          formattedDate,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               ),

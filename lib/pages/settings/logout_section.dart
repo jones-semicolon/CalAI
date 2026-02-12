@@ -4,7 +4,6 @@ import 'package:calai/pages/settings/settings_item.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_sizes.dart';
-import '../auth/auth-page.dart';
 
 class LogoutSection extends StatelessWidget {
   const LogoutSection({super.key});
@@ -17,21 +16,49 @@ class LogoutSection extends StatelessWidget {
         color: const Color.fromARGB(26, 185, 168, 209),
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
       ),
-      child: SettingsItemTile(label: "Logout", icon: Icons.logout, // inside LogoutSection
-        onTap: () async {
-          // 1. Show a loading indicator if desired
-          // 2. Await the sign-out to ensure tokens are cleared
-          await AuthService.signOut();
+      child: SettingsItemTile(
+        label: "Logout",
+        icon: Icons.logout,
+        onTap: () => _showLogoutConfirmation(context),
+      ),
+    );
+  }
 
-          if (context.mounted) {
-            // 3. Clear the entire navigation stack and go to AppEntry or AuthPage
-            // Replace 'AppEntry()' with the name of your initial root widget
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const AppEntry()),
-                  (route) => true,
-            );
-          }
-        },)
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          title: const Text("Logout"),
+          content: const Text("Are you sure you want to log out?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Close dialog
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context); // Close dialog before starting process
+
+                await AuthService.signOut();
+
+                if (context.mounted) {
+                  // Clear stack and navigate to Entry
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const AppEntry()),
+                        (route) => false, // Set to false to clear previous routes
+                  );
+                }
+              },
+              child: const Text(
+                "Logout",
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

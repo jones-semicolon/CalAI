@@ -161,7 +161,7 @@ class _DayIndicator extends StatelessWidget {
             fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
             color: isToday
                 ? todayColor // ✅ Highlight if today
-                : (isDone ? activeColor : Theme.of(context).primaryColor),
+                : (isDone ? activeColor : Theme.of(context).colorScheme.onPrimary),
           ),
         ),
         const SizedBox(height: 4),

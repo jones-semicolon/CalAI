@@ -70,7 +70,7 @@ class _OnboardingStep7State extends ConsumerState<OnboardingStep7> {
           // ),
           ConfirmationButtonWidget(onConfirm: () {
             // Finalize the selection in Riverpod
-            ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(profile: s.profile.copyWith(birthDay: selectedBirthday)));
+            ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(profile: s.profile.copyWith(birthDate: selectedBirthday)));
 
             debugPrint(
               'Birthday: ${selectedBirthday.toIso8601String()}',

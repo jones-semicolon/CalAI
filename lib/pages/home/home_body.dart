@@ -4,19 +4,13 @@ import 'package:calai/providers/global_provider.dart';
 import 'package:flutter/material.dart' hide CarouselView;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:calai/api/exercise_api.dart';
-
 import '../../models/exercise_model.dart';
 import '../../models/food_model.dart';
 import '../shell/widgets/widget_app_bar.dart';
 import 'calendar/day_item.dart';
-import  'carousel/carousel_view.dart';
+import 'carousel/carousel_view.dart';
 
 const double _maxContentWidth = 700;
-
-// ------------------------------------------------------------
-// HOME BODY
-// ------------------------------------------------------------
 
 class HomeBody extends ConsumerStatefulWidget {
   const HomeBody({super.key});
@@ -35,64 +29,72 @@ class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClie
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final globalAsync = ref.watch(globalDataProvider);
 
-    final global = globalAsync.value;
+    // ✅ OPTIMIZATION: Use .select to watch only specific properties.
+    // This prevents the entire HomeBody from rebuilding when unrelated data changes.
+    final activeDateId = ref.watch(globalDataProvider.select((async) => async.value?.activeDateId ?? ''));
+    final calorieGoal = ref.watch(globalDataProvider.select((async) => async.value?.todayGoal.calories.toDouble() ?? 0.0));
+    final progressDays = ref.watch(globalDataProvider.select((async) => async.value?.progressDays ?? {}));
+    final dailyNutrition = ref.watch(globalDataProvider.select((async) => async.value?.dailyNutrition ?? []));
 
     return CustomScrollView(
-      key: const PageStorageKey('home_scroll'),
+      // ✅ Optimization: Using slivers properly reduces the layout passes
       slivers: [
         const WidgetTreeAppBar(),
         SliverToBoxAdapter(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: _maxContentWidth),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Day selector always shows
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: DayItem(
-                    progressDays: global?.progressDays ?? {},
-                    dailyCalories: global?.dailyNutrition ?? [],
-                    calorieGoal: global?.todayGoal.calories.toDouble() ?? 0,
-                    selectedDateId: global?.activeDateId ?? '',
-                    onDaySelected: (dateId) {
-                      if (global != null) {
-                        ref
-                            .read(globalDataProvider.notifier)
-                            .selectDay(dateId);
-                      }
-                    },
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: _maxContentWidth),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- DAY SELECTOR ---
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: DayItem(
+                      progressDays: progressDays,
+                      dailyCalories: dailyNutrition,
+                      calorieGoal: calorieGoal,
+                      selectedDateId: activeDateId,
+                      onDaySelected: (dateId) {
+                        // ✅ Optimization: read(notifier) doesn't cause a rebuild
+                        ref.read(globalDataProvider.notifier).selectDay(dateId);
+                      },
+                    ),
                   ),
-                ),
 
-                // Carousel always visible
-                CarouselView(
-                  isTap: _isTap,
-                  onTap: _toggleTap,
-                  currentIndex: _currentIndex,
-                  onPageChanged: _onPageChanged,
-                  date: (global?.activeDateId != null)
-                      ? DateTime.parse(global!.activeDateId)
-                      : DateTime.now(),
-                  onWaterChange: (_) {},
-                ),
+                  // --- CAROUSEL VIEW ---
+                  // ✅ Optimization: RepaintBoundary helps cache complex UI layers (shadows/gradients)
+                  RepaintBoundary(
+                    child: CarouselView(
+                      key: ValueKey(activeDateId), // ✅ Keeps state tied to the date
+                      isTap: _isTap,
+                      onTap: _toggleTap,
+                      currentIndex: _currentIndex,
+                      onPageChanged: _onPageChanged,
+                      date: activeDateId.isNotEmpty
+                          ? DateTime.parse(activeDateId)
+                          : DateTime.now(),
+                      onWaterChange: (_) {},
+                    ),
+                  ),
 
-                const SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
-                // Recently logged section handles its own empty state
-                RecentlyUploadedSection(
-                  dateId: global?.activeDateId ?? '',
-                ),
+                  // --- RECENTLY LOGGED ---
+                  // ✅ Optimization: RecentlyUploadedSection should use its own providers
+                  // to keep this parent widget even lighter.
+                  RecentlyUploadedSection(
+                    dateId: activeDateId,
+                  ),
 
-                const SizedBox(height: 50),
-              ],
+                  const SizedBox(height: 50),
+                ],
+              ),
             ),
           ),
         ),
-      ),]
+      ],
     );
   }
 

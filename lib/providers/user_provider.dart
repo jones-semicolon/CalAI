@@ -1,4 +1,5 @@
 import 'package:calai/models/nutrition_model.dart';
+import 'package:calai/pages/auth/auth.dart';
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -151,7 +152,9 @@ class UserNotifier extends StateNotifier<User> {
     // 1. Update Local State
     _update((s) => s.copyWith(
       goal: s.goal.copyWith(
-        targetWeight: target,
+        targets: s.goal.targets.copyWith(
+          targetWeight: target,
+        ),
         type: newGoalType,
       ),
     ));
@@ -170,6 +173,30 @@ class UserNotifier extends StateNotifier<User> {
     }
   }
 
+  /// PERMANENTLY DELETES USER DATA & AUTH ACCOUNT
+  /// This is destructive and cannot be undone.
+  Future<void> deleteUserAccount() async {
+    try {
+      debugPrint("Initiating account deletion for UID: ${state.id}");
+
+      // 1. Wipe Firestore data first while we still have Auth permissions
+      await AuthService().deleteUserDocumentAndData();
+
+      // 2. Delete the actual Firebase Auth account
+      // This will trigger your auth state listener to move the user to the login screen
+      await AuthService().deleteAuthAccount();
+
+      // 3. Reset local state to initial defaults
+      state = _initialUser;
+
+      debugPrint("Account successfully deleted.");
+    } catch (e) {
+      debugPrint("Delete Account Failed: $e");
+      rethrow;
+    }
+  }
+
+
   /// Sets Diet Type (e.g., Vegan) -> Syncs to DB
   void setDietType(DietType type) async {
     _update((s) => s.copyWith(
@@ -186,13 +213,13 @@ class UserNotifier extends StateNotifier<User> {
     }
   }
 
-  void setMaintenanceStrategy(String strategy) async {
+  void setMaintenanceStrategy(ObstacleType strategy) async {
     _update((s) => s.copyWith(
       goal: s.goal.copyWith(maintenanceStrategy: strategy),
     ));
     try {
       await _service.userDoc.update({
-        'dailyGoals.maintenanceStrategy': strategy,
+        'dailyGoals.maintenanceStrategy': strategy.name,
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
@@ -208,12 +235,23 @@ class UserNotifier extends StateNotifier<User> {
     }
   }
 
+  Future<void> updateExercise(ExerciseLog oldEx, ExerciseLog newEx) async {
+    try {
+      await _service.updateExerciseEntry(oldEx, newEx);
+      // Refresh your local state if necessary, though
+      // your StreamProvider will likely pick this up automatically!
+    } catch (e) {
+      debugPrint("Failed to update exercise: $e");
+    }
+  }
+
   void updateNutritionGoals(NutritionGoals newTargets) {
     state = state.copyWith(
       goal: state.goal.copyWith(
         targets: newTargets,
       ),
     );
+    _service.updateDailyGoals(newTargets.toJson());
   }
 
   // -----------------------------------------------------------------------------
@@ -255,7 +293,6 @@ final _initialUser = User(
   profile: UserProfile(
     name: "user",
     birthDate: DateTime(2001, 1, 1),
-    provider: UserProvider.anonymous,
   ),
   body: UserBiometrics(
     height: 150,

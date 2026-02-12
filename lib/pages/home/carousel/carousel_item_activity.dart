@@ -13,7 +13,7 @@ import '../../../providers/health_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class CarouselActivity extends StatelessWidget {
-  final int waterIntake;
+  final num waterIntake;
   final Function(int) onWaterChange;
   final String dateId; // Changed from DateTime to String dateId
 
@@ -107,7 +107,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
                   if (stepsToday! > 0)
                     _ActivityItemRow(
                       title: "Steps",
-                      value: "+$stepsToday cal",
+                      value: "+${stepsToday.round()} cal",
                       icon: Icons.directions_walk,
                     ),
 
@@ -116,7 +116,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
                       .take(stepsToday > 0 ? 2 : 3)
                       .map((ex) => _ActivityItemRow(
                     title: ex.type.label,
-                    value: "+${ex.caloriesBurned} kcal",
+                    value: "+${ex.caloriesBurned.round()} kcal",
                     icon: ex.type.icon,
                   )),
                 ],
@@ -129,7 +129,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
   }
 }
 
-Widget _buildBurnedHeader(ThemeData theme, int burned) {
+Widget _buildBurnedHeader(ThemeData theme, num burned) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -147,7 +147,7 @@ Widget _buildBurnedHeader(ThemeData theme, int burned) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "$burned",
+              "${burned.round()}",
               style: TextStyle(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
@@ -207,7 +207,7 @@ class _StepsTodayCard extends ConsumerWidget {
 }
 
 class _WaterIntakeSection extends StatelessWidget {
-  final int waterIntake;
+  final num waterIntake;
   final Function(int) onWaterChange;
 
   const _WaterIntakeSection({
@@ -241,17 +241,17 @@ class _WaterIntakeSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Water", style: theme.textTheme.labelSmall),
-              // TODO wrap to Row and add setting button to change serving size
+              // TODO create a custom widget for this
               Row(
                 children: [
                   Text(
-                    "$waterIntake fl oz", // Unit update
+                    "${waterIntake.round()} fl oz", // Unit update
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(width: 5),
                   GestureDetector(
-                    onTap: () => {},
-                    child: Icon(Icons.settings, color: theme.colorScheme.onPrimary, size: 16),
+                    onTap: () => _showWaterSettings(context), // ✅ Call the sheet
+                    child: Icon(Icons.settings_outlined, color: theme.colorScheme.onPrimary, size: 16),
                   )
                 ],
               ),
@@ -273,6 +273,152 @@ class _WaterIntakeSection extends StatelessWidget {
       ),
     );
   }
+}
+
+// TODO: Add functionality to this water serving size picker
+void _showWaterSettings(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+    ),
+    builder: (context) {
+      // Use StatefulBuilder to manage the picker visibility inside the sheet
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setSheetState) {
+          bool isPickerVisible = false;
+          int selectedValue = 8; // Default value based on your screenshot
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildDragHandle(),
+                const SizedBox(height: 10),
+                _buildSheetHeader(context),
+                const SizedBox(height: 30),
+
+                // --- SERVING SIZE ROW ---
+                GestureDetector(
+                  onTap: () => setSheetState(() => isPickerVisible = !isPickerVisible),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Serving Size",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              "$selectedValue fl oz (1 cup)",
+                              style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                            ),
+                            const SizedBox(width: 5),
+                            Icon(Icons.edit, size: 16, color: Colors.grey[400]),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // --- DYNAMIC NUMBER PICKER ---
+                if (isPickerVisible) ...[
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 120,
+                    child: CupertinoPicker(
+                      itemExtent: 40,
+                      scrollController: FixedExtentScrollController(initialItem: 0),
+                      onSelectedItemChanged: (index) {
+                        setSheetState(() => selectedValue = 8 + index);
+                      },
+                      children: List.generate(20, (index) =>
+                          Center(child: Text("${8 + index}"))
+                      ),
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 30),
+                _buildHydrationInfo(),
+                const SizedBox(height: 30),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+// 1. Creates the small horizontal gray bar at the very top of the sheet
+Widget _buildDragHandle() {
+  return Center(
+    child: Container(
+      width: 40,
+      height: 5,
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(10),
+      ),
+    ),
+  );
+}
+
+// 2. Creates the "X" button and the "Water settings" title
+Widget _buildSheetHeader(BuildContext context) {
+  return Row(
+    children: [
+      GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.close, size: 20, color: Colors.black54),
+        ),
+      ),
+      const Expanded(
+        child: Text(
+          "Water settings",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      const SizedBox(width: 40), // Balances the X button so title stays centered
+    ],
+  );
+}
+
+// Helper for the "How much water..." text section
+Widget _buildHydrationInfo() {
+  return Column(
+    children: [
+      const Text(
+        "How much water do you need to stay hydrated?",
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+      ),
+      const SizedBox(height: 10),
+      Text(
+        "Everyone's needs are slightly different, but we recommended aiming for at least 64 fl oz (8 cups) of water each day",
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 14, color: Colors.grey[600], height: 1.4),
+      ),
+    ],
+  );
 }
 
 class _ActionButton extends StatelessWidget {
@@ -392,7 +538,7 @@ class ActivityCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // ✅ 2. Get the user and extract the steps goal
     final user = ref.watch(userProvider);
-    final int goalValue = user.goal.targets.steps;
+    final num goalValue = user.goal.targets.steps;
 
     final double progress = (goalValue == 0) ? 0 : (currentValue / goalValue);
     final theme = Theme.of(context);
@@ -414,7 +560,7 @@ class ActivityCard extends ConsumerWidget {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                "$currentValue",
+                "${currentValue.round()}",
                 style: TextStyle(
                   color: primaryColor,
                   fontWeight: FontWeight.bold,
@@ -423,7 +569,7 @@ class ActivityCard extends ConsumerWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                "/$goalValue",
+                "/${goalValue.round()}",
                 style: TextStyle(
                   color: theme.colorScheme.onSurfaceVariant, // Better visibility
                   fontSize: 14,

@@ -114,7 +114,7 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                           getDrawingHorizontalLine: (_) => FlLine(
                             dashArray: [6, 6],
                             strokeWidth: 1.5,
-                            color: Theme.of(context).primaryColor,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                         titlesData: _buildTitlesData(interval),
@@ -124,24 +124,24 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                 ),
               ),
               const SizedBox(height: 10),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GraphLegend(
-                    icon: Icons.set_meal_outlined,
-                    color: Color.fromARGB(255, 221, 105, 105),
+                    icon: NutritionType.protein.icon,
+                    color: NutritionType.protein.color,
                     label: 'Protein',
                   ),
                   SizedBox(width: 12),
                   GraphLegend(
-                    icon: Icons.bubble_chart,
-                    color: Color.fromARGB(255, 222, 154, 105),
+                    icon: NutritionType.carbs.icon,
+                    color: NutritionType.carbs.color,
                     label: 'Carbs',
                   ),
                   SizedBox(width: 12),
                   GraphLegend(
-                    icon: Icons.oil_barrel,
-                    color: Color.fromARGB(255, 105, 152, 222),
+                    icon: NutritionType.fats.icon,
+                    color: NutritionType.fats.color,
                     label: 'Fats',
                   ),
                 ],

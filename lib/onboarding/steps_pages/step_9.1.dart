@@ -36,7 +36,7 @@ class WeightPickerPage extends ConsumerWidget {
               return "Maintain Weight";
             },
             onWeightChanged: (kg) {
-              userNotifier.updateLocal((s) => s.copyWith(goal: s.goal.copyWith(targetWeight: kg)));
+              userNotifier.updateLocal((s) => s.copyWith(goal: s.goal.copyWith(targets: s.goal.targets.copyWith(targetWeight: kg))));
             }
           ),
 

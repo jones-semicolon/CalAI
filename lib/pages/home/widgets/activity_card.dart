@@ -6,8 +6,8 @@ import '../../../widgets/animated_number.dart';
 /// current progress against a goal, shown with an animated circular indicator.
 class CalorieCard extends StatelessWidget {
   final String title;
-  final int nutrients;
-  final int progress;
+  final num nutrients;
+  final num progress;
   final Color color;
   final IconData icon;
   final bool isTap;
@@ -30,7 +30,7 @@ class CalorieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int valueInt = isTap ? progress : (nutrients - progress);
+    final num valueInt = isTap ? progress : (nutrients - progress);
 
     // The TextStyle is defined here to be passed down, preserving the original style.
     final valueStyle = TextStyle(
@@ -82,9 +82,9 @@ class CalorieCard extends StatelessWidget {
 
 /// Displays the top section with the main animated number and unit.
 class _Header extends StatelessWidget {
-  final int valueInt;
+  final num valueInt;
   final bool isTap;
-  final int nutrients;
+  final num nutrients;
   final String? unit;
   final TextStyle valueStyle;
 
@@ -98,6 +98,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final value = valueInt.abs().round();
     // This widget's structure is identical to the original implementation.
     return SizedBox(
       width: double.infinity,
@@ -116,7 +117,7 @@ class _Header extends StatelessWidget {
             children: [
               // First digit slide
               AnimatedSlideNumber(
-                value: valueInt.abs().toString().split("").first,
+                value: value.toString().split("").first,
                 style: valueStyle,
                 reverse: isTap,
               ),
@@ -133,8 +134,8 @@ class _Header extends StatelessWidget {
                   ),
                   child: Text(
                     isTap
-                        ? valueInt.abs().toString().substring(1)
-                        : "${valueInt.abs().toString().substring(1)}$unit",
+                        ? value.toString().substring(1)
+                        : "${value.toString().substring(1)}$unit",
                     key: ValueKey(isTap),
                     // REMOVE style: valueStyle here.
                     // Let it inherit from AnimatedDefaultTextStyle to enable font tweening.
@@ -145,7 +146,7 @@ class _Header extends StatelessWidget {
                 baseline: 18,
                 baselineType: TextBaseline.alphabetic,
                 child: AnimatedSlideNumber(
-                  value: isTap ? " /$nutrients$unit" : "",
+                  value: isTap ? " /${nutrients.round()}$unit" : "",
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
@@ -207,8 +208,8 @@ class _Title extends StatelessWidget {
 
 /// Displays the circular progress indicator and the central icon.
 class _ProgressIndicator extends StatelessWidget {
-  final int progress;
-  final int nutrients;
+  final num progress;
+  final num nutrients;
   final Color color;
   final IconData icon;
 

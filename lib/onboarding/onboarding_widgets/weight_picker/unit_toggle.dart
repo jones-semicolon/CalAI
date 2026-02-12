@@ -21,7 +21,6 @@ class UnitToggle extends StatelessWidget {
 
     final bgColor = theme.colorScheme.onTertiary.withOpacity(0.5);
     final thumbColor = theme.colorScheme.surface;
-    // TODO text color not visible on light mode
     final selectedTextColor = theme.colorScheme.primary;
     final unselectedTextColor = theme.colorScheme.onPrimary;
 
