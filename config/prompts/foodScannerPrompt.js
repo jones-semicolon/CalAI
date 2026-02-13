@@ -1,27 +1,28 @@
 // Define the output structure strictly
 const RESPONSE_SCHEMA = {
+  is_food: true,
   name: "Grilled Chicken with Rice",
   ingredients: [
     {
       name: "Chicken Breast",
       nutrients: {
         calories: 200,
-      }
-    }
+      },
+    },
   ],
   nutrients: {
     protein: 45,
     carbs: 50,
     fats: 10,
-    fibers: 5, 
-    sugar: 2, 
+    fibers: 5,
+    sugar: 2,
     sodium: 150,
     calories: 200,
     water: 2,
   },
   confidence_score: 0.9,
   notes: "Contains soy sauce.",
-  health_score: 9
+  health_score: 9,
 };
 
 // Inject schema into prompt
@@ -41,6 +42,9 @@ STRICT RULES:
    - Do NOT use generic terms like "Mixed Vegetables", "Fruit Salad", "Stir Fry", or "Sides". 
    - You MUST separate distinct visible items into their own ingredients. 
    - Example: Instead of "Mixed Vegetables", output "Steamed Broccoli" AND "Green Beans" as separate items in the ingredients list.
+8. *** NON-FOOD DETECTION ***:
+   - If the image does NOT contain edible food (e.g., a floor, a countertop, a person, or a blurry mess), 
+     set "is_food" to false, "name" to "Non-food item", and all nutrient values to 0.
 
 Return the JSON strictly following this structure:
 ${JSON.stringify(RESPONSE_SCHEMA, null, 2)}
@@ -49,5 +53,5 @@ ${JSON.stringify(RESPONSE_SCHEMA, null, 2)}
 module.exports = {
   SYSTEM_PROMPT,
   // Exporting schema allows us to use Zod/AJV for validation in the controller later if we want
-  JSON_SCHEMA: RESPONSE_SCHEMA 
+  JSON_SCHEMA: RESPONSE_SCHEMA,
 };

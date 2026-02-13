@@ -9,7 +9,7 @@
 const groq = require("../config/groq");
 const { SYSTEM_PROMPT } = require("../config/prompts/foodScannerPrompt");
 
-const API_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct"; 
+const API_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct";
 const ERROR_MESSAGE_INTERNAL = "Internal server error during food scanning.";
 
 exports.scanFood = async (req, res) => {
@@ -21,7 +21,7 @@ exports.scanFood = async (req, res) => {
 
     // ✅ Convert Buffer to Base64 Data URL
     // This allows you to pass the image data without saving it to a disk
-    const base64Image = req.file.buffer.toString('base64');
+    const base64Image = req.file.buffer.toString("base64");
     const dataUrl = `data:${req.file.mimetype};base64,${base64Image}`;
 
     // 2. Call Groq API
@@ -32,14 +32,14 @@ exports.scanFood = async (req, res) => {
           role: "user",
           content: [
             { type: "text", text: SYSTEM_PROMPT },
-            { 
-              type: "image_url", 
-              image_url: { url: dataUrl } // ✅ Pass the Data URL here
+            {
+              type: "image_url",
+              image_url: { url: dataUrl }, // ✅ Pass the Data URL here
             },
           ],
         },
       ],
-      response_format: { type: "json_object" }, 
+      response_format: { type: "json_object" },
       temperature: 0.1,
     });
 
@@ -55,10 +55,17 @@ exports.scanFood = async (req, res) => {
     try {
       parsedData = JSON.parse(responseContent);
     } catch (parseError) {
-      console.error("JSON Parse Fail:", responseContent);
       return res.status(500).json({
         success: false,
         error: "AI generation failed to produce valid JSON.",
+      });
+    }
+
+    if (parsedData.is_food === false || parsedData.confidence_score < 0.2) {
+      return res.status(422).json({
+        success: false,
+        error: "No food detected in image.",
+        detected_as: parsedData.notes || "Unknown object",
       });
     }
 
@@ -68,7 +75,6 @@ exports.scanFood = async (req, res) => {
       data: parsedData,
       usage: completion.usage,
     });
-
   } catch (err) {
     console.error("Food Scan Error:", err);
     res.status(500).json({
