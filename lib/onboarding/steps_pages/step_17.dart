@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/loading_widget/health_plan_loading_widget.dart';
@@ -42,7 +43,7 @@ class _OnboardingStep17State extends State<OnboardingStep17> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    "All done!",
+                    context.tr("All done!"),
                     style: TextStyle(
                       fontSize: 14,
                       color: Theme.of(context).colorScheme.onPrimary,
@@ -56,7 +57,7 @@ class _OnboardingStep17State extends State<OnboardingStep17> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 child: Text(
-                  "Time to generate your custom plan!",
+                  context.tr("Time to generate your custom plan!"),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import '../onboarding_widgets/continue_button.dart';
 
 class OnboardingStep12 extends StatelessWidget {
@@ -20,7 +21,7 @@ class OnboardingStep12 extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'Thank you for\ntrusting us!',
+                  context.tr('Thank you for\ntrusting us!'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
@@ -32,7 +33,7 @@ class OnboardingStep12 extends StatelessWidget {
                 const SizedBox(height: 12),
 
                 Text(
-                  'Now let\'s personalize Cal AI for you...',
+                  context.tr("Now let's personalize Cal AI for you..."),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -53,7 +54,7 @@ class OnboardingStep12 extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'Your privacy and security matter to us.',
+                        context.tr('Your privacy and security matter to us.'),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
@@ -65,7 +66,9 @@ class OnboardingStep12 extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       Text(
-                        'We promise to always keep your\npersonal information private and secure.',
+                        context.tr(
+                          'We promise to always keep your\npersonal information private and secure.',
+                        ),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,

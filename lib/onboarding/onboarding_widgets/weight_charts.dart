@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class AnimatedWeightChart extends StatefulWidget {
   const AnimatedWeightChart({super.key});
@@ -74,7 +75,7 @@ class _AnimatedWeightChartState extends State<AnimatedWeightChart>
         children: [
           /// Title
           Text(
-            "Your weight",
+            context.tr("Your weight"),
             style: TextStyle(
               color: theme.colorScheme.onPrimary,
               fontSize: 18,
@@ -126,14 +127,14 @@ class _AnimatedWeightChartState extends State<AnimatedWeightChart>
                                 if (value == 0) {
                                   return Transform.translate(
                                     offset: const Offset(25, 5), // move LEFT
-                                    child: const Text("Month 1"),
+                                    child: Text(context.tr("Month 1")),
                                   );
                                 }
 
                                 if (value == 5) {
                                   return Transform.translate(
                                     offset: const Offset(-25, 5), // move RIGHT
-                                    child: const Text("Month 6"),
+                                    child: Text(context.tr("Month 6")),
                                   );
                                 }
 
@@ -231,7 +232,7 @@ class _AnimatedWeightChartState extends State<AnimatedWeightChart>
                             borderRadius: BorderRadius.circular(25),
                           ),
                           child: Text(
-                            "Weight",
+                            context.tr("Weight"),
                             style: TextStyle(
                               color: theme.colorScheme.onPrimary,
                               fontSize: 8,
@@ -249,7 +250,7 @@ class _AnimatedWeightChartState extends State<AnimatedWeightChart>
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20),
                     child: Text(
-                      "Traditional Diet",
+                      context.tr("Traditional Diet"),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -265,7 +266,9 @@ class _AnimatedWeightChartState extends State<AnimatedWeightChart>
             child: Padding(
               padding: const EdgeInsets.fromLTRB(40, 20, 40, 0),
               child: Text(
-                "80% of Cal AI users maintain their weight loss even 6 months later",
+                context.tr(
+                  "80% of Cal AI users maintain their weight loss even 6 months later",
+                ),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: theme.colorScheme.onSecondary,

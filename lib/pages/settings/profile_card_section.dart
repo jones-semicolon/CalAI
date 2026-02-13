@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import 'package:calai/data/notifiers.dart';
 import 'edit_name.dart';
 
@@ -58,7 +59,7 @@ class ProfileCardSection extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            name.isEmpty ? "Enter your name" : name,
+                            name.isEmpty ? context.tr("Enter your name") : name,
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   color: Theme.of(context).highlightColor,
@@ -72,7 +73,7 @@ class ProfileCardSection extends StatelessWidget {
                     },
                   ),
                   Text(
-                    "$age years old",
+                    "$age ${context.tr('years old')}",
                     style: TextStyle(color: primaryColor, fontSize: 12),
                   ),
                 ],

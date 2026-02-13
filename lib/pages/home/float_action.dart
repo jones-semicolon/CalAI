@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 import 'camera/scan_screen.dart';
 
@@ -118,7 +119,7 @@ class FloatActionContent extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              label,
+              context.tr(label),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,

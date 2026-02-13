@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class Header extends StatelessWidget {
   final String title;
@@ -30,7 +31,7 @@ class Header extends StatelessWidget {
         children: [
           /// TITLE
           Text(
-            title,
+            context.tr(title),
             textAlign: textAlign,
             style: TextStyle(
               fontSize: 28,
@@ -44,7 +45,7 @@ class Header extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               textAlign: textAlign,
-              subtitle!,
+              context.tr(subtitle!),
               style: TextStyle(fontSize: 14, color: colorScheme.onSecondary),
             ),
           ],

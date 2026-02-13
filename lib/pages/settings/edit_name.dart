@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class EditNamePage extends StatefulWidget {
   const EditNamePage({super.key});
@@ -37,15 +38,15 @@ class _EditNamePageState extends State<EditNamePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Edit name",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            Text(
+              context.tr("Edit name"),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             TextField(
               controller: _controller,
               decoration: InputDecoration(
-                labelText: "Enter your name",
+                labelText: context.tr("Enter your name"),
                 counterStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -69,7 +70,7 @@ class _EditNamePageState extends State<EditNamePage> {
                   ),
                 ),
                 child: Text(
-                  "Done",
+                  context.tr("Done"),
                   style: TextStyle(
                     color: hasInput ? Colors.white : Colors.white70,
                     fontSize: 18,

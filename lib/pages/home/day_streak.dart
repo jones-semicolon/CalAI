@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class DayStreakDialog extends StatelessWidget {
   const DayStreakDialog({super.key});
@@ -14,15 +15,18 @@ class DayStreakDialog extends StatelessWidget {
           height: MediaQuery.of(context).size.height * 0.6,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               Text(
-                "Day Streak",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                context.tr("Day Streak"),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
-                "Day Streak Placeholder",
-                style: TextStyle(fontSize: 20),
+                context.tr("Day Streak Placeholder"),
+                style: const TextStyle(fontSize: 20),
               ),
             ],
           ),

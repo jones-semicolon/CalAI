@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class SettingsItemTile extends StatelessWidget {
   final IconData icon;
@@ -28,7 +29,7 @@ class SettingsItemTile extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Text(
-              label,
+              context.tr(label),
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,

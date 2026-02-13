@@ -106,6 +106,8 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
         break;
 
       case ScanMode.gallery:
+        // APIpost: send image only here.
+        // await _postToApi(image: image);
         break;
     }
 

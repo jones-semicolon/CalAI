@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'settings_item.dart';
 import 'divider.dart';
+import '../../onboarding/auth_entry/language_card.dart';
 
 class SettingsGroupSection extends StatelessWidget {
   const SettingsGroupSection({super.key});
@@ -42,7 +43,19 @@ class SettingsGroupSection extends StatelessWidget {
           SettingsItemTile(
             icon: Icons.language_outlined,
             label: "Language",
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: true,
+                barrierColor: Colors.black26,
+                builder: (_) => Center(
+                  child: LanguageCard(
+                    onClose: () => Navigator.of(context).pop(),
+                    onLanguageChanged: (_) => Navigator.of(context).pop(),
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),

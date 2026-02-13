@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 
@@ -77,7 +78,7 @@ class _OnboardingStep13State extends State<OnboardingStep13>
                           horizontal: 40,
                         ),
                         child: Text(
-                          'Cal AI would like to send you Notifications',
+                          context.tr('Cal AI would like to send you Notifications'),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
@@ -110,7 +111,7 @@ class _OnboardingStep13State extends State<OnboardingStep13>
                                 ),
                                 child: Center(
                                   child: Text(
-                                    "Don't Allow",
+                                    context.tr("Don't Allow"),
                                     style: TextStyle(
                                       color: !isAllowNotification
                                           ? Theme.of(
@@ -144,7 +145,7 @@ class _OnboardingStep13State extends State<OnboardingStep13>
                                 ),
                                 child: Center(
                                   child: Text(
-                                    "Allow",
+                                    context.tr("Allow"),
                                     style: TextStyle(
                                       color: isAllowNotification
                                           ? Theme.of(

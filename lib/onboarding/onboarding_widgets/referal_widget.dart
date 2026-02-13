@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class ReferralCodeInput extends StatefulWidget {
   final void Function(String referralCode) onSubmit;
@@ -78,7 +79,7 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
                           color: Colors.grey[500],
                           fontWeight: FontWeight.w500,
                         ),
-                        child: const Text('Referral Code'),
+                        child: Text(context.tr('Referral Code')),
                       ),
                     ),
                     Padding(
@@ -122,7 +123,7 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
                       ),
                     ),
                     child: Text(
-                      'Submit',
+                      context.tr('Submit'),
                       style: TextStyle(
                         color: theme.scaffoldBackgroundColor,
                         fontWeight: FontWeight.w500,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider_plus/carousel_slider_plus.dart';
+import 'package:calai/l10n/app_strings.dart';
 import '../../data/global_data.dart';
 import 'card1.dart';
 import 'day_item.dart';
@@ -31,6 +32,8 @@ class _HomeBodyState extends State<HomeBody> {
       fontWeight: FontWeight.bold,
       color: Theme.of(context).colorScheme.onPrimary,
     );
+    final calorieStatusKey =
+        isTap ? 'Calories eaten' : (isOverEaten ? 'Calories over' : 'Calories left');
 
     Widget valueText(String text, {double fontSize = 32, Color? color}) {
       return FittedBox(
@@ -91,7 +94,7 @@ class _HomeBodyState extends State<HomeBody> {
                                 ],
                               ),
                         Text(
-                          "Calories ${isTap ? 'eaten' : (isOverEaten ? 'over' : 'left')}",
+                          context.tr(calorieStatusKey),
                           style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context).colorScheme.onPrimary,
@@ -252,7 +255,7 @@ class _HomeBodyState extends State<HomeBody> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Health Score',
+                            context.tr('Health Score'),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
@@ -300,7 +303,9 @@ class _HomeBodyState extends State<HomeBody> {
                       // 3. Summary Text
                       Text(
                         // Provides contextual feedback based on the current state.
-                        'Carbs and fat are on track. You’re low in calories and protein, which can slow weight loss and impact muscle retention.',
+                        context.tr(
+                          "Carbs and fat are on track. You're low in calories and protein, which can slow weight loss and impact muscle retention.",
+                        ),
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).colorScheme.onSecondary,
@@ -371,7 +376,7 @@ class _HomeBodyState extends State<HomeBody> {
                           ],
                         ),
                         Text(
-                          "Steps Today",
+                          context.tr("Steps Today"),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onPrimary,
                             fontSize: 12,
@@ -476,7 +481,7 @@ class _HomeBodyState extends State<HomeBody> {
                           ),
 
                           Text(
-                            "Calories Burned",
+                            context.tr("Calories Burned"),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 12,
@@ -510,7 +515,7 @@ class _HomeBodyState extends State<HomeBody> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Steps",
+                                context.tr("Steps"),
                                 style: TextStyle(
                                   fontSize: 10,
                                   color: Theme.of(
@@ -592,7 +597,7 @@ class _HomeBodyState extends State<HomeBody> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Water",
+                          context.tr("Water"),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onPrimary,
                             fontSize: 14,
@@ -740,7 +745,7 @@ class _HomeBodyState extends State<HomeBody> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    "Recently uploaded",
+                    context.tr("Recently uploaded"),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

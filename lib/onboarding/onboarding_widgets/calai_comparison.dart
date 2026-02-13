@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class ComparisonCard extends StatefulWidget {
   const ComparisonCard({super.key});
@@ -178,7 +179,7 @@ class _AnimatedText extends StatelessWidget {
           Tween(begin: const Offset(0, 0.2), end: Offset.zero),
         ),
         child: Text(
-          text,
+          context.tr(text),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w700,
@@ -232,7 +233,7 @@ class _ProgressColumn extends StatelessWidget {
               left: 6,
               right: 6,
               child: Text(
-                title,
+                context.tr(title),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,

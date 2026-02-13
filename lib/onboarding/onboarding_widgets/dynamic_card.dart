@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class OptionCard extends StatelessWidget {
   final IconData? icon;
@@ -86,7 +87,7 @@ class OptionCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            title,
+                            context.tr(title),
                             style: TextStyle(
                               color: textColor,
                               fontSize: 14,
@@ -95,7 +96,7 @@ class OptionCard extends StatelessWidget {
                           ),
                           if (subtitle != null) ...[
                             Text(
-                              subtitle!,
+                              context.tr(subtitle!),
                               style: TextStyle(
                                 color: subtitleColor,
                                 fontSize: 12,

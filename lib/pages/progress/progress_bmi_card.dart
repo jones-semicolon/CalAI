@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import 'progress_page.dart';
 
 class ProgressBmiCard extends StatelessWidget {
@@ -85,7 +86,7 @@ class ProgressBmiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = isAdult ? adultLabel : childLabel;
+    final label = context.tr(isAdult ? adultLabel : childLabel);
     final color = isAdult ? adultColor : childColor;
 
     return Container(
@@ -106,7 +107,7 @@ class ProgressBmiCard extends StatelessWidget {
         children: [
           // ---------------- TITLE ----------------
           Text(
-            'Your BMI',
+            context.tr('Your BMI'),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -133,7 +134,7 @@ class ProgressBmiCard extends StatelessWidget {
               const SizedBox(width: 10),
 
               Text(
-                'Your weight is',
+                context.tr('Your weight is'),
                 style: TextStyle(
                   fontSize: 14,
                   color: Theme.of(context).shadowColor,
@@ -289,7 +290,7 @@ class _Legend extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
-        Text(label, style: const TextStyle(fontSize: 12)),
+        Text(context.tr(label), style: const TextStyle(fontSize: 12)),
       ],
     );
   }

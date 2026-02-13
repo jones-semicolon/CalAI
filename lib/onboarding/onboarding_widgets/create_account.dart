@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CreateAccount extends StatelessWidget {
@@ -27,7 +28,7 @@ class CreateAccount extends StatelessWidget {
                 Icon(FontAwesomeIcons.google, size: 18, color: bg),
                 const SizedBox(width: 12),
                 Text(
-                  'Sign in with Google',
+                  context.tr('Sign in with Google'),
                   style: TextStyle(
                     color: bg,
                     fontSize: 14,
@@ -46,7 +47,7 @@ class CreateAccount extends StatelessWidget {
             backgroundColor: bg,
             borderColor: scheme.onPrimary,
             child: Text(
-              'Skip',
+              context.tr('Skip'),
               style: TextStyle(
                 color: scheme.onPrimary,
                 fontSize: 14,

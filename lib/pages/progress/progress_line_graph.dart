@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import 'progress_page.dart';
 
 class ProgressGraph extends StatelessWidget {
@@ -35,8 +36,17 @@ class ProgressGraph extends StatelessWidget {
     final double maxY = (maxWeight + yPadding).toDouble();
 
     final double interval = (maxY - minY) / 4;
+    final progressMessage = progressPercent.round() <= 24
+        ? context.tr("Getting started is the hardest part, You're ready for this!")
+        : progressPercent.round() >= 25 && progressPercent.round() <= 49
+        ? context.tr("You're making progress - now's the time to keep pushing!")
+        : progressPercent.round() >= 50 && progressPercent.round() <= 74
+        ? context.tr("You're dedication is paying off! Keep going.")
+        : progressPercent.round() >= 75 && progressPercent.round() <= 99
+        ? context.tr("It's the final stretch! Push yourself!")
+        : context.tr("You did it! Congratulations!");
 
-    String monthName(int month) {
+    String monthName(BuildContext context, int month) {
       const months = [
         'January',
         'February',
@@ -51,7 +61,7 @@ class ProgressGraph extends StatelessWidget {
         'November',
         'December',
       ];
-      return months[month - 1];
+      return context.tr(months[month - 1]);
     }
 
     return Column(
@@ -104,7 +114,7 @@ class ProgressGraph extends StatelessWidget {
                             onTap: () => onRangeChanged(r),
                             child: Center(
                               child: Text(
-                                _rangeText(r),
+                                _rangeText(context, r),
                                 style: TextStyle(
                                   color: selected
                                       ? Theme.of(context).colorScheme.onTertiary
@@ -139,7 +149,7 @@ class ProgressGraph extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      'Goal Progress',
+                      context.tr('Goal Progress'),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -183,7 +193,7 @@ class ProgressGraph extends StatelessWidget {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              'of goal',
+                              context.tr('of goal'),
                               style: TextStyle(
                                 color: Theme.of(context).primaryColor,
                                 fontSize: 11,
@@ -287,7 +297,7 @@ class ProgressGraph extends StatelessWidget {
                             final date = logs[index]['date'] as DateTime;
 
                             final formattedDate =
-                                '${monthName(date.month)} ${date.day}, ${date.year}';
+                                '${monthName(context, date.month)} ${date.day}, ${date.year}';
 
                             return LineTooltipItem(
                               '${spot.y.toStringAsFixed(1)} kg',
@@ -359,18 +369,7 @@ class ProgressGraph extends StatelessWidget {
                     color: Theme.of(context).colorScheme.scrim,
                   ),
                   child: Text(
-                    progressPercent.round() <= 24
-                        ? "Getting started is the hardest part, You're ready for this!"
-                        : progressPercent.round() >= 25 &&
-                              progressPercent.round() <= 49
-                        ? "You're making progress—now's the time to keep pushing!"
-                        : progressPercent.round() >= 50 &&
-                              progressPercent.round() <= 74
-                        ? "You're dedication is paying off! Keep going."
-                        : progressPercent.round() >= 75 &&
-                              progressPercent.round() <= 99
-                        ? "It's the final stretch! Push yourself!"
-                        : "You did it! Congratulations!",
+                    progressMessage,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Color.fromARGB(255, 33, 139, 28),
@@ -388,16 +387,16 @@ class ProgressGraph extends StatelessWidget {
     );
   }
 
-  String _rangeText(TimeRange r) {
+  String _rangeText(BuildContext context, TimeRange r) {
     switch (r) {
       case TimeRange.days90:
-        return '90 Days';
+        return context.tr('90 Days');
       case TimeRange.months6:
-        return '6 Months';
+        return context.tr('6 Months');
       case TimeRange.year1:
-        return '1 Year';
+        return context.tr('1 Year');
       case TimeRange.all:
-        return 'All time';
+        return context.tr('All time');
     }
   }
 }

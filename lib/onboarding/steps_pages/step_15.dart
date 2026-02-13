@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/yes_no_button.dart';
 
@@ -29,7 +30,7 @@ class OnboardingStep15 extends StatelessWidget {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: 'Rollover up to ',
+                      text: '${context.tr('Rollover up to')} ',
                       style: TextStyle(
                         color: theme.colorScheme.onPrimary,
                         fontSize: 12,
@@ -37,7 +38,7 @@ class OnboardingStep15 extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: '200 cals',
+                      text: '200 ${context.tr('cals')}',
                       style: TextStyle(
                         color: const Color.fromARGB(255, 105, 152, 222),
                         fontSize: 12,

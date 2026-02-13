@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/user_data.dart';
@@ -155,7 +156,7 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
         const SizedBox(height: 30),
 
         Text(
-          _goalLabel,
+          context.tr(_goalLabel),
           style: TextStyle(
             fontSize: 16,
             color: theme.colorScheme.onPrimary,

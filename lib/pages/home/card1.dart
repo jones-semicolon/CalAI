@@ -1,5 +1,6 @@
 // card1.dart
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class CalorieCard extends StatelessWidget {
   final String title;
@@ -77,7 +78,7 @@ class CalorieCard extends StatelessWidget {
                       ],
                     ),
               Text(
-                "$title ${isEaten ? 'eaten' : (overEat ? 'over' : 'left')}",
+                "${context.tr(title)} ${context.tr(isEaten ? 'eaten' : (overEat ? 'over' : 'left'))}",
                 style: TextStyle(
                   fontSize: 12,
                   color: Theme.of(context).colorScheme.onPrimary,

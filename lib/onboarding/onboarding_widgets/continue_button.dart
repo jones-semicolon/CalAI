@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class ContinueButton extends StatelessWidget {
   final bool enabled;
@@ -42,7 +43,7 @@ class ContinueButton extends StatelessWidget {
             ),
           ),
           child: Text(
-            text,
+            context.tr(text),
             style: TextStyle(
               color: enabled
                   ? Theme.of(context).scaffoldBackgroundColor

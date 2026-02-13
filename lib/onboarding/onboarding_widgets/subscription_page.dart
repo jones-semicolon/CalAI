@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class SubscriptionPage extends StatelessWidget {
   final VoidCallback onFinished;
@@ -34,7 +35,7 @@ class SubscriptionPage extends StatelessWidget {
 
               // Headline
               Text(
-                'Unlock CalAI to reach\nyour goals faster.',
+                context.tr('Unlock CalAI to reach\nyour goals faster.'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 26,
@@ -58,7 +59,7 @@ class SubscriptionPage extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Continue',
+                    context.tr('Continue'),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -72,8 +73,7 @@ class SubscriptionPage extends StatelessWidget {
 
               // Pricing hint
               Text(
-                'Just ₱${yearlyPrice.toStringAsFixed(2)} per year '
-                '(₱${monthlyPrice.toStringAsFixed(2)}/mo)',
+                '${context.tr("Just")} PHP${yearlyPrice.toStringAsFixed(2)} ${context.tr("per year")} (PHP${monthlyPrice.toStringAsFixed(2)}/${context.tr("mo")})',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,

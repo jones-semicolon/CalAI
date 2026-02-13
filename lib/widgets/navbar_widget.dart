@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import '../data/notifiers.dart';
 
 class NavBarWidget extends StatelessWidget {
@@ -86,7 +87,7 @@ class NavBarWidget extends StatelessWidget {
           ),
           const SizedBox(height: 3),
           Text(
-            label,
+            context.tr(label),
             style: TextStyle(
               color: selected
                   ? Theme.of(context).colorScheme.onPrimary

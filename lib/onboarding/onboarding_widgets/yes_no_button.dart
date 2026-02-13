@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class NoYesButton extends StatelessWidget {
   final VoidCallback onNo;
@@ -51,7 +52,7 @@ class NoYesButton extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  noText,
+                  context.tr(noText),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -75,7 +76,7 @@ class NoYesButton extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  yesText,
+                  context.tr(yesText),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 enum WeekRange { thisWeek, lastWeek, twoWeeksAgo, threeWeeksAgo }
 
@@ -159,6 +160,18 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
     final double interval = maxCalories / 4;
     final double minY = -interval * 0.01;
     final double maxY = maxCalories + interval * 0.01;
+    final motivationMessage = percentageOfTarget.round() <= 24
+        ? context.tr("Getting started is the hardest part, You're ready for this!")
+        : percentageOfTarget.round() >= 25 &&
+              percentageOfTarget.round() <= 49
+        ? context.tr("You're making progress - now's the time to keep pushing!")
+        : percentageOfTarget.round() >= 50 &&
+              percentageOfTarget.round() <= 74
+        ? context.tr("You're dedication is paying off! Keep going.")
+        : percentageOfTarget.round() >= 75 &&
+              percentageOfTarget.round() <= 99
+        ? context.tr("It's the final stretch! Push yourself!")
+        : context.tr("You did it! Congratulations!");
 
     return Column(
       children: [
@@ -184,7 +197,7 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Total Calories',
+                        context.tr('Total Calories'),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -205,7 +218,7 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                             ),
                           ),
                           Text(
-                            ' cals',
+                            ' ${context.tr('cals')}',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.normal,
@@ -339,14 +352,14 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                           showTitles: true,
                           reservedSize: 40,
                           getTitlesWidget: (v, _) {
-                            const days = [
-                              'Sun',
-                              'Mon',
-                              'Tue',
-                              'Wed',
-                              'Thu',
-                              'Fri',
-                              'Sat',
+                            final days = [
+                              context.tr('Sun'),
+                              context.tr('Mon'),
+                              context.tr('Tue'),
+                              context.tr('Wed'),
+                              context.tr('Thu'),
+                              context.tr('Fri'),
+                              context.tr('Sat'),
                             ];
                             if (v < 0 || v > 6) {
                               return const SizedBox.shrink();
@@ -372,14 +385,14 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                         tooltipBorderRadius: BorderRadius.all(Radius.circular(10)),
                         tooltipPadding: const EdgeInsets.all(10),
                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                          const days = [
-                            'Sun',
-                            'Mon',
-                            'Tue',
-                            'Wed',
-                            'Thu',
-                            'Fri',
-                            'Sat',
+                          final days = [
+                            context.tr('Sun'),
+                            context.tr('Mon'),
+                            context.tr('Tue'),
+                            context.tr('Wed'),
+                            context.tr('Thu'),
+                            context.tr('Fri'),
+                            context.tr('Sat'),
                           ];
 
                           final calories = rod.toY;
@@ -388,11 +401,11 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                           final fats = _dayFats(group.x);
 
                           return BarTooltipItem(
-                            'Calories: ${calories.toStringAsFixed(0)}\n'
-                            'Protein: ${protein.toStringAsFixed(0)}g\n'
-                            'Carbs: ${carbs.toStringAsFixed(0)}g\n'
-                            'Fats: ${fats.toStringAsFixed(0)}g\n',
-                             TextStyle(
+                            '${context.tr('Calories')}: ${calories.toStringAsFixed(0)}\n'
+                            '${context.tr('Protein')}: ${protein.toStringAsFixed(0)}g\n'
+                            '${context.tr('Carbs')}: ${carbs.toStringAsFixed(0)}g\n'
+                            '${context.tr('Fats')}: ${fats.toStringAsFixed(0)}g\n',
+                            TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontWeight: FontWeight.w500,
                               height: 1.4,
@@ -455,18 +468,7 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                     color: Theme.of(context).colorScheme.scrim,
                   ),
                   child: Text(
-                    percentageOfTarget.round() <= 24
-                        ? "Getting started is the hardest part, You're ready for this!"
-                        : percentageOfTarget.round() >= 25 &&
-                              percentageOfTarget.round() <= 49
-                        ? "You're making progress—now's the time to keep pushing!"
-                        : percentageOfTarget.round() >= 50 &&
-                              percentageOfTarget.round() <= 74
-                        ? "You're dedication is paying off! Keep going."
-                        : percentageOfTarget.round() >= 75 &&
-                              percentageOfTarget.round() <= 99
-                        ? "It's the final stretch! Push yourself!"
-                        : "You did it! Congratulations!",
+                    motivationMessage,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Color.fromARGB(255, 33, 139, 28),
@@ -533,7 +535,7 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                         onTap: () => setState(() => selectedRange = r),
                         child: Center(
                           child: Text(
-                            _rangeText(r),
+                            _rangeText(context, r),
                             style: TextStyle(
                               color: selected
                                   ? Theme.of(context).colorScheme.onTertiary
@@ -556,16 +558,16 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
     );
   }
 
-  String _rangeText(WeekRange r) {
+  String _rangeText(BuildContext context, WeekRange r) {
     switch (r) {
       case WeekRange.thisWeek:
-        return 'This Week';
+        return context.tr('This Week');
       case WeekRange.lastWeek:
-        return 'Last Week';
+        return context.tr('Last Week');
       case WeekRange.twoWeeksAgo:
-        return '2 wks ago';
+        return context.tr('2 wks ago');
       case WeekRange.threeWeeksAgo:
-        return '3 wks ago';
+        return context.tr('3 wks ago');
     }
   }
 }
@@ -585,7 +587,7 @@ class _Legend extends StatelessWidget {
         Icon(icon, color: color, size: 20),
         const SizedBox(width: 6),
         Text(
-          label,
+          context.tr(label),
           style: TextStyle(
             fontSize: 12,
             color: Theme.of(context).colorScheme.onPrimary,

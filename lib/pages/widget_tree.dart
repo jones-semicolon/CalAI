@@ -2,6 +2,7 @@ import 'package:calai/pages/home/home_page.dart';
 import 'package:calai/pages/progress/progress_page.dart';
 import 'package:calai/widgets/CustomFab.dart';
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import '../widgets/navbar_widget.dart';
 import '../data/notifiers.dart';
 import '../pages/home/day_streak.dart';
@@ -92,7 +93,7 @@ class _WidgetTreeState extends State<WidgetTree> {
                             );
                           } else if (pages == 1) {
                             return Text(
-                              'Progress',
+                              context.tr('Progress'),
                               style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,
@@ -101,7 +102,7 @@ class _WidgetTreeState extends State<WidgetTree> {
                             );
                           } else {
                             return Text(
-                              'Settings',
+                              context.tr('Settings'),
                               style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,

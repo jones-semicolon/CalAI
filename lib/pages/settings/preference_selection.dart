@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import '../../theme/theme_service.dart';
 import '../../main.dart'; // To call MyApp.of(context) for theme changes
 
@@ -72,7 +73,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                 Icon(Icons.settings_outlined, color: textColor, size: 26),
                 const SizedBox(width: 12),
                 Text(
-                  "Preferences",
+                  context.tr("Preferences"),
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -94,8 +95,8 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Appearance",
+                        Text(
+                          context.tr("Appearance"),
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -104,7 +105,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        "Choose light, dark, or system appearance",
+                        context.tr("Choose light, dark, or system appearance"),
                         style: TextStyle(fontSize: 10, color: textColor),
                       ),
                     ],
@@ -129,7 +130,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                               value: e,
                               child: Center(
                                 child: Text(
-                                  e,
+                                  context.tr(e),
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
@@ -170,7 +171,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Add Burned Calories",
+                          context.tr("Add Burned Calories"),
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -179,7 +180,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          "Add burned calories to daily goal",
+                          context.tr("Add burned calories to daily goal"),
                           style: TextStyle(fontSize: 10, color: textColor),
                         ),
                       ],
@@ -227,7 +228,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Rollover Calories",
+                          context.tr("Rollover Calories"),
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -236,7 +237,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "Add up to 200 leftover calories into today's goal",
+                          context.tr("Add up to 200 leftover calories into today's goal"),
                           style: TextStyle(fontSize: 10, color: textColor),
                         ),
                       ],

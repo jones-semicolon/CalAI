@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:calai/l10n/app_strings.dart';
 import '../../data/user_data.dart';
 import 'weight_picker/weight_enums.dart';
 import 'weight_picker/weight_unit_provider.dart';
@@ -174,7 +175,7 @@ class _ProgSpeedSliderState extends ConsumerState<ProgSpeedSlider> {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  _bottomLabelFromKg(speedKg),
+                  context.tr(_bottomLabelFromKg(speedKg)),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontWeight: FontWeight.w900,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class LogoutSection extends StatelessWidget {
   const LogoutSection({super.key});
@@ -19,7 +20,7 @@ class LogoutSection extends StatelessWidget {
           Icon(Icons.logout, size: 20, color: primaryColor),
           const SizedBox(width: 10),
           Text(
-            "Logout",
+            context.tr("Logout"),
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,

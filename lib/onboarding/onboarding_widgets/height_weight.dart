@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/user_data.dart';
@@ -268,7 +269,7 @@ class _HeightWeightPickerWidgetState
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "Imperial",
+          context.tr("Imperial"),
           style: TextStyle(
             color: !isMetric ? theme.colorScheme.onPrimary : theme.shadowColor,
             fontWeight: FontWeight.bold,
@@ -293,7 +294,7 @@ class _HeightWeightPickerWidgetState
         ),
         const SizedBox(width: 20),
         Text(
-          "Metric",
+          context.tr("Metric"),
           style: TextStyle(
             color: isMetric ? theme.colorScheme.onPrimary : theme.shadowColor,
             fontWeight: FontWeight.bold,
@@ -305,7 +306,7 @@ class _HeightWeightPickerWidgetState
   }
 
   Widget _header(String t, ThemeData theme) => Text(
-    t,
+    context.tr(t),
     style: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.bold,

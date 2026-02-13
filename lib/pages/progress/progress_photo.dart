@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class ProgressPhoto extends StatelessWidget {
   const ProgressPhoto({super.key});
@@ -27,7 +28,7 @@ class ProgressPhoto extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Progress Photos',
+              context.tr('Progress Photos'),
               style: TextStyle(
                 fontSize: 22,
                 color: Theme.of(context).colorScheme.onPrimary,
@@ -44,7 +45,7 @@ class ProgressPhoto extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Want to add a photo to track your progress?',
+                        context.tr('Want to add a photo to track your progress?'),
                         softWrap: true,
                         style: TextStyle(
                           fontSize: 14,
@@ -75,7 +76,7 @@ class ProgressPhoto extends StatelessWidget {
                               ),
                               const SizedBox(width: 2),
                               Text(
-                                'Upload a Photo',
+                                context.tr('Upload a Photo'),
                                 style: TextStyle(
                                   color: Theme.of(
                                     context,

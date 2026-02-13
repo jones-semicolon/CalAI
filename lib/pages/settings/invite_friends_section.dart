@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class InviteFriendsSection extends StatelessWidget {
   const InviteFriendsSection({super.key});
@@ -27,7 +28,7 @@ class InviteFriendsSection extends StatelessWidget {
           Icon(Icons.group_outlined, size: 20, color: primaryColor),
           const SizedBox(width: 10),
           Text(
-            "Invite friends",
+            context.tr("Invite friends"),
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,

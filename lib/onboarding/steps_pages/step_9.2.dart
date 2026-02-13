@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../onboarding_widgets/continue_button.dart';
@@ -55,15 +56,15 @@ class EncourageMessage extends ConsumerWidget {
                       color: primary,
                     ),
                     children: [
-                      TextSpan(text: '$goalText '),
+                      TextSpan(text: '${context.tr(goalText)} '),
                       TextSpan(
                         text: '${weightDiff.toStringAsFixed(1)} $unitLabel',
                         style: const TextStyle(
                           color: Color.fromARGB(255, 222, 154, 105),
                         ),
                       ),
-                      const TextSpan(
-                        text: ' is a realistic target. It’s not hard at all!',
+                      TextSpan(
+                        text: context.tr("is a realistic target. It's not hard at all!"),
                       ),
                     ],
                   ),
@@ -72,7 +73,7 @@ class EncourageMessage extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 Text(
-                  '90% of users say the change is obvious after using Cal AI, and it’s not easy to rebound.',
+                  context.tr("90% of users say the change is obvious after using Cal AI, and it's not easy to rebound."),
                   textAlign: TextAlign.center,
                   style: TextStyle(color: primary, fontSize: 16),
                 ),

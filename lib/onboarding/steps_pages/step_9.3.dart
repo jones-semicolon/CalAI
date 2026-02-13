@@ -2,6 +2,7 @@ import 'package:calai/onboarding/onboarding_widgets/header.dart';
 import 'package:calai/onboarding/onboarding_widgets/speed_prog_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calai/l10n/app_strings.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../../data/user_data.dart';
 import '../onboarding_widgets/weight_picker/weight_enums.dart';
@@ -40,7 +41,7 @@ class ProgressSpeed extends ConsumerWidget {
           Column(
             children: [
               Text(
-                '$weightLabel weight speed per week',
+                '${context.tr(weightLabel)} ${context.tr('weight speed per week')}',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

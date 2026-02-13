@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_strings.dart';
 
 class WeightCard extends StatelessWidget {
   final double currentWeight;
@@ -29,7 +30,7 @@ class WeightCard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    'My Weight',
+                    context.tr('My Weight'),
                     style: TextStyle(
                       color: Theme.of(context).primaryColor,
                       fontSize: 12,
@@ -70,7 +71,7 @@ class WeightCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Goal',
+                        context.tr('Goal'),
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).primaryColor,
@@ -105,7 +106,7 @@ class WeightCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Log Weight',
+                      context.tr('Log Weight'),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -179,9 +180,9 @@ class StreakCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Day streak',
-            style: TextStyle(
+          Text(
+            context.tr('Day streak'),
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Color.fromARGB(255, 249, 149, 11),
             ),
