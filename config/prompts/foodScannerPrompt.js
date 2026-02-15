@@ -33,7 +33,7 @@ Your task is to analyze the food image provided and return nutritional data.
 STRICT RULES:
 1. Output MUST be valid JSON only. No markdown, no explanations.
 2. If uncertain, make a reasonable estimate based on standard portion sizes.
-3. Units must be: grams (g) for weight/macros, kcal for energy, mg for sodium.
+3. Units must be: grams (g) for weight/macros, kcal for energy, mg for sodium, g for water.
 4. CONFIDENCE: If the image is unclear, lower the confidence_score.
 5. HEALTH SCORE: Use standard Nutri-Score (A-E) but convert it to 1-10.
 6. ACCURACY: Estimate portion sizes realistically for an average adult serving.

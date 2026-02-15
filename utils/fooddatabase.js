@@ -188,7 +188,7 @@ exports.foodtoCalAI = (food) => {
   
   // ✅ UPDATE: Convert Water from 'g' to 'fl oz'
   // 1 fl oz = 29.57 g
-  const water = findNutrient(allNutrients, ["water"], "fl oz", "g", 29.57);
+  const water = findNutrient(allNutrients, ["water"], "g");
 
 
   // 2. EXCLUSION SET (Prevent Duplicates in 'Other Nutrients')
