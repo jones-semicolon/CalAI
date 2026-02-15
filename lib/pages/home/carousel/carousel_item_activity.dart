@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:calai/enums/user_enums.dart';
 import 'package:calai/providers/user_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -192,8 +193,9 @@ class _StepsTodayCard extends ConsumerWidget {
     final status = await Permission.activityRecognition.request();
 
     if (status.isGranted) {
-      // Invalidate the stream to force a fresh hardware connection
+      // Restart both the hardware stream AND the tracker logic
       ref.invalidate(stepCountStreamProvider);
+      ref.invalidate(stepTrackerProvider);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -206,7 +208,7 @@ class _StepsTodayCard extends ConsumerWidget {
   }
 }
 
-class _WaterIntakeSection extends StatelessWidget {
+class _WaterIntakeSection extends ConsumerWidget {
   final num waterIntake;
   final Function(int) onWaterChange;
 
@@ -216,8 +218,9 @@ class _WaterIntakeSection extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final unitSystem = ref.read(userProvider).settings.measurementUnit;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -241,16 +244,15 @@ class _WaterIntakeSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Water", style: theme.textTheme.labelSmall),
-              // TODO create a custom widget for this
               Row(
                 children: [
                   Text(
-                    "${waterIntake.round()} fl oz", // Unit update
+                    "${unitSystem?.liquidToDisplay(waterIntake.toDouble()).round() ?? waterIntake.round()}  ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}", // Unit update
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(width: 5),
                   GestureDetector(
-                    onTap: () => _showWaterSettings(context), // ✅ Call the sheet
+                    onTap: () => _showWaterSettings(context, unitSystem), // ✅ Call the sheet
                     child: Icon(Icons.settings_outlined, color: theme.colorScheme.onPrimary, size: 16),
                   )
                 ],
@@ -276,11 +278,11 @@ class _WaterIntakeSection extends StatelessWidget {
 }
 
 // TODO: Add functionality to this water serving size picker
-void _showWaterSettings(BuildContext context) {
+void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
     ),
@@ -316,11 +318,9 @@ void _showWaterSettings(BuildContext context) {
                         Row(
                           children: [
                             Text(
-                              "$selectedValue fl oz (1 cup)",
+                              "$selectedValue ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
                               style: TextStyle(fontSize: 15, color: Colors.grey[800]),
                             ),
-                            const SizedBox(width: 5),
-                            Icon(Icons.edit, size: 16, color: Colors.grey[400]),
                           ],
                         ),
                       ],

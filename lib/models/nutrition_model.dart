@@ -56,7 +56,7 @@ class NutritionGoals extends Nutrition {
       fiber: val('fiberGoal') ?? 0,
       sugar: val('sugarGoal') ?? 0,
       sodium: val('sodiumGoal') ?? 0,
-      water: val('waterGoal') ?? 64,
+      water: val('waterGoal') ?? 1900,
       steps: val('stepsGoal') ?? 10000,
       weightGoal: val('weightGoal') ?? 0,
       rollover: val('rollover') ?? 0,

@@ -1,3 +1,4 @@
+import 'package:calai/enums/user_enums.dart';
 import 'package:calai/pages/settings/settings_item.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
@@ -61,7 +62,7 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
     MyApp.of(context)?.setThemeMode(mode);
   }
 
-  void _updateSettings({bool? isAddCalorieBurn, bool? isRollover}) async {
+  void _updateSettings({bool? isAddCalorieBurn, bool? isRollover, bool? isImperial}) async {
     final userNotifier = ref.read(userProvider.notifier);
 
     // 1. Update only the specific field that was changed.
@@ -72,6 +73,10 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
 
     if (isRollover != null) {
       userNotifier.setRolloverCalories(isRollover);
+    }
+
+    if (isImperial != null) {
+      userNotifier.setMeasurementUnit(isImperial ? MeasurementUnit.imperial : MeasurementUnit.metric);
     }
 
     // 2. Sync the updated settings object to Firestore
@@ -140,7 +145,7 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
                 ),
               ),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           ),
           const SettingsDivider(),
           SettingsItemTile(
@@ -172,6 +177,24 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
                 return states.contains(MaterialState.selected)
                     ? Theme.of(context).dialogTheme.barrierColor ??
                           Theme.of(context).primaryColor
+                    : Theme.of(context).colorScheme.secondary;
+              }),
+              trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+          ),
+          const SettingsDivider(),
+          SettingsItemTile(
+            label: "Measurement unit",
+            description: "All values will be converted to imperial (currently on metrics)",
+            widget: Switch(
+              value: settings.measurementUnit?.isImperial ?? false,
+              onChanged: (v) => _updateSettings(isImperial: v),
+              thumbColor: MaterialStateProperty.all(Colors.white),
+              trackColor: MaterialStateProperty.resolveWith((states) {
+                return states.contains(MaterialState.selected)
+                    ? Theme.of(context).dialogTheme.barrierColor ??
+                    Theme.of(context).primaryColor
                     : Theme.of(context).colorScheme.secondary;
               }),
               trackOutlineColor: MaterialStateProperty.all(Colors.transparent),

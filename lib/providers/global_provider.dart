@@ -67,7 +67,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
       // STEP 4: Finalize initialization state
       final current = state.asData?.value ?? GlobalDataState.initial();
-      state = AsyncData(current.copyWith(isInitialized: true));
+      state = AsyncData(current.copyWith(isInitialized: true, userSettings: ref.read(userProvider).settings));
 
     } catch (e, st) {
       debugPrint("❌ GlobalData Init Error: $e");
@@ -237,10 +237,8 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     }
 
     // Load Master Goal Object
-    if (data['goal'] != null) {
+    if (data['goal']['dailyGoals'] != null) {
       userNotifier.setUserGoal(UserGoal.fromJson(data['goal']));
-    } else if (data['dailyGoals'] != null) {
-      userNotifier.updateNutritionGoals(NutritionGoals.fromJson(data['dailyGoals']));
     }
   }
 
@@ -254,34 +252,18 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
       final userNotifier = ref.read(userProvider.notifier);
 
-      // 1. Sync the Provider Status (Crucial for Settings UI)
+      // 1. Check if the profile map exists in the document
       if (data['profile'] != null) {
-        final providerString = data['profile']['provider'] as String?;
+        // 2. Parse the ENTIRE profile using your factory
+        final updatedProfile = UserProfile.fromJson(data['profile'] as Map<String, dynamic>);
 
-        // Map string back to Enum
-        final providerEnum = UserProvider.values.firstWhere(
-              (e) => e.value == providerString,
-          orElse: () => UserProvider.anonymous,
-        );
-
-        // Update the local provider state
+        // 3. Update the local state with the complete profile object
         userNotifier.updateLocal((s) => s.copyWith(
-          profile: s.profile.copyWith(provider: providerEnum),
+          profile: updatedProfile,
         ));
       }
     });
   }
-
-  // Future<void> _ensureStatsExists() async {
-  //   final user = ref.read(userProvider);
-  //   final statsSub = _service.stats;
-  //
-  //   final doc = await statsSub.get();
-  //   final existingData = doc.docs.isNotEmpty;
-  //   if (!existingData) {
-  //     await statsSub.add(_service.weightHistory);
-  //   }
-  // }
 
   Future<void> _ensureDailyLogExists() async {
     final user = ref.read(userProvider);
@@ -316,7 +298,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   Future<int> _calculateYesterdayRollover() async {
     try {
       final user = ref.read(userProvider);
-      if (user.settings.isRollover!) return 0;
+      // if (user.settings.isRollover!) return 0;
 
       // 1. Get Yesterday's ID based on Local Time to match your Firestore keys
       final now = DateTime.now().toLocal();

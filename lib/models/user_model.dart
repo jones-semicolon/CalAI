@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:calai/enums/user_enums.dart';
 
@@ -79,7 +80,7 @@ class UserProfile {
 
   Map<String, dynamic> toJson() => {
     'name': name,
-    'gender': gender?.name ?? "male",
+    'gender': gender?.name,
     'birthDate': birthDate?.toIso8601String(),
     'provider': provider?.name ?? UserProvider.anonymous.name,
   };
@@ -87,12 +88,22 @@ class UserProfile {
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       name: json['name'] ?? 'Anonymous',
-      gender: Gender.fromString(json['gender'] ?? ''),
-      birthDate: DateTime.tryParse(json['birthDate'] ?? '') ?? DateTime(2001, 1, 1),
+      gender: Gender.fromString(json['gender'] ?? ""),
+      // ✅ Handle the conversion from Timestamp to DateTime
+      birthDate: _parseBirthDate(json['birthDate']),
       provider: UserProvider.fromString(
           json['provider'] ?? UserProvider.anonymous.name
       ),
     );
+  }
+
+  static DateTime _parseBirthDate(dynamic value) {
+    if (value is Timestamp) {
+      return value.toDate();
+    } else if (value is String) {
+      return DateTime.tryParse(value) ?? DateTime(2001, 1, 1);
+    }
+    return DateTime(2001, 1, 1); // Fallback
   }
 
   UserProfile copyWith({String? name, Gender? gender, DateTime? birthDate, UserProvider? provider}) {
@@ -264,28 +275,35 @@ class UserGoal {
 class UserSettings {
   final bool? isAddCalorieBurn;
   final bool? isRollover;
+  final MeasurementUnit? measurementUnit;
 
   const UserSettings({
     this.isAddCalorieBurn,
     this.isRollover,
+    this.measurementUnit
   });
 
   Map<String, dynamic> toJson() => {
     'isAddCalorieBurn': isAddCalorieBurn,
     'isRollover': isRollover,
+    'measurementUnit': measurementUnit?.value ?? MeasurementUnit.metric.value
   };
 
   factory UserSettings.fromJson(Map<String, dynamic> json) {
     return UserSettings(
       isAddCalorieBurn: json['isAddCalorieBurn'],
       isRollover: json['isRollover'],
+      measurementUnit: MeasurementUnit.fromString(json['measurementUnit'] ?? MeasurementUnit.metric.value),
     );
   }
 
-  UserSettings copyWith({bool? isAddCalorieBurn, bool? isRollover}) {
+  static const defaultSettings = UserSettings(isRollover: false, isAddCalorieBurn: false, measurementUnit: MeasurementUnit.metric);
+
+  UserSettings copyWith({bool? isAddCalorieBurn, bool? isRollover, MeasurementUnit? measurementUnit}) {
     return UserSettings(
       isAddCalorieBurn: isAddCalorieBurn ?? this.isAddCalorieBurn,
       isRollover: isRollover ?? this.isRollover,
+      measurementUnit: measurementUnit ?? this.measurementUnit,
     );
   }
 }

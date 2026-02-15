@@ -1,4 +1,5 @@
 import 'package:calai/services/calai_firestore_service.dart';
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -74,45 +75,12 @@ class _EditNamePageState extends ConsumerState<EditNamePage> {
             CustomAppBar(title: SizedBox.shrink()),
             _PageBody(controller: _controller),
             const Spacer(),
-            _DoneFooter(
-              hasInput: _hasInput && !isSaving,
-              onDone: _handleDone,
-              isSaving: isSaving,
-            ),
+            ConfirmationButtonWidget(onConfirm: _handleDone, enabled: _hasInput && !isSaving,)
           ],
         ),
       ),
     );
   }
-}
-
-// --- Private UI Widgets --- //
-
-/// The custom AppBar for the Edit Name page.
-class _EditNameAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _EditNameAppBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.pop(context),
-        // This style creates the circular background button effect.
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all(
-            const Color.fromARGB(255, 249, 248, 253),
-          ),
-        ),
-      ),
-      // Empty title as the title is in the body.
-      title: const Text(""),
-      elevation: 0,
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 /// The main content area of the page, including the title and input field.
@@ -164,24 +132,6 @@ class _NameInputField extends StatelessWidget {
         ),
       ),
     );
-    // return TextField(
-    //   controller: controller,
-    //   // style: TextStyle(color: Theme.of(context).colorScheme.primary),
-    //   decoration: InputDecoration(
-    //     hintText: "Enter your name",
-    //     border: OutlineInputBorder(
-    //       borderRadius: BorderRadius.circular(12),
-    //       borderSide: const BorderSide(width: 1),
-    //     ),
-    //     focusedBorder: OutlineInputBorder(
-    //       borderRadius: BorderRadius.circular(12),
-    //       borderSide: BorderSide(
-    //         width: 3,
-    //         color: Theme.of(context).colorScheme.primary,
-    //       ),
-    //     ),
-    //   ),
-    // );
   }
 }
 
@@ -230,46 +180,6 @@ class _DoneFooter extends StatelessWidget {
               child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
           )
               : const Text("Done", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        ),
-      ),
-    );
-  }
-}
-
-/// The final "Done" button with enabled/disabled states.
-class _DoneButton extends StatelessWidget {
-  final VoidCallback? onPressed;
-
-  const _DoneButton({this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 45,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ButtonStyle(
-          // resolveWith handles the button's appearance in different states.
-          backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-            if (states.contains(MaterialState.disabled)) {
-              return Colors.grey.shade400; // Disabled color
-            }
-            return Colors.black; // Enabled color
-          }),
-          foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-            if (states.contains(MaterialState.disabled)) {
-              return Colors.grey.shade700;
-            }
-            return Colors.white;
-          }),
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-          ),
-        ),
-        child: const Text(
-          "Done",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
     );

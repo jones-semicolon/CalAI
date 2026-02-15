@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../enums/user_enums.dart';
 import '../../../providers/user_provider.dart';
-import 'unit_toggle.dart';
+import '../../../widgets/profile_widgets/unit_toggle.dart';
 
 class WeightSelectionView extends ConsumerStatefulWidget {
   const WeightSelectionView({super.key});

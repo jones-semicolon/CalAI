@@ -1,3 +1,5 @@
+import 'package:calai/enums/user_enums.dart';
+import 'package:calai/providers/user_provider.dart';
 import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,6 +35,7 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
                 data: (global) {
                   // 3. Get logs and Sort them (Newest first)
                   final logs = global.weightLogs;
+                  final unitSystem = ref.read(userProvider).settings.measurementUnit;
 
                   if (logs.isEmpty) {
                     return Center(
@@ -53,6 +56,7 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
                     separatorBuilder: (context, index) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final log = sortedLogs[index];
+                      final double displayWeight = unitSystem?.metricToDisplay(log.weight)  ?? log.weight;
 
                       // 4. Format real data
                       final String formattedDate = DateFormat('MMM, dd yyyy').format(log.date);
@@ -80,7 +84,7 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
                               children: [
                                 Text(
                                   // Ensure uniform decimal places (e.g., 70.0)
-                                  log.weight.toStringAsFixed(1),
+                                  displayWeight.toStringAsFixed(1),
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -89,7 +93,7 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  "kg",
+                                  unitSystem?.weightLabel ?? MeasurementUnit.metric.weightLabel,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Theme.of(context).colorScheme.secondary,

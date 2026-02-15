@@ -126,6 +126,26 @@ class FoodLog extends FoodBase {
     return DateTime.now(); // Fallback
   }
 
+  factory FoodLog.empty() {
+    return FoodLog(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      foodId: 'manual_${DateTime.now().millisecondsSinceEpoch}',
+      amount: 1.0,
+      portion: "serving",
+      timestamp: DateTime.now(),
+      name: "",
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fats: 0,
+      fiber: 0,
+      sugar: 0,
+      sodium: 0,
+      water: 0,
+      otherNutrients: [],
+    );
+  }
+
   FoodLog copyWith({
     String? id,
     String? foodId,

@@ -13,7 +13,8 @@ import '../screens/bmi_info_view.dart';
 class ProgressBmiCard extends ConsumerWidget {
   final BoxDecoration? decoration;
   final bool? hasPadding;
-  const ProgressBmiCard({super.key, this.decoration, this.hasPadding = true});
+  final VoidCallback? onTap;
+  const ProgressBmiCard({super.key, this.decoration, this.hasPadding = true, this.onTap});
 
   int _calculateAge(DateTime? birthDate) {
     if (birthDate == null) return 0; // Guard for null birthDate
@@ -45,24 +46,19 @@ class ProgressBmiCard extends ConsumerWidget {
     }
 
     // fallback weight
-    double weightKg = user.body.currentWeight;
-
-    // take latest logged weight if available
-    globalAsync.whenData((global) {
-      if (global.weightLogs.isNotEmpty) {
-        weightKg = global.weightLogs.last.weight;
-      }
-    });
+    final double weightKg = globalAsync.maybeWhen(
+      data: (global) => global.weightLogs.isNotEmpty
+          ? global.weightLogs.last.weight
+          : user.body.currentWeight,
+      orElse: () => user.body.currentWeight,
+    );
 
     final bmi = _calculateBmi(
       weightKg: weightKg,
       heightCm: user.body.height.toDouble(),
     );
 
-    // Handle null age safely
     final age = _calculateAge(user.profile.birthDate);
-
-    // Provide a default gender if null so BmiCalculator doesn't crash
     final gender = user.profile.gender ?? Gender.other;
 
     final calculator = BmiCalculator(
@@ -140,9 +136,8 @@ class ProgressBmiCard extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 8), // Replaces Wrap spacing
-                    // TODO move it to BMI info page
                     GestureDetector(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BmiInfoView())),
+                      onTap: onTap,
                       child: Icon(
                         Icons.help_outline,
                         size: 22,

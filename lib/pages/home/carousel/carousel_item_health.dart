@@ -51,6 +51,8 @@ class CarouselHealth extends ConsumerWidget {
             ),
             const SizedBox(height: 10),
             _HealthScoreCard(
+              protein: progress.protein,
+              calories: progress.calories,
               score: currentScore,
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => HealthScoreView(score: currentScore)));
@@ -122,17 +124,27 @@ class _NutrientCardsRow extends StatelessWidget {
 /// Displays the "Health Score" card with its progress bar and summary text.
 class _HealthScoreCard extends StatelessWidget {
   final double score;
+  final double protein; // Added
+  final double calories; // Added
   final VoidCallback onTap;
 
-  const _HealthScoreCard({required this.score, required this.onTap});
+  const _HealthScoreCard({
+    required this.score,
+    required this.protein,
+    required this.calories,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell( // ✅ Added InkWell for navigation
+    // Generate the message based on current data
+    final String summaryMessage = _getHealthSummary(score, protein, calories);
+
+    return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(AppSizes.lg),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Theme.of(context).appBarTheme.backgroundColor,
           borderRadius: BorderRadius.circular(16),
@@ -178,11 +190,12 @@ class _HealthScoreCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
-              'Carbs and fat are on track. You’re low in calories and protein, which can slow weight loss and impact muscle retention.',
+              summaryMessage, // ✅ Displays the dynamic summary
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onPrimary,
+                fontSize: 14,
               ),
             ),
           ],
@@ -190,4 +203,21 @@ class _HealthScoreCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String _getHealthSummary(double score, double protein, double calories) {
+  if (score == 0) {
+    return 'No data logged for today. Start tracking your meals to see your health insights!';
+  }
+
+  if (score < 5) {
+    return 'Your intake is quite low. Focus on hitting your calorie and protein targets to maintain energy and muscle.';
+  }
+
+  // Example of specific macro feedback
+  if (protein < 30) {
+    return 'Carbs and fat are on track, but you’re low in protein. Increasing protein can help with muscle retention.';
+  }
+
+  return 'Great job! Your nutrition is well-balanced today.';
 }

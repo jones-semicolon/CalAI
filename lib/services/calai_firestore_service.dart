@@ -9,6 +9,7 @@ import '../enums/food_enums.dart';
 import '../enums/user_enums.dart';
 import '../models/exercise_model.dart';
 import '../models/food_model.dart';
+import '../models/nutrition_model.dart';
 import '../models/user_model.dart';
 
 /// Handles all Database interactions and API calls
@@ -97,6 +98,22 @@ class CalaiFirestoreService {
     }
   }
 
+  Future<void> updateDailyLogGoals(String dateId, UserGoal goals) async {
+    try {
+      // Reference: users/{uid}/dailyLogs/{dateId}
+      final docRef = dailyLogsCol.doc(dateId);
+      final newGoal = goals.targets.toJson();
+
+      // Use merge: true to avoid overwriting existing dailyProgress data
+      await docRef.set({
+        'dailyGoals': newGoal,
+      }, SetOptions(merge: true));
+
+    } catch (e) {
+      throw Exception("Failed to update daily log: $e");
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // 2. PARTIAL UPDATES (Settings / Biometrics)
   // ---------------------------------------------------------------------------
@@ -105,10 +122,17 @@ class CalaiFirestoreService {
   Future<void> updateUserProfileField(String field, dynamic value) async {
     if (uid == null) return;
 
-    // ✅ AUTO-FIX: Prepend 'profile.' so it nests correctly
-    // Input: 'name' -> Path: 'profile.name'
+    // 1. Prepare the value for Firestore
+    dynamic valueToSave = value;
+
+    // 2. Automatically convert Dart DateTime to Firestore Timestamp
+    if (value is DateTime) {
+      valueToSave = Timestamp.fromDate(value);
+    }
+
+    // 3. Perform the nested update
     await userDoc.update({
-      'profile.$field': value,
+      'profile.$field': valueToSave,
       'updatedAt': FieldValue.serverTimestamp(),
     });
   }
@@ -469,9 +493,9 @@ class CalaiFirestoreService {
     if (!forceRefresh) {
       final doc = await userDoc.get();
 
-      if (doc.data()?['dailyGoals'] != null) {
-        debugPrint("✅ Found existing goals.");
-        return UserGoal.fromJson({'dailyGoals': doc.data()!['dailyGoals']});
+      if (doc.data()?['goal'] != null) {
+        debugPrint("✅ Found existing goals. ${doc.data()?['goal']}");
+        return UserGoal.fromJson({'dailyGoals': doc.data()!['goal']['dailyGoals']});
       }
     }
 
@@ -497,13 +521,17 @@ class CalaiFirestoreService {
 
   Future<void> updateDailyGoals(Map<String, dynamic> goals) async {
     final batch = _db.batch();
-
-    // 1. Root convenience field (for quick stats access)
-    batch.set(userDoc, {'dailyGoals': goals}, SetOptions(merge: true));
+    final String dateKey = todayId; // YYYY-MM-DD
 
     // 2. Nested field (for User model integrity)
     batch.set(userDoc, {
       'goal': {'dailyGoals': goals},
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    batch.set(dailyLogDoc(dateKey), {
+      'dailyGoals': goals,
+      'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
 
     await batch.commit();

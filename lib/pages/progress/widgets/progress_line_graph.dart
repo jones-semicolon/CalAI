@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:calai/enums/food_enums.dart';
+import 'package:calai/enums/user_enums.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
@@ -22,6 +23,7 @@ class ProgressGraph extends StatefulWidget {
   final double startedWeight;
   final double goalWeight;
   final double progressPercent;
+  final MeasurementUnit? unitSystem;
 
   const ProgressGraph({
     super.key,
@@ -31,6 +33,7 @@ class ProgressGraph extends StatefulWidget {
     required this.startedWeight,
     required this.goalWeight,
     required this.progressPercent,
+    this.unitSystem,
   });
 
   @override
@@ -68,16 +71,19 @@ class _ProgressGraphState extends State<ProgressGraph> {
   Widget build(BuildContext context) {
     // ✅ 1. Check if we have real data
     final bool hasNoData = widget.logs.isEmpty;
+    final MeasurementUnit unitSystem = widget.unitSystem ?? MeasurementUnit.metric;
+
+    final double goalWeightDisplay = unitSystem.metricToDisplay(widget.goalWeight);
 
     // ✅ 2. Create placeholder values if empty
     final List<double> weights = hasNoData
-        ? [widget.goalWeight, widget.goalWeight] // Use Goal as baseline
-        : widget.logs.map<double>((e) => (e.weight as num).toDouble()).toList();
+        ? [goalWeightDisplay, goalWeightDisplay]
+        : widget.logs.map<double>((e) => unitSystem.metricToDisplay((e.weight as num).toDouble())).toList();
 
     final minWeight = weights.reduce((a, b) => a < b ? a : b);
     final maxWeight = weights.reduce((a, b) => a > b ? a : b);
 
-    const double minRange = 3;
+    const double minRange = 5; // Increased range to prevent 0-scale crashes
     double chartMin = minWeight;
     double chartMax = maxWeight;
     final currentRange = chartMax - chartMin;
@@ -234,11 +240,17 @@ class _ProgressGraphState extends State<ProgressGraph> {
             int index = spot.x.toInt();
             if (widget.logs.length == 1) index = 0;
 
+            double getDisplay(double val) {
+              double converted = widget.unitSystem?.metricToDisplay(val) ?? val;
+              // Rounds to 2 decimal places
+              return double.parse(converted.toStringAsFixed(2));
+            }
+
             final date = widget.logs[index].date;
             final formattedDate = '${_monthName(date.month)} ${date.day}, ${date.year}';
 
             return LineTooltipItem(
-              '${spot.y.toStringAsFixed(1)} kg',
+              '${getDisplay(spot.y)} ${widget.unitSystem?.weightLabel ?? MeasurementUnit.metric.weightLabel}',
               TextStyle(
                 color: Theme.of(context).canvasColor,
                 fontSize: 14,
@@ -268,18 +280,23 @@ class _ProgressGraphState extends State<ProgressGraph> {
         : (_isTouched ? Colors.green : Theme.of(context).colorScheme.primary);
 
     List<FlSpot> spots;
+
+    double getDisplay(double val) {
+      double converted = widget.unitSystem?.metricToDisplay(val) ?? val;
+      // Rounds to 2 decimal places
+      return double.parse(converted.toStringAsFixed(2));
+    }
+
     if (hasNoData) {
-      // Create a flat line across the chart
-      spots = [FlSpot(0, widget.goalWeight), FlSpot(6, widget.goalWeight)];
+      double target = getDisplay(widget.goalWeight);
+      spots = [FlSpot(0, target), FlSpot(6, target)];
     } else if (widget.logs.length <= 1) {
-      spots = [
-        FlSpot(0, (widget.logs[0].weight as num).toDouble()),
-        FlSpot(1, (widget.logs[0].weight as num).toDouble()),
-      ];
+      double weight = getDisplay(widget.logs[0].weight);
+      spots = [FlSpot(0, weight), FlSpot(1, weight)];
     } else {
       spots = List.generate(
         widget.logs.length,
-            (i) => FlSpot(i.toDouble(), (widget.logs[i].weight as num).toDouble()),
+            (i) => FlSpot(i.toDouble(), getDisplay(widget.logs[i].weight)),
       );
     }
 

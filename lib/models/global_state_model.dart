@@ -1,3 +1,4 @@
+import 'package:calai/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:calai/models/nutrition_model.dart';
 import '../enums/food_enums.dart';
@@ -18,6 +19,7 @@ class GlobalDataState {
 
   // Metadata for Calendar dots and history
   final Set<String> progressDays;
+  final UserSettings userSettings;
 
   const GlobalDataState({
     required this.isInitialized,
@@ -27,6 +29,7 @@ class GlobalDataState {
     required this.progressDays,
     required this.dailyNutrition, // ✅ Updated field
     required this.todayGoal,
+    required this.userSettings
   });
 
   factory GlobalDataState.initial() => GlobalDataState(
@@ -37,6 +40,7 @@ class GlobalDataState {
     progressDays: const {},
     dailyNutrition: const [], // ✅ Updated field
     todayGoal: NutritionGoals.empty,
+    userSettings: UserSettings.defaultSettings,
   );
 
   // --- Dynamic Dashboard Logic ---
@@ -73,6 +77,7 @@ class GlobalDataState {
       'progressDays': progressDays.toList(),
       'dailyNutrition': dailyNutrition.map((e) => e.toJson()).toList(), // ✅ Updated
       'todayGoal': todayGoal.toJson(),
+      'userSettings': userSettings.toJson(),
     };
   }
 
@@ -86,6 +91,7 @@ class GlobalDataState {
     List<DailyNutrition>? dailyNutrition, // ✅ Updated
     double? calorieGoal,
     NutritionGoals? todayGoal,
+    UserSettings? userSettings,
   }) {
     return GlobalDataState(
       isInitialized: isInitialized ?? this.isInitialized,
@@ -95,6 +101,7 @@ class GlobalDataState {
       progressDays: progressDays ?? this.progressDays,
       dailyNutrition: dailyNutrition ?? this.dailyNutrition,
       todayGoal: todayGoal ?? this.todayGoal,
+      userSettings: userSettings ?? this.userSettings,
     );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:calai/onboarding/onboarding_widgets/weight_picker/unit_toggle.dart';
+import 'package:calai/widgets/profile_widgets/unit_toggle.dart';
 import 'package:calai/widgets/circle_back_button.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/weight_picker_widget.dart';

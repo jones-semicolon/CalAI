@@ -1,3 +1,4 @@
+import 'package:calai/enums/user_enums.dart';
 import 'package:calai/pages/progress/screens/weight_picker_view.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
@@ -10,16 +11,18 @@ class WeightCard extends StatelessWidget {
   final double currentWeight;
   final double goalWeight;
   final double progressPercent;
+  final MeasurementUnit? unitSystem;
 
   const WeightCard({
     super.key,
     required this.currentWeight,
     required this.goalWeight,
     required this.progressPercent,
+    this.unitSystem
   });
 
   /// Formats a double value into a string with ' kg' appended.
-  String _formatKg(double v) => '${v.toStringAsFixed(1)} kg';
+  String _formatKg(double v) => '${unitSystem?.metricToDisplay(v).toStringAsFixed(1) ?? v.toStringAsFixed(1)} ${unitSystem?.weightLabel ?? MeasurementUnit.metric.weightLabel}';
 
   @override
   Widget build(BuildContext context) {

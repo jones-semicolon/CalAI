@@ -1,3 +1,4 @@
+import 'package:calai/pages/progress/screens/bmi_info_view.dart';
 import 'package:calai/providers/progress_data_provider.dart';
 import 'package:calai/pages/progress/widgets/progress_bar_graph.dart';
 import 'package:calai/pages/progress/widgets/progress_bmi_card.dart';
@@ -5,6 +6,7 @@ import 'package:calai/pages/progress/widgets/progress_line_graph.dart';
 import 'package:calai/pages/progress/widgets/progress_photo.dart';
 import 'package:calai/pages/progress/widgets/streak_card.dart';
 import 'package:calai/pages/progress/widgets/weight_card.dart';
+import 'package:calai/providers/user_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,10 +49,11 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
           data: (global) {
             // 2. Instantiate the logic provider (no Firestore calls here anymore)
             final provider = ProgressPageDataProvider();
+            final unitSystem = ref.read(userProvider).settings.measurementUnit;
 
             // 3. Extract and Process Data using the provider's logic methods
             final weightLogs = global.weightLogs;
-            final goalWeight = global.todayGoal.weightGoal.toDouble();
+            final double goalWeightMetric = global.todayGoal.weightGoal;
 
             // Math & Filtering operations (Pure Logic)
             final filteredWeightLogs = provider.getFilteredLogs(weightLogs, _selectedRange);
@@ -58,7 +61,7 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
             final currentWeight = provider.currentWeight(weightLogs);
             final progressPercent = provider.goalProgressPercent(
               logs: weightLogs,
-              goalWeight: goalWeight,
+              goalWeight: goalWeightMetric,
             );
 
             return SliverToBoxAdapter(
@@ -74,8 +77,9 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
                           Expanded(
                             child: WeightCard(
                               currentWeight: currentWeight,
-                              goalWeight: goalWeight,
+                              goalWeight: goalWeightMetric,
                               progressPercent: progressPercent,
+                              unitSystem: unitSystem,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -96,8 +100,9 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
                       onRangeChanged: (r) => setState(() => _selectedRange = r),
                       logs: filteredWeightLogs,
                       startedWeight: startedWeight,
-                      goalWeight: goalWeight,
+                      goalWeight: goalWeightMetric,
                       progressPercent: progressPercent,
+                      unitSystem: unitSystem
                     ),
 
                     const SizedBox(height: 25),
@@ -111,7 +116,7 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
                     ),
 
                     const SizedBox(height: 25),
-                    const ProgressBmiCard(),
+                    ProgressBmiCard(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BmiInfoView()))),
                     const SizedBox(height: 50),
                   ],
                 ),

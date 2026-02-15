@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../enums/user_enums.dart';
+import '../../enums/user_enums.dart';
 
-// TODO move this to widget folder
 class UnitToggle extends StatelessWidget {
   final WeightUnit unit;
   final ValueChanged<WeightUnit> onChanged;

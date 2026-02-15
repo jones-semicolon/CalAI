@@ -1,4 +1,5 @@
 import 'package:calai/enums/food_enums.dart';
+import 'package:calai/enums/user_enums.dart';
 import 'package:calai/models/nutrition_model.dart';
 import 'package:calai/providers/global_provider.dart';
 import 'package:calai/providers/user_provider.dart';
@@ -134,7 +135,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                                         Text("Water", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                         const SizedBox(height: 4),
                                         Text(
-                                            "${progress.water.round()} / ${user.goal.targets.water.round()} fl oz",
+                                            "${user.settings.measurementUnit?.liquidToDisplay(progress.water).round() ?? progress.water} / ${user.settings.measurementUnit?.liquidToDisplay(user.goal.targets.water).round() ?? user.goal.targets.water} ${user.settings.measurementUnit?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
                                             style: TextStyle(color: Colors.grey[600])
                                         )
                                       ]

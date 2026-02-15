@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 enum Gender {
-  male("male"),
+  male("male"),     // Change to lowercase to match your fromString logic
   female("female"),
   other("other");
 
   final String value;
   const Gender(this.value);
 
+  String get label => this == Gender.male ? 'Male' : this == Gender.female ? 'Female' : 'Other';
+
   static Gender fromString(String val) {
     return Gender.values.firstWhere(
-          (e) => e.value == val,
+          (e) => e.value == val.toLowerCase().trim(),
       orElse: () => Gender.other,
     );
   }
@@ -43,6 +45,63 @@ enum WeightUnit {
           (e) => e.value == val,
       orElse: () => WeightUnit.kg,
     );
+  }
+}
+
+enum MeasurementUnit {
+  metric("metric"),
+  imperial("imperial");
+
+  final String value;
+  const MeasurementUnit(this.value);
+
+  static MeasurementUnit fromString(String val) {
+    return MeasurementUnit.values.firstWhere(
+          (e) => e.value == val,
+      orElse: () => MeasurementUnit.metric,
+    );
+  }
+
+  // --- UI Labels ---
+
+  /// Returns 'kg' or 'lbs'
+  String get weightLabel => this == MeasurementUnit.metric ? 'kg' : 'lbs';
+
+  /// Returns 'cm' or 'ft'
+  String get heightLabel => this == MeasurementUnit.metric ? 'cm' : 'ft';
+
+  /// Returns 'ml' or 'fl oz'
+  String get liquidLabel => this == MeasurementUnit.metric ? 'ml' : 'fl oz';
+
+  /// Returns 'g' or 'oz' (for small food portions)
+  String get massLabel => this == MeasurementUnit.metric ? 'g' : 'oz';
+
+  // --- Logic Helpers ---
+
+  bool get isMetric => this == MeasurementUnit.metric;
+  bool get isImperial => this == MeasurementUnit.imperial;
+
+  double weightToMetric(double value) {
+    if (isMetric) return value;
+    // Convert Imperial Input to Metric Storage
+    return value * 0.453592; // lbs to kg
+  }
+
+  /// Use this when PULLING from the database for the UI
+  double metricToDisplay(double value) {
+    if (isMetric) return value;
+    // Convert Metric Storage to Imperial Display
+    return value * 2.20462; // kg to lbs
+  }
+
+  double liquidToDisplay(double ml) {
+    if (isMetric) return ml;
+    return ml * 0.033814; // ml to US fl oz
+  }
+
+  double heightToDisplay(double cm) {
+    if (isMetric) return cm;
+    return cm * 0.0328084; // cm to ft
   }
 }
 

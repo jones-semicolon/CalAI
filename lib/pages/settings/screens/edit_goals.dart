@@ -1,4 +1,5 @@
 import 'package:calai/models/nutrition_model.dart';
+import 'package:calai/pages/settings/screens/generate_goals_view.dart';
 import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +16,6 @@ class EditGoalsView extends ConsumerStatefulWidget {
   ConsumerState<EditGoalsView> createState() => _EditGoalsViewState();
 }
 
-// TODO: Needs an optimization
 class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
   bool _showMicros = false;
 
@@ -29,7 +29,6 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
-          // TODO :: onBackTap will trigger to save the data globally then pop the view
           CustomAppBar(title: SizedBox.shrink()),
           Expanded(
             child: SingleChildScrollView(
@@ -53,7 +52,6 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                     value: targets.calories,
                     color: Colors.black,
                     icon: Icons.local_fire_department,
-                    // TODO this should only update the UI but not the provider
                     onTap: () => _showEdit(
                       context,
                       "Calories",
@@ -145,13 +143,18 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                   // Expandable Section
                   Center(
                     child: TextButton.icon(
-                      onPressed: () => setState(() => _showMicros = !_showMicros),
+                      onPressed: () =>
+                          setState(() => _showMicros = !_showMicros),
                       icon: Text(
-                        _showMicros ? "Hide micronutrients" : "View micronutrients",
+                        _showMicros
+                            ? "Hide micronutrients"
+                            : "View micronutrients",
                         style: const TextStyle(color: Colors.grey),
                       ),
                       label: Icon(
-                        _showMicros ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        _showMicros
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
                         color: Colors.grey,
                       ),
                     ),
@@ -165,27 +168,69 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                       value: targets.sugar,
                       color: MicroNutritionType.sugar.color,
                       icon: MicroNutritionType.sugar.icon,
-                      onTap: () => _showEdit(context, "Sugar", targets.sugar, Colors.purple, (v) {
-                        _updateTarget((t) => t.copyWith(sugar: v));
-                      }),
+                      onTap: () => _showEdit(
+                        context,
+                        "Sugar",
+                        targets.sugar,
+                        Colors.purple,
+                            (v) {
+                          ref
+                              .read(userProvider.notifier)
+                              .updateLocal(
+                                (s) => s.copyWith(
+                              goal: s.goal.copyWith(
+                                targets: s.goal.targets.copyWith(sugar: v),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                     _GoalCard(
                       label: "Fiber goal",
                       value: targets.fiber,
                       color: MicroNutritionType.fiber.color,
                       icon: MicroNutritionType.fiber.icon,
-                      onTap: () => _showEdit(context, "Fiber", targets.fiber, Colors.green, (v) {
-                        _updateTarget((t) => t.copyWith(fiber: v));
-                      }),
+                      onTap: () => _showEdit(
+                        context,
+                        "Fiber",
+                        targets.fiber,
+                        Colors.green,
+                            (v) {
+                          ref
+                              .read(userProvider.notifier)
+                              .updateLocal(
+                                (s) => s.copyWith(
+                              goal: s.goal.copyWith(
+                                targets: s.goal.targets.copyWith(fiber: v),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                     _GoalCard(
                       label: "Sodium limit",
                       value: targets.sodium,
                       color: MicroNutritionType.sodium.color,
                       icon: MicroNutritionType.sodium.icon,
-                      onTap: () => _showEdit(context, "Sodium", targets.sodium, Colors.blueGrey, (v) {
-                        _updateTarget((t) => t.copyWith(sodium: v));
-                      }),
+                      onTap: () => _showEdit(
+                        context,
+                        "Sodium",
+                        targets.sodium,
+                        Colors.blueGrey,
+                            (v) {
+                          ref
+                              .read(userProvider.notifier)
+                              .updateLocal(
+                                (s) => s.copyWith(
+                              goal: s.goal.copyWith(
+                                targets: s.goal.targets.copyWith(sodium: v),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ],
@@ -195,23 +240,13 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
 
           // Bottom Action Button
           ConfirmationButtonWidget(
-            onConfirm: () {
-              // TODO :: This will show the parts of onboarding to Generate Goals
-              // Logic to re-calculate based on user profile
-            },
+            onConfirm: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const GenerateGoalsView()),
+            ),
             text: "Auto Generate Goals",
           ),
         ],
-      ),
-    );
-  }
-
-  void _updateTarget(NutritionGoals Function(NutritionGoals) updateFn) {
-    ref.read(userProvider.notifier).updateLocal(
-          (s) => s.copyWith(
-        goal: s.goal.copyWith(
-          targets: updateFn(s.goal.targets),
-        ),
       ),
     );
   }
@@ -226,7 +261,7 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
@@ -282,8 +317,8 @@ class _GoalCard extends StatelessWidget {
                   child: CircularProgressIndicator(
                     value: 0.5, // Decorative progress
                     strokeWidth: 4,
-                    color: color.withOpacity(0.5),
-                    backgroundColor: Colors.grey[300],
+                    color: color,
+                    backgroundColor: Theme.of(context).splashColor,
                   ),
                 ),
                 Icon(icon, color: color, size: 16),
@@ -295,7 +330,7 @@ class _GoalCard extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12),
                 ),
                 Text(
                   value.toInt().toString(),

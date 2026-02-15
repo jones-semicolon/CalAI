@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:calai/pages/home/recently_logged/logged_view/logged_food_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -171,8 +172,10 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
   }
 
   void _onLogEmptyFood() {
-    debugPrint("Log empty food tapped");
-    // TODO: Navigate to empty food log form
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const LoggedFoodView()),
+    );
   }
 
   void _navigateToFoodDetails(Food item) {

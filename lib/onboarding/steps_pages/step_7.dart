@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/user_provider.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
-import '../onboarding_widgets/birthday_picker_widget.dart';
+import '../../widgets/profile_widgets/birthday_picker_widget.dart';
 
 class OnboardingStep7 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;

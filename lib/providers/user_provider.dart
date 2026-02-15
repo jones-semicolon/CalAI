@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:intl/intl.dart';
 import '../enums/food_enums.dart';
 import '../models/exercise_model.dart';
 import '../models/food_model.dart';
@@ -75,6 +76,73 @@ class UserNotifier extends StateNotifier<User> {
 
   void setUserGoal(UserGoal newGoal) {
     state = state.copyWith(goal: newGoal);
+  }
+
+  void updateUserBodyField(String field, dynamic value) async {
+    // 1. Update local state using a switch to map string to model fields
+    _update((s) {
+      UserBiometrics updatedBody;
+
+      switch (field) {
+        case 'height':
+          updatedBody = s.body.copyWith(height: (value as num).toDouble());
+          break;
+        case 'currentWeight':
+          updatedBody = s.body.copyWith(currentWeight: (value as num).toDouble());
+          break;
+        default:
+        // If the field doesn't match, return the state unchanged
+          return s;
+      }
+
+      return s.copyWith(body: updatedBody);
+    });
+
+    // 2. Sync with your database service
+    try {
+      await _service.updateUserBodyField(field, value);
+    } catch (e) {
+      // Optionally: Handle errors or revert local state if DB update fails
+      debugPrint("Failed to sync $field: $e");
+    }
+  }
+
+  void updateProfileField(String field, dynamic value) async {
+    // 1. Update local state using a switch to map string to model fields
+    _update((s) {
+      UserProfile updatedProfile;
+
+      switch (field) {
+        case 'birthDate':
+          updatedProfile = s.profile.copyWith(birthDate: (value as DateTime));
+          break;
+        case 'gender':
+          updatedProfile = s.profile.copyWith(gender: (value as Gender));
+          break;
+        case 'name':
+          updatedProfile = s.profile.copyWith(name: (value as String));
+          break;
+        default:
+        // If the field doesn't match, return the state unchanged
+          return s;
+      }
+
+      return s.copyWith(profile: updatedProfile);
+    });
+
+    // 2. Sync with your database service
+    try {
+      // We convert the value if necessary (e.g., Enum to string or DateTime to ISO string)
+      // depending on what your _service.updateUserProfileField expects.
+      dynamic storageValue = value;
+      if (value is Gender) storageValue = value.name;
+      if (value is DateTime) storageValue = value.toIso8601String();
+
+      await _service.updateUserProfileField(field, storageValue);
+    } catch (e) {
+      debugPrint("Failed to sync profile field $field: $e");
+      // Optional: You could trigger a local state revert here if the DB update fails
+    }
   }
 
   // -----------------------------------------------------------------------------
@@ -229,10 +297,13 @@ class UserNotifier extends StateNotifier<User> {
 
   /// Recalculates nutrition goals via API using current state
   Future<void> refreshNutritionGoals() async {
-    final freshGoals = await _service.fetchGoals(state, forceRefresh: true);
-    if (freshGoals != null) {
-      _update((s) => s.copyWith(goal: freshGoals));
-    }
+    final newGoal = await _service.fetchGoals(state, forceRefresh: true);
+
+    final String todayId = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    _update((s) => s.copyWith(goal: newGoal ?? state.goal));
+
+    await _service.updateDailyLogGoals(todayId, newGoal ?? state.goal);
   }
 
   Future<void> updateExercise(ExerciseLog oldEx, ExerciseLog newEx) async {
@@ -280,6 +351,13 @@ class UserNotifier extends StateNotifier<User> {
   void setAddCaloriesBurned(bool enable) async {
     _update((s) => s.copyWith(
       settings: s.settings.copyWith(isAddCalorieBurn: enable),
+    ));
+    await _service.updateUserSettings(state.settings);
+  }
+
+  void setMeasurementUnit(MeasurementUnit unit) async {
+    _update((s) => s.copyWith(
+      settings: s.settings.copyWith(measurementUnit: unit),
     ));
     await _service.updateUserSettings(state.settings);
   }

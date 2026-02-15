@@ -1,4 +1,3 @@
-import 'package:calai/models/nutrition_model.dart';
 import 'package:calai/widgets/edit_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,12 +7,11 @@ import 'package:intl/intl.dart';
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/models/food_model.dart';
 import 'package:calai/enums/food_enums.dart';
-import 'package:calai/providers/entry_streams_provider.dart';
 
 class LoggedFoodView extends ConsumerStatefulWidget {
-  final FoodLog foodLog;
+  final FoodLog? foodLog; // Made optional
 
-  const LoggedFoodView({super.key, required this.foodLog});
+  const LoggedFoodView({super.key, this.foodLog});
 
   @override
   ConsumerState<LoggedFoodView> createState() => _LoggedFoodPageState();
@@ -21,14 +19,17 @@ class LoggedFoodView extends ConsumerStatefulWidget {
 
 class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   late double _servingsCount;
-  late FoodLog _tempLog = widget.foodLog;
+  late FoodLog _tempLog;
+
+  // Helper to check if we are creating or editing
+  bool get isNewEntry => widget.foodLog == null;
 
   @override
   void initState() {
     super.initState();
+    // If null, start with a fresh empty log
+    _tempLog = widget.foodLog ?? FoodLog.empty();
     _servingsCount = _tempLog.amount;
-
-    _tempLog = _tempLog;
   }
 
   void onCaloriesChanged(double newVal) {
@@ -37,12 +38,35 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     });
   }
 
-  void _onUpdateLog(FoodLog updatedLog) {
-    ref.read(calaiServiceProvider).updateFoodEntry(
-      widget.foodLog,
-      updatedLog,
-    );
+  void _onSave(FoodLog finalLog) {
+    final service = ref.read(calaiServiceProvider);
+
+    if (isNewEntry) {
+      // Logic for adding a brand new entry to Firestore
+      service.logFoodEntry(finalLog, SourceType.foodUpload);
+    } else {
+      // Logic for updating an existing entry
+      service.updateFoodEntry(widget.foodLog!, finalLog);
+    }
     Navigator.pop(context);
+  }
+
+  Widget _buildFoodTitle() {
+    if (isNewEntry) {
+      return TextField(
+        decoration: const InputDecoration(
+          hintText: "Enter food name",
+          border: InputBorder.none,
+          hintStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.grey),
+        ),
+        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5),
+        onChanged: (val) => _tempLog = _tempLog.copyWith(name: val),
+      );
+    }
+    return Text(
+      _tempLog.name,
+      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5),
+    );
   }
 
   void _showEditModal({
@@ -210,13 +234,6 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     );
   }
 
-  Widget _buildFoodTitle() {
-    return Text(
-      _tempLog.name,
-      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5),
-    );
-  }
-
   Widget _buildServingsRow(ThemeData theme) => Row(
     children: [
       const Text("Number of Servings", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -310,11 +327,26 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 
   Widget _buildMacroRow(FoodLog data) => Row(
     children: [
-      Expanded(child: _MacroTile(value: "${data.protein.round()}g", nutritionType: NutritionType.protein, )),
+      Expanded(child: _MacroTile(value: "${data.protein.round()}g", nutritionType: NutritionType.protein,
+        onEdit: () => _showEditModal(
+          title: 'Protein',
+          initialValue: data.protein,
+          onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(protein: val))),
+      )),
       const SizedBox(width: 8),
-      Expanded(child: _MacroTile(value: "${data.carbs.round()}g", nutritionType: NutritionType.carbs)),
+      Expanded(child: _MacroTile(value: "${data.carbs.round()}g", nutritionType: NutritionType.carbs,
+        onEdit: () => _showEditModal(
+            title: 'Carbs',
+            initialValue: data.carbs,
+            onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(carbs: val))),
+      )),
       const SizedBox(width: 8),
-      Expanded(child: _MacroTile(value: "${data.fats.round()}g", nutritionType: NutritionType.fats)),
+      Expanded(child: _MacroTile(value: "${data.fats.round()}g", nutritionType: NutritionType.fats,
+        onEdit: () => _showEditModal(
+            title: 'Fats',
+            initialValue: data.fats,
+            onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(fats: val))),
+      )),
     ],
   );
 
@@ -359,16 +391,8 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
       child: Row(
         children: [
           Expanded(
-            child: OutlinedButton(
-              onPressed: () => Navigator.pop(context),
-              style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-              child: const Text("Fix result", style: TextStyle(color: Colors.black)),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
             child: ElevatedButton(
-              onPressed: () => _onUpdateLog(log),
+              onPressed: () => _onSave(log),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
               child: const Text("Done", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
