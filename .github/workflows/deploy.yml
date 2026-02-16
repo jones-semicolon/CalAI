@@ -1,20 +1,21 @@
-name: Deploy Android Debug APK
+name: Build Cal AI (Android & iOS)
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
+  workflow_dispatch: # Allows you to trigger this manually from the Actions tab
 
 jobs:
-  build-android-debug:
-    name: Build Debug APK
+  # ---------------------------------------------------
+  # JOB 1: Build Android APK
+  # ---------------------------------------------------
+  build_android:
+    name: Build Android APK
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Java
@@ -26,20 +27,52 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: "stable" # Gets the latest stable release automatically
-          cache: true
-          # Removed "flutter-version: 'stable'" to fix the error
+          channel: "stable"
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Android APK (Debug)
-        run: flutter build apk --debug
+      - name: Build Android APK
+        run: flutter build apk --release
 
-      - name: Create Release & Upload APK
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
         with:
-          files: build/app/outputs/flutter-apk/app-debug.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: cal-ai-android-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  # ---------------------------------------------------
+  # JOB 2: Build Unsigned iOS IPA
+  # ---------------------------------------------------
+  build_ios:
+    name: Build iOS IPA (Unsigned)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build unsigned iOS app
+        # The --no-codesign flag skips Apple's mandatory signing step
+        run: flutter build ios --release --no-codesign
+
+      - name: Package into IPA
+        run: |
+          cd build/ios/iphoneos
+          mkdir Payload
+          cp -r Runner.app Payload/
+          zip -r cal_ai_unsigned.ipa Payload
+
+      - name: Upload iOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cal-ai-ios-release
+          path: build/ios/iphoneos/cal_ai_unsigned.ipa
