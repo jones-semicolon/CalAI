@@ -42,9 +42,8 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
             // Keep shrinking on to keep the APK small
-            minifyEnabled = true
-            shrinkResources = true
-
+            isMinifyEnabled = true
+            isShrinkResources = true
             // Add this line right here to apply the rules we just made:
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
