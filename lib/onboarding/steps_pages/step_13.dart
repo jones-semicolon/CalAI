@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:calai/l10n/app_strings.dart';
+import 'package:calai/data/global_data.dart';
+import 'package:calai/features/reminders/data/reminder_settings_repository.dart';
+import 'package:calai/features/reminders/models/nutrition_goals.dart';
+import 'package:calai/features/reminders/models/reminder_settings.dart';
+import 'package:calai/features/reminders/services/notification_service.dart';
+import 'package:calai/features/reminders/services/reminder_scheduler.dart';
 import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 
@@ -14,6 +20,7 @@ class OnboardingStep13 extends StatefulWidget {
 class _OnboardingStep13State extends State<OnboardingStep13>
     with SingleTickerProviderStateMixin {
   bool isAllowNotification = true;
+  bool _isSubmitting = false;
 
   late final AnimationController _controller;
   late final Animation<Offset> _bounceAnimation;
@@ -78,7 +85,9 @@ class _OnboardingStep13State extends State<OnboardingStep13>
                           horizontal: 40,
                         ),
                         child: Text(
-                          context.tr('Cal AI would like to send you Notifications'),
+                          context.tr(
+                            'Cal AI would like to send you Notifications',
+                          ),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
@@ -190,13 +199,78 @@ class _OnboardingStep13State extends State<OnboardingStep13>
           SizedBox(
             width: double.infinity,
             child: ContinueButton(
-              enabled: true,
-              //TODO: allow notifications
-              onNext: widget.nextPage,
+              enabled: !_isSubmitting,
+              onNext: _handleContinue,
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _handleContinue() async {
+    if (_isSubmitting) {
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+    try {
+      final repository = ReminderSettingsRepository();
+      final notificationService = NotificationService();
+      final scheduler = ReminderScheduler(notificationService);
+      final currentSettings = await repository.load();
+
+      bool granted = false;
+      if (isAllowNotification) {
+        granted = await notificationService.requestPermissions();
+      }
+
+      final updatedSettings = _withAllReminderToggles(
+        currentSettings,
+        enabled: granted,
+      );
+      await repository.save(updatedSettings);
+      await notificationService.initialize();
+
+      if (granted) {
+        final goals = GlobalData();
+        await scheduler.syncAll(
+          settings: updatedSettings,
+          goals: NutritionGoals(
+            calorieGoal: goals.caloriesADay,
+            proteinGoalGrams: goals.proteinADay,
+            carbGoalGrams: goals.carbsADay,
+            fatGoalGrams: goals.fatsADay,
+          ),
+        );
+      } else {
+        await notificationService.cancelAll();
+      }
+
+      if (!mounted) {
+        return;
+      }
+      widget.nextPage();
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
+  }
+
+  ReminderSettings _withAllReminderToggles(
+    ReminderSettings settings, {
+    required bool enabled,
+  }) {
+    return settings.copyWith(
+      smartNutritionEnabled: enabled,
+      waterRemindersEnabled: enabled,
+      breakfastReminderEnabled: enabled,
+      lunchReminderEnabled: enabled,
+      dinnerReminderEnabled: enabled,
+      snackReminderEnabled: enabled,
+      goalTrackingAlertsEnabled: enabled,
+      activityReminderEnabled: enabled,
     );
   }
 }

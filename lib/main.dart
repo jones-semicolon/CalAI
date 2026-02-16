@@ -1,4 +1,6 @@
 import 'package:calai/l10n/app_localizations.dart';
+import 'package:calai/data/global_data.dart';
+import 'package:calai/features/reminders/reminders.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -81,13 +83,28 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late ThemeMode _themeMode;
   Locale? _locale;
+  DateTime? _lastReminderSyncDay;
+  bool _isReminderSyncInProgress = false;
 
   @override
   void initState() {
     super.initState();
     _themeMode = widget.initialThemeMode;
     _locale = widget.initialLocale;
+    WidgetsBinding.instance.addObserver(_lifecycleObserver);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _syncRemindersIfNeeded();
+    });
   }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(_lifecycleObserver);
+    super.dispose();
+  }
+
+  late final WidgetsBindingObserver _lifecycleObserver =
+      _ReminderLifecycleObserver(onResume: _syncRemindersIfNeeded);
 
   void setThemeMode(ThemeMode mode) {
     setState(() => _themeMode = mode);
@@ -95,6 +112,38 @@ class _MyAppState extends State<MyApp> {
 
   void setLocale(Locale? locale) {
     setState(() => _locale = locale);
+  }
+
+  Future<void> _syncRemindersIfNeeded() async {
+    if (_isReminderSyncInProgress) {
+      return;
+    }
+
+    final now = DateTime.now();
+    if (_lastReminderSyncDay != null &&
+        _isSameDay(_lastReminderSyncDay!, now)) {
+      return;
+    }
+
+    _isReminderSyncInProgress = true;
+    try {
+      final goals = GlobalData();
+      await ReminderBootstrap.initializeIfNeeded(
+        goals: NutritionGoals(
+          calorieGoal: goals.caloriesADay,
+          proteinGoalGrams: goals.proteinADay,
+          carbGoalGrams: goals.carbsADay,
+          fatGoalGrams: goals.fatsADay,
+        ),
+      );
+      _lastReminderSyncDay = now;
+    } finally {
+      _isReminderSyncInProgress = false;
+    }
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
   @override
@@ -110,5 +159,18 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: AppLocalizations.supportedLocales,
       home: const AppEntry(),
     );
+  }
+}
+
+class _ReminderLifecycleObserver extends WidgetsBindingObserver {
+  _ReminderLifecycleObserver({required this.onResume});
+
+  final Future<void> Function() onResume;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      onResume();
+    }
   }
 }
