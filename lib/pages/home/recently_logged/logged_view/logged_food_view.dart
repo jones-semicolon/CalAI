@@ -1,3 +1,4 @@
+import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/edit_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -144,7 +145,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Header Image
@@ -162,7 +163,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
               child: Container(
                 constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height * (hasImage ? 0.6 : 1.0)),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: hasImage ? const BorderRadius.vertical(top: Radius.circular(30)) : null,
                 ),
                 padding: const EdgeInsets.fromLTRB(20, 30, 20, 120),
@@ -224,7 +225,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -280,7 +281,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Stack(
@@ -385,21 +386,22 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   }
 
   Widget _buildBottomActionButtons(FoodLog log) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
-      color: Colors.white,
-      child: Row(
-        children: [
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () => _onSave(log),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-              child: const Text("Done", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          ),
-        ],
-      ),
-    );
+    return ConfirmationButtonWidget(onConfirm: () => _onSave(log), text: "Done");
+    // return Container(
+    //   padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
+    //   color: Colors.white,
+    //   child: Row(
+    //     children: [
+    //       Expanded(
+    //         child: ElevatedButton(
+    //           onPressed: () => _onSave(log),
+    //           style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+    //           child: const Text("Done", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+    //         ),
+    //       ),
+    //     ],
+    //   ),
+    // );
   }
 
   Widget _buildSectionLabel(ThemeData theme, String label) => Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey));
@@ -423,7 +425,7 @@ class _MacroTile extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
