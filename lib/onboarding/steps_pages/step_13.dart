@@ -1,20 +1,29 @@
+import 'package:calai/providers/global_provider.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../onboarding_widgets/continue_button.dart';
+import 'package:calai/features/reminders/data/reminder_settings_repository.dart';
+import 'package:calai/features/reminders/models/reminder_settings.dart';
+import 'package:calai/features/reminders/services/notification_service.dart';
+import 'package:calai/features/reminders/services/reminder_scheduler.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✅ Added
+import '../../models/nutrition_model.dart';
 import '../onboarding_widgets/header.dart';
 
-class OnboardingStep13 extends StatefulWidget {
+// ✅ Changed to ConsumerStatefulWidget
+class OnboardingStep13 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
   const OnboardingStep13({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep13> createState() => _OnboardingStep13State();
+  ConsumerState<OnboardingStep13> createState() => _OnboardingStep13State();
 }
 
-class _OnboardingStep13State extends State<OnboardingStep13>
+// ✅ Changed to ConsumerState
+class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
     with SingleTickerProviderStateMixin {
   bool isAllowNotification = true;
+  bool _isSubmitting = false;
 
   late final AnimationController _controller;
   late final Animation<Offset> _bounceAnimation;
@@ -22,7 +31,6 @@ class _OnboardingStep13State extends State<OnboardingStep13>
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
@@ -40,16 +48,85 @@ class _OnboardingStep13State extends State<OnboardingStep13>
     super.dispose();
   }
 
+  // --- Logic ---
+
+  Future<void> _processNotificationAndContinue() async {
+    if (_isSubmitting) return;
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final notificationService = NotificationService();
+      bool granted = false;
+
+      // 1. Request Permission if toggled "Allow"
+      if (isAllowNotification) {
+        granted = await notificationService.requestPermissions();
+      }
+
+      // 2. Prepare Settings & Scheduler
+      final repository = ReminderSettingsRepository();
+      final scheduler = ReminderScheduler(notificationService);
+      final currentSettings = await repository.load();
+
+      final updatedSettings = _withAllReminderToggles(
+        currentSettings,
+        enabled: granted,
+      );
+
+      // 3. Save to Local Storage
+      await repository.save(updatedSettings);
+      await notificationService.initialize();
+
+      // 4. Sync with Provider Data
+      if (granted) {
+        // ✅ ref is now accessible here
+        final globalState = ref.read(globalDataProvider).value;
+
+        if (globalState != null) {
+          await scheduler.syncAll(
+            settings: updatedSettings,
+            goals: NutritionGoals(
+              calories: globalState.todayGoal.calories,
+              protein: globalState.todayGoal.protein,
+              carbs: globalState.todayGoal.carbs,
+              fats: globalState.todayGoal.fats,
+            ),
+          );
+        }
+      } else {
+        await notificationService.cancelAll();
+      }
+
+      widget.nextPage();
+    } catch (e) {
+      debugPrint("❌ Notification Onboarding Error: $e");
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  ReminderSettings _withAllReminderToggles(ReminderSettings settings, {required bool enabled}) {
+    return settings.copyWith(
+      smartNutritionEnabled: enabled,
+      waterRemindersEnabled: enabled,
+      breakfastReminderEnabled: enabled,
+      lunchReminderEnabled: enabled,
+      dinnerReminderEnabled: enabled,
+      snackReminderEnabled: enabled,
+      goalTrackingAlertsEnabled: enabled,
+      activityReminderEnabled: enabled,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final buttonHeight = 60.0;
-    final cardPadding = 15.0;
 
     return SafeArea(
       child: Column(
         children: [
-          Spacer(),
+          const Spacer(),
           const Header(
             title: 'Reach your goals with notifications',
             textAlign: TextAlign.center,
@@ -57,27 +134,20 @@ class _OnboardingStep13State extends State<OnboardingStep13>
           ),
           const SizedBox(height: 10),
 
-          /// Main content card
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                /// Card with buttons
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
-                    color: Theme.of(
-                      context,
-                    ).hintColor,
+                    color: Theme.of(context).hintColor.withOpacity(0.1),
                   ),
                   child: Column(
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: cardPadding,
-                          horizontal: 40,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
                         child: Text(
                           'Cal AI would like to send you Notifications',
                           textAlign: TextAlign.center,
@@ -88,97 +158,22 @@ class _OnboardingStep13State extends State<OnboardingStep13>
                           ),
                         ),
                       ),
-                      Divider(
-                        height: 1.5,
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
-                      ),
+                      Divider(height: 1.5, color: Theme.of(context).colorScheme.primary.withOpacity(0.25)),
                       Row(
                         children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () =>
-                                  setState(() => isAllowNotification = false),
-                              child: Container(
-                                height: buttonHeight,
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.only(
-                                    bottomLeft: Radius.circular(15),
-                                  ),
-                                  color: !isAllowNotification
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(
-                                          context,
-                                        ).hintColor,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "Don't Allow",
-                                    style: TextStyle(
-                                      color: !isAllowNotification
-                                          ? Theme.of(
-                                              context,
-                                            ).scaffoldBackgroundColor
-                                          : Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () =>
-                                  setState(() => isAllowNotification = true),
-                              child: Container(
-                                height: buttonHeight,
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.only(
-                                    bottomRight: Radius.circular(15),
-                                  ),
-                                  color: isAllowNotification
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(
-                                          context,
-                                        ).colorScheme.surfaceContainerHighest,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "Allow",
-                                    style: TextStyle(
-                                      color: isAllowNotification
-                                          ? Theme.of(
-                                              context,
-                                            ).scaffoldBackgroundColor
-                                          : Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                          _buildToggleButton(label: "Don't Allow", isActive: !isAllowNotification, isLeft: true),
+                          _buildToggleButton(label: "Allow", isActive: isAllowNotification, isLeft: false),
                         ],
                       ),
                     ],
                   ),
                 ),
-
-                /// Hand icon under Allow button
                 Positioned(
                   bottom: -50,
                   left: (screenWidth / 1.5),
                   child: SlideTransition(
                     position: _bounceAnimation,
-                    child: const Icon(
-                      Icons.pan_tool_alt_rounded,
-                      size: 40,
-                      color: Color.fromARGB(255, 255, 201, 40),
-                    ),
+                    child: const Icon(Icons.pan_tool_alt_rounded, size: 40, color: Color.fromARGB(255, 255, 201, 40)),
                   ),
                 ),
               ],
@@ -187,27 +182,40 @@ class _OnboardingStep13State extends State<OnboardingStep13>
 
           const Spacer(),
 
-          ConfirmationButtonWidget(onConfirm: _handleNotificationRequest)
+          // ✅ Updated to use the new unified method
+          ConfirmationButtonWidget(
+            enabled: !_isSubmitting,
+            onConfirm: _processNotificationAndContinue,
+          )
         ],
       ),
     );
   }
 
-  Future<void> _handleNotificationRequest() async {
-    if (isAllowNotification) {
-      // This triggers the native iOS/Android "Allow Notifications?" system popup
-      PermissionStatus status = await Permission.notification.request();
-
-      if (status.isGranted) {
-        debugPrint("Notification permission granted");
-      } else if (status.isPermanentlyDenied) {
-        // User clicked "Don't Allow" multiple times or disabled in settings
-        // You could show a snackbar here if you really need them to turn it on
-      }
-    }
-
-    // Move to the next page regardless of the choice
-    // (Standard onboarding practice)
-    widget.nextPage();
+  Widget _buildToggleButton({required String label, required bool isActive, required bool isLeft}) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => isAllowNotification = !isLeft),
+        child: Container(
+          height: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              bottomLeft: isLeft ? const Radius.circular(15) : Radius.zero,
+              bottomRight: !isLeft ? const Radius.circular(15) : Radius.zero,
+            ),
+            color: isActive ? Theme.of(context).colorScheme.primary : Colors.transparent,
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isActive ? Colors.white : Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

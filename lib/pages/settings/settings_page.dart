@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/pages/settings/preference_selection.dart';
 import 'package:calai/providers/user_provider.dart';
+import '../../features/reminders/presentation/reminder_settings_section.dart';
 import '../auth/auth.dart';
 import '../shell/widgets/widget_app_bar.dart';
 import 'logout_section.dart';
@@ -45,6 +46,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             const SettingsGroup(),
             const SizedBox(height: 16),
             const PreferencesSection(),
+            SizedBox(height: 16),
+            ReminderSettingsSection(),
             const SizedBox(height: 16),
             TermsFeedbackSection(isAnonymous: isAnonymous),
             const SizedBox(height: 16),

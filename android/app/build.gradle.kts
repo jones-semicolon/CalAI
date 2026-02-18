@@ -18,6 +18,7 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -31,6 +32,7 @@ android {
 
         // KEEP THIS: 26 is good for the 'health' package
         minSdk = 26
+        multiDexEnabled = true
 
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -55,4 +57,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
