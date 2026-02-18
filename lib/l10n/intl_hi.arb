@@ -1,0 +1,12 @@
+{
+  "@@locale": "hi",
+  "welcomeMessage": "Cal AI में आपका स्वागत है",
+  "trackMessage": "और स्मार्ट तरीके से ट्रैक करें। बेहतर खाएं।",
+  "getStarted": "शुरू करें",
+  "alreadyAccount": "क्या पहले से एक खाता है?",
+  "signIn": "साइन इन करें",
+  "chooseLanguage": "भाषा चुनें",
+  "calorieTrackingMadeEasy": "कैलोरी ट्रैकिंग आसान है",
+  "onboardingStep1Title": "अपने भोजन को ट्रैक करें",
+  "onboardingStep1Description": "अपने भोजन को आसानी से लॉग करें और अपने पोषण को ट्रैक करें।"
+}
