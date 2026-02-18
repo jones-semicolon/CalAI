@@ -135,7 +135,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                                         Text("Water", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                         const SizedBox(height: 4),
                                         Text(
-                                            "${user.settings.measurementUnit?.liquidToDisplay(progress.water).round() ?? progress.water} / ${user.settings.measurementUnit?.liquidToDisplay(user.goal.targets.water).round() ?? user.goal.targets.water} ${user.settings.measurementUnit?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
+                                            "${user.settings.measurementUnit?.liquidToDisplay(progress.water).round() ?? progress.water.round()} / ${user.settings.measurementUnit?.liquidToDisplay(user.goal.targets.water).round() ?? user.goal.targets.water.round()} ${user.settings.measurementUnit?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
                                             style: TextStyle(color: Colors.grey[600])
                                         )
                                       ]

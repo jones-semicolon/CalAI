@@ -19,7 +19,7 @@ final initialStepsProvider = Provider<int>((ref) {
   final globalData = ref.watch(globalDataProvider).value;
 
   // Return the steps from your existing todayProgress
-  return (globalData?.todayProgress.steps ?? 0) as int;
+  return (globalData?.todayProgress.steps ?? 0).round();
 });
 
 final stepsTodayProvider = StateProvider<int>((ref) => 0);

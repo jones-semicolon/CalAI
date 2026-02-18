@@ -223,7 +223,7 @@ class _ReminderSettingsContent extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSecondary,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 ),
@@ -368,19 +368,14 @@ class _ReminderSettingsContent extends ConsumerWidget {
             Switch(
               value: value,
               onChanged: onChanged,
-              thumbColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.selected)) {
-                  return Colors.white;
-                }
-                return Colors.white;
+              thumbColor: MaterialStateProperty.all(Colors.white),
+              trackColor: MaterialStateProperty.resolveWith((states) {
+                return states.contains(MaterialState.selected)
+                    ? Theme.of(context).dialogTheme.barrierColor ??
+                    Theme.of(context).primaryColor
+                    : Theme.of(context).colorScheme.secondary;
               }),
-              trackColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.selected)) {
-                  return Theme.of(context).dialogTheme.barrierColor;
-                }
-                return Theme.of(context).dialogTheme.backgroundColor;
-              }),
-              trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+              trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
             ),
           ],
         ),

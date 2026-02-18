@@ -206,7 +206,7 @@ class _DayItemState extends ConsumerState<DayItem> with AutomaticKeepAliveClient
                 return Opacity(
                   opacity: isCurrentMonth ? 1.0 : 0.3,
                   child: InkWell(
-                    onTap: () => widget.onDaySelected(dateId),
+                    onTap: isFuture ? null : () => widget.onDaySelected(dateId),
                     child: _DayContainer(
                       isActive: isSelected,
                       child: _DayDisplay(
@@ -298,10 +298,7 @@ class _DayDisplay extends StatelessWidget {
         : isToday
         ? Colors.black
         : theme.shadowColor.withOpacity(0.4);
-
-// Progress calculation for the ring
-    final double progress = (goalCalories > 0) ? (calories / goalCalories) : 0;
-
+    
     final textColor = isSelected ? theme.colorScheme.primary : theme.hintColor;
 
     final noProgress = calories <= 0;
