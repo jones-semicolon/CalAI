@@ -33,6 +33,12 @@ jobs:
 
       - name: Install Dependencies
         run: flutter pub get
+      - name: Print Release SHA1
+        run: |
+          keytool -list -v \
+          -alias ${{ secrets.KEY_ALIAS }} \
+          -keystore android/app/upload-keystore.jks \
+          -storepass ${{ secrets.STORE_PASSWORD }}
 
       - name: Decode Keystore and Firebase Config
         env:
@@ -45,10 +51,10 @@ jobs:
           cd android
           # Decode the Keystore
           echo $KEYSTORE_BASE64 | base64 --decode > app/upload-keystore.jks
-          
+
           # Decode the Google Services JSON
           echo $GOOGLE_SERVICES_JSON | base64 --decode > app/google-services.json
-          
+
           # Recreate key.properties
           cat << EOF > key.properties
           storePassword=$STORE_PASSWORD
