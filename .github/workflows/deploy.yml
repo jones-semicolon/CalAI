@@ -33,13 +33,6 @@ jobs:
 
       - name: Install Dependencies
         run: flutter pub get
-      - name: Print Release SHA1
-        run: |
-          keytool -list -v \
-          -alias ${{ secrets.KEY_ALIAS }} \
-          -keystore android/app/upload-keystore.jks \
-          -storepass ${{ secrets.STORE_PASSWORD }}
-
       - name: Decode Keystore and Firebase Config
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -62,6 +55,13 @@ jobs:
           keyAlias=$KEY_ALIAS
           storeFile=../app/upload-keystore.jks
           EOF
+
+      - name: Print Release SHA1
+        run: |
+          keytool -list -v \
+          -alias ${{ secrets.KEY_ALIAS }} \
+          -keystore android/app/upload-keystore.jks \
+          -storepass ${{ secrets.STORE_PASSWORD }}
 
       - name: Build Android APK (Release)
         run: flutter build apk --release
