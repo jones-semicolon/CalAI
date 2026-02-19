@@ -28,6 +28,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
       if (!mounted) return;
 
+      ref.read(calaiServiceProvider).saveFood(food.copyWith(source: SourceType.vision.value));
+
       // Calculate initial log (defaulting to 1 serving/100g)
       final initialLog = food.createLog(
         amount: 1.0,
@@ -68,6 +70,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     try {
       // Send the path instead of a large base64 string
       final food = await FoodApi.scanFood(imagePath);
+
+      ref.read(calaiServiceProvider).saveFood(food.copyWith(source: SourceType.vision.value));
 
       final initialLog = food.createLog(
         amount: 1.0,
@@ -111,6 +115,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       final portion = _getDisplayPortion(bestMatch);
 
       debugPrint("Best Match: ${bestMatch.toJson().toString()}");
+
+      ref.read(calaiServiceProvider).saveFood(bestMatch.copyWith(source: SourceType.vision.value));
 
       // 3. Create the log entry
       final initialLog = bestMatch.createLog(

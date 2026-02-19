@@ -10,10 +10,22 @@ import '../floating_grid/food_database/food_database.dart';
 /// [AnimatedPadding] to smoothly slide up when the system keyboard appears,
 /// preventing the keyboard from covering the buttons.
 class FloatingActionGrid extends StatelessWidget {
-  const FloatingActionGrid({super.key});
+  final VoidCallback onClose; 
+
+  // ✅ 2. Add it to the constructor
+  const FloatingActionGrid({super.key, required this.onClose});
 
   @override
   Widget build(BuildContext context) {
+
+    void handleTap(Widget page) {
+      onClose();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => page),
+      );
+    }
+
     return AnimatedPadding(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOut,
@@ -35,25 +47,12 @@ class FloatingActionGrid extends StatelessWidget {
                     ActionGridButton(
                       icon: Icons.fitness_center,
                       label: "Log Exercise",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const LogExercisePage(),
-                          ),
-                        );
-                      },
+                      onTap: () => handleTap(const LogExercisePage()),
                     ),
                     ActionGridButton(
                       icon: Icons.bookmark_outline,
                       label: "Saved Foods",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const FoodDatabasePage(selectedTabIndex: 3),
-                          ),
-                        );                      },
+                      onTap: () => handleTap(const FoodDatabasePage()),        
                     ),
                   ],
                 ),
@@ -65,29 +64,12 @@ class FloatingActionGrid extends StatelessWidget {
                     ActionGridButton(
                       icon: Icons.search,
                       label: "Food Database",
-                      onTap: () {
-                        // debugPrint("Food Database tapped");
-
-                        // ✅ Example navigation
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const FoodDatabasePage(),
-                          ),
-                        );
-                      },
+                      onTap: () => handleTap(const FoodDatabasePage()),
                     ),
                     ActionGridButton(
                       icon: Icons.qr_code_scanner,
                       label: "Scan Food",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ScanScreen(),
-                          ),
-                        );
-                      },
+                      onTap: () => handleTap(const ScanScreen()),
                     ),
                   ],
                 ),

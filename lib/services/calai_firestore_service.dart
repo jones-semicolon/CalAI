@@ -9,7 +9,6 @@ import '../enums/food_enums.dart';
 import '../enums/user_enums.dart';
 import '../models/exercise_model.dart';
 import '../models/food_model.dart';
-import '../models/nutrition_model.dart';
 import '../models/user_model.dart';
 
 /// Handles all Database interactions and API calls
@@ -407,6 +406,22 @@ class CalaiFirestoreService {
     await batch.commit();
   }
 
+  Future<void> updateStepsEntry(num steps, {String? dateId, double? currentWeight}) async {
+    dateId ??= todayId;
+
+    final double caloriesBurned = currentWeight != null
+        ? steps * 0.0005 * currentWeight
+        : steps * 0.04;
+
+    await dailyLogDoc(dateId).set({
+      'dailyProgress': {
+        'steps': steps,
+        'caloriesBurnedPerSteps': caloriesBurned,
+      },
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
   Future<void> deleteLogEntry(String dateId, dynamic item) async {
     if (uid == null) return;
 
@@ -537,15 +552,23 @@ class CalaiFirestoreService {
     await batch.commit();
   }
 
-  Future<void> syncSteps(int steps) async {
+  Future<void> syncSteps(int steps, {double? currentWeight}) async {
     if (uid == null) return;
 
     final batch = _db.batch();
     final String dateKey = todayId;
 
-    // Update Daily Progress
+    // ✅ LOGIC: Use weight if available, else fallback to 0.04
+    final double caloriesBurned = currentWeight != null
+        ? steps * 0.0005 * currentWeight
+        : steps * 0.04;
+
     batch.set(dailyLogDoc(dateKey), {
-      'dailyProgress': { 'steps': steps },
+      'dailyProgress': {
+        'steps': steps,
+        'caloriesBurnedPerSteps': caloriesBurned,
+        'caloriesBurned': FieldValue.increment(caloriesBurned),
+      },
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
 

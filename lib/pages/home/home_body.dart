@@ -75,7 +75,9 @@ class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClie
                       date: activeDateId.isNotEmpty
                           ? DateTime.parse(activeDateId)
                           : DateTime.now(),
-                      onWaterChange: (_) {},
+                      onWaterChange: (v) {
+                        ref.read(globalDataProvider.notifier).updateWater(v);
+                      },
                     ),
                   ),
 

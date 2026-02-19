@@ -11,7 +11,7 @@ import '../enums/user_enums.dart';
 import '../models/exercise_model.dart';
 import '../models/global_state_model.dart';
 import '../models/nutrition_model.dart';
-import '../models/user_model.dart';
+import '../models/user_model.dart' hide User;
 import '../providers/user_provider.dart';
 import '../services/calai_firestore_service.dart';
 
@@ -34,13 +34,19 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
   @override
   FutureOr<GlobalDataState> build() {
-    // Cleanup listeners when provider is destroyed
+    // 1. Cleanup listeners when provider is destroyed
     ref.onDispose(() {
       _dailyLogSub?.cancel();
       _historySub?.cancel();
       _weightSub?.cancel();
       _userSub?.cancel();
     });
+
+    // 2. Automatically trigger init if not initialized
+    // This ensures that as soon as the UI watches this provider,
+    // it starts fetching data from Firestore.
+    Future.microtask(() => init());
+
     return GlobalDataState.initial();
   }
 
@@ -49,26 +55,37 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   // ---------------------------------------------------------------------------
 
   Future<void> init() async {
-    // Prevent double initialization
+    // 1. Wait until Auth is definitely ready
+    User? user = FirebaseAuth.instance.currentUser;
+
+    // If user is null, wait a bit (Auth state propagation can be slow)
+    if (user == null) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      user = FirebaseAuth.instance.currentUser;
+    }
+
+    if (user == null) {
+      debugPrint("⚠️ GlobalData: Aborting init. No authenticated user.");
+      return;
+    }
+
     if (state.asData?.value.isInitialized == true) return;
     state = const AsyncLoading();
 
     try {
+      // 2. Load and Listen
       await _loadUserProfileIntoUserProvider();
-      _syncFirebaseNameIntoUserProvider();
-
-      await _ensureDailyLogExists();
-      // await _ensureStatsExists();
-
       listenToDailySummary(_service.todayId);
       listenToHistory();
       listenToWeightHistory();
       listenToUserProfile();
 
-      // STEP 4: Finalize initialization state
+      // Finalize
       final current = state.asData?.value ?? GlobalDataState.initial();
-      state = AsyncData(current.copyWith(isInitialized: true, userSettings: ref.read(userProvider).settings));
-
+      state = AsyncData(current.copyWith(
+          isInitialized: true,
+          userSettings: ref.read(userProvider).settings
+      ));
     } catch (e, st) {
       debugPrint("❌ GlobalData Init Error: $e");
       state = AsyncError(e, st);
@@ -205,14 +222,17 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   void _applyDailyLogToState(Map<String, dynamic> data, String dateId) {
     final progress = NutritionProgress.fromDailyLog(data);
 
+    // Fallback to userProvider if dailyGoals is missing in the log
     final masterTargets = ref.read(userProvider).goal.targets;
     final goals = (data['dailyGoals'] != null)
         ? NutritionGoals.fromJson(data['dailyGoals'])
         : masterTargets;
 
-    final current = state.asData?.value ?? GlobalDataState.initial();
+    final currentValue = state.value ?? GlobalDataState.initial();
 
-    state = AsyncData(current.copyWith(
+    // ✅ FIX: Using AsyncData correctly updates the state
+    // without triggering a "Loading" flicker in the UI
+    state = AsyncData(currentValue.copyWith(
       todayProgress: progress,
       todayGoal: goals,
       calorieGoal: goals.calories.toDouble(),
@@ -266,33 +286,47 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   }
 
   Future<void> _ensureDailyLogExists() async {
+    // Wait for user data to be ready if it's currently 0
     final user = ref.read(userProvider);
-    final masterTargets = user.goal.targets;
-
-    // Don't create if master targets aren't loaded yet
-    if (masterTargets.calories == 0) return;
+    if (user.goal.targets.calories == 0) {
+      debugPrint("⏳ Master targets not ready. Postponing log creation.");
+      return;
+    }
 
     final dayRef = _service.dailyLogDoc(_service.todayId);
-    final doc = await dayRef.get();
-    final existingData = doc.data();
 
-    // Create or update missing dailyGoals
-    if (!doc.exists || existingData?['dailyGoals'] == null) {
-      int rolloverAmount = await _calculateYesterdayRollover();
+    // We use a transaction or a simple check-then-set
+    final doc = await dayRef.get();
+    if (!doc.exists || doc.data()?['dailyGoals'] == null) {
+      final int rollover = await _calculateYesterdayRollover();
 
       await dayRef.set({
         'date': _service.todayId,
         'dailyGoals': {
-          ...masterTargets.toJson(),
-          'weightGoal': masterTargets.weightGoal,
-          'rollover': rolloverAmount,
+          ...user.goal.targets.toJson(),
+          'rollover': rollover,
         },
         'dailyProgress': {
           'weight': user.body.currentWeight,
+          // Initialize other fields to 0 to prevent null errors in UI
+          'caloriesEaten': 0,
+          'water': 0,
         },
         'createdAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
     }
+  }
+
+  Future<void> updateWater(int newWater) async {
+    final dayRef = _service.dailyLogDoc(_service.todayId);
+
+    await dayRef.set({
+      'date': _service.todayId,
+      'dailyProgress': {
+        'water': FieldValue.increment(newWater),
+      },
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   Future<int> _calculateYesterdayRollover() async {

@@ -111,7 +111,6 @@ class _BaseLogCard extends StatelessWidget {
             extentRatio: 0.50,
             dismissible: DismissiblePane(
               onDismissed: () => onDelete?.call(),
-              // You can also add a confirmDismiss: () async => showDialog(...) if needed
             ),
             children: [
               SlidableAction(

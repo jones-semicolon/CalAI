@@ -288,11 +288,11 @@ class _ReminderSettingsContent extends ConsumerWidget {
               builder: (context, child) {
                 final theme = Theme.of(context);
                 final primary = theme.colorScheme.primary;
-                final scaffold = theme.scaffoldBackgroundColor;
+                final scaffold = theme.colorScheme.secondary;
                 return Theme(
                   data: theme.copyWith(
                     timePickerTheme: TimePickerThemeData(
-                      backgroundColor: theme.colorScheme.secondary,
+                      backgroundColor: theme.colorScheme.surface,
                       hourMinuteColor: scaffold,
                       hourMinuteTextColor: primary,
                       hourMinuteTextStyle: TextStyle(

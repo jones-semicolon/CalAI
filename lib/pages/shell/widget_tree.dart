@@ -33,13 +33,17 @@ class _WidgetTreeState extends ConsumerState<WidgetTree> {
       if (_booted) return;
       _booted = true;
 
-      // ✅ If no logged in user → fallback to guest
+      // 1. Handle Auth
       if (AuthService.getCurrentUser() == null) {
+        debugPrint("👤 No user found, signing in as guest...");
         await AuthService.signInAsGuest();
+        // Give the Firebase SDK a frame to update the current user internally
+        await Future.delayed(Duration.zero);
       }
 
-      // ✅ Now you always have a UID here
-      await ref.read(globalDataProvider.notifier).init();
+      // 2. Now initialize data
+      final notifier = ref.read(globalDataProvider.notifier);
+      await notifier.init();
     });
   }
 

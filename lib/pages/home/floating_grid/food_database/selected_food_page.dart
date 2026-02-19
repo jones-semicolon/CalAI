@@ -13,8 +13,9 @@ import '../../../../providers/entry_streams_provider.dart';
 
 class SelectedFoodPage extends ConsumerStatefulWidget {
   final String? foodId;
+  final Food? foodItem;
 
-  const SelectedFoodPage({super.key, required this.foodId});
+  const SelectedFoodPage({super.key, this.foodId, this.foodItem});
 
   @override
   ConsumerState<SelectedFoodPage> createState() => _SelectedFoodPageState();
@@ -33,7 +34,20 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
   @override
   void initState() {
     super.initState();
-    _fetchFoodDetails();
+    // ✅ Check if we already have the data or need to fetch it
+    if (SourceType.fromString(widget.foodItem?.source ?? SourceType.foodUpload.value) != SourceType.foodDatabase || widget.foodId == null) {
+      _initializeWithProvidedFood();
+    } else {
+      _fetchFoodDetails();
+    }
+  }
+
+  void _initializeWithProvidedFood() {
+    setState(() {
+      _foodItem = widget.foodItem;
+      _setupInitialMeasurements();
+      _isLoading = false;
+    });
   }
 
   Future<void> _fetchFoodDetails() async {
@@ -53,20 +67,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
       if (mounted) {
         setState(() {
           _foodItem = foods.first;
-
-          if (_foodItem!.portions.isNotEmpty) {
-            final portions = _foodItem!.portions.cast<FoodPortionItem>();
-            _selectedPortion = portions.firstWhere(
-                  (p) => !p.label.toLowerCase().contains("quantity not specified"),
-              orElse: () => portions.first,
-            );
-
-            _isGramsMode = false;
-            _servingsCount = 1;
-          } else {
-            _isGramsMode = true;
-            _servingsCount = 100;
-          }
+          _setupInitialMeasurements();
           _isLoading = false;
         });
       }
@@ -78,6 +79,22 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  void _setupInitialMeasurements() {
+    if (_foodItem != null && _foodItem!.portions.isNotEmpty) {
+      final portions = _foodItem!.portions.cast<FoodPortionItem>();
+      _selectedPortion = portions.firstWhere(
+            (p) => !p.label.toLowerCase().contains("quantity not specified"),
+        orElse: () => portions.first,
+      );
+
+      _isGramsMode = false;
+      _servingsCount = 1;
+    } else {
+      _isGramsMode = true;
+      _servingsCount = 100;
     }
   }
 
@@ -196,21 +213,6 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      child: Row(
-        children: [
-          _CircleButton(icon: Icons.arrow_back, onTap: () => Navigator.pop(context)),
-          const SizedBox(width: 12),
-          const Expanded(child: Center(child: Text("Nutrients", style: TextStyle(fontWeight: FontWeight.w700)))),
-          const SizedBox(width: 12),
-          _CircleButton(icon: Icons.more_horiz, onTap: () => debugPrint("Options")),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFoodTitle() {
     // ✅ FIX 1: Watch the StreamProvider directly for instant updates
     final savedFoodsAsync = ref.watch(savedFoodsStreamProvider);
@@ -238,7 +240,10 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
             if (isSaved) {
               notifier.unsaveFood(_foodItem!.id);
             } else {
-              notifier.saveFood(_foodItem!);
+              final foodToSave = _foodItem!.copyWith(
+                source: SourceType.foodDatabase.value,
+              );
+              notifier.saveFood(foodToSave);
             }
           },
           child: Icon(

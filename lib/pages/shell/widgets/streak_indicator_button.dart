@@ -81,7 +81,7 @@ class StreakIndicatorButton extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceVariant,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(25),
         ),
         child: Row(

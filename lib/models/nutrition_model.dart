@@ -163,10 +163,11 @@ class NutritionLog extends Nutrition {
 
 class NutritionProgress extends Nutrition {
   final double caloriesBurned;
+  final double caloriesBurnedPerSteps;
 
   const NutritionProgress({
     super.calories, super.protein, super.carbs, super.fats,
-    super.fiber, super.sugar, super.sodium, super.water, this.caloriesBurned = 0, super.steps,
+    super.fiber, super.sugar, super.sodium, super.water, this.caloriesBurned = 0, super.steps, this.caloriesBurnedPerSteps = 0
   });
 
   Map<String, dynamic> toJson() {
@@ -182,6 +183,7 @@ class NutritionProgress extends Nutrition {
       'caloriesBurned': caloriesBurned,
       'steps': steps,
       'caloriesEaten': calories,
+      'caloriesBurnedPerSteps': caloriesBurnedPerSteps
     };
   }
 
@@ -201,6 +203,7 @@ class NutritionProgress extends Nutrition {
       sodium: val(dp, 'sodium'),
       caloriesBurned: val(dp, 'caloriesBurned'),
       steps: val(dp, 'steps'),
+      caloriesBurnedPerSteps: val(dp, 'caloriesBurnedPerSteps')
     );
   }
 

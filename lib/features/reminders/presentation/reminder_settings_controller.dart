@@ -3,12 +3,22 @@ import 'package:calai/features/reminders/models/nutrition_intake_snapshot.dart';
 import 'package:calai/features/reminders/models/reminder_settings.dart';
 import 'package:calai/features/reminders/services/notification_service.dart';
 import 'package:calai/features/reminders/services/reminder_scheduler.dart';
-import 'package:calai/models/nutrition_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../../models/nutrition_model.dart';
 import '../../../providers/global_provider.dart';
+
+final nutritionGoalsProvider = Provider<NutritionGoals>((ref) {
+  final globalData = ref.read(globalDataProvider).value!.todayGoal;
+  return NutritionGoals(
+    calories: globalData.calories,
+    protein: globalData.protein,
+    carbs: globalData.carbs,
+    fats: globalData.fats,
+  );
+});
 
 final reminderSettingsRepositoryProvider = Provider<ReminderSettingsRepository>(
   (ref) => ReminderSettingsRepository(),
@@ -54,18 +64,18 @@ class ReminderSettingsController extends AsyncNotifier<ReminderSettings> {
 
   Future<void> initializeNotifications() async {
     final current = await future;
-    final goals = ref.read(globalDataProvider).value?.todayGoal;
+    final goals = ref.read(nutritionGoalsProvider);
     await _notificationService.initialize();
-    await _scheduler.syncAll(settings: current, goals: goals ?? NutritionGoals.empty);
+    await _scheduler.syncAll(settings: current, goals: goals);
   }
 
   Future<void> saveAndReschedule(ReminderSettings settings) async {
     // Update UI immediately so toggles/time labels feel responsive.
     state = AsyncData(settings);
     await _repository.save(settings);
-    final goals = ref.read(globalDataProvider).value?.todayGoal;
+    final goals = ref.read(nutritionGoalsProvider);
     await _notificationService.initialize();
-    await _scheduler.syncAll(settings: settings, goals: goals ?? NutritionGoals.empty);
+    await _scheduler.syncAll(settings: settings, goals: goals);
   }
 
   Future<void> toggleSmartNutrition(bool enabled) async {

@@ -1,3 +1,4 @@
+import 'package:calai/enums/food_enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -129,7 +130,7 @@ class FoodLog extends FoodBase {
   factory FoodLog.empty() {
     return FoodLog(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      foodId: 'manual_${DateTime.now().millisecondsSinceEpoch}',
+      foodId: '',
       amount: 1.0,
       portion: "serving",
       timestamp: DateTime.now(),
@@ -354,6 +355,25 @@ class Food extends FoodBase {
     );
   }
 
+  factory Food.empty() {
+    return Food(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      source: SourceType.foodUpload.toString(),
+      timestamp: Timestamp.now(),
+      name: '',
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fats: 0,
+      fiber: 0,
+      sugar: 0,
+      sodium: 0,
+      water: 0,
+      otherNutrients: [],
+      portions: List.empty(),
+    );
+  }
+
   FoodLog createLog({
     double weight = 100, // The reference weight (usually 100g)
     required double amount, // The number of units (e.g., 2)
@@ -390,6 +410,45 @@ class Food extends FoodBase {
           amount: scale(n.amount).toDouble(),
         );
       }).toList(),
+    );
+  }
+
+
+  Food copyWith({
+    String? id,
+    String? source,
+    String? parentFoodId,
+    String? ownerId,
+    String? imageUrl,
+    String? name,
+    double? calories,
+    double? protein,
+    double? carbs,
+    double? fats,
+    double? fiber,
+    double? sugar,
+    double? sodium,
+    double? water,
+    Timestamp? timestamp,
+    List<FoodPortionItem>? portion,
+  }) {
+    return Food(
+      id: id ?? this.id,
+      source: source ?? this.source,
+      parentFoodId: parentFoodId ?? this.parentFoodId,
+      ownerId: ownerId ?? this.ownerId,
+      imageUrl: imageUrl ?? this.imageUrl,
+      name: name ?? this.name,
+      calories: calories ?? this.calories,
+      protein: protein ?? this.protein,
+      carbs: carbs ?? this.carbs,
+      fats: fats ?? this.fats,
+      fiber: fiber ?? this.fiber,
+      sugar: sugar ?? this.sugar,
+      sodium: sodium ?? this.sodium,
+      water: water ?? this.water,
+      timestamp: timestamp ?? this.timestamp,
+      portions: portion != null ? [portion] : this.portions,
     );
   }
 }

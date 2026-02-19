@@ -19,19 +19,19 @@ Future<void> showActionGridDialog(BuildContext context) {
       return const SizedBox.shrink();
     },
     transitionBuilder: (context, animation, secondaryAnimation, child) {
-      // Use a CurvedAnimation for a smoother, non-linear transition.
       final curvedAnimation = CurvedAnimation(
         parent: animation,
         curve: Curves.easeOut,
       );
 
-      // Combine Opacity and Transform to create the slide and fade effect.
       return Opacity(
         opacity: curvedAnimation.value,
         child: Transform.translate(
-          // Animate the vertical offset from 50 (off-screen) to 0 (in position).
           offset: Offset(0, 50 * (1 - curvedAnimation.value)),
-          child: const FloatingActionGrid(),
+          // ✅ Pass Navigator.pop as the onClose callback
+          child: FloatingActionGrid(
+            onClose: () => Navigator.pop(context),
+          ),
         ),
       );
     },

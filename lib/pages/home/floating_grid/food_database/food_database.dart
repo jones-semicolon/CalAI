@@ -1,19 +1,18 @@
 import 'dart:async';
-import 'package:calai/pages/home/recently_logged/logged_view/logged_food_view.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
-// Update these paths to match your project structure
+// Project Imports
 import 'package:calai/api/food_api.dart';
 import 'package:calai/models/food_model.dart';
+import 'package:calai/pages/home/recently_logged/logged_view/logged_food_view.dart';
 import '../../../../enums/food_enums.dart';
 import '../../../../providers/global_provider.dart';
-import '../../../../widgets/circle_back_button.dart';
 import '../../../../widgets/header_widget.dart';
 import 'selected_food_page.dart';
-import '../../../../providers/entry_streams_provider.dart'; // Ensure correct path
-import '../../../../services/calai_firestore_service.dart'; // Ensure correct path
+import '../../../../providers/entry_streams_provider.dart';
+import '../../../../services/calai_firestore_service.dart';
 
 class FoodDatabasePage extends ConsumerStatefulWidget {
   final int selectedTabIndex;
@@ -24,9 +23,9 @@ class FoodDatabasePage extends ConsumerStatefulWidget {
 }
 
 class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
-  // State
   final TextEditingController _searchController = TextEditingController();
   late int _selectedTabIndex = widget.selectedTabIndex;
+
   bool _isLoadingSuggestions = true;
   bool _isSearching = false;
   List<Food> _suggestedFoods = [];
@@ -34,26 +33,13 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
 
   Timer? _debounce;
 
-  // Constants
-  static const List<String> _tabs = [
-    "All",
-    "My meals",
-    "My foods",
-    "Saved scans",
-  ];
-
-  // IDs are Strings in your new model
-  static const List<String> _featuredFoodIds = [
-    "2707537", // Peanut butter
-    "2709223", // Avocado
-    "2707152", // Egg
-    "2709215", // Apples
-    "2709614", // Spinach
-  ];
+  static const List<String> _tabs = ["All", "My meals", "My foods", "Saved scans"];
+  static const List<String> _featuredFoodIds = ["2707537", "2709223", "2707152", "2709215", "2709614"];
 
   @override
   void initState() {
     super.initState();
+    // Cache suggestions early
     _fetchFeaturedSuggestions();
   }
 
@@ -65,142 +51,78 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
   }
 
   // ===========================================================================
-  // Logic & API
+  // Logic & Performance
   // ===========================================================================
 
   void _onSearchChanged(String query) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-
+    _debounce?.cancel();
     if (query.isEmpty) {
-      setState(() {
-        _searchResults = [];
-        _isSearching = false;
-      });
+      setState(() { _searchResults = []; _isSearching = false; });
       return;
     }
 
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
+    _debounce = Timer(const Duration(milliseconds: 350), () async {
       setState(() => _isSearching = true);
-
       try {
         final results = await FoodApi.search(query);
-
-        if (mounted) {
-          setState(() {
-            _searchResults = results;
-            _isSearching = false;
-          });
-        }
-      } catch (e) {
-        debugPrint("Search error: $e");
+        if (mounted) setState(() { _searchResults = results; });
+      } finally {
         if (mounted) setState(() => _isSearching = false);
       }
     });
   }
 
   Future<void> _fetchFeaturedSuggestions() async {
-    setState(() => _isLoadingSuggestions = true);
-
     try {
       final foods = await FoodApi.getFoodsByIds(_featuredFoodIds);
-
-      if (mounted) {
-        setState(() {
-          _suggestedFoods = foods;
-          _isLoadingSuggestions = false;
-        });
-      }
-    } catch (e) {
-      debugPrint("Error loading suggestions: $e");
-      if (mounted) {
-        setState(() => _isLoadingSuggestions = false);
-      }
+      if (mounted) setState(() { _suggestedFoods = foods; _isLoadingSuggestions = false; });
+    } catch (_) {
+      if (mounted) setState(() => _isLoadingSuggestions = false);
     }
-  }
-
-  FoodPortionItem _getDisplayPortion(Food item) {
-    // ✅ FIX: Don't call .fromJson() here.
-    // The model already parsed it. Just cast the list to the correct type.
-    final List<FoodPortionItem> portions = item.portions.cast<FoodPortionItem>();
-
-    if (portions.isEmpty) {
-      return const FoodPortionItem(label: "Serving", gramWeight: 100);
-    }
-
-    // Try to find a portion that isn't just "100g" or "Quantity not specified"
-    return portions.firstWhere(
-          (p) => !p.label.toLowerCase().contains("quantity not specified"),
-      orElse: () => portions.first,
-    );
   }
 
   void _onAddFood(Food item, FoodPortionItem portion) async {
-    // 1. Get the date the user is currently viewing on the dashboard
     final activeDateId = ref.read(globalDataProvider).value?.activeDateId;
-
-    // 2. Create the log entry using your model's logic
-    final logEntry = item.createLog(
-      amount: 1.0,
-      unit: portion.label,
-      gramWeight: portion.gramWeight,
-    );
+    final logEntry = item.createLog(amount: 1.0, unit: portion.label, gramWeight: portion.gramWeight);
 
     try {
-      // 3. Use the Service (Source of Truth for DB Writes)
-      await ref.read(calaiServiceProvider).logFoodEntry(
-        logEntry,
-        SourceType.foodDatabase,
-        dateId: activeDateId, // ✅ Pass the viewed date
-      );
-
+      await ref.read(calaiServiceProvider).logFoodEntry(logEntry, SourceType.foodDatabase, dateId: activeDateId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Added ${item.name} to $activeDateId"),
-            behavior: SnackBarBehavior.floating,
-          ),
+          SnackBar(content: Text("Added ${item.name}"), behavior: SnackBarBehavior.floating, duration: const Duration(seconds: 1)),
         );
       }
-    } catch (e) {
-      debugPrint("Error adding food: $e");
+    } catch (e) { debugPrint("Add Error: $e"); }
+  }
+
+  void _onUnsaveFood(Food item) async {
+    final originalItems = _suggestedFoods; // For optimistic rollback if needed
+    try {
+      await ref.read(calaiServiceProvider).unsaveFood(item.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to add food. Try again.")),
+          SnackBar(content: Text("Removed ${item.name}"), behavior: SnackBarBehavior.floating),
         );
       }
-    }
-  }
-
-  void _onLogEmptyFood() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const LoggedFoodView()),
-    );
-  }
-
-  void _navigateToFoodDetails(Food item) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => SelectedFoodPage(foodId: item.id)),
-    );
+    } catch (e) { debugPrint("Delete Error: $e"); }
   }
 
   // ===========================================================================
-  // UI Building
+  // UI Optimized Sections
   // ===========================================================================
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bool isShowingSearchResults = _searchController.text.isNotEmpty;
+    final bool isSearching = _searchController.text.isNotEmpty;
+    final String sectionTitle = _selectedTabIndex == 0 && !isSearching ? "Suggestions" : (isSearching && _selectedTabIndex != 3 ? "Search Results" : "");
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            CustomAppBar(
-              title: const Text("Food Database"),
-            ),
+            const CustomAppBar(title: Text("Food Database")),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -213,184 +135,122 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
                   _OutlinedPillButton(
                     icon: Icons.edit,
                     text: "Log empty food",
-                    onTap: _onLogEmptyFood,
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoggedFoodView())),
                   ),
                   const SizedBox(height: 18),
-                  // Only show "Suggestions" title if not searching
-                  // TODO wrap the whole section based on selected category
-                  _selectedTabIndex == 0
-                      ? Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      isShowingSearchResults ? "Search Results" : "Suggestions",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
-                  const SizedBox(height: 10),
+                  if (sectionTitle.isNotEmpty) ...[
+                    Align(alignment: Alignment.centerLeft, child: Text(sectionTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900))),
+                    const SizedBox(height: 10),
+                  ],
                 ],
               ),
             ),
-            _buildContentList(theme, isShowingSearchResults),
+            _buildContentList(theme, isSearching),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildContentList(ThemeData theme, bool isShowingSearchResults) {
-    if (_selectedTabIndex == 3) {
-      return _buildSavedScansList(theme);
+  Widget _buildContentList(ThemeData theme, bool isSearching) {
+    if (isSearching && _selectedTabIndex == 0) {
+      if (_isSearching) return const Expanded(child: Center(child: CircularProgressIndicator()));
+      return _searchResults.isEmpty ? const Expanded(child: Center(child: Text("No items found."))) : _buildFoodList(_searchResults, theme, canDelete: false);
     }
 
-    // 👉 Handle Search State
-    if (isShowingSearchResults) {
-      if (_isSearching) {
-        return const Expanded(child: Center(child: CircularProgressIndicator()));
-      }
-      if (_searchResults.isEmpty) {
-        return const Expanded(child: Center(child: Text("No items found.")));
-      }
-      return _buildFoodList(_searchResults, theme);
-    }
-
-    // 👉 Default: API suggestions
-    return _buildSuggestionsList(theme);
+    return switch (_selectedTabIndex) {
+      1 => _buildFilteredStream(SourceType.foodUpload, "No meals saved"),
+      2 => _buildFilteredStream(SourceType.foodDatabase, "No foods saved"),
+      3 => _buildFilteredStream(SourceType.vision, "No scans saved"),
+      _ => _buildSuggestionsList(theme),
+    };
   }
 
-  // ✅ Helper to keep code clean since Search and Suggestions look the same
-  Widget _buildFoodList(List<Food> items, ThemeData theme) {
+  Widget _buildFilteredStream(SourceType source, String emptyMsg) {
+    return ref.watch(savedFoodsStreamProvider).when(
+      loading: () => const Expanded(child: Center(child: CircularProgressIndicator())),
+      error: (err, _) => Expanded(child: Center(child: Text("Error loading data"))),
+      data: (allFoods) {
+        final filtered = allFoods.where((f) => SourceType.fromString(f.source) == source).toList();
+        return filtered.isEmpty ? Expanded(child: Center(child: Text(emptyMsg))) : _buildFoodList(filtered, Theme.of(context), canDelete: true);
+      },
+    );
+  }
+
+  Widget _buildSuggestionsList(ThemeData theme) {
+    if (_isLoadingSuggestions) return const Expanded(child: Center(child: CircularProgressIndicator()));
+    return _buildFoodList(_suggestedFoods, theme, canDelete: false);
+  }
+
+  Widget _buildFoodList(List<Food> items, ThemeData theme, {required bool canDelete}) {
     return Expanded(
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(18, 0, 18, 20),
-        physics: const BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(), // ✅ This is the correct class name
+        ),
         itemCount: items.length,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final item = items[index];
-
-          // Use helper to get the "best" portion to display
           final portion = _getDisplayPortion(item);
 
-          // Calculate preview calories for 1 unit of this portion
-          final previewLog = item.createLog(
-              amount: 1,
-              unit: portion.unitOnly,
-              gramWeight: portion.gramWeight
+          Widget tile = FoodTile(
+            key: ValueKey('tile_${item.id}'),
+            name: item.name,
+            calories: item.calories,
+            unit: portion.unitOnly,
+            onAdd: () => _onAddFood(item, portion),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SelectedFoodPage(foodId: item.id, foodItem: item))),
           );
 
-          // debugPrint(previewLog.calories.toString());
+          if (!canDelete) return tile;
 
-          return FoodTile(
-            name: item.name,
-            calories: previewLog.calories,
-            unit: portion.unitOnly, // Use the getter from your FoodPortionItem
-            onAdd: () => _onAddFood(item, portion),
-            onTap: () => _navigateToFoodDetails(item),
+          return Slidable(
+            key: ValueKey('slidable_${item.id}'),
+            endActionPane: ActionPane(
+              motion: const BehindMotion(),
+              extentRatio: 0.25,
+              dismissible: DismissiblePane(
+                onDismissed: () => _onUnsaveFood(item),
+              ),
+              children: [
+                SlidableAction(
+                  onPressed: (_) => _onUnsaveFood(item),
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  icon: Icons.delete,
+                  label: 'Delete',
+                  borderRadius: BorderRadius.circular(18),
+                ),
+              ],
+            ),
+            child: tile,
           );
         },
       ),
     );
   }
 
-  Widget _buildSuggestionsList(ThemeData theme) {
-    if (_isLoadingSuggestions) {
-      return const Expanded(child: Center(child: CircularProgressIndicator()));
-    }
-
-    if (_suggestedFoods.isEmpty) {
-      return const Expanded(
-        child: Center(child: Text("No suggestions available")),
-      );
-    }
-
-    // Reuse the generic builder
-    return _buildFoodList(_suggestedFoods, theme);
-  }
-
-  Widget _buildSavedScansList(ThemeData theme) {
-    // 1. Watch the stream provider
-    final savedFoodsAsync = ref.watch(savedFoodsStreamProvider);
-
-    // 2. Loading State
-    if (savedFoodsAsync.isLoading) {
-      return const Expanded(child: Center(child: CircularProgressIndicator()));
-    }
-
-    // 3. Error State
-    if (savedFoodsAsync.hasError) {
-      return Expanded(
-        child: Center(child: Text("Error: ${savedFoodsAsync.error}")),
-      );
-    }
-
-    // 4. Extract data safely
-    final foods = savedFoodsAsync.value ?? [];
-
-    // 5. Empty State
-    if (foods.isEmpty) {
-      return const Expanded(
-        child: Center(
-          child: Text("No saved scans yet", style: TextStyle(fontSize: 16)),
-        ),
-      );
-    }
-
-    // 6. Success: Reuse generic builder
-    return _buildFoodList(foods, theme);
-  }
-
-  // ... (Header, SearchBox, Tabs, Reusable Widgets remain identical) ...
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        children: [
-          CircleBackButton(onTap: () => Navigator.pop(context)),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Center(
-              child: Text(
-                "Food Database",
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22),
-              ),
-            ),
-          ),
-          const SizedBox(width: 44),
-        ],
-      ),
+  FoodPortionItem _getDisplayPortion(Food item) {
+    if (item.portions.isEmpty) return const FoodPortionItem(label: "Serving", gramWeight: 100);
+    return item.portions.cast<FoodPortionItem>().firstWhere(
+          (p) => !p.label.toLowerCase().contains("quantity not specified"),
+      orElse: () => item.portions.first as FoodPortionItem,
     );
   }
 
-  Widget _buildSearchBox(ThemeData theme) {
-    return _SearchInput(
-      controller: _searchController,
-      hint: "Describe what you ate",
-      onChanged: _onSearchChanged,
-    );
-  }
+  Widget _buildSearchBox(ThemeData theme) => _SearchInput(controller: _searchController, hint: "Search foods...", onChanged: _onSearchChanged);
 
-  Widget _buildTabs() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: List.generate(_tabs.length, (index) {
-          return Padding(
-            padding: EdgeInsets.only(right: index == _tabs.length - 1 ? 0 : 22),
-            child: _TabItem(
-              label: _tabs[index],
-              isSelected: index == _selectedTabIndex,
-              onTap: () => setState(() => _selectedTabIndex = index),
-            ),
-          );
-        }),
-      ),
-    );
-  }
+  Widget _buildTabs() => SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Row(
+      children: List.generate(_tabs.length, (index) => Padding(
+        padding: EdgeInsets.only(right: index == _tabs.length - 1 ? 0 : 22),
+        child: _TabItem(label: _tabs[index], isSelected: index == _selectedTabIndex, onTap: () => setState(() => _selectedTabIndex = index)),
+      )),
+    ),
+  );
 }
 
 // ===========================================================================

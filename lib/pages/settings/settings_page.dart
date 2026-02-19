@@ -1,12 +1,11 @@
 import 'package:calai/enums/user_enums.dart';
+import 'package:calai/features/reminders/presentation/reminder_settings_section.dart';
 import 'package:calai/pages/settings/terms_feedback_section.dart';
-import 'package:calai/providers/global_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/pages/settings/preference_selection.dart';
 import 'package:calai/providers/user_provider.dart';
-import '../../features/reminders/presentation/reminder_settings_section.dart';
 import '../auth/auth.dart';
 import '../shell/widgets/widget_app_bar.dart';
 import 'logout_section.dart';
@@ -14,52 +13,51 @@ import 'widgets/name_age_card.dart';
 import 'widgets/invite_friends_item.dart';
 import 'widgets/settings_group.dart';
 
-class SettingsPage extends ConsumerStatefulWidget {
+class SettingsPage extends ConsumerWidget { // ✅ Converted to ConsumerWidget for speed
   const SettingsPage({super.key});
 
   @override
-  ConsumerState<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends ConsumerState<SettingsPage> {
-  @override
-  Widget build(BuildContext context) {
-    final isAnonymous = ref.watch(userProvider.select((u) => u.profile.provider))
-        ?? UserProvider.anonymous;
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Select specifically the provider to avoid unnecessary rebuilds
+    final provider = ref.watch(userProvider.select((u) => u.profile.provider));
+    final bool isAnonymous = provider == null || provider == UserProvider.anonymous;
 
     return CustomScrollView(
       slivers: [
         const WidgetTreeAppBar(),
         SliverToBoxAdapter(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 12),
-            const NameAgeCard(),
-            const SizedBox(height: 12),
-            if (isAnonymous == UserProvider.anonymous) ... [
-              const _LinkAccountButton(),
-              const SizedBox(height: 16),
-            ],
-            const InviteFriendsItem(),
-            const SizedBox(height: 16),
-            const SettingsGroup(),
-            const SizedBox(height: 16),
-            const PreferencesSection(),
-            SizedBox(height: 16),
-            ReminderSettingsSection(),
-            const SizedBox(height: 16),
-            TermsFeedbackSection(isAnonymous: isAnonymous),
-            const SizedBox(height: 16),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const NameAgeCard(),
+                if (isAnonymous) ...[
+                  const SizedBox(height: 12),
+                  const _LinkAccountButton(),
+                ],
+                const SizedBox(height: 16),
+                const InviteFriendsItem(),
+                const SizedBox(height: 16),
+                const SettingsGroup(),
+                const SizedBox(height: 16),
+                const PreferencesSection(),
+                const SizedBox(height: 16),
 
-            if (isAnonymous != UserProvider.anonymous) ...[
-              const LogoutSection(),
-              const SizedBox(height: 16),
-            ],
-          ],
+                // ✅ Unified Reminder UI
+                const ReminderSettingsSection(),
+                const SizedBox(height: 16),
+                TermsFeedbackSection(isAnonymous: isAnonymous ? UserProvider.anonymous : provider!),
+
+                if (!isAnonymous) ...[
+                  const SizedBox(height: 16),
+                  const LogoutSection(),
+                ],
+              ],
+            ),
+          ),
         ),
-      ),
-      ]
+      ],
     );
   }
 }
@@ -145,9 +143,50 @@ void _handleLinkingError(BuildContext context, dynamic e) {
   String message = "Failed to link account.";
 
   if (e is FirebaseAuthException && e.code == 'credential-already-in-use') {
-    message = "This Google account is already linked to another Cal AI profile.";
-    // TODO: Show a dialog asking if they want to switch accounts instead
+    _showSwitchAccountDialog(context);
+    return; // Exit here as the dialog handles the UI now
   }
 
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+}
+
+void _showSwitchAccountDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      backgroundColor: Theme.of(context).dialogBackgroundColor,
+      title: const Text("Account Already Exists"),
+      content: const Text(
+        "This Google account is already linked to another Cal AI profile. "
+        "Would you like to switch to that account? \n\n"
+        "Note: Current guest progress will be lost.",
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.errorContainer,
+            foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
+          ),
+          onPressed: () async {
+            Navigator.pop(context); // Close dialog
+            try {
+              // We call sign-in which will replace the anonymous user
+              await AuthService.signInWithGoogle(); 
+            } catch (error) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Failed to switch accounts.")),
+                );
+              }
+            }
+          },
+          child: const Text("Switch Account"),
+        ),
+      ],
+    ),
+  );
 }

@@ -124,15 +124,6 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
     }
   }
 
-  // Sample API method (placeholder):
-  // Future<void> _postToApi({
-  //   required XFile image,
-  //   String? barcode,
-  //   String? label,
-  // }) async {
-  //   // APIpost: build multipart/form-data and POST to your endpoint.
-  // }
-
   Future<void> _openGallery() async {
     final status = await Permission.photos.request();
     if (!status.isGranted) return;
@@ -159,7 +150,16 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
       children: [
         // CAMERA
         if (_ready && controller != null)
-          Positioned.fill(child: CameraPreview(controller))
+          Positioned.fill(
+            child: FittedBox(
+              fit: BoxFit.cover, // ✅ Scales proportionally to fill the area
+              child: SizedBox(
+                width: controller.value.previewSize!.height,
+                height: controller.value.previewSize!.width,
+                child: CameraPreview(controller),
+              ),
+            ),
+          )
         else
           const Center(child: CircularProgressIndicator()),
 

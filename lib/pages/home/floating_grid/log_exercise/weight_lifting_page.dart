@@ -94,6 +94,27 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
   @override
   Widget build(BuildContext context) {
     final int activeIndex = _getCurrentZoneIndex();
+    ref.listen<ExerciseLogState>(exerciseLogProvider, (previous, next) {
+      if (next.status == ExerciseLogStatus.loading) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+      } else if (next.status == ExerciseLogStatus.success) {
+        Navigator.of(context, rootNavigator: true).pop(); // Close loading
+        Navigator.pop(context); // Close Page
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Exercise logged successfully!')),
+        );
+        ref.read(exerciseLogProvider.notifier).reset();
+      } else if (next.status == ExerciseLogStatus.error) {
+        Navigator.of(context, rootNavigator: true).pop(); // Close loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${next.errorMessage}')),
+        );
+      }
+    });
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

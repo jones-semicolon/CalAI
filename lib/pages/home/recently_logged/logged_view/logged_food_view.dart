@@ -1,3 +1,4 @@
+import 'package:calai/api/food_api.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/edit_value_view.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:calai/models/food_model.dart';
 import 'package:calai/enums/food_enums.dart';
 
 class LoggedFoodView extends ConsumerStatefulWidget {
-  final FoodLog? foodLog; // Made optional
+  final FoodLog? foodLog;
 
   const LoggedFoodView({super.key, this.foodLog});
 
@@ -21,9 +22,10 @@ class LoggedFoodView extends ConsumerStatefulWidget {
 class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   late double _servingsCount;
   late FoodLog _tempLog;
+  bool _isSubmitting = false;
 
   // Helper to check if we are creating or editing
-  bool get isNewEntry => widget.foodLog == null;
+  bool get isNewEntry => widget.foodLog == null || widget.foodLog?.id == null;
 
   @override
   void initState() {
@@ -39,17 +41,59 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     });
   }
 
-  void _onSave(FoodLog finalLog) {
-    final service = ref.read(calaiServiceProvider);
-
-    if (isNewEntry) {
-      // Logic for adding a brand new entry to Firestore
-      service.logFoodEntry(finalLog, SourceType.foodUpload);
-    } else {
-      // Logic for updating an existing entry
-      service.updateFoodEntry(widget.foodLog!, finalLog);
+  void _onSave(FoodLog finalLog) async {
+    // 1. Guard against empty names and concurrent taps
+    if (finalLog.name.trim().isEmpty) {
+      return;
     }
-    Navigator.pop(context);
+    if (_isSubmitting) return;
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final service = ref.read(calaiServiceProvider);
+      final navigator = Navigator.of(context);
+      if (isNewEntry) {
+        final newFoodId = DateTime.now().millisecondsSinceEpoch.toString();
+        final masterFood = Food.empty().copyWith(
+          id: newFoodId,
+          name: finalLog.name,
+          calories: finalLog.calories,
+          protein: finalLog.protein,
+          carbs: finalLog.carbs,
+          fats: finalLog.fats,
+          sugar: finalLog.sugar,
+          fiber: finalLog.fiber,
+          sodium: finalLog.sodium,
+          imageUrl: finalLog.imageUrl,
+          source: SourceType.foodUpload.name,
+          water: finalLog.water,
+          portion: [FoodPortionItem(label: 'serving', gramWeight: 100)]
+        );
+
+        await Future.wait([
+          service.saveFood(masterFood),
+          service.logFoodEntry(
+            finalLog.copyWith(foodId: newFoodId),
+            SourceType.foodUpload,
+          ),
+        ]);
+      } else {
+        // Updating an existing log entry
+        await service.updateFoodEntry(widget.foodLog!, finalLog);
+      }
+
+      if (mounted) navigator.pop();
+    } catch (e) {
+      debugPrint("❌ Save Error: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Error saving. Please check your connection."),
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildFoodTitle() {
@@ -58,15 +102,27 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
         decoration: const InputDecoration(
           hintText: "Enter food name",
           border: InputBorder.none,
-          hintStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.grey),
+          hintStyle: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: Colors.grey,
+          ),
         ),
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5),
-        onChanged: (val) => _tempLog = _tempLog.copyWith(name: val),
+        style: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5,
+        ),
+        onChanged: (val) => setState(() => _tempLog = _tempLog.copyWith(name: val)),
       );
     }
     return Text(
       _tempLog.name,
-      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5),
+      style: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w900,
+        letterSpacing: -0.5,
+      ),
     );
   }
 
@@ -109,7 +165,8 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           // We display the portion saved in the FoodLog as the primary tab
           _TabButton(
             label: _capitalize(_tempLog.portion),
-            isActive: true, // Always active since it's the only available context
+            isActive:
+                true, // Always active since it's the only available context
             onTap: () {
               // Logic stays here as it's the fixed reference point
             },
@@ -123,10 +180,12 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final hasImage = _tempLog.imageUrl != null;
+    final bool isNameValid = _tempLog.name.trim().isNotEmpty;
 
     // 1. Calculate the Ratio
     // If original amount was 100 and new is 200, ratio is 2.0
-    final double ratio = _servingsCount / (_tempLog.amount > 0 ? _tempLog.amount : 1.0);
+    final double ratio =
+        _servingsCount / (_tempLog.amount > 0 ? _tempLog.amount : 1.0);
 
     // 2. Create the Preview Log with recalculated macros
     final previewLog = _tempLog.copyWith(
@@ -139,9 +198,9 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
       fiber: (_tempLog.fiber * ratio),
       sodium: (_tempLog.sodium * ratio),
       // Recalculate other nutrients list if it exists
-      otherNutrients: _tempLog.otherNutrients.map((n) => n.copyWith(
-        amount: n.amount * ratio,
-      )).toList(),
+      otherNutrients: _tempLog.otherNutrients
+          .map((n) => n.copyWith(amount: n.amount * ratio))
+          .toList(),
     );
 
     return Scaffold(
@@ -151,7 +210,9 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           // Header Image
           if (hasImage)
             Positioned(
-              top: 0, left: 0, right: 0,
+              top: 0,
+              left: 0,
+              right: 0,
               height: MediaQuery.of(context).size.height * 0.45,
               child: Image.network(_tempLog.imageUrl!, fit: BoxFit.cover),
             ),
@@ -159,18 +220,27 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           // Content Card
           Positioned.fill(
             child: SingleChildScrollView(
-              padding: EdgeInsets.only(top: hasImage ? MediaQuery.of(context).size.height * 0.4 : 0),
+              padding: EdgeInsets.only(
+                top: hasImage ? MediaQuery.of(context).size.height * 0.4 : 0,
+              ),
               child: Container(
-                constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height * (hasImage ? 0.6 : 1.0)),
+                constraints: BoxConstraints(
+                  minHeight:
+                      MediaQuery.of(context).size.height *
+                      (hasImage ? 0.6 : 1.0),
+                ),
                 decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: hasImage ? const BorderRadius.vertical(top: Radius.circular(30)) : null,
+                  borderRadius: hasImage
+                      ? const BorderRadius.vertical(top: Radius.circular(30))
+                      : null,
                 ),
                 padding: const EdgeInsets.fromLTRB(20, 30, 20, 120),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (!hasImage) SizedBox(height: MediaQuery.of(context).padding.top + 60),
+                    if (!hasImage)
+                      SizedBox(height: MediaQuery.of(context).padding.top + 60),
                     _buildTimestamp(),
                     const SizedBox(height: 10),
                     _buildFoodTitle(),
@@ -189,7 +259,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 
                     if (_tempLog.healthScore != null) ...[
                       const SizedBox(height: 18),
-                      _buildHealthScore(_tempLog.healthScore!)
+                      _buildHealthScore(_tempLog.healthScore!),
                     ],
 
                     const SizedBox(height: 26),
@@ -205,14 +275,21 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           // App Bar
           Positioned(
             top: MediaQuery.of(context).padding.top,
-            left: 0, right: 0,
+            left: 0,
+            right: 0,
             child: _buildTransparentAppBar(hasImage),
           ),
 
           // Bottom Buttons
           Positioned(
-            bottom: 0, left: 0, right: 0,
-            child: _buildBottomActionButtons(previewLog),
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: ConfirmationButtonWidget(
+              onConfirm: () => _onSave(previewLog),
+              text: isNewEntry ? "Log Food" : "Update Entry",
+              enabled: isNameValid && !_isSubmitting,
+            ),
           ),
         ],
       ),
@@ -230,14 +307,21 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
       ),
       child: Text(
         DateFormat.jm().format(_tempLog.timestamp),
-        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey),
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: Colors.grey,
+        ),
       ),
     );
   }
 
   Widget _buildServingsRow(ThemeData theme) => Row(
     children: [
-      const Text("Number of Servings", style: TextStyle(fontWeight: FontWeight.bold)),
+      const Text(
+        "Number of Servings",
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
       const Spacer(),
       _ServingsInputBox(
         value: _servingsCount,
@@ -247,7 +331,9 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   );
 
   Widget _buildHealthScore(double score) {
-    final color = score >= 8 ? Colors.green : (score >= 5 ? Colors.orange : Colors.red);
+    final color = score >= 8
+        ? Colors.green
+        : (score >= 5 ? Colors.orange : Colors.red);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -260,8 +346,14 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Health Score', style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('$score/10', style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+              const Text(
+                'Health Score',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '$score/10',
+                style: TextStyle(fontWeight: FontWeight.bold, color: color),
+              ),
             ],
           ),
           const SizedBox(height: 10),
@@ -277,7 +369,6 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   }
 
   Widget _buildCaloriesCard(BuildContext context, FoodLog data) {
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -288,17 +379,30 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
         children: [
           Row(
             children: [
-              const Icon(Icons.local_fire_department, color: Colors.black, size: 28),
+              const Icon(
+                Icons.local_fire_department,
+                color: Colors.black,
+                size: 28,
+              ),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Calories",
-                      style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)
+                  const Text(
+                    "Calories",
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   // ✅ This now displays the local state value
-                  Text("${data.calories.round()}",
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)
+                  Text(
+                    "${data.calories.round()}",
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                 ],
               ),
@@ -312,13 +416,10 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
               onTap: () => _showEditModal(
                 title: 'Calories',
                 initialValue: data.calories,
-                onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(calories: val)),
+                onSave: (val) =>
+                    setState(() => _tempLog = _tempLog.copyWith(calories: val)),
               ),
-              child: Icon(
-                  Icons.edit,
-                  size: 16,
-                  color: Colors.grey[400]
-              ),
+              child: Icon(Icons.edit, size: 16, color: Colors.grey[400]),
             ),
           ),
         ],
@@ -328,26 +429,44 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 
   Widget _buildMacroRow(FoodLog data) => Row(
     children: [
-      Expanded(child: _MacroTile(value: "${data.protein.round()}g", nutritionType: NutritionType.protein,
-        onEdit: () => _showEditModal(
-          title: 'Protein',
-          initialValue: data.protein,
-          onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(protein: val))),
-      )),
+      Expanded(
+        child: _MacroTile(
+          value: "${data.protein.round()}g",
+          nutritionType: NutritionType.protein,
+          onEdit: () => _showEditModal(
+            title: 'Protein',
+            initialValue: data.protein,
+            onSave: (val) =>
+                setState(() => _tempLog = _tempLog.copyWith(protein: val)),
+          ),
+        ),
+      ),
       const SizedBox(width: 8),
-      Expanded(child: _MacroTile(value: "${data.carbs.round()}g", nutritionType: NutritionType.carbs,
-        onEdit: () => _showEditModal(
+      Expanded(
+        child: _MacroTile(
+          value: "${data.carbs.round()}g",
+          nutritionType: NutritionType.carbs,
+          onEdit: () => _showEditModal(
             title: 'Carbs',
             initialValue: data.carbs,
-            onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(carbs: val))),
-      )),
+            onSave: (val) =>
+                setState(() => _tempLog = _tempLog.copyWith(carbs: val)),
+          ),
+        ),
+      ),
       const SizedBox(width: 8),
-      Expanded(child: _MacroTile(value: "${data.fats.round()}g", nutritionType: NutritionType.fats,
-        onEdit: () => _showEditModal(
+      Expanded(
+        child: _MacroTile(
+          value: "${data.fats.round()}g",
+          nutritionType: NutritionType.fats,
+          onEdit: () => _showEditModal(
             title: 'Fats',
             initialValue: data.fats,
-            onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(fats: val))),
-      )),
+            onSave: (val) =>
+                setState(() => _tempLog = _tempLog.copyWith(fats: val)),
+          ),
+        ),
+      ),
     ],
   );
 
@@ -356,7 +475,8 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
       _nutriRow("Sugar", "${data.sugar.toStringAsFixed(2)}g"),
       _nutriRow("Fiber", "${data.fiber.toStringAsFixed(2)}g"),
       _nutriRow("Sodium", "${data.sodium.toStringAsFixed(2)}mg"),
-      for (var n in data.otherNutrients) _nutriRow(n.name, "${n.amount.toStringAsFixed(1)}${n.unit}"),
+      for (var n in data.otherNutrients)
+        _nutriRow(n.name, "${n.amount.toStringAsFixed(1)}${n.unit}"),
     ],
   );
 
@@ -364,7 +484,10 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     padding: const EdgeInsets.symmetric(vertical: 12),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [Text(name, style: const TextStyle(color: Colors.grey)), Text(value, style: const TextStyle(fontWeight: FontWeight.bold))],
+      children: [
+        Text(name, style: const TextStyle(color: Colors.grey)),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+      ],
     ),
   );
 
@@ -376,35 +499,33 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: Icon(Icons.arrow_back_ios_new, color: hasImage ? Colors.white : Colors.black, size: 20),
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: hasImage ? Colors.white : Colors.black,
+              size: 20,
+            ),
           ),
-          Text("Nutrients", style: TextStyle(fontWeight: FontWeight.bold, color: hasImage ? Colors.white : Colors.black)),
+          Text(
+            "Nutrients",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: hasImage ? Colors.white : Colors.black,
+            ),
+          ),
           const SizedBox(width: 40), // Spacer
         ],
       ),
     );
   }
 
-  Widget _buildBottomActionButtons(FoodLog log) {
-    return ConfirmationButtonWidget(onConfirm: () => _onSave(log), text: "Done");
-    // return Container(
-    //   padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
-    //   color: Colors.white,
-    //   child: Row(
-    //     children: [
-    //       Expanded(
-    //         child: ElevatedButton(
-    //           onPressed: () => _onSave(log),
-    //           style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-    //           child: const Text("Done", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    // );
-  }
-
-  Widget _buildSectionLabel(ThemeData theme, String label) => Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey));
+  Widget _buildSectionLabel(ThemeData theme, String label) => Text(
+    label,
+    style: const TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+      color: Colors.grey,
+    ),
+  );
 }
 
 class _MacroTile extends StatelessWidget {
@@ -420,7 +541,8 @@ class _MacroTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack( // ✅ Use Stack to pin the icon to the corner
+    return Stack(
+      // ✅ Use Stack to pin the icon to the corner
       children: [
         Container(
           padding: const EdgeInsets.all(12),
@@ -429,7 +551,8 @@ class _MacroTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center, // Align text to start
+            crossAxisAlignment:
+                CrossAxisAlignment.center, // Align text to start
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -440,7 +563,11 @@ class _MacroTile extends StatelessWidget {
                       color: Theme.of(context).colorScheme.onTertiary,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(nutritionType.icon, color: nutritionType.color, size: 12),
+                    child: Icon(
+                      nutritionType.icon,
+                      color: nutritionType.color,
+                      size: 12,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Text(
@@ -456,7 +583,10 @@ class _MacroTile extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ],
           ),
@@ -499,7 +629,9 @@ class _TabButton extends StatelessWidget {
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSecondaryContainer,
+          color: isActive
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.onSecondaryContainer,
           borderRadius: BorderRadius.circular(999),
         ),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -507,7 +639,9 @@ class _TabButton extends StatelessWidget {
           label,
           style: TextStyle(
             fontWeight: FontWeight.w800,
-            color: isActive ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
+            color: isActive
+                ? Theme.of(context).colorScheme.surface
+                : Theme.of(context).colorScheme.primary,
           ),
         ),
       ),
@@ -515,15 +649,11 @@ class _TabButton extends StatelessWidget {
   }
 }
 
-
 class _ServingsInputBox extends StatefulWidget {
   final double value;
   final ValueChanged<double> onChanged;
 
-  const _ServingsInputBox({
-    required this.value,
-    required this.onChanged,
-  });
+  const _ServingsInputBox({required this.value, required this.onChanged});
 
   @override
   State<_ServingsInputBox> createState() => _ServingsInputBoxState();
@@ -577,8 +707,14 @@ class _ServingsInputBoxState extends State<_ServingsInputBox> {
             child: TextField(
               controller: _controller,
               textAlign: TextAlign.center,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
               style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
               onChanged: (v) {
                 final parsed = double.tryParse(v);

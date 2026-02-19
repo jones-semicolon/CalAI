@@ -40,13 +40,17 @@ class _AppEntryState extends State<AppEntry> {
             .doc(_user!.uid)
             .get();
 
-        print(doc);
+        if (doc.exists) {
+          final data = doc.data();
 
-        // If they have a calorie goal, they definitely finished onboarding before
-        if (doc.exists && doc.data()?['dailyGoals'] != null) {
-          _onboardingCompleted = true;
-          // Sync the local flag so we don't have to hit Firestore next time
-          await prefs.setBool('onboarding_completed', true);
+          // ✅ FIX: Check the correct nested field path
+          // In your Service, you save goals under 'goal': {'dailyGoals': ...}
+          final hasGoals = data?['goal']?['dailyGoals'] != null;
+
+          if (hasGoals) {
+            _onboardingCompleted = true;
+            await prefs.setBool('onboarding_completed', true);
+          }
         }
       }
     }

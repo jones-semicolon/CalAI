@@ -15,6 +15,6 @@ class NutritionIntakeSnapshot {
   final int consumedFatGrams;
   final NutritionGoals goals;
 
-  double get caloriesRemaining => goals.calories - consumedCalories;
-  double get proteinRemaining => goals.protein - consumedProteinGrams;
+  int get caloriesRemaining => goals.calories.round() - consumedCalories;
+  int get proteinRemaining => goals.protein.round() - consumedProteinGrams;
 }

@@ -13,6 +13,7 @@ class ScanFrameOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     final isBarcode = mode == ScanMode.barcode;
     final radius = isBarcode ? 12.0 : 16.0;
+    final visualFrame = frame.deflate(12.0);
 
     return Stack(
       children: [
@@ -24,7 +25,7 @@ class ScanFrameOverlay extends StatelessWidget {
           ),
 
         Positioned.fromRect(
-          rect: frame,
+          rect: isBarcode ? frame : visualFrame,
           child: isBarcode
               ? DecoratedBox(
                   decoration: BoxDecoration(

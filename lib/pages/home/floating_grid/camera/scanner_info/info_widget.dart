@@ -43,7 +43,7 @@ class BestScanningPracticesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Theme.of(context).colorScheme.onPrimary;
+    final textColor = Theme.of(context).colorScheme.primary;
     return Column(
       children: [
         _HeaderRow(onClose: onClose, textColor: textColor),
@@ -79,7 +79,7 @@ class _HeaderRow extends StatelessWidget {
           child: Text(
             'Best scanning practices',
             style: TextStyle(
-              fontSize: 32,
+              fontSize: 24,
               fontWeight: FontWeight.w900,
               color: textColor,
             ),
@@ -90,8 +90,8 @@ class _HeaderRow extends StatelessWidget {
           child: IconButton(
             onPressed: onClose,
             style: IconButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              backgroundColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.2),
+              foregroundColor: Theme.of(context).colorScheme.primary,
               iconSize: 28,
               shape: const CircleBorder(),
             ),
@@ -114,7 +114,7 @@ class _TipsTitle extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Text(
         'General tips:',
-        style: TextStyle(fontSize: 24, color: textColor),
+        style: TextStyle(fontSize: 20, color: textColor),
       ),
     );
   }
@@ -133,9 +133,9 @@ class _TipItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('•  ', style: TextStyle(fontSize: 22, color: color)),
+          Text('•  ', style: TextStyle(fontSize: 16, color: color)),
           Expanded(
-            child: Text(text, style: TextStyle(fontSize: 22, color: color)),
+            child: Text(text, style: TextStyle(fontSize: 16, color: color)),
           ),
         ],
       ),
@@ -156,7 +156,7 @@ class _ScanNowButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onScanNow,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.onPrimary,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).scaffoldBackgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
