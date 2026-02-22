@@ -1,0 +1,12 @@
+{
+  "@@locale": "fr",
+  "welcomeMessage": "Bienvenue sur Cal AI",
+  "trackMessage": "Suivez plus intelligemment. Mangez mieux.",
+  "getStarted": "Commencer",
+  "alreadyAccount": "Vous avez déjà un compte ?",
+  "signIn": "Se connecter",
+  "chooseLanguage": "Choisissez la langue",
+  "calorieTrackingMadeEasy": "Le suivi des calories est facile",
+  "onboardingStep1Title": "Suivez vos repas",
+  "onboardingStep1Description": "Notez facilement vos repas et suivez votre nutrition."
+}

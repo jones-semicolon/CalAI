@@ -1,0 +1,12 @@
+{
+  "@@locale": "en",
+  "welcomeMessage": "Welcome to Cal AI",
+  "trackMessage": "Track smarter. Eat better.",
+  "getStarted": "Get Started",
+  "alreadyAccount": "Already have an account?",
+  "signIn": "Sign in",
+  "chooseLanguage": "Choose language",
+  "calorieTrackingMadeEasy": "Calorie tracking made easy",
+  "onboardingStep1Title": "Track your meals",
+  "onboardingStep1Description": "Log your meals easily and track your nutrition."
+}

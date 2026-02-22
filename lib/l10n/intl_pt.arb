@@ -1,0 +1,12 @@
+{
+  "@@locale": "pt",
+  "welcomeMessage": "Bem-vindo ao Cal AI",
+  "trackMessage": "Acompanhe com mais inteligência. Coma melhor.",
+  "getStarted": "Começar",
+  "alreadyAccount": "Já tem uma conta?",
+  "signIn": "Entrar",
+  "chooseLanguage": "Escolha o idioma",
+  "calorieTrackingMadeEasy": "O acompanhamento de calorias ficou fácil",
+  "onboardingStep1Title": "Registre suas refeições",
+  "onboardingStep1Description": "Registre suas refeições facilmente e acompanhe sua nutrição."
+}
