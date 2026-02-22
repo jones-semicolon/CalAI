@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:calai/enums/user_enums.dart';
 import 'package:calai/providers/user_provider.dart';
@@ -17,7 +16,7 @@ import 'package:permission_handler/permission_handler.dart';
 class CarouselActivity extends StatelessWidget {
   final num waterIntake;
   final Function(int) onWaterChange;
-  final String dateId; // Changed from DateTime to String dateId
+  final String dateId;
 
   const CarouselActivity({
     super.key,
@@ -64,13 +63,12 @@ class _CaloriesBurnedCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    // 1. Watch progress from the Global Provider (Replacing HealthData)
+    // 1. Watch progress from the Global Provider
     final globalState = ref.watch(globalDataProvider).value;
-    final burned = globalState?.todayProgress.caloriesBurned ?? 0;
-    // TODO: it should be caloriesBurnedPerSteps
-    final stepsToday = globalState?.todayProgress.steps;
+    final double stepsCalories = globalState?.todayProgress.caloriesBurnedPerSteps ?? 0;
+    final burned = (globalState?.todayProgress.caloriesBurned ?? 0);
 
-    // 2. Watch the list of entries specifically for this date using your StreamProvider.family
+    // 2. Watch the list of entries specifically for this date
     final entriesAsync = ref.watch(dailyEntriesProvider(dateId));
 
     return Container(
@@ -83,7 +81,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildBurnedHeader(theme, burned), // Extracted for readability
+          _buildBurnedHeader(theme, burned, stepsCalories),
           const SizedBox(height: 15),
 
           entriesAsync.when(
@@ -94,7 +92,6 @@ class _CaloriesBurnedCard extends ConsumerWidget {
             error: (err, _) => const SizedBox.shrink(),
             data: (entries) {
               // Extract exercise logs from database entries
-              // We filter out anything that looks like a "steps" log to avoid repetition
               final List<ExerciseLog> exercises = entries
                   .where((data) =>
               data.containsKey('calories_burned') &&
@@ -105,17 +102,20 @@ class _CaloriesBurnedCard extends ConsumerWidget {
 
               return Column(
                 children: [
-                  // ✅ LOGGED STEPS: Always at the top, only one, hidden if 0
-                  if (stepsToday! > 0)
+                  // ✅ LOGGED STEPS:
+                  // Uses the calories variable we fixed above.
+                  if (stepsCalories > 0)
                     _ActivityItemRow(
                       title: "Steps",
-                      value: "+${stepsToday.round()} cal",
+                      // I updated 'cal' to 'kcal' to match the exercises below
+                      value: "+${stepsCalories.round()} kcal",
                       icon: Icons.directions_walk,
                     ),
 
-                  // Map the remaining exercises (take top 2 if steps exist, or 3 if not)
+                  // Map the remaining exercises
+                  // (take top 2 if steps exist, or 3 if not)
                   ...exercises
-                      .take(stepsToday > 0 ? 2 : 3)
+                      .take(stepsCalories > 0 ? 2 : 3)
                       .map((ex) => _ActivityItemRow(
                     title: ex.type.label,
                     value: "+${ex.caloriesBurned.round()} kcal",
@@ -131,7 +131,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
   }
 }
 
-Widget _buildBurnedHeader(ThemeData theme, num burned) {
+Widget _buildBurnedHeader(ThemeData theme, double burned, double stepsCalories) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -149,7 +149,7 @@ Widget _buildBurnedHeader(ThemeData theme, num burned) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "${burned.round()}",
+              "${(burned + stepsCalories).round()}",
               style: TextStyle(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
@@ -191,10 +191,7 @@ class _StepsTodayCard extends ConsumerWidget {
   }
 
   Future<void> _handlePermissionRequest(BuildContext context, WidgetRef ref) async {
-    final permission = Platform.isIOS
-        ? Permission.sensors
-        : Permission.activityRecognition;
-    final status = await permission.request();
+    final status = await Permission.activityRecognition.request();
 
     if (status.isGranted) {
       // Restart both the hardware stream AND the tracker logic
@@ -224,7 +221,24 @@ class _WaterIntakeSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final unitSystem = ref.read(userProvider).settings.measurementUnit;
+    final user = ref.read(userProvider); // Get full user object
+    final unitSystem = user.settings.measurementUnit;
+
+    // Get current goal safely
+    final waterGoal = ref.read(globalDataProvider).value?.todayGoal.water;
+
+    // ✅ Define the save callback
+    void onWaterGoalChange(int newWaterGoal) {
+      // 1. Get current targets
+      final currentTargets = user.goal.targets;
+
+      // 2. Update just the water goal (assuming copyWith exists on your model)
+      final newTargets = currentTargets.copyWith(water: newWaterGoal.toDouble());
+
+      // 3. Call the notifier
+      ref.read(userProvider.notifier).updateNutritionGoals(newTargets);
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -251,13 +265,22 @@ class _WaterIntakeSection extends ConsumerWidget {
               Row(
                 children: [
                   Text(
-                    "${unitSystem?.liquidToDisplay(waterIntake.toDouble()).round() ?? waterIntake.round()}  ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}", // Unit update
+                    // Display logic
+                    "${unitSystem?.liquidToDisplay(waterIntake.toDouble()).round() ?? waterIntake.round()} ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(width: 5),
+
                   GestureDetector(
-                    onTap: () => _showWaterSettings(context, unitSystem), // ✅ Call the sheet
-                    child: Icon(Icons.settings_outlined, color: theme.colorScheme.onPrimary, size: 16),
+                    onTap: () {
+                      _showWaterSettings(
+                        context,
+                        unitSystem,
+                        waterGoal?.round() ?? 2000, // Default to 2000 if null
+                            (newValue) => onWaterGoalChange(newValue), // Pass the callback
+                      );
+                    },
+                    child: Icon(Icons.settings_outlined, color: theme.colorScheme.primary, size: 16),
                   )
                 ],
               ),
@@ -281,8 +304,16 @@ class _WaterIntakeSection extends ConsumerWidget {
   }
 }
 
-// TODO: Add functionality to this water serving size picker
-void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
+// 1. Add a callback parameter (onValueChanged) to send data back
+void _showWaterSettings(
+    BuildContext context,
+    MeasurementUnit? unitSystem,
+    int initialValue,
+    ValueChanged<int> onSave, // Triggered only on close
+    ) {
+  // 1. Capture the value in a variable outside the builder
+  int finalValue = initialValue;
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -291,12 +322,12 @@ void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
     ),
     builder: (context) {
-      // Use StatefulBuilder to manage the picker visibility inside the sheet
+      // Local state for the UI (instant updates)
+      int localSelectedValue = initialValue;
+      bool isPickerVisible = false;
+
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setSheetState) {
-          bool isPickerVisible = false;
-          int selectedValue = 8; // Default value based on your screenshot
-
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Column(
@@ -307,24 +338,26 @@ void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
                 _buildSheetHeader(context),
                 const SizedBox(height: 30),
 
-                // --- SERVING SIZE ROW ---
                 GestureDetector(
                   onTap: () => setSheetState(() => isPickerVisible = !isPickerVisible),
+                  behavior: HitTestBehavior.opaque,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: isPickerVisible ? Colors.grey.withOpacity(0.1) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Serving Size",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
+                        const Text("Serving Size", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         Row(
                           children: [
                             Text(
-                              "$selectedValue ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
+                              "$localSelectedValue ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
                               style: TextStyle(fontSize: 15, color: Colors.grey[800]),
                             ),
+                            Icon(isPickerVisible ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
                           ],
                         ),
                       ],
@@ -332,26 +365,29 @@ void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
                   ),
                 ),
 
-                // --- DYNAMIC NUMBER PICKER ---
                 if (isPickerVisible) ...[
                   const SizedBox(height: 10),
                   SizedBox(
-                    height: 120,
+                    height: 150,
                     child: CupertinoPicker(
                       itemExtent: 40,
-                      scrollController: FixedExtentScrollController(initialItem: 0),
-                      onSelectedItemChanged: (index) {
-                        setSheetState(() => selectedValue = 8 + index);
-                      },
-                      children: List.generate(20, (index) =>
-                          Center(child: Text("${8 + index}"))
+                      scrollController: FixedExtentScrollController(
+                        initialItem: (localSelectedValue / 100).round().clamp(0, 50),
                       ),
+                      onSelectedItemChanged: (index) {
+                        final newValue = index * 100;
+                        setSheetState(() {
+                          localSelectedValue = newValue;
+                        });
+                        // 2. Update our outer variable, but DO NOT save yet
+                        finalValue = newValue;
+                      },
+                      children: List.generate(51, (index) => Center(child: Text("${index * 100}"))),
                     ),
                   ),
                 ],
-
-                const SizedBox(height: 30),
-                _buildHydrationInfo(),
+                const SizedBox(height: 10,),
+                _buildHydrationInfo(unitSystem ?? MeasurementUnit.metric),
                 const SizedBox(height: 30),
               ],
             ),
@@ -359,7 +395,12 @@ void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
         },
       );
     },
-  );
+  ).whenComplete(() {
+    // 3. This runs when the sheet is dismissed (swiped down or tapped outside)
+    if (finalValue != initialValue) {
+      onSave(finalValue);
+    }
+  });
 }
 
 // 1. Creates the small horizontal gray bar at the very top of the sheet
@@ -407,7 +448,7 @@ Widget _buildSheetHeader(BuildContext context) {
 }
 
 // Helper for the "How much water..." text section
-Widget _buildHydrationInfo() {
+Widget _buildHydrationInfo(MeasurementUnit measurementUnit) {
   return Column(
     children: [
       const Text(
@@ -417,7 +458,7 @@ Widget _buildHydrationInfo() {
       ),
       const SizedBox(height: 10),
       Text(
-        "Everyone's needs are slightly different, but we recommended aiming for at least 64 fl oz (8 cups) of water each day",
+        "Everyone's needs are slightly different, but we recommended aiming for at least ${measurementUnit.liquidToDisplay(1900).round()} ${measurementUnit.liquidLabel} (8 cups) of water each day",
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 14, color: Colors.grey[600], height: 1.4),
       ),
