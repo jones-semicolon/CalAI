@@ -1,32 +1,38 @@
-# 1. Add these lines at the very top to link Flutter
-target_local_path = File.expand_path(File.join('..', '..', '..'), __FILE__)
-$LOAD_PATH << File.join(target_local_path, 'packages', 'flutter_tools', 'bin', 'cache', 'dart-sdk', 'lib', 'dart_p_sdk', 'lib')
-
-# This loads the actual Flutter helpers
-load File.join(File.dirname(File.realpath(__FILE__)), '.symlinks', 'plugins', 'flutter_export_environment.sh') rescue nil
-# This is the standard way Flutter handles the bridge
-path_to_utils = File.join('..', '.flutter-plugins-dependencies')
-
-# 2. Main Setup
+# Set platform to 13.0 for Cal AI
 platform :ios, '13.0'
+
+# This logic finds the Flutter SDK path dynamically on the build server
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "Generated.xcconfig must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+# Load the Flutter podhelper
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
 
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
-  # This is the line that was failing—it now has the context it needs
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
-# 3. Permission Settings for Cal AI
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     
+    # Enable Camera permissions for Cal AI
     target.build_configurations.each do |config|
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
-        'PERMISSION_CAMERA=1', 
+        'PERMISSION_CAMERA=1',
         'PERMISSION_PHOTOS=1',
       ]
     end
