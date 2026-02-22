@@ -65,6 +65,7 @@ class UserNotifier extends StateNotifier<User> {
       // C. THE BIG SAVE (Atomic Write)
       // Now we save Profile + Body + Goals + Settings all in ONE document write.
       await _service.updateProfile(state);
+      await _service.initializeUserReferral(_service.uid!);
 
       debugPrint("Onboarding Complete & Saved!");
     } catch (e) {

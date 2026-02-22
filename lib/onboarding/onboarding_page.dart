@@ -74,12 +74,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       OnboardingStep13(nextPage: _nextPage),
       OnboardingStep14(nextPage: _nextPage),
       OnboardingStep15(nextPage: _nextPage),
-      OnboardingStep16(nextPage: _nextPage),
       OnboardingStep17(nextPage: _nextPage),
       OnboardingStep18(
         key: _step18Key,
         nextPage: _nextPage,
       ),
+      OnboardingStep16(nextPage: _nextPage),
       OnboardingStep19(nextPage:  _nextPage)
     ];
   }

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 class ReminderSettings {
   const ReminderSettings({
-    required this.smartNutritionEnabled,
-    required this.smartNutritionTime,
     required this.waterRemindersEnabled,
     required this.waterReminderIntervalHours,
     required this.waterReminderStartTime,
@@ -19,9 +17,6 @@ class ReminderSettings {
     required this.activityReminderEnabled,
     required this.activityReminderTime,
   });
-
-  final bool smartNutritionEnabled;
-  final TimeOfDay smartNutritionTime;
 
   final bool waterRemindersEnabled;
   final int waterReminderIntervalHours;
@@ -43,8 +38,6 @@ class ReminderSettings {
 
   static ReminderSettings defaults() {
     return const ReminderSettings(
-      smartNutritionEnabled: true,
-      smartNutritionTime: TimeOfDay(hour: 16, minute: 0),
       waterRemindersEnabled: true,
       waterReminderIntervalHours: 2,
       waterReminderStartTime: TimeOfDay(hour: 8, minute: 0),
@@ -81,9 +74,6 @@ class ReminderSettings {
     TimeOfDay? activityReminderTime,
   }) {
     return ReminderSettings(
-      smartNutritionEnabled:
-          smartNutritionEnabled ?? this.smartNutritionEnabled,
-      smartNutritionTime: smartNutritionTime ?? this.smartNutritionTime,
       waterRemindersEnabled:
           waterRemindersEnabled ?? this.waterRemindersEnabled,
       waterReminderIntervalHours:
@@ -125,8 +115,6 @@ class ReminderSettings {
 
   Map<String, Object> toJson() {
     return {
-      'smartNutritionEnabled': smartNutritionEnabled,
-      'smartNutritionTime': _toMinutes(smartNutritionTime),
       'waterRemindersEnabled': waterRemindersEnabled,
       'waterReminderIntervalHours': waterReminderIntervalHours,
       'waterReminderStartTime': _toMinutes(waterReminderStartTime),
@@ -147,13 +135,6 @@ class ReminderSettings {
   factory ReminderSettings.fromJson(Map<String, dynamic> json) {
     final defaults = ReminderSettings.defaults();
     return ReminderSettings(
-      smartNutritionEnabled:
-          json['smartNutritionEnabled'] as bool? ??
-          defaults.smartNutritionEnabled,
-      smartNutritionTime: _fromMinutes(
-        json['smartNutritionTime'] as int? ??
-            _toMinutes(defaults.smartNutritionTime),
-      ),
       waterRemindersEnabled:
           json['waterRemindersEnabled'] as bool? ??
           defaults.waterRemindersEnabled,

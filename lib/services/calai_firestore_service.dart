@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/cupertino.dart';
@@ -567,7 +569,6 @@ class CalaiFirestoreService {
       'dailyProgress': {
         'steps': steps,
         'caloriesBurnedPerSteps': caloriesBurned,
-        'caloriesBurned': FieldValue.increment(caloriesBurned),
       },
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
@@ -649,6 +650,30 @@ class CalaiFirestoreService {
     await savedFoodCol.doc(id).delete();
   }
 
+  String generateCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    return List.generate(6, (index) => chars[Random().nextInt(chars.length)]).join();
+  }
+
+  // When saving the profile for the first time
+  Future<void> initializeUserReferral(String uid) async {
+    String newCode = generateCode();
+    
+    WriteBatch batch = _db.batch();
+    
+    batch.set(_db.collection('users').doc(uid), {
+      'referralCode': newCode,
+    }, SetOptions(merge: true));
+
+    batch.set(_db.collection('referrals').doc(newCode), {
+      'ownerUid': uid,
+      'usageCount': 0,
+      'redeemedUids': [],
+    });
+
+    await batch.commit();
+  }
+
   // --- Helpers ---
 
   String getWeekId(DateTime date) {
@@ -675,3 +700,52 @@ class CalaiFirestoreService {
 }
 
 final calaiServiceProvider = Provider((ref) => CalaiFirestoreService(ref));
+
+class ReferralService {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  Future<void> redeemReferralCode(String code, String currentUid) async {
+    final upperCode = code.trim().toUpperCase();
+    
+    // 1. Reference the referral document
+    DocumentReference refDoc = _db.collection('referrals').doc(upperCode);
+    
+    // 2. Use a Transaction to ensure both updates happen or none do
+    return _db.runTransaction((transaction) async {
+      DocumentSnapshot snapshot = await transaction.get(refDoc);
+
+      if (!snapshot.exists) {
+        throw Exception("Invalid referral code.");
+      }
+
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      String ownerUid = data['ownerUid'];
+
+      // Prevent self-referral
+      if (ownerUid == currentUid) {
+        throw Exception("You cannot use your own code.");
+      }
+
+      // Check if user already used this code
+      List redeemedUids = data['redeemedUids'] ?? [];
+      if (redeemedUids.contains(currentUid)) {
+        throw Exception("You have already used this code.");
+      }
+
+      // 3. Perform Updates
+      // Update the referral lookup doc
+      transaction.update(refDoc, {
+        'usageCount': FieldValue.increment(1),
+        'redeemedUids': FieldValue.arrayUnion([currentUid]),
+      });
+
+      // Update the current user doc
+      transaction.update(_db.collection('users').doc(currentUid), {
+        'referredBy': upperCode,
+        'referralStatus': 'completed',
+        // Optional: add reward points here
+        'points': FieldValue.increment(50), 
+      });
+    });
+  }
+}

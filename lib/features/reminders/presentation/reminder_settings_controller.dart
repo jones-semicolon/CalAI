@@ -78,18 +78,6 @@ class ReminderSettingsController extends AsyncNotifier<ReminderSettings> {
     await _scheduler.syncAll(settings: settings, goals: goals);
   }
 
-  Future<void> toggleSmartNutrition(bool enabled) async {
-    final current = await future;
-    final ready = await _ensurePermissionForToggle(
-      currentValue: current.smartNutritionEnabled,
-      nextValue: enabled,
-    );
-    if (!ready) {
-      return;
-    }
-    await saveAndReschedule(current.copyWith(smartNutritionEnabled: enabled));
-  }
-
   Future<void> setSmartNutritionTime(TimeOfDay value) async {
     final current = await future;
     await saveAndReschedule(current.copyWith(smartNutritionTime: value));

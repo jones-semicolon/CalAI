@@ -8,6 +8,10 @@
 	<string>Calai</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Cal AI needs access to your photo library to analyze previously taken food photos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Cal AI needs access to your camera to scan barcodes and identify food items.</string>
 	<key>GIDClientID</key>
     <string>530467491766-53nb81qnsc5eds4eb0mbot0m0jrpin0g.apps.googleusercontent.com</string>
     <key>CFBundleURLTypes</key>

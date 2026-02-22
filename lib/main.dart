@@ -1,6 +1,9 @@
 import 'package:calai/l10n/app_localizations.dart';
 import 'package:calai/onboarding/app_entry.dart';
+import 'package:calai/providers/entry_streams_provider.dart';
+import 'package:calai/providers/global_provider.dart';
 import 'package:calai/providers/reminder_provider.dart';
+import 'package:calai/providers/user_provider.dart';
 import 'package:calai/widgets/debug/debug_overlay.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -127,7 +130,18 @@ class _MyAppState extends State<MyApp> {
       builder: (context, child) {
         return Consumer(
           builder: (context, ref, _) {
+            ref.listen(userProvider, (previous, next) {
+              if (previous != null && previous.id.isNotEmpty && next.id.isEmpty) {
+                
+                ref.invalidate(globalDataProvider);
+                ref.invalidate(dailyEntriesProvider);
+                
+                debugPrint("Cleanup: User signed out, listeners closed.");
+              }
+            });
+
             ref.watch(reminderSyncProvider);
+
             return Stack(
               children: [
                 if (child != null) child,

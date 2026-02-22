@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:calai/providers/auth_state_providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,8 +34,8 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   CalaiFirestoreService get _service => ref.read(calaiServiceProvider);
 
   @override
-  FutureOr<GlobalDataState> build() {
-    // 1. Cleanup listeners when provider is destroyed
+  FutureOr<GlobalDataState> build() async {
+    // Cleanup when destroyed
     ref.onDispose(() {
       _dailyLogSub?.cancel();
       _historySub?.cancel();
@@ -42,12 +43,27 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       _userSub?.cancel();
     });
 
-    // 2. Automatically trigger init if not initialized
-    // This ensures that as soon as the UI watches this provider,
-    // it starts fetching data from Firestore.
-    Future.microtask(() => init());
+    // Wait for Firebase Auth to be fully initialized
+    final authAsync = ref.watch(authStateProvider);
+    final user = await authAsync.when(
+      data: (user) => user,
+      loading: () async {
+        // Wait a short moment until auth is ready
+        await Future.delayed(const Duration(milliseconds: 100));
+        return ref.watch(authStateProvider).value;
+      },
+      error: (_, __) => null,
+    );
 
-    return GlobalDataState.initial();
+    if (user == null) {
+      debugPrint("🔒 GlobalData disposed (no auth)");
+      return GlobalDataState.initial();
+    }
+
+    // Start Firestore initialization
+    await init();
+
+    return state.value ?? GlobalDataState.initial();
   }
 
   // ---------------------------------------------------------------------------
@@ -55,20 +71,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   // ---------------------------------------------------------------------------
 
   Future<void> init() async {
-    // 1. Wait until Auth is definitely ready
-    User? user = FirebaseAuth.instance.currentUser;
-
-    // If user is null, wait a bit (Auth state propagation can be slow)
-    if (user == null) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      user = FirebaseAuth.instance.currentUser;
-    }
-
-    if (user == null) {
-      debugPrint("⚠️ GlobalData: Aborting init. No authenticated user.");
-      return;
-    }
-
     if (state.asData?.value.isInitialized == true) return;
     state = const AsyncLoading();
 
@@ -102,6 +104,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
     _dailyLogSub?.cancel();
     _dailyLogSub = _service.dailyLogDoc(dateId).snapshots().listen((doc) {
+      if (!ref.mounted) return;
       final data = doc.data();
 
       // If doc doesn't exist yet, we don't clear the state,
@@ -122,6 +125,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     _weightSub = _service.weightHistory.snapshots().listen((snapshot) async {
       // ✅ If the document doesn't exist, initialize it
       if (!snapshot.exists) {
+        if (!ref.mounted) return;
         debugPrint("Weight history doc missing. Initializing...");
 
         // Get current weight from the user provider state
@@ -167,6 +171,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
     _historySub?.cancel();
     _historySub = _service.weeklyNutritionDoc.snapshots().listen((snapshot) {
+      if (!ref.mounted) return;
       final data = snapshot.data() ?? {};
       final String currentWeekId = _service.getWeekId(DateTime.now());
       final weekData = data[currentWeekId] as Map<String, dynamic>?;
@@ -247,6 +252,8 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
     final userNotifier = ref.read(userProvider.notifier);
 
+    userNotifier.updateLocal((state) => state.copyWith(id: doc.id));
+
     // Load Body Stats
     final body = data['body'] as Map<String, dynamic>? ?? {};
     if (body['height'] != null) {
@@ -267,6 +274,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
     _userSub?.cancel();
     _userSub = _service.userDoc.snapshots().listen((doc) {
+      if (!ref.mounted) return;
       final data = doc.data();
       if (data == null) return;
 
@@ -315,6 +323,20 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
         'createdAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
     }
+  }
+
+  Future<void> disposeListeners() async {
+    await _dailyLogSub?.cancel();
+    await _historySub?.cancel();
+    await _weightSub?.cancel();
+    await _userSub?.cancel();
+
+    _dailyLogSub = null;
+    _historySub = null;
+    _weightSub = null;
+    _userSub = null;
+
+    debugPrint("🔥 Firestore listeners stopped BEFORE logout");
   }
 
   Future<void> updateWater(int newWater) async {

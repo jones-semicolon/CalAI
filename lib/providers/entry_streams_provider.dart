@@ -1,11 +1,15 @@
+import 'package:calai/providers/auth_state_providers.dart';
+import 'package:calai/providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/food_model.dart';
 import '../services/calai_firestore_service.dart';
 
 // 1. Saved Foods Stream
-final savedFoodsStreamProvider = StreamProvider<List<Food>>((ref) {
+final savedFoodsStreamProvider =
+    StreamProvider.autoDispose<List<Food>>((ref) {
   final service = ref.watch(calaiServiceProvider);
 
   if (service.uid == null) return const Stream.empty();
@@ -25,15 +29,34 @@ final savedFoodsStreamProvider = StreamProvider<List<Food>>((ref) {
   });
 });
 
-// 2. Daily Entries Stream (Family allows passing dateId)
-final dailyEntriesProvider = StreamProvider.family<List<Map<String, dynamic>>, String>((ref, dateId) {
+final dailyEntriesProvider =
+    StreamProvider.autoDispose.family<List<Map<String, dynamic>>, String>(
+        (ref, dateId) {
+  final authAsync = ref.watch(authStateProvider);
+
+  // Only start the stream if auth is ready and user is signed in
+  if (!authAsync.hasValue || authAsync.value == null) {
+    return const Stream.empty();
+  }
+
   final service = ref.watch(calaiServiceProvider);
 
   if (service.uid == null) return const Stream.empty();
 
-  return service.dailyLogDoc(dateId)
+  return service
+      .dailyLogDoc(dateId)
       .collection('entries')
       .orderBy('timestamp', descending: true)
       .snapshots()
-      .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+      // Optional: catch permission errors gracefully
+      .handleError((error) {
+        if (error is FirebaseException && error.code == 'permission-denied') {
+          debugPrint(
+              'Swallowed Firestore permission-denied in dailyEntriesProvider.');
+        } else {
+          throw error;
+        }
+      })
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => doc.data()).toList());
 });

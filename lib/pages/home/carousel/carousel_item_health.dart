@@ -1,6 +1,5 @@
 import 'package:calai/pages/home/health_score/health_score_view.dart';
 import 'package:flutter/material.dart';
-import 'package:calai/core/constants/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../enums/food_enums.dart';
 import '../../../models/nutrition_model.dart';

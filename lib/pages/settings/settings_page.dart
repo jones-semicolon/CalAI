@@ -1,6 +1,11 @@
 import 'package:calai/enums/user_enums.dart';
 import 'package:calai/features/reminders/presentation/reminder_settings_section.dart';
+import 'package:calai/onboarding/app_entry.dart';
+import 'package:calai/onboarding/onboarding_page.dart';
 import 'package:calai/pages/settings/terms_feedback_section.dart';
+import 'package:calai/providers/auth_state_providers.dart' hide AuthService;
+import 'package:calai/providers/global_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,7 +52,7 @@ class SettingsPage extends ConsumerWidget { // ✅ Converted to ConsumerWidget f
                 // ✅ Unified Reminder UI
                 const ReminderSettingsSection(),
                 const SizedBox(height: 16),
-                TermsFeedbackSection(isAnonymous: isAnonymous ? UserProvider.anonymous : provider!),
+                TermsFeedbackSection(isAnonymous: isAnonymous ? UserProvider.anonymous : provider),
 
                 if (!isAnonymous) ...[
                   const SizedBox(height: 16),
@@ -83,22 +88,13 @@ class _LinkAccountButton extends ConsumerWidget {
         ),
         child: InkWell(
           onTap: () async {
-            try {
-              final result = await AuthService.linkGoogleAccount();
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => const Center(child: CircularProgressIndicator()),
+            );
 
-              // ✅ Check if the widget is still in the tree before using context
-              if (!context.mounted) return;
-
-              if (result != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Account successfully backed up!")),
-                );
-              }
-            } catch (e) {
-              // ✅ Check mounted again before calling error handler
-              if (!context.mounted) return;
-              _handleLinkingError(context, e);
-            }
+            await ref.read(authServiceProvider).logout();
           },
           borderRadius: BorderRadius.circular(16),
           child: Padding(

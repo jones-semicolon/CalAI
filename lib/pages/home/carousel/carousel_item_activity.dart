@@ -66,7 +66,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
     // 1. Watch progress from the Global Provider
     final globalState = ref.watch(globalDataProvider).value;
     final double stepsCalories = globalState?.todayProgress.caloriesBurnedPerSteps ?? 0;
-    final burned = (globalState?.todayProgress.caloriesBurned ?? 0) + stepsCalories;
+    final burned = (globalState?.todayProgress.caloriesBurned ?? 0);
 
     // 2. Watch the list of entries specifically for this date
     final entriesAsync = ref.watch(dailyEntriesProvider(dateId));
@@ -81,7 +81,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildBurnedHeader(theme, burned),
+          _buildBurnedHeader(theme, burned, stepsCalories),
           const SizedBox(height: 15),
 
           entriesAsync.when(
@@ -131,7 +131,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
   }
 }
 
-Widget _buildBurnedHeader(ThemeData theme, double burned) {
+Widget _buildBurnedHeader(ThemeData theme, double burned, double stepsCalories) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -149,7 +149,7 @@ Widget _buildBurnedHeader(ThemeData theme, double burned) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "${burned.round()}",
+              "${(burned + stepsCalories).round()}",
               style: TextStyle(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,

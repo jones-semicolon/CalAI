@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../../../../api/food_api.dart';
 import '../scanner_info/info_widget.dart';
 import 'scan_mode.dart';
 import 'camera_controller_service.dart';

@@ -89,23 +89,6 @@ class _ReminderSettingsContent extends ConsumerWidget {
         _divider(context),
         _switchRow(
           context: context,
-          title: 'Smart nutrition reminders',
-          subtitle:
-              'Daily reminder at ${_formatTime(context, settings.smartNutritionTime)}',
-          value: settings.smartNutritionEnabled,
-          onChanged: controller.toggleSmartNutrition,
-        ),
-        _timeAction(
-          context: context,
-          label: 'Set smart nutrition time',
-          value: settings.smartNutritionTime,
-          onPicked: (value) {
-            controller.setSmartNutritionTime(value);
-          },
-        ),
-        _divider(context),
-        _switchRow(
-          context: context,
           title: 'Water reminders',
           subtitle:
               'Every ${settings.waterReminderIntervalHours} hour(s) from ${_formatTime(context, settings.waterReminderStartTime)}',
