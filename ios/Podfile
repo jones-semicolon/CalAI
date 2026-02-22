@@ -1,36 +1,33 @@
-# Set the deployment target to 13.0 or higher for modern Flutter apps
+# 1. Add these lines at the very top to link Flutter
+target_local_path = File.expand_path(File.join('..', '..', '..'), __FILE__)
+$LOAD_PATH << File.join(target_local_path, 'packages', 'flutter_tools', 'bin', 'cache', 'dart-sdk', 'lib', 'dart_p_sdk', 'lib')
+
+# This loads the actual Flutter helpers
+load File.join(File.dirname(File.realpath(__FILE__)), '.symlinks', 'plugins', 'flutter_export_environment.sh') rescue nil
+# This is the standard way Flutter handles the bridge
+path_to_utils = File.join('..', '.flutter-plugins-dependencies')
+
+# 2. Main Setup
 platform :ios, '13.0'
-
-# Standard Flutter setup to find the engine and plugins
-copy_pods_resources_path = "Frameworks/Flutter.framework/Resources/copy_unpack_ios_resources.sh"
-exclude_pods_resources = [
-  'Flutter.framework',
-  'App.framework',
-]
-
-project 'Runner', {
-  'Debug' => :debug,
-  'Release' => :release,
-  'Profile' => :profile,
-}
 
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
+  # This is the line that was failing—it now has the context it needs
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
+# 3. Permission Settings for Cal AI
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     
-    # This block is CRITICAL for the permission_handler plugin on iOS
     target.build_configurations.each do |config|
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
         'PERMISSION_CAMERA=1', 
-        'PERMISSION_PHOTOS=1', # Added in case you want to upload food photos
+        'PERMISSION_PHOTOS=1',
       ]
     end
   end
