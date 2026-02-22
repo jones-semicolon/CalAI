@@ -1,17 +1,36 @@
+# Set the deployment target to 13.0 or higher for modern Flutter apps
 platform :ios, '13.0'
 
-# Standard Flutter setup
-insert_point = '## dart: [PermissionGroup.camera]'
+# Standard Flutter setup to find the engine and plugins
+copy_pods_resources_path = "Frameworks/Flutter.framework/Resources/copy_unpack_ios_resources.sh"
+exclude_pods_resources = [
+  'Flutter.framework',
+  'App.framework',
+]
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Release' => :release,
+  'Profile' => :profile,
+}
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    
+    # This block is CRITICAL for the permission_handler plugin on iOS
     target.build_configurations.each do |config|
-      # This is the critical part for permission_handler on iOS
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
-        'PERMISSION_CAMERA=1',
-        'PERMISSION_PHOTOS=1',
+        'PERMISSION_CAMERA=1', 
+        'PERMISSION_PHOTOS=1', # Added in case you want to upload food photos
       ]
     end
   end
