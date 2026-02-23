@@ -8,6 +8,7 @@ import 'carousel_item_health.dart';
 import '../../../providers/global_provider.dart'; // Import to get activeDateId
 
 const double _carouselHeight = 330;
+const int _carouselPageCount = 3;
 
 class CarouselView extends ConsumerStatefulWidget {
   final bool isTap;
@@ -37,20 +38,29 @@ class _CarouselViewState extends ConsumerState<CarouselView> {
   @override
   void initState() {
     super.initState();
-    _controller = PageController(initialPage: widget.currentIndex);
+    final safeInitialPage = widget.currentIndex.clamp(
+      0,
+      _carouselPageCount - 1,
+    );
+    _controller = PageController(initialPage: safeInitialPage);
   }
 
   @override
   void didUpdateWidget(CarouselView oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final safeIndex = widget.currentIndex.clamp(0, _carouselPageCount - 1);
     if (_controller.hasClients &&
-        widget.currentIndex != oldWidget.currentIndex &&
-        widget.currentIndex != _controller.page?.round()) {
-      _controller.animateToPage(
-        widget.currentIndex,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+        safeIndex != oldWidget.currentIndex &&
+        safeIndex != _controller.page?.round()) {
+      _controller
+          .animateToPage(
+            safeIndex,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          )
+          .catchError((_) {
+            // Ignore transient controller errors during rapid rebuilds.
+          });
     }
   }
 
@@ -61,14 +71,19 @@ class _CarouselViewState extends ConsumerState<CarouselView> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     // ✅ FIX 1: Only watch the specific data needed for this level (the ID)
     // This prevents a rebuild of the whole Carousel if water/calories change!
-    final activeDateId = ref.watch(globalDataProvider.select((async) => async.value?.activeDateId ?? ''));
+    final activeDateId = ref.watch(
+      globalDataProvider.select((async) => async.value?.activeDateId ?? ''),
+    );
 
     // ✅ FIX 2: Watch water separately using select
-    final currentWater = ref.watch(globalDataProvider.select((async) => async.value?.todayProgress.water ?? 0));
+    final currentWater = ref.watch(
+      globalDataProvider.select(
+        (async) => async.value?.todayProgress.water ?? 0,
+      ),
+    );
 
     final pages = [
       CarouselCalories(
@@ -103,10 +118,7 @@ class _CarouselViewState extends ConsumerState<CarouselView> {
           ),
         ),
         const SizedBox(height: 8),
-        PageIndicator(
-          count: pages.length,
-          activeIndex: widget.currentIndex,
-        ),
+        PageIndicator(count: pages.length, activeIndex: widget.currentIndex),
       ],
     );
   }

@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:calai/pages/home/floating_grid/food_database/food_database.dart';
+import 'package:calai/pages/home/floating_grid/camera/scan_screen.dart';
+import 'package:calai/pages/home/floating_grid/camera/camera_scanner/scan_mode.dart';
 
 import 'package:calai/theme/app_theme.dart';
 import 'package:calai/theme/theme_service.dart';
@@ -100,6 +102,26 @@ class _MyAppState extends State<MyApp> {
       navigator.push(
         MaterialPageRoute(
           builder: (_) => const FoodDatabasePage(),
+        ),
+      );
+      return;
+    }
+
+    if (destination == 'scan-food' ||
+        normalized == 'scan_food' ||
+        uri.path.contains('scan_food')) {
+      navigator.push(
+        MaterialPageRoute(
+          builder: (_) => const ScanScreen(initialMode: ScanMode.scanFood),
+        ),
+      );
+      return;
+    }
+
+    if (destination == 'barcode' || normalized == 'barcode') {
+      navigator.push(
+        MaterialPageRoute(
+          builder: (_) => const ScanScreen(initialMode: ScanMode.barcode),
         ),
       );
     }

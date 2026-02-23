@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="widget_label">Cal AI – Calorie Tracker</string>
-    <string name="widget_description">Calorie tracker widget\n2x2</string>
+    <string name="widget_label">Cal AI - Calorie Tracker</string>
+    <string name="widget_description">Calorie tracker widget</string>
+    <string name="widget_second_label">Cal AI - Nutrition Widget</string>
+    <string name="widget_second_description">Nutrition tracker widget</string>
+    <string name="widget_third_label">Cal AI - Streak Widget</string>
+    <string name="widget_third_description">Streak tracker widget</string>
 </resources>

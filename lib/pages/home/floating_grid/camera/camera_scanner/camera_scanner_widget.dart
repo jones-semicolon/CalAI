@@ -20,6 +20,7 @@ class CameraScannerWidget extends StatefulWidget {
   final ValueChanged<XFile>? onGalleryPicked;
   final ValueChanged<String>? onBarcodeCaptured;
   final ValueChanged<String>? onFoodLabelCaptured;
+  final ScanMode initialMode;
 
   const CameraScannerWidget({
     super.key,
@@ -27,6 +28,7 @@ class CameraScannerWidget extends StatefulWidget {
     this.onGalleryPicked,
     this.onBarcodeCaptured,
     this.onFoodLabelCaptured,
+    this.initialMode = ScanMode.scanFood,
   });
 
   @override
@@ -40,12 +42,13 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
   bool _ready = false;
   bool _flashOn = false;
 
-  ScanMode _mode = ScanMode.scanFood;
+  late ScanMode _mode;
   Rect? _normalizedFrame;
 
   @override
   void initState() {
     super.initState();
+    _mode = widget.initialMode;
     _init();
   }
 

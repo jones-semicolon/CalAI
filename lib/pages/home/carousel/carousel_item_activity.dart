@@ -68,7 +68,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
     final globalState = ref.watch(globalDataProvider).value;
     final burned = globalState?.todayProgress.caloriesBurned ?? 0;
     // TODO: it should be caloriesBurnedPerSteps
-    final stepsToday = globalState?.todayProgress.steps;
+    final stepsToday = (globalState?.todayProgress.steps ?? 0).round();
 
     // 2. Watch the list of entries specifically for this date using your StreamProvider.family
     final entriesAsync = ref.watch(dailyEntriesProvider(dateId));
@@ -95,32 +95,39 @@ class _CaloriesBurnedCard extends ConsumerWidget {
             data: (entries) {
               // Extract exercise logs from database entries
               // We filter out anything that looks like a "steps" log to avoid repetition
-              final List<ExerciseLog> exercises = entries
-                  .where((data) =>
-              data.containsKey('calories_burned') &&
-                  data['exercise_type'] != null &&
-                  data['source'] == SourceType.exercise.value)
-                  .map((data) => ExerciseLog.fromJson(data))
-                  .toList();
+              final List<ExerciseLog> exercises = [];
+              for (final data in entries) {
+                try {
+                  if (data.containsKey('calories_burned') &&
+                      data['exercise_type'] != null &&
+                      data['source'] == SourceType.exercise.value) {
+                    exercises.add(ExerciseLog.fromJson(data));
+                  }
+                } catch (_) {
+                  // Keep rendering even if one malformed entry exists.
+                }
+              }
 
               return Column(
                 children: [
                   // ✅ LOGGED STEPS: Always at the top, only one, hidden if 0
-                  if (stepsToday! > 0)
+                  if (stepsToday > 0)
                     _ActivityItemRow(
                       title: "Steps",
-                      value: "+${stepsToday.round()} cal",
+                      value: "+$stepsToday cal",
                       icon: Icons.directions_walk,
                     ),
 
                   // Map the remaining exercises (take top 2 if steps exist, or 3 if not)
                   ...exercises
                       .take(stepsToday > 0 ? 2 : 3)
-                      .map((ex) => _ActivityItemRow(
-                    title: ex.type.label,
-                    value: "+${ex.caloriesBurned.round()} kcal",
-                    icon: ex.type.icon,
-                  )),
+                      .map(
+                        (ex) => _ActivityItemRow(
+                          title: ex.type.label,
+                          value: "+${ex.caloriesBurned.round()} kcal",
+                          icon: ex.type.icon,
+                        ),
+                      ),
                 ],
               );
             },
@@ -158,10 +165,7 @@ Widget _buildBurnedHeader(ThemeData theme, num burned) {
             ),
             Text(
               "Calories Burned",
-              style: TextStyle(
-                color: theme.colorScheme.primary,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: theme.colorScheme.primary, fontSize: 12),
             ),
           ],
         ),
@@ -190,7 +194,10 @@ class _StepsTodayCard extends ConsumerWidget {
     );
   }
 
-  Future<void> _handlePermissionRequest(BuildContext context, WidgetRef ref) async {
+  Future<void> _handlePermissionRequest(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final permission = Platform.isIOS
         ? Permission.sensors
         : Permission.activityRecognition;
@@ -202,9 +209,9 @@ class _StepsTodayCard extends ConsumerWidget {
       ref.invalidate(stepTrackerProvider);
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Step tracking active!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Step tracking active!')));
       }
     } else if (status.isPermanentlyDenied) {
       openAppSettings();
@@ -256,9 +263,16 @@ class _WaterIntakeSection extends ConsumerWidget {
                   ),
                   const SizedBox(width: 5),
                   GestureDetector(
-                    onTap: () => _showWaterSettings(context, unitSystem), // ✅ Call the sheet
-                    child: Icon(Icons.settings_outlined, color: theme.colorScheme.onPrimary, size: 16),
-                  )
+                    onTap: () => _showWaterSettings(
+                      context,
+                      unitSystem,
+                    ), // ✅ Call the sheet
+                    child: Icon(
+                      Icons.settings_outlined,
+                      color: theme.colorScheme.onPrimary,
+                      size: 16,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -309,21 +323,31 @@ void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
 
                 // --- SERVING SIZE ROW ---
                 GestureDetector(
-                  onTap: () => setSheetState(() => isPickerVisible = !isPickerVisible),
+                  onTap: () =>
+                      setSheetState(() => isPickerVisible = !isPickerVisible),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 16,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
                           "Serving Size",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Row(
                           children: [
                             Text(
                               "$selectedValue ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
-                              style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.grey[800],
+                              ),
                             ),
                           ],
                         ),
@@ -339,12 +363,15 @@ void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
                     height: 120,
                     child: CupertinoPicker(
                       itemExtent: 40,
-                      scrollController: FixedExtentScrollController(initialItem: 0),
+                      scrollController: FixedExtentScrollController(
+                        initialItem: 0,
+                      ),
                       onSelectedItemChanged: (index) {
                         setSheetState(() => selectedValue = 8 + index);
                       },
-                      children: List.generate(20, (index) =>
-                          Center(child: Text("${8 + index}"))
+                      children: List.generate(
+                        20,
+                        (index) => Center(child: Text("${8 + index}")),
                       ),
                     ),
                   ),
@@ -395,13 +422,12 @@ Widget _buildSheetHeader(BuildContext context) {
         child: Text(
           "Water settings",
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
-      const SizedBox(width: 40), // Balances the X button so title stays centered
+      const SizedBox(
+        width: 40,
+      ), // Balances the X button so title stays centered
     ],
   );
 }
@@ -575,7 +601,8 @@ class ActivityCard extends ConsumerWidget {
               Text(
                 "/${goalValue.round()}",
                 style: TextStyle(
-                  color: theme.colorScheme.onSurfaceVariant, // Better visibility
+                  color:
+                      theme.colorScheme.onSurfaceVariant, // Better visibility
                   fontSize: 14,
                 ),
               ),
@@ -596,7 +623,8 @@ class ActivityCard extends ConsumerWidget {
                     child: CircularProgressIndicator(
                       value: progress.clamp(0.0, 1.0),
                       strokeWidth: 8, // Slightly thicker for a premium feel
-                      strokeCap: StrokeCap.round, // Makes the progress bar look modern
+                      strokeCap:
+                          StrokeCap.round, // Makes the progress bar look modern
                       backgroundColor: theme.splashColor,
                       color: primaryColor,
                     ),

@@ -190,6 +190,17 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
         dailyNutrition: nutritionLogs,
         progressDays: progressDays,
       ));
+
+      if (!kIsWeb) {
+        final streakCount = _calculateStreakFromProgressDays(progressDays);
+        unawaited(() async {
+          await HomeWidgetService.saveStreakWidgetData(
+            streakCount: streakCount,
+            dateId: _service.todayId,
+          );
+          await HomeWidgetService.updateWidget(dateId: _service.todayId);
+        }());
+      }
     });
   }
   /// Allows UI to switch dates on the dashboard
@@ -202,6 +213,37 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   // ---------------------------------------------------------------------------
   // 4. DATA SYNC HELPERS
   // ---------------------------------------------------------------------------
+
+  int _calculateStreakFromProgressDays(Set<String> progressDays) {
+    final daysOrder = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+    ];
+
+    final week = List<bool>.generate(
+      7,
+          (i) => progressDays.contains(daysOrder[i]),
+    );
+
+    if (week.length != 7) return 0;
+    final today = DateTime.now().weekday % 7;
+
+    var streak = 0;
+    for (var i = today; i >= 0; i--) {
+      if (week[i]) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+
+    return streak;
+  }
 
   void _applyDailyLogToState(Map<String, dynamic> data, String dateId) {
     final progress = NutritionProgress.fromDailyLog(data);
@@ -228,12 +270,20 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       num effectiveGoal = baseGoal;
       if (isRolloverEnabled) effectiveGoal += goals.rollover;
       if (isAddBurnEnabled) effectiveGoal += progress.caloriesBurned;
+      final streakCount = _calculateStreakFromProgressDays(current.progressDays);
 
       unawaited(() async {
         await HomeWidgetService.saveCalorieWidgetData(
           calories: progress.calories.round(),
           calorieGoal: effectiveGoal.round(),
           dateId: dateId,
+          protein: progress.protein.round(),
+          proteinGoal: goals.protein.round(),
+          carbs: progress.carbs.round(),
+          carbsGoal: goals.carbs.round(),
+          fats: progress.fats.round(),
+          fatsGoal: goals.fats.round(),
+          streakCount: streakCount,
         );
         await HomeWidgetService.updateWidget(dateId: dateId);
       }());

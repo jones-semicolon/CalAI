@@ -44,8 +44,9 @@
                     android:layout_height="wrap_content"
                     android:autoSizeTextType="uniform"
                     android:autoSizeMaxTextSize="32sp"
-                    android:autoSizeMinTextSize="18sp"
+                    android:autoSizeMinTextSize="10sp"
                     android:autoSizeStepGranularity="1sp"
+                    android:maxLines="1"
                     android:text="2135"
                     android:textColor="@color/widget_primary"
                     android:textStyle="bold" />
@@ -107,5 +108,4 @@
             android:textStyle="bold"
             android:layout_gravity="center_vertical" />
     </LinearLayout>
-
 </LinearLayout>

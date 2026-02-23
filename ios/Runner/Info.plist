@@ -20,6 +20,14 @@
                 <string>com.googleusercontent.apps.530467491766-53nb81qnsc5eds4eb0mbot0m0jrpin0g</string>
             </array>
         </dict>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>calai</string>
+            </array>
+        </dict>
     </array>
 	<key>NSCameraUsageDescription</key>
 	<string>Cal AI needs camera access to scan food, labels, and barcodes.</string>

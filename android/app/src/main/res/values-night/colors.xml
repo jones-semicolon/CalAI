@@ -10,4 +10,30 @@
     <color name="widget_cta_text">#111111</color>
     <color name="widget_cta_icon_bg">#2F2935</color>
     <color name="widget_cta_icon_tint">#F4F4F8</color>
+
+    <color name="widget2_primary">#FFFFFF</color>
+    <color name="widget2_secondary">#B0B0B5</color>
+    <color name="widget2_track">#3A3A3C</color>
+    <color name="widget2_background">#2F2935</color>
+    <color name="widget2_border">#3A3A3C</color>
+    <color name="widget2_cta_icon_bg">#2F2935</color>
+    <color name="widget2_cta_icon_tint">#F4F4F8</color>
+    <color name="widget2_panel_bg">#2F2935</color>
+    <color name="widget2_panel_border">#3A3A3C</color>
+    <color name="widget2_action_bg">#F4F4F8</color>
+    <color name="widget2_action_border">#3A3A3C</color>
+    <color name="widget2_divider">#3A3A3C</color>
+    <color name="widget2_text_primary">#FFFFFF</color>
+    <color name="widget2_text_secondary">#B0B0B5</color>
+    <color name="widget2_nutrient_protein">#DD6969</color>
+    <color name="widget2_nutrient_carbs">#DE9A69</color>
+    <color name="widget2_nutrient_fats">#6998DE</color>
+
+    <color name="widget3_background">#2F2935</color>
+    <color name="widget3_border">#3A3A3C</color>
+    <color name="widget3_inner">#2F2935</color>
+    <color name="widget3_star_primary">#F8E7A8</color>
+    <color name="widget3_star_secondary">#F2B57F</color>
+    <color name="widget3_streak_outline">#F6A73F</color>
+    <color name="widget3_streak_fill">#111111</color>
 </resources>

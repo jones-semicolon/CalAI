@@ -19,7 +19,8 @@ class HomeBody extends ConsumerStatefulWidget {
   ConsumerState<HomeBody> createState() => _HomeBodyState();
 }
 
-class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClientMixin {
+class _HomeBodyState extends ConsumerState<HomeBody>
+    with AutomaticKeepAliveClientMixin {
   bool _isTap = false;
   int _currentIndex = 0;
 
@@ -32,10 +33,20 @@ class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClie
 
     // ✅ OPTIMIZATION: Use .select to watch only specific properties.
     // This prevents the entire HomeBody from rebuilding when unrelated data changes.
-    final activeDateId = ref.watch(globalDataProvider.select((async) => async.value?.activeDateId ?? ''));
-    final calorieGoal = ref.watch(globalDataProvider.select((async) => async.value?.todayGoal.calories.toDouble() ?? 0.0));
-    final progressDays = ref.watch(globalDataProvider.select((async) => async.value?.progressDays ?? {}));
-    final dailyNutrition = ref.watch(globalDataProvider.select((async) => async.value?.dailyNutrition ?? []));
+    final activeDateId = ref.watch(
+      globalDataProvider.select((async) => async.value?.activeDateId ?? ''),
+    );
+    final calorieGoal = ref.watch(
+      globalDataProvider.select(
+        (async) => async.value?.todayGoal.calories.toDouble() ?? 0.0,
+      ),
+    );
+    final progressDays = ref.watch(
+      globalDataProvider.select((async) => async.value?.progressDays ?? {}),
+    );
+    final dailyNutrition = ref.watch(
+      globalDataProvider.select((async) => async.value?.dailyNutrition ?? []),
+    );
 
     return CustomScrollView(
       // ✅ Optimization: Using slivers properly reduces the layout passes
@@ -67,14 +78,14 @@ class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClie
                   // ✅ Optimization: RepaintBoundary helps cache complex UI layers (shadows/gradients)
                   RepaintBoundary(
                     child: CarouselView(
-                      key: ValueKey(activeDateId), // ✅ Keeps state tied to the date
+                      key: ValueKey(
+                        activeDateId,
+                      ), // ✅ Keeps state tied to the date
                       isTap: _isTap,
                       onTap: _toggleTap,
                       currentIndex: _currentIndex,
                       onPageChanged: _onPageChanged,
-                      date: activeDateId.isNotEmpty
-                          ? DateTime.parse(activeDateId)
-                          : DateTime.now(),
+                      date: _safeParseDate(activeDateId) ?? DateTime.now(),
                       onWaterChange: (_) {},
                     ),
                   ),
@@ -84,9 +95,7 @@ class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClie
                   // --- RECENTLY LOGGED ---
                   // ✅ Optimization: RecentlyUploadedSection should use its own providers
                   // to keep this parent widget even lighter.
-                  RecentlyUploadedSection(
-                    dateId: activeDateId,
-                  ),
+                  RecentlyUploadedSection(dateId: activeDateId),
 
                   const SizedBox(height: 50),
                 ],
@@ -100,13 +109,19 @@ class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClie
 
   @override
   bool get wantKeepAlive => true;
+
+  DateTime? _safeParseDate(String dateId) {
+    if (dateId.isEmpty) return null;
+    return DateTime.tryParse(dateId);
+  }
 }
 
 // ------------------------------------------------------------
 // LOG ITEM FACTORY
 // ------------------------------------------------------------
 
-Widget buildLogItem(Map<String, dynamic> data, {VoidCallback? onDelete}) {  final source = data['source'] as String? ?? 'unknown';
+Widget buildLogItem(Map<String, dynamic> data, {VoidCallback? onDelete}) {
+  final source = data['source'] as String? ?? 'unknown';
 
   // 1. Check for Exercise
   if (source == 'exercise' || data.containsKey('caloriesBurned')) {
@@ -117,11 +132,10 @@ Widget buildLogItem(Map<String, dynamic> data, {VoidCallback? onDelete}) {  fina
   }
 
   // 2. Check for Food
-  if (source == 'food-database' || source == 'food-upload' || data.containsKey('calories')) {
-    return FoodLogCard(
-      food: FoodLog.fromJson(data),
-      onDelete: onDelete,
-    );
+  if (source == 'food-database' ||
+      source == 'food-upload' ||
+      data.containsKey('calories')) {
+    return FoodLogCard(food: FoodLog.fromJson(data), onDelete: onDelete);
   }
 
   return const SizedBox.shrink();

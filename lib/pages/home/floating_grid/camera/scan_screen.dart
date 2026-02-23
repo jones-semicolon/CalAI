@@ -7,9 +7,15 @@ import '../../../../enums/food_enums.dart';
 import '../../../../models/food_model.dart';
 import '../../../../services/calai_firestore_service.dart';
 import 'camera_scanner/camera_scanner_widget.dart';
+import 'camera_scanner/scan_mode.dart';
 
 class ScanScreen extends ConsumerStatefulWidget {
-  const ScanScreen({super.key});
+  final ScanMode initialMode;
+
+  const ScanScreen({
+    super.key,
+    this.initialMode = ScanMode.scanFood,
+  });
 
   @override
   ConsumerState<ScanScreen> createState() => _ScanScreenState();
@@ -151,6 +157,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
         children: [
           // The Camera Scanner
           CameraScannerWidget(
+            initialMode: widget.initialMode,
             onImageCaptured: (image) => _handleVisionScan(image.path),
             onBarcodeCaptured: (barcode) => _handleBarcode(barcode),
             onFoodLabelCaptured: (text) => _handleLabelScan(text),
