@@ -2,7 +2,6 @@ import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/user_provider.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import '../../widgets/profile_widgets/birthday_picker_widget.dart';
 
@@ -16,14 +15,11 @@ class OnboardingStep7 extends ConsumerStatefulWidget {
 }
 
 class _OnboardingStep7State extends ConsumerState<OnboardingStep7> {
-  // We keep a temporary local state while the user is scrolling
-  // so we don't spam the provider with every tiny scroll movement.
   late DateTime selectedBirthday;
 
   @override
   void initState() {
     super.initState();
-    // Load the existing birthday from the provider
     selectedBirthday = ref.read(userProvider).profile.birthDate!;
   }
 
@@ -40,7 +36,6 @@ class _OnboardingStep7State extends ConsumerState<OnboardingStep7> {
 
           Spacer(),
 
-          /// 🎂 Birthday Picker
           BirthdayPickerWidget(
             initialDate: selectedBirthday,
             onChanged: (date) {
@@ -52,22 +47,6 @@ class _OnboardingStep7State extends ConsumerState<OnboardingStep7> {
 
           const Spacer(),
 
-          // SizedBox(
-          //   width: double.infinity,
-          //   child: ContinueButton(
-          //     enabled: true, // Birthday is never null based on your provider default
-          //     onNext: () {
-          //       // Finalize the selection in Riverpod
-          //       ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(profile: s.profile.copyWith(birthDay: selectedBirthday)));
-          //
-          //       debugPrint(
-          //         'Birthday: ${selectedBirthday.toIso8601String()}',
-          //       );
-          //
-          //       widget.nextPage();
-          //     },
-          //   ),
-          // ),
           ConfirmationButtonWidget(onConfirm: () {
             // Finalize the selection in Riverpod
             ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(profile: s.profile.copyWith(birthDate: selectedBirthday)));

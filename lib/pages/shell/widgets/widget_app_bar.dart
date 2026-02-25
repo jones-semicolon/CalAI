@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // Add this
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/widgets/radial_background/radial_background.dart';
-// Import your navigation provider
 import '../../../providers/navigation_provider.dart';
-import '../../home/widgets/day_streak.dart';
 import 'app_title.dart';
 import 'generic_app_bar_title.dart';
 import 'streak_indicator_button.dart';
 
-class WidgetTreeAppBar extends ConsumerWidget { // Changed to ConsumerWidget
+class WidgetTreeAppBar extends ConsumerWidget {
   const WidgetTreeAppBar({super.key});
 
   @override
@@ -38,7 +36,6 @@ class WidgetTreeAppBar extends ConsumerWidget { // Changed to ConsumerWidget
           surfaceTintColor: Colors.transparent,
           centerTitle: false,
 
-          // Simplified: No more ValueListenableBuilder
           title: _getAppBarTitle(pageIndex),
         );
       },

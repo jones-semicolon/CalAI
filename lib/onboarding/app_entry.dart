@@ -15,15 +15,11 @@ class AppEntry extends StatefulWidget {
 }
 
 class _AppEntryState extends State<AppEntry> {
-  bool _loading = true;
-  bool _onboardingCompleted = false;
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // ✅ WAIT for Firebase Auth restoration
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CupertinoActivityIndicator(radius: 15)),
@@ -32,12 +28,10 @@ class _AppEntryState extends State<AppEntry> {
 
         final user = snapshot.data;
 
-        // ✅ Not logged in
         if (user == null) {
           return const OnboardingPage(startIndex: 0);
         }
 
-        // ✅ Logged in → check onboarding
         return FutureBuilder<bool>(
           future: _checkOnboarding(user),
           builder: (context, onboardingSnap) {
@@ -69,7 +63,6 @@ class _AppEntryState extends State<AppEntry> {
           .get();
 
       final data = doc.data();
-      // ✅ Change this: Only complete if the specific flag is true
       final isDone = data?['profile']?['onboardingCompleted'] == true;
 
       if (isDone) {

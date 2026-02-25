@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import '../models/exercise_model.dart';
 import '../services/calai_firestore_service.dart';
 

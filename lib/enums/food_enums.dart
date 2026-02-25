@@ -1,5 +1,3 @@
-import 'package:calai/models/nutrition_model.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 enum SourceType {

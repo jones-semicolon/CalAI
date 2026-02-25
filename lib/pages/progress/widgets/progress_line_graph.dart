@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:calai/enums/food_enums.dart';
 import 'package:calai/enums/user_enums.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +13,6 @@ import 'package:calai/pages/progress/widgets/progress_message_pill.dart';
 import 'package:calai/pages/progress/widgets/time_range_selector.dart';
 
 import '../screens/goal_picker_view.dart';
-import '../screens/weight_picker_view.dart';
 
 class ProgressGraph extends StatefulWidget {
   final TimeRange selectedRange;
@@ -41,7 +39,6 @@ class ProgressGraph extends StatefulWidget {
 }
 
 class _ProgressGraphState extends State<ProgressGraph> {
-  // ✅ Track touch state to toggle colors
   bool _isTouched = false;
 
   // ----------------------------
@@ -69,13 +66,11 @@ class _ProgressGraphState extends State<ProgressGraph> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ 1. Check if we have real data
     final bool hasNoData = widget.logs.isEmpty;
     final MeasurementUnit unitSystem = widget.unitSystem ?? MeasurementUnit.metric;
 
     final double goalWeightDisplay = unitSystem.metricToDisplay(widget.goalWeight);
 
-    // ✅ 2. Create placeholder values if empty
     final List<double> weights = hasNoData
         ? [goalWeightDisplay, goalWeightDisplay]
         : widget.logs.map<double>((e) => unitSystem.metricToDisplay((e.weight as num).toDouble())).toList();
@@ -122,7 +117,6 @@ class _ProgressGraphState extends State<ProgressGraph> {
                   onEdit: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GoalPickerView()))
               ),
               const SizedBox(height: 16),
-              // ✅ 3. Stack the Chart with a "No Data" label if needed
               SizedBox(
                 height: 250,
                 child: Stack(
@@ -164,12 +158,11 @@ class _ProgressGraphState extends State<ProgressGraph> {
     final yMin = (minY / yStep).floor() * yStep;
     final yMax = (maxY / yStep).ceil() * yStep;
 
-    // ✅ Keep maxXValue as an exact integer (the last index)
     final double maxXValue = isSinglePoint ? 1.0 : (widget.logs.length - 1).toDouble();
 
     return LineChartData(
       minX: 0,
-      maxX: maxXValue, // ✅ Strict boundary: No +0.1 here
+      maxX: maxXValue,
       minY: yMin,
       maxY: yMax,
       clipData: const FlClipData.all(),
@@ -192,7 +185,6 @@ class _ProgressGraphState extends State<ProgressGraph> {
     return LineTouchData(
       enabled: true,
       handleBuiltInTouches: true,
-      // ✅ Toggle _isTouched state based on interaction
       touchCallback: (FlTouchEvent event, LineTouchResponse? response) {
         if (!event.isInterestedForInteractions || response == null || response.lineBarSpots == null) {
           setState(() => _isTouched = false);
@@ -203,29 +195,25 @@ class _ProgressGraphState extends State<ProgressGraph> {
       getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
         return spotIndexes.map((spotIndex) {
           return TouchedSpotIndicatorData(
-            // 1. Style the vertical line
             FlLine(
-              strokeWidth: 2, // Adjust thickness here
-              // ✅ Setting gradient instead of color to create the fade effect
+              strokeWidth: 2,
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.green.withOpacity(0.8), // Start color (solid-ish)
-                  Colors.green.withOpacity(0.0), // End color (fully transparent)
+                  Colors.green.withOpacity(0.8),
+                  Colors.green.withOpacity(0.0),
                 ],
               ),
-              // ✅ dashArray is removed or set to null to make the line solid
               dashArray: null,
             ),
-            // 2. Style the dot at the point
             FlDotData(
               getDotPainter: (spot, percent, barData, index) {
                 return FlDotCirclePainter(
                   radius: 4,
                   color: Colors.white,
                   strokeWidth: 2,
-                  strokeColor: Colors.green, // Border around the dot
+                  strokeColor: Colors.green,
                 );
               },
             ),
@@ -242,7 +230,6 @@ class _ProgressGraphState extends State<ProgressGraph> {
 
             double getDisplay(double val) {
               double converted = widget.unitSystem?.metricToDisplay(val) ?? val;
-              // Rounds to 2 decimal places
               return double.parse(converted.toStringAsFixed(2));
             }
 
@@ -368,9 +355,9 @@ class _ProgressGraphState extends State<ProgressGraph> {
               child: Transform.translate(
                 offset: Offset(
                   i == 0
-                      ? 0 // push first label right
+                      ? 0 
                       : i == widget.logs.length - 1
-                      ? -18 // push last label left
+                      ? -18 
                       : 0,
                   0,
                 ),

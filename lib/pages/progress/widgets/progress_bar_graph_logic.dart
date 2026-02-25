@@ -62,7 +62,7 @@ class ProgressBarGraphLogic {
   // --- Computed Properties for the UI --- //
 
   double get totalCalories =>
-      filteredLogs.fold(0.0, (s, e) => s + e.kc.toDouble());
+      filteredLogs.fold(0.0, (s, e) => s + e.kc);
 
   double percentageOfTarget(double dailyGoal) {
     final weeklyTarget = dailyGoal * 7;

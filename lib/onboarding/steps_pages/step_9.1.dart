@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
-import '../onboarding_widgets/continue_button.dart';
-import '../onboarding_widgets/weight_picker/weight_selection_view.dart';
 
 class WeightPickerPage extends ConsumerWidget {
   final VoidCallback nextPage;
@@ -25,7 +23,6 @@ class WeightPickerPage extends ConsumerWidget {
 
           const Spacer(),
 
-          // const WeightSelectionView(),
           WeightPicker(
             initialWeight: user.goal.type == Goal.loseWeight ? user.body.currentWeight - 5 : user.body.currentWeight + 5,
             referenceWeight: user.body.currentWeight,

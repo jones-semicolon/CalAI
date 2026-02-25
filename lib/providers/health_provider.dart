@@ -69,7 +69,7 @@ final stepTrackerProvider = Provider<void>((ref) {
 
         service.syncSteps(
           stepsToday,
-          currentWeight: user?.body.currentWeight
+          currentWeight: user.body.currentWeight
         );
       }
     });

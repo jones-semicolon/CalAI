@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../enums/user_enums.dart';
 import '../../../providers/global_provider.dart';
 import '../../../providers/user_provider.dart';
-import '../screens/bmi_info_view.dart';
 
 class ProgressBmiCard extends ConsumerWidget {
   final BoxDecoration? decoration;
@@ -17,7 +16,7 @@ class ProgressBmiCard extends ConsumerWidget {
   const ProgressBmiCard({super.key, this.decoration, this.hasPadding = true, this.onTap});
 
   int _calculateAge(DateTime? birthDate) {
-    if (birthDate == null) return 0; // Guard for null birthDate
+    if (birthDate == null) return 0;
     final today = DateTime.now();
     var age = today.year - birthDate.year;
 
@@ -39,8 +38,6 @@ class ProgressBmiCard extends ConsumerWidget {
     final user = ref.watch(userProvider);
     final globalAsync = ref.watch(globalDataProvider);
 
-    // ✅ MODIFIED GUARD: Only hide if we can't do the math (Weight/Height)
-    // We provide a fallback for gender/birthday so the card still shows.
     if (user.body.height == 0 || user.body.currentWeight == 0) {
       return const SizedBox.shrink();
     }
@@ -100,9 +97,9 @@ class ProgressBmiCard extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               FittedBox(
-                fit: BoxFit.scaleDown, // Ensures it only scales down if it overflows
+                fit: BoxFit.scaleDown,
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center, // Aligns items vertically
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       bmi.isFinite ? bmi.toStringAsFixed(2) : "0.00",
@@ -112,7 +109,7 @@ class ProgressBmiCard extends ConsumerWidget {
                         color: theme.colorScheme.primary,
                       ),
                     ),
-                    const SizedBox(width: 8), // Replaces Wrap spacing
+                    const SizedBox(width: 8), 
                     Text(
                       'Your weight is',
                       style: TextStyle(
@@ -120,7 +117,7 @@ class ProgressBmiCard extends ConsumerWidget {
                         color: theme.shadowColor,
                       ),
                     ),
-                    const SizedBox(width: 8), // Replaces Wrap spacing
+                    const SizedBox(width: 8), 
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
@@ -135,7 +132,7 @@ class ProgressBmiCard extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8), // Replaces Wrap spacing
+                    const SizedBox(width: 8), 
                     GestureDetector(
                       onTap: onTap,
                       child: Icon(
@@ -159,13 +156,13 @@ class ProgressBmiCard extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: FittedBox(
-                  fit: BoxFit.scaleDown, // Shrinks the content only if it's too wide
-                  alignment: Alignment.centerLeft, // Keeps the legends starting from the left
+                  fit: BoxFit.scaleDown, 
+                  alignment: Alignment.centerLeft, 
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       BmiLegend(color: BmiCalculator.blue, label: 'Underweight'),
-                      const SizedBox(width: 8), // Replaces 'spacing' from Wrap
+                      const SizedBox(width: 8), 
                       BmiLegend(color: BmiCalculator.green, label: 'Healthy'),
                       const SizedBox(width: 8),
                       BmiLegend(color: BmiCalculator.orange, label: 'Overweight'),

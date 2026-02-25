@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-// Project Imports
 import 'package:calai/api/food_api.dart';
 import 'package:calai/models/food_model.dart';
 import 'package:calai/pages/home/recently_logged/logged_view/logged_food_view.dart';
@@ -97,7 +96,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
   }
 
   void _onUnsaveFood(Food item) async {
-    final originalItems = _suggestedFoods; // For optimistic rollback if needed
+    final originalItems = _suggestedFoods;
     try {
       await ref.read(calaiServiceProvider).unsaveFood(item.id);
       if (mounted) {

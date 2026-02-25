@@ -10,9 +10,7 @@ class FoodApi {
   static const _domain = _isLocal ? "10.0.2.2" : "cal-ai-liard.vercel.app";
   static const _port = 3000;
 
-  // Use this to build your URI
     static const _host = "$_domain:$_port";
-  /// ✅ GET /food?id=1,2,3
   static Future<List<Food>> getFoodsByIds(List<String> ids) async {
     if (ids.isEmpty) return [];
 

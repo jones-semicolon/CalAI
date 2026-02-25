@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../pages/auth/auth.dart';
-import '../../pages/shell/widget_tree.dart';
 import '../onboarding_widgets/create_account.dart';
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/subscription_page.dart';

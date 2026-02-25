@@ -1,10 +1,7 @@
-import 'package:calai/widgets/profile_widgets/unit_toggle.dart';
-import 'package:calai/widgets/circle_back_button.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
 import 'package:calai/widgets/weight_picker_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../providers/user_provider.dart';

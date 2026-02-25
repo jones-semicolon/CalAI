@@ -70,7 +70,6 @@ class _CaloriesBurnedCard extends ConsumerWidget {
     final burned = (globalState?.todayProgress.caloriesBurned ?? 0);
 
     final entriesAsync = ref.watch(dailyEntriesProvider(dateId));
-    debugPrint("Watching dailyEntriesProvider for dateId: $dateId, current state: ${entriesAsync.asData?.value.length ?? 'loading'} entries");
 
     return Container(
       padding: const EdgeInsets.all(16),

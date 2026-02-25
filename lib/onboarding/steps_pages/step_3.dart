@@ -1,12 +1,9 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 
 class OnboardingStep3 extends ConsumerStatefulWidget {
@@ -86,39 +83,6 @@ class _OnboardingStep3State extends ConsumerState<OnboardingStep3> {
               ],
             ),
           ),
-
-          // SizedBox(
-          //   width: double.infinity,
-          //   child: ContinueButton(
-          //     enabled: isEnable,
-          //     onNext: () async {
-          //       // if (selectedIndex != null) {
-          //       //   final selectedOption = options[selectedIndex!].title;
-          //       //   final uid = FirebaseAuth.instance.currentUser?.uid;
-          //       //
-          //       //   if (uid != null) {
-          //       //     // ✅ DIRECT TO FIRESTORE: Save marketing data to a separate collection
-          //       //     // We don't save this to the User model to keep the health data clean.
-          //       //     try {
-          //       //       await FirebaseFirestore.instance
-          //       //           .collection('onboarding_surveys')
-          //       //           .doc(uid)
-          //       //           .set({
-          //       //         'socialSource': selectedOption,
-          //       //         'surveyStep': 3,
-          //       //         'updatedAt': FieldValue.serverTimestamp(),
-          //       //       }, SetOptions(merge: true));
-          //       //
-          //       //       debugPrint('Successfully saved social source: $selectedOption');
-          //       //     } catch (e) {
-          //       //       debugPrint('Error saving social source: $e');
-          //       //     }
-          //       //   }
-          //       // }
-          //       widget.nextPage();
-          //     },
-          //   ),
-          // ),
           ConfirmationButtonWidget(onConfirm: widget.nextPage, enabled: isEnable,)
         ],
       ),

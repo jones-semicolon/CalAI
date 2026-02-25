@@ -3,7 +3,6 @@ import 'package:calai/pages/auth/auth.dart';
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:intl/intl.dart';
 import '../enums/food_enums.dart';

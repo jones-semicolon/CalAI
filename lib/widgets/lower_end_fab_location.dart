@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:calai/core/constants/constants.dart';
 
 /// A custom FloatingActionButtonLocation that allows you to
 /// offset the FAB lower and/or horizontally from its default `endFloat` position.

@@ -1,6 +1,5 @@
 import 'package:calai/enums/food_enums.dart';
 import 'package:calai/enums/user_enums.dart';
-import 'package:calai/models/nutrition_model.dart';
 import 'package:calai/providers/global_provider.dart';
 import 'package:calai/providers/user_provider.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
@@ -353,7 +352,7 @@ class _ProgressIndicator extends StatelessWidget {
 String getHealthStatus(double score) {
   if (score == 0) return "Not evaluated";
   if (score <= 3) return "Critically low";
-  if (score <= 5) return "Needs improvement"; // ✅ Matches your current 4/10
+  if (score <= 5) return "Needs improvement";
   if (score <= 7) return "Fair progress";
   if (score <= 9) return "Good health";
   return "Excellent health";

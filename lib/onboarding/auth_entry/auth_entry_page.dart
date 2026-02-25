@@ -1,7 +1,5 @@
 import 'package:calai/onboarding/auth_entry/sign_in_sheet.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../pages/auth/auth.dart';
 import '../../widgets/language_card.dart';
 
 class AuthEntryPage extends StatefulWidget {

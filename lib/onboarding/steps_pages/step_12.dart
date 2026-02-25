@@ -1,6 +1,5 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
-import '../onboarding_widgets/continue_button.dart';
 
 class OnboardingStep12 extends StatelessWidget {
   final VoidCallback nextPage;
@@ -43,7 +42,6 @@ class OnboardingStep12 extends StatelessWidget {
 
                 const SizedBox(height: 48),
 
-                /// Privacy Card
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 20),

@@ -1,6 +1,5 @@
 import 'package:calai/pages/home/floating_grid/log_exercise/run_page.dart';
 import 'package:calai/pages/home/floating_grid/log_exercise/weight_lifting_page.dart';
-import 'package:calai/widgets/circle_back_button.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../widgets/header_widget.dart';

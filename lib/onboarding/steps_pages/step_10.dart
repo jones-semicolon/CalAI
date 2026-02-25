@@ -5,7 +5,6 @@ import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -59,7 +58,6 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
         children: [
           Header(title: 'What would you like to accomplish?'),
 
-          /// SCROLLABLE CONTENT
           Expanded(
             child: CustomScrollView(
               slivers: [

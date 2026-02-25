@@ -1,5 +1,3 @@
-// models/nutrition_model.dart
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class Nutrition {
@@ -40,12 +38,11 @@ class NutritionGoals extends Nutrition {
     super.sodium,
     super.water,
     super.steps = 10000,
-    this.weightGoal = 0, // ✅ Make it optional with a default
+    this.weightGoal = 0,
     this.rollover = 0,
   });
 
   factory NutritionGoals.fromJson(Map<String, dynamic> map) {
-    // Use a nullable return type here
     double? val(String key) => (map[key] as num?)?.toDouble();
 
     return NutritionGoals(
@@ -140,7 +137,6 @@ class NutritionLog extends Nutrition {
     };
   }
 
-  // Helper to quickly convert a Firestore doc into a log entry for charts
   factory NutritionLog.fromSnapshot(DateTime date, Map<String, dynamic> data) {
     final dp = data['dailyProgress'] as Map<String, dynamic>? ?? {};
 
@@ -211,10 +207,10 @@ class NutritionProgress extends Nutrition {
 }
 
 class DailyNutrition {
-  final int p; // Protein
-  final int c; // Carbs
-  final int f; // Fats
-  final int kc;   // Total Calories
+  final double p; // Protein
+  final double c; // Carbs
+  final double f; // Fats
+  final double kc;   // Total Calories
   final DateTime date;
 
   DailyNutrition({
@@ -225,14 +221,22 @@ class DailyNutrition {
     required this.date
   });
 
-  // Factory to create from Firestore map
   factory DailyNutrition.fromMap(Map<String, dynamic> data) {
+    double toDouble(dynamic val) => (val as num?)?.toDouble() ?? 0.0;
+
+    DateTime parsedDate;
+    if (data['date'] != null && data['date'] is Timestamp) {
+      parsedDate = (data['date'] as Timestamp).toDate();
+    } else {
+      parsedDate = DateTime.now(); 
+    }
+
     return DailyNutrition(
-      p: (data['p'] ?? 0).toDouble(),
-      c: (data['c'] ?? 0).toDouble(),
-      f: (data['f'] ?? 0).toDouble(),
-      kc: (data['kc'] ?? 0).toInt(),
-      date: (data['date'] as Timestamp).toDate()
+      p: toDouble(data['p']),
+      c: toDouble(data['c']),
+      f: toDouble(data['f']),
+      kc: toDouble(data['kc']),
+      date: parsedDate,
     );
   }
 
@@ -287,8 +291,7 @@ class WeeklyNutritionModel {
     'updatedAt': FieldValue.serverTimestamp(),
   };
 
-  // Helper to calculate this week's total for the "↓ 1%" comparison
-  int get currentWeekTotal {
+  double get currentWeekTotal {
     return days.values.fold(0, (sum, day) => sum + day.kc);
   }
 }

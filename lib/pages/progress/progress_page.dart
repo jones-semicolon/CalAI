@@ -33,7 +33,6 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Watch the global state (which now includes weightLogs and dailyNutrition)
     final globalAsync = ref.watch(globalDataProvider);
 
     return CustomScrollView(
@@ -47,15 +46,12 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
             child: Center(child: Text("Unable to load progress: $e")),
           ),
           data: (global) {
-            // 2. Instantiate the logic provider (no Firestore calls here anymore)
             final provider = ProgressPageDataProvider();
             final unitSystem = ref.read(userProvider).settings.measurementUnit;
 
-            // 3. Extract and Process Data using the provider's logic methods
             final weightLogs = global.weightLogs;
             final double goalWeightMetric = global.todayGoal.weightGoal;
 
-            // Math & Filtering operations (Pure Logic)
             final filteredWeightLogs = provider.getFilteredLogs(weightLogs, _selectedRange);
             final startedWeight = provider.startedWeight(weightLogs);
             final currentWeight = provider.currentWeight(weightLogs);

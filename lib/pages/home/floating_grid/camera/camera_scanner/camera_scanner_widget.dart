@@ -91,7 +91,6 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
       case ScanMode.foodLabel:
         final rawText = await _processors.scanText(image);
         if (rawText != null && rawText.trim().isNotEmpty) {
-          // 1. Split by lines
           List<String> lines = rawText.split('\n');
 
           final noiseWords = ['natural', 'ingredients', 'organic', 'serving', 'suggestion'];

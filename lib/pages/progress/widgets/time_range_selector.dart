@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:calai/core/constants/constants.dart';
 
 class SegmentedSelector<T> extends StatelessWidget {
   final List<RangeOption<T>> options;
@@ -87,8 +86,8 @@ class SegmentedSelector<T> extends StatelessWidget {
 }
 
 class RangeOption<T> {
-  final T value;     // the actual value you care about
-  final String label; // what the user sees
+  final T value; 
+  final String label; 
 
   const RangeOption({
     required this.value,

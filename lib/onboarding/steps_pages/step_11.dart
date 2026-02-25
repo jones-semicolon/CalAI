@@ -1,6 +1,5 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 
 class OnboardingStep11 extends StatefulWidget {
@@ -18,7 +17,7 @@ class _OnboardingStep11State extends State<OnboardingStep11> {
       child: Column(
         children: [
           Header(title: 'You have great potential to crush your goal'),
-          Spacer(), // Animation
+          Spacer(),
           
           ConfirmationButtonWidget(onConfirm: () => widget.nextPage())
         ],

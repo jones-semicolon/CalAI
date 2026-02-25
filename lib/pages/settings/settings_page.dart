@@ -146,14 +146,11 @@ class _LinkAccountButton extends ConsumerWidget {
 }
 
 void _handleLinkingError(BuildContext context, dynamic e) {
-  String message = "Failed to link account.";
 
   if (e is FirebaseAuthException && e.code == 'credential-already-in-use') {
     _showSwitchAccountDialog(context);
-    return; // Exit here as the dialog handles the UI now
+    return; 
   }
-
-  // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 }
 
 void _showSwitchAccountDialog(BuildContext context) {
@@ -180,7 +177,6 @@ void _showSwitchAccountDialog(BuildContext context) {
           onPressed: () async {
             Navigator.pop(context); // Close dialog
             try {
-              // We call sign-in which will replace the anonymous user
               await AuthService.signInWithGoogle(); 
             } catch (error) {
               if (context.mounted) {

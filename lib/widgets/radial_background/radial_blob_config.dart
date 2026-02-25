@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:calai/core/constants/constants.dart';
 import 'radial_blob.dart';
 
 List<Widget> radialBlobs(double screenHeight) {

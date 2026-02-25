@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../widgets/confirmation_button_widget.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/weight_charts.dart';
 
@@ -22,7 +21,6 @@ class _OnboardingStep5State extends State<OnboardingStep5> {
         children: [
           Header(title: 'Cal AI creates long-term results'),
 
-          /// SCROLLABLE CONTENT
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -41,16 +39,6 @@ class _OnboardingStep5State extends State<OnboardingStep5> {
               },
             ),
           ),
-
-          // SizedBox(
-          //   width: double.infinity,
-          //   child: ContinueButton(
-          //     enabled: true,
-          //     onNext: () {
-          //       widget.nextPage();
-          //     },
-          //   ),
-          // ),
           ConfirmationButtonWidget(onConfirm: widget.nextPage)
         ],
       ),

@@ -1,18 +1,11 @@
-import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// --- IMPORTS ---
-// Update these paths to match your project structure
-import 'package:calai/widgets/circle_back_button.dart';
-import '../../../../api/exercise_api.dart';
 import '../../../../enums/exercise_enums.dart';
 import '../../../../providers/exercise_provider.dart';
-import '../../../../providers/user_provider.dart';
 
 class WeightLiftingPage extends ConsumerStatefulWidget {
   const WeightLiftingPage({super.key});

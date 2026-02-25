@@ -1,16 +1,12 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../enums/exercise_enums.dart';
 import '../models/exercise_model.dart';
-// Import your model file here
-// import 'package:calai/models/exercise_model.dart';
 
 class ExerciseApi {
   static const _host = "cal-ai-liard.vercel.app";
 
-  // ✅ Updated return type to List<ExerciseLog>
   Future<ExerciseLog> getBurnedCalories({
     required double weightKg,
     ExerciseType exerciseType = ExerciseType.run,

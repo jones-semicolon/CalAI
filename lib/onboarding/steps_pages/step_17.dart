@@ -1,7 +1,5 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
-import '../onboarding_widgets/continue_button.dart';
-import '../onboarding_widgets/loading_widget/health_plan_loading_widget.dart';
 
 class OnboardingStep17 extends StatefulWidget {
   final VoidCallback nextPage;

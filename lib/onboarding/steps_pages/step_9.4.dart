@@ -1,7 +1,6 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import '../onboarding_widgets/calai_comparison.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 
 class Comparison extends StatelessWidget {

@@ -166,39 +166,36 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     _historySub = _service.weeklyNutritionDoc.snapshots().listen((snapshot) {
       if (!ref.mounted) return;
       final data = snapshot.data() ?? {};
-      final String currentWeekId = _service.getWeekId(DateTime.now());
-      final weekData = data[currentWeekId] as Map<String, dynamic>?;
+      
+      final List<DailyNutrition> allLogs = [];
+      final Set<String> allProgressDays = {};
 
-      final List<DailyNutrition> nutritionLogs = [];
-      final Set<String> progressDays = {};
+      // ✅ Iterate through every Week Key (e.g., 2026_W06, 2026_W07)
+      data.forEach((weekKey, weekValue) {
+        if (weekKey == 'updatedAt' || weekValue is! Map) return;
 
-      if (weekData != null) {
-        final daysOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        // Use your WeeklyNutritionModel to parse the week
+        final weekModel = WeeklyNutritionModel.fromMap({
+          'weekId': weekKey,
+          ...weekValue,
+        });
 
-        for (var dayName in daysOrder) {
-          if (weekData.containsKey(dayName)) {
-            final stats = weekData[dayName] as Map<String, dynamic>;
-
-            if ((stats['kc'] ?? 0) > 0) {
-              progressDays.add(dayName);
-              final DateTime logDate = (stats['date'] as Timestamp).toDate().toLocal();
-
-              nutritionLogs.add(DailyNutrition(
-                date: logDate,
-                kc: (stats['kc'] as num).toInt(),
-                p: (stats['p'] as num).toInt(),
-                c: (stats['c'] as num).toInt(),
-                f: (stats['f'] as num).toInt(),
-              ));
-            }
+        weekModel.days.forEach((dayName, dailyData) {
+          // Only include days with data, using double precision for accuracy
+          if (dailyData.kc > 0.0) {
+            allLogs.add(dailyData);
+            allProgressDays.add(DateFormat('yyyy-MM-dd').format(dailyData.date));
           }
-        }
-      }
+        });
+      });
+
+      // Sort chronologically so your charts don't break
+      allLogs.sort((a, b) => a.date.compareTo(b.date));
 
       final current = state.asData?.value ?? GlobalDataState.initial();
       state = AsyncData(current.copyWith(
-        dailyNutrition: nutritionLogs,
-        progressDays: progressDays,
+        dailyNutrition: allLogs,
+        progressDays: allProgressDays,
       ));
     });
   }

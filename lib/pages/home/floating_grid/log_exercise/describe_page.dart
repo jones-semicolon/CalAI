@@ -1,15 +1,9 @@
-import 'package:calai/widgets/circle_back_button.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../api/exercise_api.dart';
-import '../../../../enums/exercise_enums.dart';
 import '../../../../providers/exercise_provider.dart';
-import '../../../../providers/user_provider.dart';
-import '../../../../services/calai_firestore_service.dart';
 
 class DescribePage extends ConsumerStatefulWidget {
   const DescribePage({super.key});

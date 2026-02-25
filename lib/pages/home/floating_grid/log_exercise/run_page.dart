@@ -1,17 +1,10 @@
-import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// --- IMPORTS ---
-import 'package:calai/widgets/circle_back_button.dart';
-import '../../../../api/exercise_api.dart';
 import '../../../../enums/exercise_enums.dart';
-import '../../../../models/exercise_model.dart';
 import '../../../../providers/exercise_provider.dart';
-import '../../../../providers/user_provider.dart';
 import '../../../../widgets/confirmation_button_widget.dart';
 
 class RunExercisePage extends ConsumerStatefulWidget {

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
-import '../onboarding_widgets/continue_button.dart';
 
 class ProgressSpeed extends ConsumerWidget {
   final VoidCallback nextPage;

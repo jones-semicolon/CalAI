@@ -1,7 +1,6 @@
 import 'package:calai/providers/global_provider.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:calai/features/reminders/data/reminder_settings_repository.dart';
 import 'package:calai/features/reminders/models/reminder_settings.dart';
 import 'package:calai/features/reminders/services/notification_service.dart';
@@ -10,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✅ Added
 import '../../models/nutrition_model.dart';
 import '../onboarding_widgets/header.dart';
 
-// ✅ Changed to ConsumerStatefulWidget
 class OnboardingStep13 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
   const OnboardingStep13({super.key, required this.nextPage});
@@ -19,7 +17,6 @@ class OnboardingStep13 extends ConsumerStatefulWidget {
   ConsumerState<OnboardingStep13> createState() => _OnboardingStep13State();
 }
 
-// ✅ Changed to ConsumerState
 class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
     with SingleTickerProviderStateMixin {
   bool isAllowNotification = true;
@@ -48,8 +45,6 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
     super.dispose();
   }
 
-  // --- Logic ---
-
   Future<void> _processNotificationAndContinue() async {
     if (_isSubmitting) return;
 
@@ -59,12 +54,10 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
       final notificationService = NotificationService();
       bool granted = false;
 
-      // 1. Request Permission if toggled "Allow"
       if (isAllowNotification) {
         granted = await notificationService.requestPermissions();
       }
 
-      // 2. Prepare Settings & Scheduler
       final repository = ReminderSettingsRepository();
       final scheduler = ReminderScheduler(notificationService);
       final currentSettings = await repository.load();
@@ -74,13 +67,10 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
         enabled: granted,
       );
 
-      // 3. Save to Local Storage
       await repository.save(updatedSettings);
       await notificationService.initialize();
 
-      // 4. Sync with Provider Data
       if (granted) {
-        // ✅ ref is now accessible here
         final globalState = ref.read(globalDataProvider).value;
 
         if (globalState != null) {
