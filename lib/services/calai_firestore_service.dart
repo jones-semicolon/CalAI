@@ -148,22 +148,39 @@ class CalaiFirestoreService {
     if (uid == null) return;
 
     final batch = _db.batch();
-    final String dateKey = todayId; // YYYY-MM-DD
+    final String dateKey = todayId; 
 
     // 1. Update Master Profile
-    batch.update(userDoc, {
-      'body.currentWeight': weight,
-      if (newTargetWeight != null)
-        'goal.dailyGoals.weightGoal': newTargetWeight,
+    batch.set(userDoc, {
+      'body': {
+        'currentWeight': weight,
+      },
+      'goal': {
+         'dailyGoals': {
+           'weightGoal': newTargetWeight, // Safe to pass null here, mergeFields ignores it
+         }
+      },
       'updatedAt': FieldValue.serverTimestamp(),
-    });
+    }, SetOptions(mergeFields: [
+      'body.currentWeight',
+      if (newTargetWeight != null) 'goal.dailyGoals.weightGoal',
+      'updatedAt',
+    ]));
 
-    // 2. Update Today's Daily Log
-    batch.update(dailyLogDoc(dateKey), {
-      'dailyProgress.weight': weight,
-      if (newTargetWeight != null) 'dailyGoals.weightGoal': newTargetWeight,
+    // 2. Update Daily Log
+    batch.set(dailyLogDoc(dateKey), {
+      'dailyProgress': {
+        'weight': weight,
+      },
+      'dailyGoals': {
+        'weightGoal': newTargetWeight,
+      },
       'updatedAt': FieldValue.serverTimestamp(),
-    });
+    }, SetOptions(mergeFields: [
+      'dailyProgress.weight',
+      if (newTargetWeight != null) 'dailyGoals.weightGoal',
+      'updatedAt',
+    ]));
 
     final Map<String, dynamic> historyData = {
       if (newTargetWeight != null) 'targetWeight': newTargetWeight,
@@ -176,11 +193,12 @@ class CalaiFirestoreService {
       'lastUpdated': FieldValue.serverTimestamp(),
     };
 
-    // Use update or set with merge for history
+    // History can stay merge: true because it adds unique date keys to a map
     batch.set(weightHistory, historyData, SetOptions(merge: true));
+    
     await batch.commit();
   }
-
+  
   /// Updates a single field in the 'body' map (e.g. currentWeight, height)
   Future<void> updateUserBodyField(String field, dynamic value) async {
     if (uid == null) return;
@@ -189,10 +207,10 @@ class CalaiFirestoreService {
 
     // 1. Update the Master Record (Nested under 'body')
     // Input: 'currentWeight' -> Path: 'body.currentWeight'
-    batch.update(userDoc, {
-      'body.$field': value,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+      batch.update(userDoc, {
+        'body.$field': value,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
 
     // 2. If it's weight, also log it to today's progress
     if (field == 'currentWeight') {
@@ -655,14 +673,15 @@ class CalaiFirestoreService {
     return List.generate(6, (index) => chars[Random().nextInt(chars.length)]).join();
   }
 
-  // When saving the profile for the first time
   Future<void> initializeUserReferral(String uid) async {
     String newCode = generateCode();
     
     WriteBatch batch = _db.batch();
     
     batch.set(_db.collection('users').doc(uid), {
-      'referralCode': newCode,
+      'profile': {
+        'referralCode': newCode,
+      }
     }, SetOptions(merge: true));
 
     batch.set(_db.collection('referrals').doc(newCode), {
@@ -707,43 +726,30 @@ class ReferralService {
   Future<void> redeemReferralCode(String code, String currentUid) async {
     final upperCode = code.trim().toUpperCase();
     
-    // 1. Reference the referral document
     DocumentReference refDoc = _db.collection('referrals').doc(upperCode);
     
-    // 2. Use a Transaction to ensure both updates happen or none do
     return _db.runTransaction((transaction) async {
       DocumentSnapshot snapshot = await transaction.get(refDoc);
 
-      if (!snapshot.exists) {
-        throw Exception("Invalid referral code.");
-      }
+      if (!snapshot.exists) throw Exception("Invalid referral code.");
 
       Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
       String ownerUid = data['ownerUid'];
 
-      // Prevent self-referral
-      if (ownerUid == currentUid) {
-        throw Exception("You cannot use your own code.");
-      }
+      if (ownerUid == currentUid) throw Exception("You cannot use your own code.");
 
-      // Check if user already used this code
       List redeemedUids = data['redeemedUids'] ?? [];
       if (redeemedUids.contains(currentUid)) {
         throw Exception("You have already used this code.");
       }
 
-      // 3. Perform Updates
-      // Update the referral lookup doc
       transaction.update(refDoc, {
         'usageCount': FieldValue.increment(1),
         'redeemedUids': FieldValue.arrayUnion([currentUid]),
       });
 
-      // Update the current user doc
       transaction.update(_db.collection('users').doc(currentUid), {
-        'referredBy': upperCode,
-        'referralStatus': 'completed',
-        // Optional: add reward points here
+        'profile.referredBy': upperCode,
         'points': FieldValue.increment(50), 
       });
     });

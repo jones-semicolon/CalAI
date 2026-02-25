@@ -1,5 +1,6 @@
 import 'package:calai/onboarding/onboarding_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -189,7 +190,7 @@ class _SignInPageState extends State<SignInPage>
                       Expanded(
                         child: _isLoading
                             ? const Center(
-                          child: CircularProgressIndicator(),
+                          child: CupertinoActivityIndicator(radius: 15),
                         )
                             : SingleChildScrollView(
                           padding: const EdgeInsets.symmetric(

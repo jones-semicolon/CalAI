@@ -98,7 +98,7 @@ class _CarouselViewState extends ConsumerState<CarouselView> {
             controller: _controller,
             physics: const BouncingScrollPhysics(),
             onPageChanged: widget.onPageChanged,
-            allowImplicitScrolling: true,
+            allowImplicitScrolling: false,
             children: pages,
           ),
         ),

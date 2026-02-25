@@ -1,35 +1,46 @@
-// Exposes the real-time step count from the device hardware
+import 'dart:io';
 import 'package:calai/providers/global_provider.dart';
 import 'package:calai/providers/user_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:pedometer/pedometer.dart';
-import 'package:calai/providers/shared_prefs_provider.dart'; // ✅ Use this import
-
+import 'package:permission_handler/permission_handler.dart';
+import 'package:calai/providers/shared_prefs_provider.dart';
 import '../services/calai_firestore_service.dart';
 
+final stepPermissionProvider = FutureProvider<bool>((ref) async {
+  if (Platform.isAndroid) {
+    return await Permission.activityRecognition.isGranted;
+  } else if (Platform.isIOS) {
+    return await Permission.sensors.isGranted;
+  }
+  return false; 
+});
 
-final stepCountStreamProvider = StreamProvider<int>((ref) {
-  // Pedometer.stepCountStream returns a StepCount object; we map it to just the integer
-  return Pedometer.stepCountStream.map((event) => event.steps);
+final stepCountStreamProvider = StreamProvider<int>((ref) async* {
+  final hasPermission = await ref.watch(stepPermissionProvider.future);
+
+  if (!hasPermission) {
+    debugPrint("Step Stream Blocked: Missing permissions. Waiting for user.");
+    yield* const Stream.empty();
+    return;
+  }
+
+  debugPrint("✅ Step Stream Connected to Hardware.");
+  yield* Pedometer.stepCountStream.map((event) => event.steps);
 });
 
 final initialStepsProvider = Provider<int>((ref) {
-  // Watch the global data. If it's loading, this will return 0 initially.
   final globalData = ref.watch(globalDataProvider).value;
-
-  // Return the steps from your existing todayProgress
   return (globalData?.todayProgress.steps ?? 0).round();
 });
 
 final stepsTodayProvider = StateProvider<int>((ref) => 0);
-
-// We use the StreamProvider as the trigger to update our calculated state
 final stepTrackerProvider = Provider<void>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
   final service = ref.read(calaiServiceProvider);
 
-  // 1. Watch the user provider so we always have the latest weight
   final user = ref.watch(userProvider);
 
   ref.listen<int>(initialStepsProvider, (previous, next) {
@@ -53,7 +64,6 @@ final stepTrackerProvider = Provider<void>((ref) {
       final int stepsToday = totalSteps - baseline;
       final int lastSyncedSteps = ref.read(stepsTodayProvider);
 
-      // ✅ OPTIMIZATION: Only sync to Firestore if steps actually increased
       if (stepsToday != lastSyncedSteps) {
         ref.read(stepsTodayProvider.notifier).state = stepsToday;
 

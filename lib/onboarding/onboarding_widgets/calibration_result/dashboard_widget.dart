@@ -1,4 +1,5 @@
 import 'package:calai/onboarding/onboarding_widgets/calibration_result/hyper_link_text.dart';
+import 'package:calai/providers/global_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../enums/user_enums.dart';
@@ -102,7 +103,7 @@ class _DailyRecommendationDashboardState
   @override
   Widget build(BuildContext context) {
     final weightGoal = ref.watch(userProvider).goal.type;
-    final unit = ref.watch(userProvider).body.weightUnit;
+    final unit = WeightUnit.fromString(ref.watch(globalDataProvider).value?.userSettings.measurementUnit?.weightLabel ?? 'kg');
     final user = ref.watch(userProvider);
     final unitLabel = unit.value;
 

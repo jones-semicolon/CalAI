@@ -52,10 +52,8 @@ class RecentlyUploadedSection extends ConsumerWidget {
                 return const EmptyState();
               }
 
-              // ✅ 1. Create a copy to sort (entries from Riverpod are immutable)
               final sortedEntries = List<Map<String, dynamic>>.from(entries);
 
-              // ✅ 2. Sort by timestamp (Descending: Newest first)
               sortedEntries.sort((a, b) {
                 final aTime = _parseDateTime(a['timestamp']);
                 final bTime = _parseDateTime(b['timestamp']);
@@ -92,7 +90,6 @@ class RecentlyUploadedSection extends ConsumerWidget {
 DateTime _parseDateTime(dynamic timestamp) {
   if (timestamp is DateTime) return timestamp;
   if (timestamp is String) return DateTime.tryParse(timestamp) ?? DateTime.now();
-  // If it's a Firestore Timestamp object
   if (timestamp.runtimeType.toString() == 'Timestamp') {
     return timestamp.toDate();
   }

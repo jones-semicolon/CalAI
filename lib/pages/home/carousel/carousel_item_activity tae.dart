@@ -191,20 +191,36 @@ class _StepsTodayCard extends ConsumerWidget {
   }
 
   Future<void> _handlePermissionRequest(BuildContext context, WidgetRef ref) async {
-    final status = await Permission.activityRecognition.request();
+    // 1. Request BOTH platform permissions simultaneously
+    final statuses = await [
+      Permission.activityRecognition, // Android 10+
+      Permission.sensors,             // iOS CoreMotion
+    ].request();
 
-    if (status.isGranted) {
-      // Restart both the hardware stream AND the tracker logic
+    // 2. Check if the relevant platform granted access
+    final isGranted = statuses[Permission.activityRecognition]?.isGranted == true || 
+                      statuses[Permission.sensors]?.isGranted == true;
+
+    final isDeniedForever = statuses[Permission.activityRecognition]?.isPermanentlyDenied == true || 
+                            statuses[Permission.sensors]?.isPermanentlyDenied == true;
+
+    if (isGranted) {
+      // 3. Safe to boot up the hardware streams now!
       ref.invalidate(stepCountStreamProvider);
       ref.invalidate(stepTrackerProvider);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Step tracking active!')),
+          const SnackBar(content: Text('Step tracking active! 🚶‍♂️')),
         );
       }
-    } else if (status.isPermanentlyDenied) {
-      openAppSettings();
+    } else if (isDeniedForever) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enable motion access in settings to track steps.')),
+        );
+      }
+      openAppSettings(); // Send them to the OS settings
     }
   }
 }

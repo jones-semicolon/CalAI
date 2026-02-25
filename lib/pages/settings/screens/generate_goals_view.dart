@@ -139,7 +139,7 @@ class _GenerateGoalsViewState extends ConsumerState<GenerateGoalsView> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircularProgressIndicator(color: Colors.white),
+                      CupertinoActivityIndicator(radius: 15),
                       SizedBox(height: 20),
                       Text(
                         "Calculating your custom goals...",

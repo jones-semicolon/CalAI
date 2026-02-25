@@ -1,5 +1,6 @@
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -165,7 +166,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    if (_isLoading) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (_isLoading) return const Scaffold(body: Center(child: CupertinoActivityIndicator(radius: 15)));
     if (_errorMessage != null) return Scaffold(body: Center(child: Text(_errorMessage!)));
     if (_foodItem == null) return const SizedBox.shrink();
 

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth.dart'; // <--- 1. IMPORT YOUR AUTH FILE
@@ -267,10 +268,7 @@ class _DoneButton extends StatelessWidget {
             ? const SizedBox(
           height: 20,
           width: 20,
-          child: CircularProgressIndicator(
-            color: Colors.white,
-            strokeWidth: 2,
-          ),
+          child: CupertinoActivityIndicator(radius: 15)
         )
             : const Text(
           "Continue",

@@ -1,6 +1,7 @@
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -177,7 +178,7 @@ class _DoneFooter extends StatelessWidget {
               ? const SizedBox(
               height: 20,
               width: 20,
-              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+              child: CupertinoActivityIndicator(radius: 15)
           )
               : const Text("Done", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ),

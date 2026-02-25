@@ -70,12 +70,16 @@ class UserProfile {
   final Gender? gender;
   final DateTime? birthDate;
   final UserProvider? provider;
+  final String? referralCode; 
+  final String? photoURL;
 
   const UserProfile({
-    this.name,      // Nullable, optional
-    this.gender,    // Nullable, optional
-    required this.birthDate,  // Nullable, optional
-    this.provider,  // Required
+    this.name,  
+    this.gender,   
+    required this.birthDate, 
+    this.provider, 
+    this.referralCode,
+    this.photoURL,
   });
 
   Map<String, dynamic> toJson() => {
@@ -83,6 +87,8 @@ class UserProfile {
     'gender': gender?.name,
     'birthDate': birthDate?.toIso8601String(),
     'provider': provider?.name ?? UserProvider.anonymous.name,
+    'referralCode': referralCode,
+    'photoURL': photoURL,
   };
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -94,6 +100,8 @@ class UserProfile {
       provider: UserProvider.fromString(
           json['provider'] ?? UserProvider.anonymous.name
       ),
+      referralCode: json['referralCode'],
+      photoURL: json['photoURL'],
     );
   }
 
@@ -106,14 +114,14 @@ class UserProfile {
     return DateTime(2001, 1, 1); // Fallback
   }
 
-  UserProfile copyWith({String? name, Gender? gender, DateTime? birthDate, UserProvider? provider}) {
+  UserProfile copyWith({String? name, Gender? gender, DateTime? birthDate, UserProvider? provider, String? referralCode, String? photoURL}) {
     return UserProfile(
-      // We check explicit null logic if you want to clear fields,
-      // but for simple updates this standard pattern works:
       name: name ?? this.name,
       gender: gender ?? this.gender,
       birthDate: birthDate ?? this.birthDate,
       provider: provider ?? this.provider,
+      referralCode: referralCode ?? this.referralCode,
+      photoURL: photoURL ?? this.photoURL,
     );
   }
 }

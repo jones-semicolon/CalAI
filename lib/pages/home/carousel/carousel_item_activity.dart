@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io' show Platform;
+import 'dart:ui';
 
 import 'package:calai/enums/user_enums.dart';
 import 'package:calai/providers/user_provider.dart';
@@ -177,16 +178,78 @@ class _StepsTodayCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(stepTrackerProvider);
     final steps = ref.watch(stepsTodayProvider);
+    
+    // ✅ 1. Watch the permission state
+    final permissionState = ref.watch(stepPermissionProvider);
+    final hasPermission = permissionState.value ?? false;
 
-    // 2. Wrap in GestureDetector so the user can actually tap to fix permissions
-    return GestureDetector(
-      onTap: () => _handlePermissionRequest(context, ref),
-      child: ActivityCard(
-        title: "Steps Today",
-        currentValue: steps,
-        icon: Icons.directions_walk,
-        color: Theme.of(context).colorScheme.primary, // Standard "Active" green
-      ),
+    final theme = Theme.of(context);
+
+    return Stack(
+      fit: StackFit.expand, // Ensures the blur covers the exact size of the card
+      children: [
+        // --- BOTTOM LAYER: The actual Step Card ---
+        ActivityCard(
+          title: "Steps Today",
+          currentValue: steps,
+          icon: Icons.directions_walk,
+          color: theme.colorScheme.primary, // Standard "Active" green
+        ),
+
+        // --- TOP LAYER: The Blurred Permission Request Overlay ---
+        if (!hasPermission)
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => _handlePermissionRequest(context, ref),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20), // Matches your ActivityCard's radius
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0), // The blur strength
+                  child: Container(
+                    color: Colors.black.withOpacity(0.2), // Slight darkening effect
+                    alignment: Alignment.center,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: theme.appBarTheme.backgroundColor, // Matches dark card color
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: theme.splashColor),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withOpacity(0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.directions_walk,
+                              color: theme.colorScheme.primary,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              "Tap to enable\nstep tracking",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -197,7 +260,10 @@ class _StepsTodayCard extends ConsumerWidget {
     final status = await permission.request();
 
     if (status.isGranted) {
-      // Restart both the hardware stream AND the tracker logic
+      // ✅ 1. Invalidate the permission provider to hide the blur overlay instantly
+      ref.invalidate(stepPermissionProvider);
+
+      // ✅ 2. Restart both the hardware stream AND the tracker logic
       ref.invalidate(stepCountStreamProvider);
       ref.invalidate(stepTrackerProvider);
 
@@ -595,8 +661,8 @@ class ActivityCard extends ConsumerWidget {
                     width: 95,
                     child: CircularProgressIndicator(
                       value: progress.clamp(0.0, 1.0),
-                      strokeWidth: 8, // Slightly thicker for a premium feel
-                      strokeCap: StrokeCap.round, // Makes the progress bar look modern
+                      strokeWidth: 8, 
+                      strokeCap: StrokeCap.round,
                       backgroundColor: theme.splashColor,
                       color: primaryColor,
                     ),

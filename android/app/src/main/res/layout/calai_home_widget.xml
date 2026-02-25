@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/calai_home_widget_background"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:id="@+id/widget_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="84dp"
+            android:layout_height="84dp"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/widget_ring"
+                android:layout_width="84dp"
+                android:layout_height="84dp"
+                android:contentDescription="@null"
+                android:src="@drawable/calai_home_widget_ring_preview" />
+
+            <LinearLayout
+                android:id="@+id/widget_ring_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/widget_ring_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMaxTextSize="32sp"
+                    android:autoSizeMinTextSize="18sp"
+                    android:autoSizeStepGranularity="1sp"
+                    android:text="2135"
+                    android:textColor="@color/widget_primary"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/widget_ring_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:text="Calories left"
+                    android:textColor="@color/widget_secondary"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_cta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/calai_home_widget_pill"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="6dp">
+
+        <FrameLayout
+            android:id="@+id/widget_cta_icon_bg"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="@drawable/calai_home_widget_icon_bg"
+            android:layout_gravity="center_vertical"
+            android:padding="4dp"
+            android:foregroundGravity="center"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/widget_cta_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_widget_add"
+                android:scaleType="centerInside"
+                android:tint="@color/widget_cta_icon_tint" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/widget_cta_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="Log your food"
+            android:textColor="@color/widget_cta_text"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+</LinearLayout>

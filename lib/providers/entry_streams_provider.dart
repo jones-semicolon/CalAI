@@ -1,5 +1,4 @@
 import 'package:calai/providers/auth_state_providers.dart';
-import 'package:calai/providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,9 +31,13 @@ final savedFoodsStreamProvider =
 final dailyEntriesProvider =
     StreamProvider.autoDispose.family<List<Map<String, dynamic>>, String>(
         (ref, dateId) {
+          
+  if (dateId.isEmpty) {
+    return const Stream.empty();
+  }
+
   final authAsync = ref.watch(authStateProvider);
 
-  // Only start the stream if auth is ready and user is signed in
   if (!authAsync.hasValue || authAsync.value == null) {
     return const Stream.empty();
   }
@@ -48,7 +51,6 @@ final dailyEntriesProvider =
       .collection('entries')
       .orderBy('timestamp', descending: true)
       .snapshots()
-      // Optional: catch permission errors gracefully
       .handleError((error) {
         if (error is FirebaseException && error.code == 'permission-denied') {
           debugPrint(

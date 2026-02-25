@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,7 +26,7 @@ class _AppEntryState extends State<AppEntry> {
         // ✅ WAIT for Firebase Auth restoration
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(child: CupertinoActivityIndicator(radius: 15)),
           );
         }
 
@@ -42,7 +43,7 @@ class _AppEntryState extends State<AppEntry> {
           builder: (context, onboardingSnap) {
             if (!onboardingSnap.hasData) {
               return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
+                body: Center(child: CupertinoActivityIndicator(radius: 15)),
               );
             }
 

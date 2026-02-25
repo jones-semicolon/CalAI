@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/core/constants/constants.dart';
@@ -24,11 +23,11 @@ class NameAgeCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    // 1. Watch the userProvider to get the current name and birthday
     final user = ref.watch(userProvider);
     final String name = user.profile.name ?? "user";
     final int age = _calculateAge(user.profile.birthDate!);
     final bool isNameEmpty = name.trim().isEmpty;
+    final String? photoURL = user.profile.photoURL;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -47,13 +46,16 @@ class NameAgeCard extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: Color.fromARGB(26, 185, 168, 209),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.person_outlined, size: 30),
+          ClipOval(
+            child: photoURL != null && photoURL.isNotEmpty
+                ? Image.network(
+                    photoURL,
+                    width: 54, 
+                    height: 54,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => _buildFallbackIcon(),
+                  )
+                : _buildFallbackIcon(),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -66,7 +68,6 @@ class NameAgeCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 2. No longer need ValueListenableBuilder
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -84,7 +85,6 @@ class NameAgeCard extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  // 3. Display the calculated age
                   Text(
                     "$age years old",
                     style: TextStyle(color: colorScheme.primary),
@@ -95,6 +95,19 @@ class NameAgeCard extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFallbackIcon() {
+    return Container(
+      width: 54,
+      height: 54,
+      padding: const EdgeInsets.all(12),
+      decoration: const BoxDecoration(
+        color: Color.fromARGB(26, 185, 168, 209),
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(Icons.person_outlined, size: 30),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:calai/pages/home/floating_grid/food_database/food_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart'; // ✅ Import this
@@ -186,17 +187,34 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(40),
-      decoration: BoxDecoration(
-        color: Theme.of(context).appBarTheme.backgroundColor,
+    final theme = Theme.of(context);
+
+    // ✅ 2. Wrap in Material & InkWell for the native ripple tap effect
+    return Material(
+      color: theme.appBarTheme.backgroundColor,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).splashColor),
-      ),
-      child: const Text(
-        "Tap + to add your first entry",
-        textAlign: TextAlign.center,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const FoodDatabasePage(), 
+            ),
+          );
+        },
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(40),
+          decoration: BoxDecoration(
+            // We moved the background color up to the Material widget so the ripple shows
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: theme.splashColor),
+          ),
+          child: const Text(
+            "Tap + to add your first entry",
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ import 'package:calai/providers/auth_state_providers.dart' hide AuthService;
 import 'package:calai/providers/global_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/pages/settings/preference_selection.dart';
@@ -91,10 +92,21 @@ class _LinkAccountButton extends ConsumerWidget {
             showDialog(
               context: context,
               barrierDismissible: false,
-              builder: (_) => const Center(child: CircularProgressIndicator()),
+              builder: (_) => const Center(child: CupertinoActivityIndicator(radius: 15)),
             );
 
-            await ref.read(authServiceProvider).logout();
+            try {
+              await AuthService.signInWithGoogle(); 
+              
+              if (context.mounted) {
+                Navigator.pop(context); 
+              }
+            } catch (e) {
+              if (context.mounted) {
+                Navigator.pop(context);
+                _handleLinkingError(context, e); 
+              }
+            }
           },
           borderRadius: BorderRadius.circular(16),
           child: Padding(
@@ -143,7 +155,7 @@ void _handleLinkingError(BuildContext context, dynamic e) {
     return; // Exit here as the dialog handles the UI now
   }
 
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 }
 
 void _showSwitchAccountDialog(BuildContext context) {

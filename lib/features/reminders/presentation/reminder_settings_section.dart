@@ -1,5 +1,6 @@
 import 'package:calai/features/reminders/models/reminder_settings.dart';
 import 'package:calai/features/reminders/presentation/reminder_settings_controller.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,7 +39,7 @@ class _ReminderSettingsSectionState
         data: (settings) => _ReminderSettingsContent(settings: settings),
         loading: () => const Padding(
           padding: EdgeInsets.all(16),
-          child: Center(child: CircularProgressIndicator()),
+          child: Center(child: CupertinoActivityIndicator(radius: 15)),
         ),
         error: (error, stackTrace) => Padding(
           padding: const EdgeInsets.all(16),

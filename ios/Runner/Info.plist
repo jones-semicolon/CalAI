@@ -7,6 +7,8 @@
 	<key>CFBundleDisplayName</key>
 	<string>Calai</string>
 	<key>CFBundleExecutable</key>
+	<key>NSMotionUsageDescription</key>
+	<string>Cal AI needs access to your motion data to track your daily steps and calculate calories burned.</string>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Cal AI needs access to your photo library to analyze previously taken food photos.</string>

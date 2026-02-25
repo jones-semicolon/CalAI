@@ -1,9 +1,9 @@
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../../../../api/food_api.dart';
 import '../scanner_info/info_widget.dart';
 import 'scan_mode.dart';
 import 'camera_controller_service.dart';
@@ -84,7 +84,6 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
       case ScanMode.barcode:
         final code = await _processors.scanBarcode(image);
         if (code != null && code.isNotEmpty) {
-          // debugPrint('Barcode data: $code');
           widget.onBarcodeCaptured?.call(code);
         }
         break;
@@ -95,14 +94,13 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
           // 1. Split by lines
           List<String> lines = rawText.split('\n');
 
-          // 2. Filter out generic "noise" words that mess up search results
           final noiseWords = ['natural', 'ingredients', 'organic', 'serving', 'suggestion'];
 
           String optimizedQuery = lines
               .map((l) => l.trim())
-              .where((l) => l.length > 2) // Ignore tiny fragments
-              .where((l) => !noiseWords.contains(l.toLowerCase())) // Filter noise
-              .take(3) // Take the first 3 relevant lines (Brand, Type, Flavor)
+              .where((l) => l.length > 2) 
+              .where((l) => !noiseWords.contains(l.toLowerCase())) 
+              .take(3) 
               .join(' ');
 
           debugPrint('Optimized Query: $optimizedQuery');
@@ -114,8 +112,6 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
         break;
 
       case ScanMode.scanFood:
-        // APIpost: send image only here.
-        // await _postToApi(image: image);
         widget.onImageCaptured?.call(image);
         break;
 
@@ -124,18 +120,9 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
     }
   }
 
-  // Sample API method (placeholder):
-  // Future<void> _postToApi({
-  //   required XFile image,
-  //   String? barcode,
-  //   String? label,
-  // }) async {
-  //   // APIpost: build multipart/form-data and POST to your endpoint.
-  // }
-
   Future<void> _openGallery() async {
     final status = await Permission.photos.request();
-    if (!(status.isGranted || status.isLimited)) return;
+    if (!status.isGranted) return;
 
     final picker = ImagePicker();
     final file = await picker.pickImage(source: ImageSource.gallery);
@@ -159,9 +146,18 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
       children: [
         // CAMERA
         if (_ready && controller != null)
-          Positioned.fill(child: CameraPreview(controller))
+          Positioned.fill(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: controller.value.previewSize!.height,
+                height: controller.value.previewSize!.width,
+                child: CameraPreview(controller),
+              ),
+            ),
+          )
         else
-          const Center(child: CircularProgressIndicator()),
+          const Center(child: CupertinoActivityIndicator(radius: 15)),
 
         // FRAME OVERLAY
         LayoutBuilder(

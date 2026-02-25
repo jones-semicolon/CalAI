@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#ffffff</color>
+    <color name="ic_launcher_background">#1f1b24</color>
+    <color name="widget_primary">#111111</color>
+    <color name="widget_secondary">#6E6E73</color>
+    <color name="widget_track">#E4E4EA</color>
+    <color name="widget_pill_bg">#2F2935</color>
+    <color name="widget_background">#F9F8FD</color>
+    <color name="widget_border">#E4E2EA</color>
+    <color name="widget_cta_text">#F4F4F8</color>
+    <color name="widget_cta_icon_bg">#ffffff</color>
+    <color name="widget_cta_icon_tint">#2F2935</color>
 </resources>

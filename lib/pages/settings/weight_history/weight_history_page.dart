@@ -1,6 +1,7 @@
 import 'package:calai/enums/user_enums.dart';
 import 'package:calai/providers/user_provider.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -30,7 +31,7 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
             // 2. Handle Loading/Error/Data states
             Expanded(
               child: globalAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(child: CupertinoActivityIndicator(radius: 15)),
                 error: (error, _) => Center(child: Text("Error: $error")),
                 data: (global) {
                   // 3. Get logs and Sort them (Newest first)

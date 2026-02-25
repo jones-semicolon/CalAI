@@ -41,7 +41,7 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
         const WidgetTreeAppBar(),
         globalAsync.when(
           loading: () => const SliverFillRemaining(
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(child: CupertinoActivityIndicator(radius: 15)),
           ),
           error: (e, _) => SliverFillRemaining(
             child: Center(child: Text("Unable to load progress: $e")),

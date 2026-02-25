@@ -5,6 +5,7 @@ import 'package:calai/providers/global_provider.dart';
 import 'package:calai/providers/user_provider.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,7 +35,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
               const CustomAppBar(title: SizedBox.shrink()),
               Expanded(
                 child: globalAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () => const Center(child: CupertinoActivityIndicator(radius: 15)),
                   error: (err, _) => Center(child: Text("Error loading data")),
                   data: (global) {
                     // --- DATA PREPARATION ---

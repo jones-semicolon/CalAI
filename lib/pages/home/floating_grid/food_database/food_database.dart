@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -154,7 +155,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
 
   Widget _buildContentList(ThemeData theme, bool isSearching) {
     if (isSearching && _selectedTabIndex == 0) {
-      if (_isSearching) return const Expanded(child: Center(child: CircularProgressIndicator()));
+      if (_isSearching) return const Expanded(child: Center(child: CupertinoActivityIndicator(radius: 15)));
       return _searchResults.isEmpty ? const Expanded(child: Center(child: Text("No items found."))) : _buildFoodList(_searchResults, theme, canDelete: false);
     }
 
@@ -168,7 +169,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
 
   Widget _buildFilteredStream(SourceType source, String emptyMsg) {
     return ref.watch(savedFoodsStreamProvider).when(
-      loading: () => const Expanded(child: Center(child: CircularProgressIndicator())),
+      loading: () => const Expanded(child: Center(child: CupertinoActivityIndicator(radius: 15))),
       error: (err, _) => Expanded(child: Center(child: Text("Error loading data"))),
       data: (allFoods) {
         final filtered = allFoods.where((f) => SourceType.fromString(f.source) == source).toList();
@@ -178,7 +179,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
   }
 
   Widget _buildSuggestionsList(ThemeData theme) {
-    if (_isLoadingSuggestions) return const Expanded(child: Center(child: CircularProgressIndicator()));
+    if (_isLoadingSuggestions) return const Expanded(child: Center(child: CupertinoActivityIndicator(radius: 15)));
     return _buildFoodList(_suggestedFoods, theme, canDelete: false);
   }
 

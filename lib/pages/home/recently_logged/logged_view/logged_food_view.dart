@@ -501,7 +501,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back_ios_new,
-              color: hasImage ? Colors.white : Colors.black,
+              color: Theme.of(context).colorScheme.onPrimary,
               size: 20,
             ),
           ),

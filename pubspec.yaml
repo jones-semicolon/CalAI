@@ -64,6 +64,7 @@ dependencies:
   google_mlkit_text_recognition: ^0.15.1
   google_mlkit_barcode_scanning: ^0.14.2
   image_picker: ^1.2.1
+  share_plus: ^12.0.1
 
 dev_dependencies:
   flutter_test:
@@ -77,12 +78,13 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
 
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: false
-  image_path: "assets/icon.png"
-  adaptive_icon_foreground: "assets/icon.png"
-  adaptive_icon_background: "#ffffff"
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"
+  # Optional: For Android 8.0+ adaptive icons
+  adaptive_icon_background: "#1f1b24" # Or a background image
+  adaptive_icon_foreground: "assets/logo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

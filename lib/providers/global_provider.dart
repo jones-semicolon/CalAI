@@ -77,6 +77,8 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     try {
       // 2. Load and Listen
       await _loadUserProfileIntoUserProvider();
+
+      await _ensureDailyLogExists();
       listenToDailySummary(_service.todayId);
       listenToHistory();
       listenToWeightHistory();
@@ -107,8 +109,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       if (!ref.mounted) return;
       final data = doc.data();
 
-      // If doc doesn't exist yet, we don't clear the state,
-      // we just wait for initialization to finish writing it.
       if (!doc.exists || data == null) return;
 
       _applyDailyLogToState(data, dateId);
@@ -123,16 +123,13 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
     _weightSub?.cancel();
     _weightSub = _service.weightHistory.snapshots().listen((snapshot) async {
-      // ✅ If the document doesn't exist, initialize it
       if (!snapshot.exists) {
         if (!ref.mounted) return;
         debugPrint("Weight history doc missing. Initializing...");
 
-        // Get current weight from the user provider state
         final currentWeight = ref.read(userProvider).body.currentWeight;
         final targetWeight = ref.read(userProvider).goal.targets.weightGoal;
 
-        // Log the initial entry (this creates the document)
         await _service.logWeightEntry(
             currentWeight,
             newTargetWeight: targetWeight.toDouble()
@@ -180,7 +177,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       final Set<String> progressDays = {};
 
       if (weekData != null) {
-        // ✅ FIX 1: Use a fixed order to prevent "Jumping Bars"
         final daysOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
         for (var dayName in daysOrder) {
@@ -189,9 +185,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
             if ((stats['kc'] ?? 0) > 0) {
               progressDays.add(dayName);
-
-              // ✅ FIX 2: Ensure the Date is treated as Local time
-              // to prevent the "Next Day" shift in the graph logic.
               final DateTime logDate = (stats['date'] as Timestamp).toDate().toLocal();
 
               nutritionLogs.add(DailyNutrition(
@@ -213,7 +206,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       ));
     });
   }
-  /// Allows UI to switch dates on the dashboard
   void selectDay(String dateId) {
     final current = state.asData?.value ?? GlobalDataState.initial();
     state = AsyncData(current.copyWith(activeDateId: dateId));
@@ -227,7 +219,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   void _applyDailyLogToState(Map<String, dynamic> data, String dateId) {
     final progress = NutritionProgress.fromDailyLog(data);
 
-    // Fallback to userProvider if dailyGoals is missing in the log
     final masterTargets = ref.read(userProvider).goal.targets;
     final goals = (data['dailyGoals'] != null)
         ? NutritionGoals.fromJson(data['dailyGoals'])
@@ -235,8 +226,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
     final currentValue = state.value ?? GlobalDataState.initial();
 
-    // ✅ FIX: Using AsyncData correctly updates the state
-    // without triggering a "Loading" flicker in the UI
     state = AsyncData(currentValue.copyWith(
       todayProgress: progress,
       todayGoal: goals,
@@ -254,7 +243,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
     userNotifier.updateLocal((state) => state.copyWith(id: doc.id));
 
-    // Load Body Stats
     final body = data['body'] as Map<String, dynamic>? ?? {};
     if (body['height'] != null) {
       userNotifier.setHeight(cm: (body['height'] as num).toDouble(), unit: HeightUnit.cm);
@@ -263,7 +251,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       userNotifier.setWeight((body['currentWeight'] as num).toDouble(), WeightUnit.kg);
     }
 
-    // Load Master Goal Object
     if (data['goal']['dailyGoals'] != null) {
       userNotifier.setUserGoal(UserGoal.fromJson(data['goal']));
     }
@@ -280,12 +267,9 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
       final userNotifier = ref.read(userProvider.notifier);
 
-      // 1. Check if the profile map exists in the document
       if (data['profile'] != null) {
-        // 2. Parse the ENTIRE profile using your factory
         final updatedProfile = UserProfile.fromJson(data['profile'] as Map<String, dynamic>);
 
-        // 3. Update the local state with the complete profile object
         userNotifier.updateLocal((s) => s.copyWith(
           profile: updatedProfile,
         ));
@@ -294,18 +278,19 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   }
 
   Future<void> _ensureDailyLogExists() async {
-    // Wait for user data to be ready if it's currently 0
     final user = ref.read(userProvider);
+    
     if (user.goal.targets.calories == 0) {
       debugPrint("⏳ Master targets not ready. Postponing log creation.");
       return;
     }
 
     final dayRef = _service.dailyLogDoc(_service.todayId);
-
-    // We use a transaction or a simple check-then-set
     final doc = await dayRef.get();
-    if (!doc.exists || doc.data()?['dailyGoals'] == null) {
+    
+    if (!doc.exists || doc.data()?['dailyGoals'] == null && doc.data()?['dailyGoals']['calories'] == null) {
+      debugPrint("🌅 Initializing new day: ${_service.todayId}");
+      
       final int rollover = await _calculateYesterdayRollover();
 
       await dayRef.set({
@@ -315,12 +300,13 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
           'rollover': rollover,
         },
         'dailyProgress': {
-          'weight': user.body.currentWeight,
-          // Initialize other fields to 0 to prevent null errors in UI
-          'caloriesEaten': 0,
-          'water': 0,
+          if (!doc.exists) 'weight': user.body.currentWeight,
+          if (!doc.exists) 'caloriesEaten': 0,
+          if (!doc.exists) 'caloriesBurned': 0,
+          if (!doc.exists) 'water': 0,
+          if (!doc.exists) 'steps': 0,
         },
-        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
     }
   }
@@ -353,10 +339,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
   Future<int> _calculateYesterdayRollover() async {
     try {
-      final user = ref.read(userProvider);
-      // if (user.settings.isRollover!) return 0;
-
-      // 1. Get Yesterday's ID based on Local Time to match your Firestore keys
       final now = DateTime.now().toLocal();
       final yesterday = now.subtract(const Duration(days: 1));
       final yesterdayId = DateFormat('yyyy-MM-dd').format(yesterday);
@@ -383,14 +365,6 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     } catch (e) {
       debugPrint("⚠️ Rollover Error: $e");
       return 0;
-    }
-  }
-
-  void _syncFirebaseNameIntoUserProvider() {
-    final fbUser = FirebaseAuth.instance.currentUser;
-    final currentName = ref.read(userProvider).profile.name;
-    if (fbUser?.displayName != null && (currentName == null || currentName.isEmpty)) {
-      ref.read(userProvider.notifier).setName(fbUser!.displayName!);
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -97,7 +98,7 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator()),
+          builder: (_) => const Center(child: CupertinoActivityIndicator(radius: 15)),
         );
       } else if (next.status == ExerciseLogStatus.success) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
