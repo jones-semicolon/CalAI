@@ -32,11 +32,11 @@
     <string>Main</string>
 
     <key>NSMotionUsageDescription</key>
-    <string>Cal AI needs access to your motion data to track your daily steps and calculate calories burned.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Cal AI needs access to your photo library to analyze previously taken food photos.</string>
-    <key>NSCameraUsageDescription</key>
-    <string>Cal AI needs access to your camera to scan barcodes and identify food items.</string>
+    <string>Cal AI needs access to your motion data to track your daily steps.</string>
+    <key>NSHealthShareUsageDescription</key>
+    <string>Cal AI needs to read your step data to track your progress.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>Cal AI needs to sync your nutrition data with the Health app.</string>
     
     <key>GIDClientID</key>
     <string>530467491766-53nb81qnsc5eds4eb0mbot0m0jrpin0g.apps.googleusercontent.com</string>
