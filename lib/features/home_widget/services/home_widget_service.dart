@@ -1,7 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
+
+enum HomeWidgetKind { calories, nutrition, streak }
 
 class HomeWidgetService {
   static const String _androidWidgetProviderClass = 'CalAIHomeWidgetProvider';
@@ -116,7 +119,31 @@ class HomeWidgetService {
     await HomeWidget.saveWidgetData<int>(_streakCountKey, streakCount);
   }
 
-  static Future<bool> requestPinWidget() async {
+  static _AndroidWidgetProviderConfig _providerConfigForKind(
+    HomeWidgetKind kind,
+  ) {
+    switch (kind) {
+      case HomeWidgetKind.calories:
+        return const _AndroidWidgetProviderConfig(
+          providerClass: _androidWidgetProviderClass,
+          qualifiedProviderName: _androidQualifiedProviderName,
+        );
+      case HomeWidgetKind.nutrition:
+        return const _AndroidWidgetProviderConfig(
+          providerClass: _androidSecondWidgetProviderClass,
+          qualifiedProviderName: _androidSecondQualifiedProviderName,
+        );
+      case HomeWidgetKind.streak:
+        return const _AndroidWidgetProviderConfig(
+          providerClass: _androidThirdWidgetProviderClass,
+          qualifiedProviderName: _androidThirdQualifiedProviderName,
+        );
+    }
+  }
+
+  static Future<bool> requestPinWidget({
+    HomeWidgetKind kind = HomeWidgetKind.calories,
+  }) async {
     if (!Platform.isAndroid) {
       return false;
     }
@@ -126,10 +153,12 @@ class HomeWidgetService {
       return false;
     }
 
+    final config = _providerConfigForKind(kind);
+
     await HomeWidget.requestPinWidget(
-      name: _androidWidgetProviderClass,
-      androidName: _androidWidgetProviderClass,
-      qualifiedAndroidName: _androidQualifiedProviderName,
+      name: config.providerClass,
+      androidName: config.providerClass,
+      qualifiedAndroidName: config.qualifiedProviderName,
     );
 
     return true;
@@ -139,6 +168,7 @@ class HomeWidgetService {
     required int calories,
     required int calorieGoal,
     String ctaText = 'Log your food',
+    HomeWidgetKind kind = HomeWidgetKind.calories,
   }) async {
     await saveCalorieWidgetData(
       calories: calories,
@@ -147,6 +177,68 @@ class HomeWidgetService {
       ctaText: ctaText,
     );
     await updateWidget(dateId: _todayDateId);
-    return requestPinWidget();
+    return requestPinWidget(kind: kind);
   }
+
+  static Future<Set<HomeWidgetKind>> getPinnedWidgetKinds() async {
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      return <HomeWidgetKind>{};
+    }
+
+    final List<HomeWidgetInfo> installed;
+    try {
+      installed = await HomeWidget.getInstalledWidgets();
+    } catch (error, stackTrace) {
+      debugPrint(
+        'HomeWidgetService.getPinnedWidgetKinds failed: $error\n$stackTrace',
+      );
+      return <HomeWidgetKind>{};
+    }
+    final pinnedKinds = <HomeWidgetKind>{};
+
+    if (Platform.isIOS) {
+      for (final widget in installed) {
+        final kind = widget.iOSKind;
+        if (kind == _iOSCaloriesWidgetKind) {
+          pinnedKinds.add(HomeWidgetKind.calories);
+        } else if (kind == _iOSNutritionWidgetKind) {
+          pinnedKinds.add(HomeWidgetKind.nutrition);
+        } else if (kind == _iOSStreakWidgetKind) {
+          pinnedKinds.add(HomeWidgetKind.streak);
+        }
+      }
+      return pinnedKinds;
+    }
+
+    for (final kind in HomeWidgetKind.values) {
+      final config = _providerConfigForKind(kind);
+      final isPinned = installed.any((widget) {
+        final className = widget.androidClassName ?? '';
+        return className == '.${config.providerClass}' ||
+            className.endsWith(config.providerClass) ||
+            className.contains(config.providerClass);
+      });
+
+      if (isPinned) {
+        pinnedKinds.add(kind);
+      }
+    }
+
+    return pinnedKinds;
+  }
+
+  static Future<bool> isWidgetPinned({required HomeWidgetKind kind}) async {
+    final pinnedKinds = await getPinnedWidgetKinds();
+    return pinnedKinds.contains(kind);
+  }
+}
+
+class _AndroidWidgetProviderConfig {
+  final String providerClass;
+  final String qualifiedProviderName;
+
+  const _AndroidWidgetProviderConfig({
+    required this.providerClass,
+    required this.qualifiedProviderName,
+  });
 }
