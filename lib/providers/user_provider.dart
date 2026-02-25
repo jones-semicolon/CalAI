@@ -36,41 +36,35 @@ class UserNotifier extends StateNotifier<User> {
   // ONBOARDING MODE (Memory Only)
   // -----------------------------------------------------------------------------
 
-  /// USE THIS FOR ONBOARDING SCREENS.
-  /// Updates the local state without hitting the database.
-  /// Prevents "Ghost Users" and saves money on writes.
   void updateLocal(User Function(User state) transform) {
     state = transform(state);
   }
 
-  /// CALL THIS AT THE END OF ONBOARDING.
-  /// Flushes the entire "Draft" user to Firestore in one write.
+  Future<void> calculateGoals() async {
+    debugPrint("Step 1: Calculating Goals...");
+
+    final calculatedGoals = await _service.fetchGoals(state, forceRefresh: true, save: false);
+
+
+    if (calculatedGoals != null) {
+      updateLocal((s) => s.copyWith(
+        goal: s.goal.copyWith(
+          targets: calculatedGoals.targets, 
+        ),
+      ));
+    }
+  }
+
   Future<void> completeOnboarding() async {
     try {
-      debugPrint("Step 1: Calculating Goals...");
-
-      final calculatedGoals = await _service.fetchGoals(state, forceRefresh: true, save: false);
-
-
-      if (calculatedGoals != null) {
-        _update((s) => s.copyWith(
-          goal: s.goal.copyWith(
-            targets: calculatedGoals.targets, // Only update the numbers!
-          ),
-        ));
-      }
-
       debugPrint("Step 2: Saving Everything...");
 
-      // C. THE BIG SAVE (Atomic Write)
-      // Now we save Profile + Body + Goals + Settings all in ONE document write.
       await _service.updateProfile(state);
       await _service.initializeUserReferral(_service.uid!);
 
       debugPrint("Onboarding Complete & Saved!");
     } catch (e) {
       debugPrint("Onboarding Failed: $e");
-      // Rethrow so the UI knows to stop the loading animation
       rethrow;
     }
   }

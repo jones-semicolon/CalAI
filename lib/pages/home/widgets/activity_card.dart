@@ -99,10 +99,9 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final value = valueInt.abs().round();
-    // This widget's structure is identical to the original implementation.
     return SizedBox(
       width: double.infinity,
-      height: 30, // Keep this fixed to prevent the card from jumping
+      height: 30, 
       child: FittedBox(
         fit: BoxFit.scaleDown,
         alignment: Alignment.centerLeft,
@@ -164,7 +163,6 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// Displays the title of the card (e.g., "Protein eaten").
 class _Title extends StatelessWidget {
   final String title;
   final bool isTap;
@@ -174,27 +172,32 @@ class _Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // This widget preserves the original Row and Flexible structure.
     return Row(
       children: [
         Flexible(
           child: RichText(
             overflow: TextOverflow.ellipsis,
-            // TextSpan styles are preserved from the original code.
             text: TextSpan(
               style: const TextStyle(fontSize: 12),
               children: [
                 TextSpan(
-                  text: title,
+                  text: "$title ",
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
-                TextSpan(
-                  text: " ${isTap ? 'eaten' : (overEat ? 'over' : 'left')}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: AnimatedSlideNumber(
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    // Logic remains the same
+                    value: isTap ? "eaten" : (overEat ? "over" : "left"),
+                    reverse: isTap,
+                    inAnim: false,
                   ),
                 ),
               ],

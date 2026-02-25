@@ -1,9 +1,7 @@
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/global_provider.dart';
@@ -26,7 +24,6 @@ class _EditNamePageState extends ConsumerState<EditNamePage> {
   @override
   void initState() {
     super.initState();
-    // 1. Initialize with current name from Riverpod
     final currentName = ref.read(userProvider).profile.name;
     _controller = TextEditingController(text: currentName);
     _hasInput = currentName!.trim().isNotEmpty;
@@ -36,7 +33,7 @@ class _EditNamePageState extends ConsumerState<EditNamePage> {
 
   @override
   void dispose() {
-    _controller.dispose(); // No need to remove listener explicitly if disposing
+    _controller.dispose();
     super.dispose();
   }
 
@@ -46,17 +43,13 @@ class _EditNamePageState extends ConsumerState<EditNamePage> {
     });
   }
 
-  /// Handles saving the name to both Riverpod and Firestore
   Future<void> _handleDone() async {
     if (!_hasInput) return;
 
     final newName = _controller.text.trim();
 
-    // 2. Update local Riverpod state (instant UI feedback)
     ref.read(userProvider.notifier).setName(newName);
 
-    // 3. Persist to Firestore using the updateProfile method in GlobalData
-    // We already cleaned this method to save the 'name' field
     await ref.read(calaiServiceProvider).updateUserProfileField('name', newName);
 
     if (mounted) {
@@ -84,7 +77,6 @@ class _EditNamePageState extends ConsumerState<EditNamePage> {
   }
 }
 
-/// The main content area of the page, including the title and input field.
 class _PageBody extends StatelessWidget {
   final TextEditingController controller;
 
@@ -109,7 +101,6 @@ class _PageBody extends StatelessWidget {
   }
 }
 
-/// The text input field for the user's name.
 class _NameInputField extends StatelessWidget {
   final TextEditingController controller;
 
@@ -130,57 +121,6 @@ class _NameInputField extends StatelessWidget {
         decoration: const InputDecoration(
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(vertical: 16),
-        ),
-      ),
-    );
-  }
-}
-
-/// The floating footer container that provides the background and shadow for the button.
-class _DoneFooter extends StatelessWidget {
-  final bool hasInput;
-  final VoidCallback onDone;
-  final bool isSaving;
-
-  const _DoneFooter({
-    required this.hasInput,
-    required this.onDone,
-    required this.isSaving,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            offset: Offset(0, -0.5),
-            blurRadius: 5,
-          ),
-        ],
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        height: 45,
-        child: ElevatedButton(
-          onPressed: hasInput ? onDone : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: Colors.grey.shade400,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-          ),
-          child: isSaving
-              ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CupertinoActivityIndicator(radius: 15)
-          )
-              : const Text("Done", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ),
       ),
     );

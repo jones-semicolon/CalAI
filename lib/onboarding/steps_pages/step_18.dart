@@ -3,12 +3,10 @@ import 'package:calai/widgets/edit_value_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/push_page_route.dart';
 import '../../enums/food_enums.dart';
 import '../../pages/auth/auth.dart';
 import '../../providers/user_provider.dart';
 import '../onboarding_widgets/calibration_result/dashboard_widget.dart';
-import '../onboarding_widgets/edit_goal/edit_goal_screen.dart';
 import '../onboarding_widgets/loading_widget/health_plan_loading_widget.dart';
 
 class OnboardingStep18 extends ConsumerStatefulWidget {
@@ -20,9 +18,8 @@ class OnboardingStep18 extends ConsumerStatefulWidget {
 }
 
 class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
-  // UI State Management
-  bool _isCalculating = true; // Waiting for API/DB
-  bool _isAnimationDone = false; // Waiting for Fancy Animation
+  bool _isCalculating = true; 
+  bool _isAnimationDone = false;
   String? _error;
 
   @override
@@ -36,17 +33,10 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
 
     try {
       final userNotifier = ref.read(userProvider.notifier);
-
-      // ✅ THE FIX: Single Responsibility
-      // We call this ONE method. It handles:
-      // 1. Calculating goals (API)
-      // 2. Updating local state
-      // 3. Saving everything to Firestore in one batch
-      // // ✅ Sign in as guest IMMEDIATELY so they have a UID for the whole onboarding
       if (FirebaseAuth.instance.currentUser == null) {
         await AuthService.signInAsGuest();
       }
-      await userNotifier.completeOnboarding();
+      await userNotifier.calculateGoals();
 
       if (mounted) {
         setState(() {
@@ -80,14 +70,10 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
         label: title,
         color: color,
         onDone: (val) {
-          // ✅ ONLY POP HERE to return the value to this function
           Navigator.pop(context, val);
         },
       ),
     );
-
-    // ✅ DO NOT call Navigator.pop(context) here!
-    // If you do, it pops the Onboarding screen, leaving you with a blank screen.
     if (newValue != null && mounted) {
       onSaved(newValue);
     }
@@ -98,9 +84,6 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
     final user = ref.watch(userProvider);
     final targets = user.goal.targets;
 
-    // ---------------------------------------------------------
-    // SCENARIO 1: ERROR (Retry Logic)
-    // ---------------------------------------------------------
     if (_error != null) {
       return Center(
         child: Column(
@@ -119,7 +102,7 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                   _isCalculating = true;
                   _error = null;
                 });
-                startComputation(); // Retry
+                startComputation(); 
               },
               child: const Text("Try Again"),
             ),
@@ -128,10 +111,6 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
       );
     }
 
-    // ---------------------------------------------------------
-    // SCENARIO 2: LOADING (Animation Sync)
-    // ---------------------------------------------------------
-    // Shows animation until BOTH (Data is Ready) AND (Timer is Done)
     if (_isCalculating || !_isAnimationDone) {
       return HealthPlanLoadingWidget(
         onFinished: () {
@@ -144,9 +123,6 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
       );
     }
 
-    // ---------------------------------------------------------
-    // SCENARIO 3: SUCCESS (Dashboard)
-    // ---------------------------------------------------------
     return Column(
       children: [
         Expanded(
@@ -270,6 +246,7 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
         ),
         ConfirmationButtonWidget(enabled: true, onConfirm: () {
           ref.read(userProvider.notifier).updateNutritionGoals(user.goal.targets);
+          ref.read(userProvider.notifier).completeOnboarding();
           widget.nextPage();
         }),
       ],

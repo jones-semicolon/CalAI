@@ -1,9 +1,8 @@
-import 'package:calai/models/nutrition_model.dart';
 import 'package:calai/pages/settings/screens/generate_goals_view.dart';
 import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:calai/widgets/edit_value_view.dart'; // Using your EditModal
+import 'package:calai/widgets/edit_value_view.dart'; 
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/providers/user_provider.dart';
 
@@ -160,7 +159,6 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                     ),
                   ),
 
-                  // ✅ 3. Conditional Micronutrient Section
                   if (_showMicros) ...[
                     const SizedBox(height: 10),
                     _GoalCard(

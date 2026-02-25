@@ -39,7 +39,6 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: [
-        // ✅ CRITICAL: Fixes your "not saving" issue by providing the real instance
         sharedPreferencesProvider.overrideWithValue(sharedPrefs),
       ],
       child: MyApp(
@@ -121,12 +120,10 @@ class _MyAppState extends State<MyApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
 
-      // Localization
       locale: _locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
 
-      // ✅ MERGED BUILDER: Handles Debug Overlay & Global Listeners
       builder: (context, child) {
         return Consumer(
           builder: (context, ref, _) {

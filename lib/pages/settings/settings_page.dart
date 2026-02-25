@@ -1,11 +1,6 @@
 import 'package:calai/enums/user_enums.dart';
 import 'package:calai/features/reminders/presentation/reminder_settings_section.dart';
-import 'package:calai/onboarding/app_entry.dart';
-import 'package:calai/onboarding/onboarding_page.dart';
 import 'package:calai/pages/settings/terms_feedback_section.dart';
-import 'package:calai/providers/auth_state_providers.dart' hide AuthService;
-import 'package:calai/providers/global_provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +14,11 @@ import 'widgets/name_age_card.dart';
 import 'widgets/invite_friends_item.dart';
 import 'widgets/settings_group.dart';
 
-class SettingsPage extends ConsumerWidget { // ✅ Converted to ConsumerWidget for speed
+class SettingsPage extends ConsumerWidget { 
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Select specifically the provider to avoid unnecessary rebuilds
     final provider = ref.watch(userProvider.select((u) => u.profile.provider));
     final bool isAnonymous = provider == null || provider == UserProvider.anonymous;
 
@@ -50,7 +44,6 @@ class SettingsPage extends ConsumerWidget { // ✅ Converted to ConsumerWidget f
                 const PreferencesSection(),
                 const SizedBox(height: 16),
 
-                // ✅ Unified Reminder UI
                 const ReminderSettingsSection(),
                 const SizedBox(height: 16),
                 TermsFeedbackSection(isAnonymous: isAnonymous ? UserProvider.anonymous : provider),
@@ -96,15 +89,20 @@ class _LinkAccountButton extends ConsumerWidget {
             );
 
             try {
-              await AuthService.signInWithGoogle(); 
+              await AuthService.linkGoogleAccount(); 
               
               if (context.mounted) {
                 Navigator.pop(context); 
               }
             } catch (e) {
               if (context.mounted) {
-                Navigator.pop(context);
-                _handleLinkingError(context, e); 
+                Navigator.pop(context); 
+                
+                if (e is FirebaseAuthException && e.code == 'credential-already-in-use') {
+                  _showSwitchAccountDialog(context);
+                } else {
+                  _handleLinkingError(context, e);
+                }
               }
             }
           },

@@ -3,7 +3,6 @@ import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../services/calai_firestore_service.dart';
 import '../../../widgets/header_widget.dart';
 import '../../../widgets/profile_widgets/height_picker.dart';
 

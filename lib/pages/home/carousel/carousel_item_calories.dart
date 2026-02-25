@@ -21,7 +21,6 @@ class CarouselCalories extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 1. Get Today's Progress from Global State
     final globalState = ref.watch(globalDataProvider).value;
     final progress = globalState?.todayProgress ?? NutritionProgress.empty;
 
@@ -118,8 +117,8 @@ class _CalorieInfo extends StatelessWidget {
   final bool isTap;
   final NutritionProgress progress;
   final NutritionGoals targets;
-  final GlobalDataState? globalState; // ✅ Add this
-  final bool isAddBurnEnabled; // ✅ Add this
+  final GlobalDataState? globalState;
+  final bool isAddBurnEnabled; 
   final bool isRolloverEnabled;
 
 
@@ -127,18 +126,18 @@ class _CalorieInfo extends StatelessWidget {
     required this.isTap,
     required this.progress,
     required this.targets,
-    required this.globalState, // ✅ Add this
-    required this.isAddBurnEnabled, // ✅ Add this
-    required this.isRolloverEnabled, // ✅ Add this
+    required this.globalState,
+    required this.isAddBurnEnabled, 
+    required this.isRolloverEnabled, 
   });
 
   @override
   Widget build(BuildContext context) {
-    // Logic: Eaten vs Left
     final num effectiveGoal = globalState?.effectiveCalorieGoal(isAddBurnEnabled, isRolloverEnabled) ?? targets.calories;
     final num value = isTap
         ? progress.calories
         : (globalState?.caloriesRemaining(isAddBurnEnabled, isRolloverEnabled) ?? (targets.calories - progress.calories));
+    final bool overEat = progress.calories > effectiveGoal;
 
     final textStyle = TextStyle(
       fontSize: 32,
@@ -152,7 +151,6 @@ class _CalorieInfo extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Wrap in AnimatedSize to make the Row expansion fluid
           AnimatedSize(
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOutCubic,
@@ -170,17 +168,15 @@ class _CalorieInfo extends StatelessWidget {
                     style: textStyle,
                     reverse: isTap,
                   ),
-                  // 2. Use AnimatedSwitcher for the rest of the number
                   if (valueString.length > 1)
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       child: Text(
                         valueString.substring(1),
-                        key: ValueKey(valueString), // Animate when the number changes
+                        key: ValueKey(valueString), 
                       ),
                     ),
                   const SizedBox(width: 4),
-                  // 3. The Goal part slides in/out smoothly
                   AnimatedSlideNumber(
                     value: isTap ? " /${effectiveGoal.round()}" : "",
                     style: TextStyle(
@@ -195,7 +191,6 @@ class _CalorieInfo extends StatelessWidget {
               ),
             ),
           ),
-          // 4. Smoothly swap "eaten" and "left"
           Row(
             children: [
               Text(
@@ -211,7 +206,7 @@ class _CalorieInfo extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                value: isTap ? "eaten" : "left",
+                value: isTap ? "eaten" : (overEat ? "over" : "left"),
                 reverse: isTap,
                 inAnim: false,
               ),

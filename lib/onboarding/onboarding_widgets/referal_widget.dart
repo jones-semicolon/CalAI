@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ReferralCodeInput extends StatefulWidget {
   final void Function(String referralCode) onSubmit;
@@ -84,6 +85,10 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
                     TextField(
                       controller: _controller,
                       focusNode: _focusNode,
+                      textCapitalization: TextCapitalization.characters, // Suggests caps to the keyboard
+                      inputFormatters: [
+                        UpperCaseTextFormatter(), // ✅ Forces the text to be uppercase
+                      ],
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         isDense: true,
@@ -130,6 +135,16 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
           ),
         );
       },
+    );
+  }
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }

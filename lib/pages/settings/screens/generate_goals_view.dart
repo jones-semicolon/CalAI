@@ -1,5 +1,4 @@
 import 'package:calai/onboarding/steps_pages/step_2.dart';
-import 'package:calai/services/calai_firestore_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -131,7 +130,6 @@ class _GenerateGoalsViewState extends ConsumerState<GenerateGoalsView> {
               ],
             ),
 
-            // ✅ The Loading Overlay
             if (_isGenerating)
               Container(
                 color: Colors.black.withOpacity(0.5),

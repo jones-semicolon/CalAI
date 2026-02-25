@@ -528,10 +528,7 @@ class CalaiFirestoreService {
     if (!forceRefresh) {
       final doc = await userDoc.get();
 
-      if (doc.data()?['goal'] != null) {
-        debugPrint("✅ Found existing goals. ${doc.data()?['goal']}");
-        return UserGoal.fromJson({'dailyGoals': doc.data()!['goal']['dailyGoals']});
-      }
+      if (doc.data()?['goal'] != null) return UserGoal.fromJson({'dailyGoals': doc.data()!['goal']['dailyGoals']});
     }
 
     final Map<String, dynamic>? dailyGoals = await _goalsApi.calculateGoals(
@@ -544,8 +541,6 @@ class CalaiFirestoreService {
       dailyGoals['weightGoal'] = user.goal.targets.weightGoal;
 
       if (save) {
-        // We save this to 'dailyGoals' so it is easily accessible
-        // AND we should also merge it into 'goal.dailyGoals' to keep the User model sync
         await updateDailyGoals(dailyGoals);
       }
 
@@ -558,7 +553,6 @@ class CalaiFirestoreService {
     final batch = _db.batch();
     final String dateKey = todayId; // YYYY-MM-DD
 
-    // 2. Nested field (for User model integrity)
     batch.set(userDoc, {
       'goal': {'dailyGoals': goals},
       'updatedAt': FieldValue.serverTimestamp(),

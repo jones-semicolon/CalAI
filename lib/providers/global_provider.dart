@@ -2,12 +2,8 @@ import 'dart:async';
 import 'package:calai/providers/auth_state_providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-
-// Project Imports
-import '../enums/food_enums.dart';
 import '../enums/user_enums.dart';
 import '../models/exercise_model.dart';
 import '../models/global_state_model.dart';
@@ -206,9 +202,10 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       ));
     });
   }
+
   void selectDay(String dateId) {
     final current = state.asData?.value ?? GlobalDataState.initial();
-    state = AsyncData(current.copyWith(activeDateId: dateId));
+    state = AsyncData(current.copyWith(activeDateId: dateId, todayProgress: NutritionProgress.empty));
     listenToDailySummary(dateId);
   }
 

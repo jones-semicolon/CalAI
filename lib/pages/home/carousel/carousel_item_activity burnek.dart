@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io' show Platform;
+import 'dart:ui';
 
 import 'package:calai/enums/user_enums.dart';
 import 'package:calai/providers/user_provider.dart';
@@ -16,7 +18,7 @@ import 'package:permission_handler/permission_handler.dart';
 class CarouselActivity extends StatelessWidget {
   final num waterIntake;
   final Function(int) onWaterChange;
-  final String dateId;
+  final String dateId; // Changed from DateTime to String dateId
 
   const CarouselActivity({
     super.key,
@@ -63,12 +65,13 @@ class _CaloriesBurnedCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    // 1. Watch progress from the Global Provider
+    // 1. Watch progress from the Global Provider (Replacing HealthData)
     final globalState = ref.watch(globalDataProvider).value;
-    final double stepsCalories = globalState?.todayProgress.caloriesBurnedPerSteps ?? 0;
-    final burned = (globalState?.todayProgress.caloriesBurned ?? 0);
+    final burned = globalState?.todayProgress.caloriesBurned ?? 0;
+    // TODO: it should be caloriesBurnedPerSteps
+    final stepsToday = globalState?.todayProgress.steps;
 
-    // 2. Watch the list of entries specifically for this date
+    // 2. Watch the list of entries specifically for this date using your StreamProvider.family
     final entriesAsync = ref.watch(dailyEntriesProvider(dateId));
 
     return Container(
@@ -81,7 +84,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildBurnedHeader(theme, burned, stepsCalories),
+          _buildBurnedHeader(theme, burned), // Extracted for readability
           const SizedBox(height: 15),
 
           entriesAsync.when(
@@ -92,6 +95,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
             error: (err, _) => const SizedBox.shrink(),
             data: (entries) {
               // Extract exercise logs from database entries
+              // We filter out anything that looks like a "steps" log to avoid repetition
               final List<ExerciseLog> exercises = entries
                   .where((data) =>
               data.containsKey('calories_burned') &&
@@ -102,20 +106,17 @@ class _CaloriesBurnedCard extends ConsumerWidget {
 
               return Column(
                 children: [
-                  // ✅ LOGGED STEPS:
-                  // Uses the calories variable we fixed above.
-                  if (stepsCalories > 0)
+                  // ✅ LOGGED STEPS: Always at the top, only one, hidden if 0
+                  if (stepsToday! > 0)
                     _ActivityItemRow(
                       title: "Steps",
-                      // I updated 'cal' to 'kcal' to match the exercises below
-                      value: "+${stepsCalories.round()} kcal",
+                      value: "+${stepsToday.round()} cal",
                       icon: Icons.directions_walk,
                     ),
 
-                  // Map the remaining exercises
-                  // (take top 2 if steps exist, or 3 if not)
+                  // Map the remaining exercises (take top 2 if steps exist, or 3 if not)
                   ...exercises
-                      .take(stepsCalories > 0 ? 2 : 3)
+                      .take(stepsToday > 0 ? 2 : 3)
                       .map((ex) => _ActivityItemRow(
                     title: ex.type.label,
                     value: "+${ex.caloriesBurned.round()} kcal",
@@ -131,7 +132,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
   }
 }
 
-Widget _buildBurnedHeader(ThemeData theme, double burned, double stepsCalories) {
+Widget _buildBurnedHeader(ThemeData theme, num burned) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -149,7 +150,7 @@ Widget _buildBurnedHeader(ThemeData theme, double burned, double stepsCalories) 
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "${(burned + stepsCalories).round()}",
+              "${burned.round()}",
               style: TextStyle(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
@@ -177,52 +178,124 @@ class _StepsTodayCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(stepTrackerProvider);
     final steps = ref.watch(stepsTodayProvider);
+    
+    // ✅ 1. Watch the permission state
+    final permissionState = ref.watch(stepPermissionProvider);
+    final hasPermission = permissionState.value ?? false;
 
-    // 2. Wrap in GestureDetector so the user can actually tap to fix permissions
-    return GestureDetector(
-      onTap: () => _handlePermissionRequest(context, ref),
-      child: ActivityCard(
-        title: "Steps Today",
-        currentValue: steps,
-        icon: Icons.directions_walk,
-        color: Theme.of(context).colorScheme.primary, // Standard "Active" green
-      ),
+    final theme = Theme.of(context);
+
+    return Stack(
+      fit: StackFit.expand, // Ensures the blur covers the exact size of the card
+      children: [
+        // --- BOTTOM LAYER: The actual Step Card ---
+        ActivityCard(
+          title: "Steps Today",
+          currentValue: steps,
+          icon: Icons.directions_walk,
+          color: theme.colorScheme.primary, // Standard "Active" green
+        ),
+
+        // --- TOP LAYER: The Blurred Permission Request Overlay ---
+        if (!hasPermission)
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => _handlePermissionRequest(context, ref),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20), // Matches your ActivityCard's radius
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0), // The blur strength
+                  child: Container(
+                    color: Colors.black.withOpacity(0.2), // Slight darkening effect
+                    alignment: Alignment.center,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: theme.appBarTheme.backgroundColor, // Matches dark card color
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: theme.splashColor),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withOpacity(0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.directions_walk,
+                              color: theme.colorScheme.primary,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              "Tap to enable\nstep tracking",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
   Future<void> _handlePermissionRequest(BuildContext context, WidgetRef ref) async {
-    // 1. Request BOTH platform permissions simultaneously
-    final statuses = await [
-      Permission.activityRecognition, // Android 10+
-      Permission.sensors,             // iOS CoreMotion
-    ].request();
+  final permission = Platform.isIOS ? Permission.sensors : Permission.activityRecognition;
+  
+  // 1. Check current status first
+  var status = await permission.status;
 
-    // 2. Check if the relevant platform granted access
-    final isGranted = statuses[Permission.activityRecognition]?.isGranted == true || 
-                      statuses[Permission.sensors]?.isGranted == true;
-
-    final isDeniedForever = statuses[Permission.activityRecognition]?.isPermanentlyDenied == true || 
-                            statuses[Permission.sensors]?.isPermanentlyDenied == true;
-
-    if (isGranted) {
-      // 3. Safe to boot up the hardware streams now!
-      ref.invalidate(stepCountStreamProvider);
-      ref.invalidate(stepTrackerProvider);
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Step tracking active! 🚶‍♂️')),
-        );
-      }
-    } else if (isDeniedForever) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enable motion access in settings to track steps.')),
-        );
-      }
-      openAppSettings(); // Send them to the OS settings
+  if (status.isPermanentlyDenied) {
+    // If we are here, we MUST go to settings, but let's tell the user why first
+    if (context.mounted) {
+      _showSettingsExplainer(context);
     }
+    return;
   }
+
+  // 2. Request the permission
+  status = await permission.request();
+
+  if (status.isGranted) {
+    ref.invalidate(stepPermissionProvider);
+    ref.invalidate(stepCountStreamProvider);
+    ref.invalidate(stepTrackerProvider);
+  }
+}
+
+void _showSettingsExplainer(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Enable Motion Tracking"),
+      content: const Text("To track your steps automatically, please enable 'Motion & Fitness' in your device settings."),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            openAppSettings();
+          }, 
+          child: const Text("Open Settings")
+        ),
+      ],
+    ),
+  );
+}
 }
 
 class _WaterIntakeSection extends ConsumerWidget {
@@ -237,24 +310,7 @@ class _WaterIntakeSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final user = ref.read(userProvider); // Get full user object
-    final unitSystem = user.settings.measurementUnit;
-
-    // Get current goal safely
-    final waterGoal = ref.read(globalDataProvider).value?.todayGoal.water;
-
-    // ✅ Define the save callback
-    void onWaterGoalChange(int newWaterGoal) {
-      // 1. Get current targets
-      final currentTargets = user.goal.targets;
-
-      // 2. Update just the water goal (assuming copyWith exists on your model)
-      final newTargets = currentTargets.copyWith(water: newWaterGoal.toDouble());
-
-      // 3. Call the notifier
-      ref.read(userProvider.notifier).updateNutritionGoals(newTargets);
-    }
-
+    final unitSystem = ref.read(userProvider).settings.measurementUnit;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -281,22 +337,13 @@ class _WaterIntakeSection extends ConsumerWidget {
               Row(
                 children: [
                   Text(
-                    // Display logic
-                    "${unitSystem?.liquidToDisplay(waterIntake.toDouble()).round() ?? waterIntake.round()} ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
+                    "${unitSystem?.liquidToDisplay(waterIntake.toDouble()).round() ?? waterIntake.round()}  ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}", // Unit update
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(width: 5),
-
                   GestureDetector(
-                    onTap: () {
-                      _showWaterSettings(
-                        context,
-                        unitSystem,
-                        waterGoal?.round() ?? 2000, // Default to 2000 if null
-                            (newValue) => onWaterGoalChange(newValue), // Pass the callback
-                      );
-                    },
-                    child: Icon(Icons.settings_outlined, color: theme.colorScheme.primary, size: 16),
+                    onTap: () => _showWaterSettings(context, unitSystem), // ✅ Call the sheet
+                    child: Icon(Icons.settings_outlined, color: theme.colorScheme.onPrimary, size: 16),
                   )
                 ],
               ),
@@ -320,16 +367,8 @@ class _WaterIntakeSection extends ConsumerWidget {
   }
 }
 
-// 1. Add a callback parameter (onValueChanged) to send data back
-void _showWaterSettings(
-    BuildContext context,
-    MeasurementUnit? unitSystem,
-    int initialValue,
-    ValueChanged<int> onSave, // Triggered only on close
-    ) {
-  // 1. Capture the value in a variable outside the builder
-  int finalValue = initialValue;
-
+// TODO: Add functionality to this water serving size picker
+void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -338,12 +377,12 @@ void _showWaterSettings(
       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
     ),
     builder: (context) {
-      // Local state for the UI (instant updates)
-      int localSelectedValue = initialValue;
-      bool isPickerVisible = false;
-
+      // Use StatefulBuilder to manage the picker visibility inside the sheet
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setSheetState) {
+          bool isPickerVisible = false;
+          int selectedValue = 8; // Default value based on your screenshot
+
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Column(
@@ -354,26 +393,24 @@ void _showWaterSettings(
                 _buildSheetHeader(context),
                 const SizedBox(height: 30),
 
+                // --- SERVING SIZE ROW ---
                 GestureDetector(
                   onTap: () => setSheetState(() => isPickerVisible = !isPickerVisible),
-                  behavior: HitTestBehavior.opaque,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: isPickerVisible ? Colors.grey.withOpacity(0.1) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Serving Size", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        const Text(
+                          "Serving Size",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                         Row(
                           children: [
                             Text(
-                              "$localSelectedValue ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
+                              "$selectedValue ${unitSystem?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
                               style: TextStyle(fontSize: 15, color: Colors.grey[800]),
                             ),
-                            Icon(isPickerVisible ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
                           ],
                         ),
                       ],
@@ -381,29 +418,26 @@ void _showWaterSettings(
                   ),
                 ),
 
+                // --- DYNAMIC NUMBER PICKER ---
                 if (isPickerVisible) ...[
                   const SizedBox(height: 10),
                   SizedBox(
-                    height: 150,
+                    height: 120,
                     child: CupertinoPicker(
                       itemExtent: 40,
-                      scrollController: FixedExtentScrollController(
-                        initialItem: (localSelectedValue / 100).round().clamp(0, 50),
-                      ),
+                      scrollController: FixedExtentScrollController(initialItem: 0),
                       onSelectedItemChanged: (index) {
-                        final newValue = index * 100;
-                        setSheetState(() {
-                          localSelectedValue = newValue;
-                        });
-                        // 2. Update our outer variable, but DO NOT save yet
-                        finalValue = newValue;
+                        setSheetState(() => selectedValue = 8 + index);
                       },
-                      children: List.generate(51, (index) => Center(child: Text("${index * 100}"))),
+                      children: List.generate(20, (index) =>
+                          Center(child: Text("${8 + index}"))
+                      ),
                     ),
                   ),
                 ],
-                const SizedBox(height: 10,),
-                _buildHydrationInfo(unitSystem ?? MeasurementUnit.metric),
+
+                const SizedBox(height: 30),
+                _buildHydrationInfo(),
                 const SizedBox(height: 30),
               ],
             ),
@@ -411,15 +445,9 @@ void _showWaterSettings(
         },
       );
     },
-  ).whenComplete(() {
-    // 3. This runs when the sheet is dismissed (swiped down or tapped outside)
-    if (finalValue != initialValue) {
-      onSave(finalValue);
-    }
-  });
+  );
 }
 
-// 1. Creates the small horizontal gray bar at the very top of the sheet
 Widget _buildDragHandle() {
   return Center(
     child: Container(
@@ -433,7 +461,6 @@ Widget _buildDragHandle() {
   );
 }
 
-// 2. Creates the "X" button and the "Water settings" title
 Widget _buildSheetHeader(BuildContext context) {
   return Row(
     children: [
@@ -463,8 +490,7 @@ Widget _buildSheetHeader(BuildContext context) {
   );
 }
 
-// Helper for the "How much water..." text section
-Widget _buildHydrationInfo(MeasurementUnit measurementUnit) {
+Widget _buildHydrationInfo() {
   return Column(
     children: [
       const Text(
@@ -474,7 +500,7 @@ Widget _buildHydrationInfo(MeasurementUnit measurementUnit) {
       ),
       const SizedBox(height: 10),
       Text(
-        "Everyone's needs are slightly different, but we recommended aiming for at least ${measurementUnit.liquidToDisplay(1900).round()} ${measurementUnit.liquidLabel} (8 cups) of water each day",
+        "Everyone's needs are slightly different, but we recommended aiming for at least 64 fl oz (8 cups) of water each day",
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 14, color: Colors.grey[600], height: 1.4),
       ),
@@ -521,8 +547,6 @@ class _ActionButton extends StatelessWidget {
     );
   }
 }
-
-// --- Shared Components ---
 
 class _ActivityItemRow extends StatelessWidget {
   final String title;
@@ -580,7 +604,6 @@ class _ActivityItemRow extends StatelessWidget {
   }
 }
 
-// ✅ 1. Change to ConsumerWidget to access 'ref'
 class ActivityCard extends ConsumerWidget {
   final String title;
   final int currentValue;
@@ -652,8 +675,8 @@ class ActivityCard extends ConsumerWidget {
                     width: 95,
                     child: CircularProgressIndicator(
                       value: progress.clamp(0.0, 1.0),
-                      strokeWidth: 8, // Slightly thicker for a premium feel
-                      strokeCap: StrokeCap.round, // Makes the progress bar look modern
+                      strokeWidth: 8, 
+                      strokeCap: StrokeCap.round,
                       backgroundColor: theme.splashColor,
                       color: primaryColor,
                     ),

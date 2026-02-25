@@ -60,9 +60,7 @@ class _AppEntryState extends State<AppEntry> {
 
   Future<bool> _checkOnboarding(User user) async {
     final prefs = await SharedPreferences.getInstance();
-
-    bool completed =
-        prefs.getBool('onboarding_completed') ?? false;
+    bool completed = prefs.getBool('onboarding_completed') ?? false;
 
     if (!completed) {
       final doc = await FirebaseFirestore.instance
@@ -71,14 +69,14 @@ class _AppEntryState extends State<AppEntry> {
           .get();
 
       final data = doc.data();
-      final hasGoals = data?['goal']?['dailyGoals'] != null;
+      // ✅ Change this: Only complete if the specific flag is true
+      final isDone = data?['profile']?['onboardingCompleted'] == true;
 
-      if (hasGoals) {
+      if (isDone) {
         completed = true;
         await prefs.setBool('onboarding_completed', true);
       }
     }
-
     return completed;
   }
 }

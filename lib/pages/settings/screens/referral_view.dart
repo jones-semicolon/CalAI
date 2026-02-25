@@ -17,12 +17,11 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    // Watch the user provider to get the real referral code
     final user = ref.watch(userProvider);
     final promoCode = user.profile.referralCode ?? "......";
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor, // Assumes dark theme
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

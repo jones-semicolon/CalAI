@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart'; // Changed from cupertino to material for standard Curves
+import 'package:flutter/material.dart'; 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../widgets/page_indicator.dart';
 import 'carousel_item_activity.dart';
 import 'carousel_item_calories.dart';
 import 'carousel_item_health.dart';
-import '../../../providers/global_provider.dart'; // Import to get activeDateId
+import '../../../providers/global_provider.dart';
 
 const double _carouselHeight = 330;
 
@@ -63,26 +63,23 @@ class _CarouselViewState extends ConsumerState<CarouselView> {
   @override
   @override
   Widget build(BuildContext context) {
-    // ✅ FIX 1: Only watch the specific data needed for this level (the ID)
-    // This prevents a rebuild of the whole Carousel if water/calories change!
     final activeDateId = ref.watch(globalDataProvider.select((async) => async.value?.activeDateId ?? ''));
 
-    // ✅ FIX 2: Watch water separately using select
     final currentWater = ref.watch(globalDataProvider.select((async) => async.value?.todayProgress.water ?? 0));
 
     final pages = [
       CarouselCalories(
-        key: const ValueKey('calories_page'), // ✅ FIX 3: Add Stable Keys
+        key: const ValueKey('calories_page'), 
         isTap: widget.isTap,
         onTap: widget.onTap,
       ),
       CarouselHealth(
-        key: const ValueKey('health_page'), // ✅ FIX 3: Add Stable Keys
+        key: const ValueKey('health_page'),
         isTap: widget.isTap,
         onTap: widget.onTap,
       ),
       CarouselActivity(
-        key: const ValueKey('activity_page'), // ✅ FIX 3: Add Stable Keys
+        key: const ValueKey('activity_page'), 
         waterIntake: currentWater,
         onWaterChange: widget.onWaterChange,
         dateId: activeDateId,
