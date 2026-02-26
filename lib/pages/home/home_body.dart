@@ -1,6 +1,7 @@
 import 'package:calai/pages/home/recently_logged/log_card.dart';
 import 'package:calai/pages/home/recently_logged/recently_logged_section.dart';
 import 'package:calai/providers/global_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide CarouselView;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,15 +31,15 @@ class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClie
   Widget build(BuildContext context) {
     super.build(context);
 
-    // ✅ OPTIMIZATION: Use .select to watch only specific properties.
-    // This prevents the entire HomeBody from rebuilding when unrelated data changes.
+    // ✅ 1. ONLY watch the activeDateId at the top level.
     final activeDateId = ref.watch(globalDataProvider.select((async) => async.value?.activeDateId ?? ''));
-    final calorieGoal = ref.watch(globalDataProvider.select((async) => async.value?.todayGoal.calories.toDouble() ?? 0.0));
-    final progressDays = ref.watch(globalDataProvider.select((async) => async.value?.progressDays ?? {}));
-    final dailyNutrition = ref.watch(globalDataProvider.select((async) => async.value?.dailyNutrition ?? []));
+
+    // Prevent rendering the heavy UI until we have a real date
+    if (activeDateId.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return CustomScrollView(
-      // ✅ Optimization: Using slivers properly reduces the layout passes
       slivers: [
         const WidgetTreeAppBar(),
         SliverToBoxAdapter(
@@ -51,30 +52,35 @@ class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClie
                   // --- DAY SELECTOR ---
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: DayItem(
-                      progressDays: progressDays,
-                      dailyCalories: dailyNutrition,
-                      calorieGoal: calorieGoal,
-                      selectedDateId: activeDateId,
-                      onDaySelected: (dateId) {
-                        // ✅ Optimization: read(notifier) doesn't cause a rebuild
-                        ref.read(globalDataProvider.notifier).selectDay(dateId);
+                    // ✅ 2. Wrap DayItem in a Consumer. 
+                    // Now, when food is logged or loaded, ONLY this small calendar strip rebuilds!
+                    child: Consumer(
+                      builder: (context, ref, child) {
+                        final calorieGoal = ref.watch(globalDataProvider.select((async) => async.value?.todayGoal.calories.toDouble() ?? 0.0));
+                        final progressDays = ref.watch(globalDataProvider.select((async) => async.value?.progressDays ?? {}));
+                        final dailyNutrition = ref.watch(globalDataProvider.select((async) => async.value?.dailyNutrition ?? []));
+
+                        return DayItem(
+                          progressDays: progressDays,
+                          dailyCalories: dailyNutrition,
+                          calorieGoal: calorieGoal,
+                          selectedDateId: activeDateId,
+                          onDaySelected: (dateId) {
+                            ref.read(globalDataProvider.notifier).selectDay(dateId);
+                          },
+                        );
                       },
                     ),
                   ),
 
                   // --- CAROUSEL VIEW ---
-                  // ✅ Optimization: RepaintBoundary helps cache complex UI layers (shadows/gradients)
                   RepaintBoundary(
                     child: CarouselView(
-                      key: ValueKey(activeDateId), // ✅ Keeps state tied to the date
                       isTap: _isTap,
                       onTap: _toggleTap,
                       currentIndex: _currentIndex,
                       onPageChanged: _onPageChanged,
-                      date: activeDateId.isNotEmpty
-                          ? DateTime.parse(activeDateId)
-                          : DateTime.now(),
+                      date: activeDateId.isNotEmpty ? DateTime.parse(activeDateId) : DateTime.now(),
                       onWaterChange: (v) {
                         ref.read(globalDataProvider.notifier).updateWater(v);
                       },
@@ -84,8 +90,6 @@ class _HomeBodyState extends ConsumerState<HomeBody> with AutomaticKeepAliveClie
                   const SizedBox(height: 30),
 
                   // --- RECENTLY LOGGED ---
-                  // ✅ Optimization: RecentlyUploadedSection should use its own providers
-                  // to keep this parent widget even lighter.
                   RecentlyUploadedSection(
                     dateId: activeDateId,
                   ),

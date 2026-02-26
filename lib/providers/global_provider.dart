@@ -97,16 +97,23 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
   // 3. LIVE LISTENERS (Streams)
   // ---------------------------------------------------------------------------
 
-  /// Listens to a specific date document for real-time calorie circle updates.
   void listenToDailySummary(String dateId) {
     if (_service.uid == null) return;
 
     _dailyLogSub?.cancel();
+    
     _dailyLogSub = _service.dailyLogDoc(dateId).snapshots().listen((doc) {
       if (!ref.mounted) return;
+      
       final data = doc.data();
 
-      if (!doc.exists || data == null) return;
+      if (!doc.exists || data == null) {
+        final current = state.asData?.value ?? GlobalDataState.initial();
+        state = AsyncData(current.copyWith(
+          todayProgress: NutritionProgress.empty, 
+        ));
+        return;
+      }
 
       _applyDailyLogToState(data, dateId);
     });
@@ -214,7 +221,18 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
 
   void selectDay(String dateId) {
     final current = state.asData?.value ?? GlobalDataState.initial();
-    state = AsyncData(current.copyWith(activeDateId: dateId, todayProgress: NutritionProgress.empty));
+
+    final hasData = current.dailyNutrition.any((log) {
+      return DateFormat('yyyy-MM-dd').format(log.date.toLocal()) == dateId;
+    });
+
+    final nextProgress = hasData ? current.todayProgress : NutritionProgress.empty;
+
+    state = AsyncData(current.copyWith(
+      activeDateId: dateId,
+      todayProgress: nextProgress,
+    ));
+
     listenToDailySummary(dateId);
   }
 

@@ -37,7 +37,7 @@ class CarouselActivity extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Expanded(child: _StepsTodayCard()),
+                Expanded(child: _StepsTodayCard(dateId: dateId)),
                 const SizedBox(width: 10),
                 Expanded(child: _CaloriesBurnedCard(dateId: dateId)),
               ],
@@ -171,47 +171,58 @@ Widget _buildBurnedHeader(ThemeData theme, double burned, double stepsCalories) 
 }
 
 class _StepsTodayCard extends ConsumerWidget {
-  const _StepsTodayCard();
+  final String dateId;
+  const _StepsTodayCard({required this.dateId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(stepTrackerProvider);
-    final steps = ref.watch(stepsTodayProvider);
+// 1. Determine if the selected date is 'today'
+    final now = DateTime.now();
+    // Assuming dateId is 'YYYY-MM-DD'
+    final String todayString = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    final bool isToday = dateId == todayString;
+
+    int displaySteps = 0;
     
-    // ✅ 1. Watch the permission state
+    if (isToday) {
+      ref.watch(stepTrackerProvider);
+      displaySteps = ref.watch(stepsTodayProvider);
+    } else {
+      final globalState = ref.watch(globalDataProvider).value;
+      displaySteps = globalState?.todayProgress.steps.round() ?? 0; 
+    }    
+
     final permissionState = ref.watch(stepPermissionProvider);
     final hasPermission = permissionState.value ?? false;
 
     final theme = Theme.of(context);
 
     return Stack(
-      fit: StackFit.expand, // Ensures the blur covers the exact size of the card
+      fit: StackFit.expand, 
       children: [
-        // --- BOTTOM LAYER: The actual Step Card ---
         ActivityCard(
-          title: "Steps Today",
-          currentValue: steps,
+          title: isToday ? "Steps Today" : "Steps",
+          currentValue: displaySteps,
           icon: Icons.directions_walk,
-          color: theme.colorScheme.primary, // Standard "Active" green
+          color: theme.colorScheme.primary,
         ),
 
-        // --- TOP LAYER: The Blurred Permission Request Overlay ---
         if (!hasPermission)
           Positioned.fill(
             child: GestureDetector(
               onTap: () => _handlePermissionRequest(context, ref),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20), // Matches your ActivityCard's radius
+                borderRadius: BorderRadius.circular(20), 
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0), // The blur strength
+                  filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0), 
                   child: Container(
-                    color: Colors.black.withOpacity(0.2), // Slight darkening effect
+                    color: Colors.black.withOpacity(0.2), 
                     alignment: Alignment.center,
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 16),
                       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                       decoration: BoxDecoration(
-                        color: theme.appBarTheme.backgroundColor, // Matches dark card color
+                        color: theme.appBarTheme.backgroundColor,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: theme.splashColor),
                       ),

@@ -15,36 +15,29 @@ class DayStreakDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
 
-    // 1. Logic to count consecutive days ending today
     int calculateStreakFromToday(List<bool> streakWeek) {
       if (streakWeek.length != 7) return 0;
 
-      // Calculate today's index (0=Sun, 6=Sat) based on your list structure
       final int todayIndex = DateTime.now().weekday % 7;
 
       int streak = 0;
-      // Iterate backwards from today to check continuity
       for (int i = todayIndex; i >= 0; i--) {
         if (streakWeek[i] == true) {
           streak++;
         } else {
-          // Break the count if we find a missed day
           break;
         }
       }
       return streak;
     }
 
-    // ✅ 2. actually CALL the function to get the number
     final int streakCount = calculateStreakFromToday(dayStreak);
 
-    // ✅ Determine State
     final bool isStreakActive = streakCount > 0;
 
-    // ✅ Dynamic Colors & Text
     final Color stateColor = isStreakActive
-        ? const Color.fromARGB(255, 249, 149, 11) // Orange
-        : theme.disabledColor; // Grey
+        ? const Color.fromARGB(255, 249, 149, 11)
+        : theme.disabledColor;
 
     final String title = isStreakActive
         ? "$streakCount Day Streak"

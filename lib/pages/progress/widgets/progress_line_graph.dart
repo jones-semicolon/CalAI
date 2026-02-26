@@ -336,7 +336,7 @@ class _ProgressGraphState extends State<ProgressGraph> {
       ),
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
-          showTitles: !hasNoData, // ✅ Only show date labels if we have logs
+          showTitles: !hasNoData,
           interval: 1,
           reservedSize: 42,
           getTitlesWidget: (v, meta) {

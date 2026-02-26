@@ -102,8 +102,8 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
                     ),
 
                     const SizedBox(height: 25),
-                    const ProgressPhoto(),
-                    const SizedBox(height: 25),
+                    // const ProgressPhoto(),
+                    // const SizedBox(height: 25),
 
                     // --- NUTRITION GRAPH (Bar) ---
                     ProgressBarGraph(
