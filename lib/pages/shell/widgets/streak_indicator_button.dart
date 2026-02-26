@@ -65,7 +65,7 @@ class StreakIndicatorButton extends ConsumerWidget {
         required int streak,
         required ColorScheme colorScheme,
         List<bool>? progressDays,
-        bool? isDisabled = false, // ✅ Use the passed callback
+        bool? isDisabled = false,
         bool isLoading = false,
       }) {
     return GestureDetector(

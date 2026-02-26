@@ -226,7 +226,6 @@ class CalaiFirestoreService {
   Future<void> updateUserSettings(UserSettings settings) async {
     if (uid == null) return;
 
-    // ✅ Uses UserSettings.toJson() for safety
     await userDoc.set({
       'settings': settings.toJson(),
       'updatedAt': FieldValue.serverTimestamp(),
@@ -254,17 +253,15 @@ class CalaiFirestoreService {
     final entryId = DateTime.now().millisecondsSinceEpoch.toString();
     final batch = _db.batch();
 
-    // 1. Add Entry to Sub-collection
     batch.set(dayRef.collection('entries').doc(entryId), {
       ...item.toJson(),
       'id': entryId,
-      'source': source.value, // Enum -> String
+      'source': source.value, 
       'timestamp': FieldValue.serverTimestamp(),
     });
 
-    // 2. Update Daily Totals (Flattened under dailyProgress)
     batch.set(dayRef, {
-      'date': targetDate, // Store DateTime object for sorting if needed
+      'date': targetDate, 
       'dailyProgress': {
         'caloriesEaten': FieldValue.increment(item.calories),
         'protein': FieldValue.increment(item.protein),
@@ -277,8 +274,6 @@ class CalaiFirestoreService {
       },
     }, SetOptions(merge: true));
 
-    // 3. Update Weekly Stats (Embedded Map)
-    // Path: 2026_W06 -> monday -> p/c/f
     batch.set(weeklyNutritionDoc, {
       weekId: {
         dayName: {
@@ -292,7 +287,11 @@ class CalaiFirestoreService {
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
 
-    await batch.commit();
+    try {
+      batch.commit(); 
+    } catch (e) {
+      debugPrint("Background save error: $e");
+    }
   }
 
   Future<void> updateFoodEntry(FoodLog oldItem, FoodLog newItem) async {
@@ -690,8 +689,6 @@ class CalaiFirestoreService {
   // --- Helpers ---
 
   String getWeekId(DateTime date) {
-    // ✅ Sunday (7) becomes the start (index 0 for the next week)
-    // Shift the date by 1 day if it's Sunday to force it into the next ISO week calculation
     final effectiveDate = date.weekday == DateTime.sunday
         ? date.add(const Duration(days: 1))
         : date;

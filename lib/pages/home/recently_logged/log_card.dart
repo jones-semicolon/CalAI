@@ -107,9 +107,10 @@ class _BaseLogCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(cardRadius),
         child: Slidable(
           key: ValueKey(title + subtitle),
+          groupTag: 'daily_logs_group',
           endActionPane: ActionPane(
             motion: const BehindMotion(),
-            extentRatio: 0.50,
+            extentRatio: 0.35,
             dismissible: DismissiblePane(
               onDismissed: () => onDelete?.call(),
             ),
@@ -121,15 +122,11 @@ class _BaseLogCard extends StatelessWidget {
                 foregroundColor: Colors.white,
                 icon: Icons.delete_outline,
                 label: 'Delete',
-                // ✅ 2. Keep this for internal rounding logic
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(cardRadius),
-                  bottomRight: Radius.circular(cardRadius),
-                ),
+                borderRadius: BorderRadius.circular(cardRadius),
               ),
             ],
           ),
-          child: InkWell( // ✅ Added InkWell for ripple effect
+          child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(cardRadius),
             child: Container(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:calai/features/home_widget/services/home_widget_service.dart';
 import 'package:calai/providers/auth_state_providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -168,35 +169,46 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       final data = snapshot.data() ?? {};
       
       final List<DailyNutrition> allLogs = [];
-      final Set<String> allProgressDays = {};
+      final Set<String> currentWeekActiveDays = {}; 
 
-      // ✅ Iterate through every Week Key (e.g., 2026_W06, 2026_W07)
+      final String currentWeekId = _service.getWeekId(DateTime.now()); 
+
       data.forEach((weekKey, weekValue) {
         if (weekKey == 'updatedAt' || weekValue is! Map) return;
 
-        // Use your WeeklyNutritionModel to parse the week
         final weekModel = WeeklyNutritionModel.fromMap({
           'weekId': weekKey,
           ...weekValue,
         });
 
         weekModel.days.forEach((dayName, dailyData) {
-          // Only include days with data, using double precision for accuracy
           if (dailyData.kc > 0.0) {
             allLogs.add(dailyData);
-            allProgressDays.add(DateFormat('yyyy-MM-dd').format(dailyData.date));
+            
+            if (weekKey == currentWeekId) {
+              currentWeekActiveDays.add(dayName.toLowerCase());
+            }
           }
         });
       });
 
-      // Sort chronologically so your charts don't break
       allLogs.sort((a, b) => a.date.compareTo(b.date));
+
+      final weeklyStreak = _calculateWeeklyStreak(currentWeekActiveDays);
 
       final current = state.asData?.value ?? GlobalDataState.initial();
       state = AsyncData(current.copyWith(
         dailyNutrition: allLogs,
-        progressDays: allProgressDays,
+        progressDays: currentWeekActiveDays,
+    ));
+
+      // ✅ Push to the Streak Widget
+      unawaited(HomeWidgetService.saveStreakWidgetData(
+        streakCount: weeklyStreak,
+        dateId: _service.todayId,
       ));
+      
+      unawaited(HomeWidgetService.updateWidget(dateId: _service.todayId));
     });
   }
 
@@ -226,6 +238,33 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       calorieGoal: goals.calories.toDouble(),
       activeDateId: dateId,
     ));
+    
+    if (!kIsWeb) {
+      final settings = ref.read(userProvider).settings;
+      final isAddBurnEnabled = settings.isAddCalorieBurn ?? false;
+      final isRolloverEnabled = settings.isRollover ?? false;
+      final num baseGoal = goals.calories;
+      num effectiveGoal = baseGoal;
+      if (isRolloverEnabled) effectiveGoal += goals.rollover;
+      if (isAddBurnEnabled) effectiveGoal += progress.caloriesBurned;
+      final streakCount = _calculateWeeklyStreak(currentValue.progressDays);
+
+      unawaited(() async {
+        await HomeWidgetService.saveCalorieWidgetData(
+          calories: progress.calories.round(),
+          calorieGoal: effectiveGoal.round(),
+          dateId: dateId,
+          protein: progress.protein.round(),
+          proteinGoal: goals.protein.round(),
+          carbs: progress.carbs.round(),
+          carbsGoal: goals.carbs.round(),
+          fats: progress.fats.round(),
+          fatsGoal: goals.fats.round(),
+          streakCount: streakCount,
+        );
+        await HomeWidgetService.updateWidget(dateId: dateId);
+      }());
+    }
   }
 
   Future<void> _loadUserProfileIntoUserProvider() async {
@@ -282,7 +321,7 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
     final dayRef = _service.dailyLogDoc(_service.todayId);
     final doc = await dayRef.get();
     
-    if (!doc.exists || doc.data()?['dailyGoals'] == null && doc.data()?['dailyGoals']['calories'] == null) {
+    if (!doc.exists || doc.data()?['dailyGoals'] == null || doc.data()?['dailyGoals']['calorieGoal'] == null) {
       debugPrint("🌅 Initializing new day: ${_service.todayId}");
       
       final int rollover = await _calculateYesterdayRollover();
@@ -360,5 +399,37 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       debugPrint("⚠️ Rollover Error: $e");
       return 0;
     }
+  }
+
+  int _calculateWeeklyStreak(Set<String> progressDays) {
+    final daysOrder = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+    ];
+
+    debugPrint("Calculating streak from progress days: $progressDays");
+
+    final week = List<bool>.generate(
+      7,
+      (i) => progressDays.contains(daysOrder[i]),
+    );
+
+    final today = DateTime.now().weekday % 7;
+
+    var streak = 0;
+    for (var i = today; i >= 0; i--) {
+      if (week[i]) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+
+    return streak;
   }
 }

@@ -9,8 +9,14 @@ class CameraControllerService {
     if (!status.isGranted) return false;
 
     final cameras = await availableCameras();
+    
+    final backCamera = cameras.firstWhere(
+      (camera) => camera.lensDirection == CameraLensDirection.back,
+      orElse: () => cameras.first, 
+    );
+
     controller = CameraController(
-      cameras.first,
+      backCamera,
       ResolutionPreset.high,
       enableAudio: false,
     );

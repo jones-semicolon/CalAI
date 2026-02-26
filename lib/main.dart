@@ -7,6 +7,7 @@ import 'package:calai/providers/user_provider.dart';
 import 'package:calai/widgets/debug/debug_overlay.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:calai/theme/app_theme.dart';
@@ -19,6 +20,11 @@ import 'package:calai/providers/shared_prefs_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   // 1. Initialize Firebase
   await Firebase.initializeApp(

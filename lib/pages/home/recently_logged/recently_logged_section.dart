@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../../../enums/food_enums.dart';
 import '../../../models/exercise_model.dart';
@@ -60,24 +61,27 @@ class RecentlyUploadedSection extends ConsumerWidget {
                 return bTime.compareTo(aTime);
               });
 
-              return Column(
-                children: sortedEntries.take(5).map((data) { // Use sorted list
-                  final category = data['source'] ?? '';
+              return SlidableAutoCloseBehavior(
+                closeWhenOpened: true,
+                child: Column(
+                  children: sortedEntries.take(5).map((data) {
+                    final category = data['source'] ?? '';
 
-                  return buildLogItem(
-                    data,
-                    onDelete: () {
-                      final logItem = category == SourceType.exercise.value
-                          ? ExerciseLog.fromJson(data)
-                          : FoodLog.fromJson(data);
+                    return buildLogItem(
+                      data,
+                      onDelete: () {
+                        final logItem = category == SourceType.exercise.value
+                            ? ExerciseLog.fromJson(data)
+                            : FoodLog.fromJson(data);
 
-                      ref.read(userProvider.notifier).deleteEntry(
-                        dateId: dateId,
-                        item: logItem,
-                      );
-                    },
-                  );
-                }).toList(),
+                        ref.read(userProvider.notifier).deleteEntry(
+                              dateId: dateId,
+                              item: logItem,
+                            );
+                      },
+                    );
+                  }).toList(),
+                ),
               );
             },
           ),

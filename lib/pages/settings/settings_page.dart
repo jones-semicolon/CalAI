@@ -90,19 +90,18 @@ class _LinkAccountButton extends ConsumerWidget {
 
             try {
               await AuthService.linkGoogleAccount(); 
-              
-              if (context.mounted) {
-                Navigator.pop(context); 
-              }
+              if (context.mounted) Navigator.pop(context); 
             } catch (e) {
-              if (context.mounted) {
-                Navigator.pop(context); 
+              if (context.mounted) Navigator.pop(context); 
+
+              if (e is FirebaseAuthException && e.code == 'credential-already-in-use') {
+                final AuthCredential? credential = e.credential;
                 
-                if (e is FirebaseAuthException && e.code == 'credential-already-in-use') {
-                  _showSwitchAccountDialog(context);
-                } else {
-                  _handleLinkingError(context, e);
+                if (context.mounted) {
+                  _showSwitchAccountDialog(context, credential);
                 }
+              } else {
+                _handleLinkingError(context, e);
               }
             }
           },
@@ -148,12 +147,12 @@ class _LinkAccountButton extends ConsumerWidget {
 void _handleLinkingError(BuildContext context, dynamic e) {
 
   if (e is FirebaseAuthException && e.code == 'credential-already-in-use') {
-    _showSwitchAccountDialog(context);
+    _showSwitchAccountDialog(context, e.credential);
     return; 
   }
 }
 
-void _showSwitchAccountDialog(BuildContext context) {
+void _showSwitchAccountDialog(BuildContext context, AuthCredential? credential) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -175,9 +174,13 @@ void _showSwitchAccountDialog(BuildContext context) {
             foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
           ),
           onPressed: () async {
-            Navigator.pop(context); // Close dialog
+            Navigator.pop(context); 
             try {
-              await AuthService.signInWithGoogle(); 
+              if (credential != null) {
+                await FirebaseAuth.instance.signInWithCredential(credential);
+              } else {
+                await AuthService.signInWithGoogle();
+              }
             } catch (error) {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#1f1b24</color>
+    <color name="ic_launcher_background">#ffffff</color>
     <color name="widget_primary">#111111</color>
     <color name="widget_secondary">#6E6E73</color>
     <color name="widget_track">#E4E4EA</color>
@@ -10,4 +10,30 @@
     <color name="widget_cta_text">#F4F4F8</color>
     <color name="widget_cta_icon_bg">#ffffff</color>
     <color name="widget_cta_icon_tint">#2F2935</color>
+
+    <color name="widget2_primary">#111111</color>
+    <color name="widget2_secondary">#6E6E73</color>
+    <color name="widget2_track">#E4E4EA</color>
+    <color name="widget2_background">#F9F8FD</color>
+    <color name="widget2_border">#E4E2EA</color>
+    <color name="widget2_cta_icon_bg">#ffffff</color>
+    <color name="widget2_cta_icon_tint">#2F2935</color>
+    <color name="widget2_panel_bg">#F9F8FD</color>
+    <color name="widget2_panel_border">#E4E2EA</color>
+    <color name="widget2_action_bg">#2F2935</color>
+    <color name="widget2_action_border">#E4E2EA</color>
+    <color name="widget2_divider">#E4E2EA</color>
+    <color name="widget2_text_primary">#111111</color>
+    <color name="widget2_text_secondary">#6E6E73</color>
+    <color name="widget2_nutrient_protein">#DD6969</color>
+    <color name="widget2_nutrient_carbs">#DE9A69</color>
+    <color name="widget2_nutrient_fats">#6998DE</color>
+
+    <color name="widget3_background">#F9F8FD</color>
+    <color name="widget3_border">#E4E2EA</color>
+    <color name="widget3_inner">#F9F8FD</color>
+    <color name="widget3_star_primary">#F8E7A8</color>
+    <color name="widget3_star_secondary">#F2B57F</color>
+    <color name="widget3_streak_outline">#F6A73F</color>
+    <color name="widget3_streak_fill">#FFFFFF</color>
 </resources>

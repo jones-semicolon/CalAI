@@ -184,50 +184,53 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
 
   Widget _buildFoodList(List<Food> items, ThemeData theme, {required bool canDelete}) {
     return Expanded(
-      child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(18, 0, 18, 20),
-        physics: const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(), // ✅ This is the correct class name
-        ),
-        itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          final item = items[index];
-          final portion = _getDisplayPortion(item);
-
-          Widget tile = FoodTile(
-            key: ValueKey('tile_${item.id}'),
-            name: item.name,
-            calories: item.calories,
-            unit: portion.unitOnly,
-            onAdd: () => _onAddFood(item, portion),
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SelectedFoodPage(foodId: item.id, foodItem: item))),
-          );
-
-          if (!canDelete) return tile;
-
-          return Slidable(
-            key: ValueKey('slidable_${item.id}'),
-            endActionPane: ActionPane(
-              motion: const BehindMotion(),
-              extentRatio: 0.25,
-              dismissible: DismissiblePane(
-                onDismissed: () => _onUnsaveFood(item),
-              ),
-              children: [
-                SlidableAction(
-                  onPressed: (_) => _onUnsaveFood(item),
-                  backgroundColor: Colors.redAccent,
-                  foregroundColor: Colors.white,
-                  icon: Icons.delete,
-                  label: 'Delete',
-                  borderRadius: BorderRadius.circular(18),
+      child: SlidableAutoCloseBehavior(
+        closeWhenOpened: true,
+        child: ListView.separated(
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 20),
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
+          itemCount: items.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final item = items[index];
+            final portion = _getDisplayPortion(item);
+        
+            Widget tile = FoodTile(
+              key: ValueKey('tile_${item.id}'),
+              name: item.name,
+              calories: item.calories,
+              unit: portion.unitOnly,
+              onAdd: () => _onAddFood(item, portion),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SelectedFoodPage(foodId: item.id, foodItem: item))),
+            );
+        
+            if (!canDelete) return tile;
+        
+            return Slidable(
+              key: ValueKey('slidable_${item.id}'),
+              endActionPane: ActionPane(
+                motion: const BehindMotion(),
+                extentRatio: 0.25,
+                dismissible: DismissiblePane(
+                  onDismissed: () => _onUnsaveFood(item),
                 ),
-              ],
-            ),
-            child: tile,
-          );
-        },
+                children: [
+                  SlidableAction(
+                    onPressed: (_) => _onUnsaveFood(item),
+                    backgroundColor: Colors.redAccent,
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete,
+                    label: 'Delete',
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ],
+              ),
+              child: tile,
+            );
+          },
+        ),
       ),
     );
   }

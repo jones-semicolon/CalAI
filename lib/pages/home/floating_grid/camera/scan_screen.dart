@@ -17,7 +17,7 @@ class ScanScreen extends ConsumerStatefulWidget {
 
 class _ScanScreenState extends ConsumerState<ScanScreen> {
   bool _isLoading = false;
-  bool _isSuccess = false; // ✅ Track success for UI feedback
+  bool _isSuccess = false;
 
   Future<void> _handleBarcode(String barcode) async {
     if (_isLoading || _isSuccess) return;
@@ -30,14 +30,12 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
       ref.read(calaiServiceProvider).saveFood(food.copyWith(source: SourceType.vision.value));
 
-      // Calculate initial log (defaulting to 1 serving/100g)
       final initialLog = food.createLog(
         amount: 1.0,
         unit: food.portions.isNotEmpty ? food.portions.first.label : "Serving",
         gramWeight: food.portions.isNotEmpty ? food.portions.first.gramWeight : 100.0,
       );
 
-      // ✅ Save to Firestore immediately
       await ref.read(calaiServiceProvider).logFoodEntry(
         initialLog,
         SourceType.foodFacts,
@@ -49,7 +47,6 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
           _isSuccess = true;
         });
 
-        // Brief delay so user sees the "Success" state
         await Future.delayed(const Duration(milliseconds: 1000));
         Navigator.pop(context);
       }
@@ -64,52 +61,55 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     }
   }
 
-  // Inside ScanScreen
   Future<void> _handleVisionScan(String imagePath) async {
-    setState(() => _isLoading = true);
-    try {
-      // Send the path instead of a large base64 string
-      final food = await FoodApi.scanFood(imagePath);
+  setState(() => _isLoading = true);
+  try {
+    final food = await FoodApi.scanFood(imagePath);
+    
+    if (!mounted) return;
+    final foodId = food.id.isEmpty 
+        ? ref.read(calaiServiceProvider).savedFoodCol.doc().id 
+        : food.id;
+    
+    final foodToSave = food.copyWith(
+      id: foodId,
+      source: SourceType.vision.value,
+    );
 
-      ref.read(calaiServiceProvider).saveFood(food.copyWith(source: SourceType.vision.value));
+    await ref.read(calaiServiceProvider).saveFood(foodToSave);
 
-      final initialLog = food.createLog(
-        amount: 1.0,
-        unit: "Serving",
-        gramWeight: 100.0,
-      );
-      debugPrint("Initial Log: ${initialLog.toJson().toString()}");
+    final initialLog = foodToSave.createLog(
+      amount: 1.0,
+      unit: "Serving",
+      gramWeight: 100.0,
+    );
 
-      await ref.read(calaiServiceProvider).logFoodEntry(
-        initialLog,
-        SourceType.vision,
-      );
+    await ref.read(calaiServiceProvider).logFoodEntry(
+      initialLog,
+      SourceType.vision,
+    );
 
-      if (mounted) setState(() => _isSuccess = true);
-      await Future.delayed(const Duration(seconds: 1));
-      Navigator.pop(context);
-    } catch (e) {
-      debugPrint("Vision Scan Error: $e");
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    if (mounted) setState(() => _isSuccess = true);
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (mounted) Navigator.pop(context);
+  } catch (e) {
+    debugPrint("Vision Scan Error: $e");
+  } finally {
+    if (mounted) setState(() => _isLoading = false);
   }
+}
 
   Future<void> _handleLabelScan(String text) async {
-    // debugPrint("query: $text");
-    // Navigator.pop(context);
     if (_isLoading || _isSuccess || text.isEmpty) return;
     setState(() => _isLoading = true);
 
     try {
-      // 1. Search for the food using the captured label text
       final List<Food> results = await FoodApi.search(text);
 
       if (results.isEmpty) {
         throw Exception("No food found for this label.");
       }
 
-      // 2. Grab the first (most relevant) item
       final bestMatch = results.first;
 
       final portion = _getDisplayPortion(bestMatch);
@@ -118,17 +118,15 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
       ref.read(calaiServiceProvider).saveFood(bestMatch.copyWith(source: SourceType.vision.value));
 
-      // 3. Create the log entry
       final initialLog = bestMatch.createLog(
         amount: 1,
         unit: portion.label,
         gramWeight: portion.gramWeight
       );
 
-      // 4. Save to Firestore
       await ref.read(calaiServiceProvider).logFoodEntry(
         initialLog,
-        SourceType.foodDatabase, // Or create a SourceType.ocr if you prefer
+        SourceType.foodDatabase,
       );
 
       if (mounted) {

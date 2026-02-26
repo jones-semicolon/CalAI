@@ -22,13 +22,11 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   late FoodLog _tempLog;
   bool _isSubmitting = false;
 
-  // Helper to check if we are creating or editing
   bool get isNewEntry => widget.foodLog == null || widget.foodLog?.id == null;
 
   @override
   void initState() {
     super.initState();
-    // If null, start with a fresh empty log
     _tempLog = widget.foodLog ?? FoodLog.empty();
     _servingsCount = _tempLog.amount;
   }
@@ -40,7 +38,6 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   }
 
   void _onSave(FoodLog finalLog) async {
-    // 1. Guard against empty names and concurrent taps
     if (finalLog.name.trim().isEmpty) {
       return;
     }
@@ -77,7 +74,6 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           ),
         ]);
       } else {
-        // Updating an existing log entry
         await service.updateFoodEntry(widget.foodLog!, finalLog);
       }
 
@@ -180,12 +176,9 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     final hasImage = _tempLog.imageUrl != null;
     final bool isNameValid = _tempLog.name.trim().isNotEmpty;
 
-    // 1. Calculate the Ratio
-    // If original amount was 100 and new is 200, ratio is 2.0
     final double ratio =
         _servingsCount / (_tempLog.amount > 0 ? _tempLog.amount : 1.0);
 
-    // 2. Create the Preview Log with recalculated macros
     final previewLog = _tempLog.copyWith(
       amount: _servingsCount,
       calories: (_tempLog.calories * ratio),
@@ -195,7 +188,6 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
       sugar: (_tempLog.sugar * ratio),
       fiber: (_tempLog.fiber * ratio),
       sodium: (_tempLog.sodium * ratio),
-      // Recalculate other nutrients list if it exists
       otherNutrients: _tempLog.otherNutrients
           .map((n) => n.copyWith(amount: n.amount * ratio))
           .toList(),
@@ -205,7 +197,6 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
-          // Header Image
           if (hasImage)
             Positioned(
               top: 0,
@@ -215,7 +206,6 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
               child: Image.network(_tempLog.imageUrl!, fit: BoxFit.cover),
             ),
 
-          // Content Card
           Positioned.fill(
             child: SingleChildScrollView(
               padding: EdgeInsets.only(
@@ -499,7 +489,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
             onPressed: () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back_ios_new,
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.primary,
               size: 20,
             ),
           ),
@@ -507,10 +497,10 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
             "Nutrients",
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: hasImage ? Colors.white : Colors.black,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
-          const SizedBox(width: 40), // Spacer
+          const SizedBox(width: 40), 
         ],
       ),
     );
@@ -529,7 +519,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 class _MacroTile extends StatelessWidget {
   final String value;
   final NutritionType nutritionType;
-  final VoidCallback? onEdit; // Added callback for the pencil tap
+  final VoidCallback? onEdit; 
 
   const _MacroTile({
     required this.value,
@@ -540,7 +530,6 @@ class _MacroTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      // ✅ Use Stack to pin the icon to the corner
       children: [
         Container(
           padding: const EdgeInsets.all(12),
@@ -590,7 +579,6 @@ class _MacroTile extends StatelessWidget {
           ),
         ),
 
-        // ✅ The Positioned Pencil Icon
         Positioned(
           bottom: 8,
           right: 8,

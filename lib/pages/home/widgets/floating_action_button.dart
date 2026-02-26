@@ -52,7 +52,7 @@ class FloatingActionGrid extends StatelessWidget {
                     ActionGridButton(
                       icon: Icons.bookmark_outline,
                       label: "Saved Foods",
-                      onTap: () => handleTap(const FoodDatabasePage()),        
+                      onTap: () => handleTap(const FoodDatabasePage(selectedTabIndex: 3,)),        
                     ),
                   ],
                 ),
