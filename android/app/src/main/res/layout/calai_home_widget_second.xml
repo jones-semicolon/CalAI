@@ -21,19 +21,21 @@
         android:padding="8dp">
 
         <LinearLayout
+            android:id="@+id/widget_ring_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:gravity="center">
 
             <FrameLayout
-                android:layout_width="84dp"
-                android:layout_height="84dp">
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center">
 
                 <ImageView
                     android:id="@+id/widget_ring"
-                    android:layout_width="84dp"
-                    android:layout_height="84dp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
                     android:contentDescription="@null"
                     android:src="@drawable/calai_home_widget_second_ring_preview" />
 
@@ -72,14 +74,16 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="108dp"
+            android:id="@+id/widget_nutrition_container"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="12dp"
-            android:gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:gravity="end"
             android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
@@ -118,7 +122,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
@@ -157,7 +161,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"

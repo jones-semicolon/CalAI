@@ -99,7 +99,7 @@ class CalAIHomeWidgetSecondProvider : HomeWidgetProvider() {
     }
 
     private fun createRingBitmap(context: Context, progress: Float): Bitmap {
-        val size = dpToPx(context, 84f)
+        val size = dpToPx(context, 100f)
         val stroke = dpToPx(context, 7f)
         val bitmap = Bitmap.createBitmap(size.toInt(), size.toInt(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
