@@ -31,6 +31,10 @@
     <key>UIMainStoryboardFile</key>
     <string>Main</string>
 
+    <key>NSCameraUsageDescription</key>
+	<string>Cal AI needs camera access to scan food, labels, and barcodes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Cal AI needs photo library access so you can pick food images from your gallery.</string>
     <key>NSMotionUsageDescription</key>
     <string>Cal AI needs access to your motion data to track your daily steps.</string>
     <key>NSHealthShareUsageDescription</key>
@@ -48,6 +52,14 @@
             <key>CFBundleURLSchemes</key>
             <array>
                 <string>com.googleusercontent.apps.530467491766-53nb81qnsc5eds4eb0mbot0m0jrpin0g</string>
+            </array>
+        </dict>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>calai</string>
             </array>
         </dict>
     </array>
