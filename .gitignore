@@ -60,6 +60,8 @@
 /dev/integration_tests/**/Pods
 /packages/flutter/coverage/
 version
+scripts/node_modules/
+scripts/service-account.json
 analysis_benchmark.json
 
 # packages file containing multi-root paths

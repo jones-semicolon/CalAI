@@ -1,0 +1,29 @@
+name: Daily Database Maintenance
+
+on:
+  schedule:
+    # This runs the cleanup every day at 00:00 UTC (8:00 AM PH time)
+    - cron: "0 0 * * *"
+  workflow_dispatch: # This adds a "Run workflow" button so you can test it manually
+
+jobs:
+  database-cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm install firebase-admin
+
+      - name: Run Cleanup Script
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/cleanup-db.js
