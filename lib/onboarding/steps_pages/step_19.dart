@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; 
+
 import '../../pages/auth/auth.dart';
+import '../../providers/user_provider.dart';
+import '../../pages/shell/widget_tree.dart'; 
 import '../onboarding_widgets/create_account.dart';
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/subscription_page.dart';
 
-class OnboardingStep19 extends StatefulWidget {
+class OnboardingStep19 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
 
   const OnboardingStep19({super.key, required this.nextPage});
 
   @override
-  State<OnboardingStep19> createState() => _OnboardingStep19State();
+  ConsumerState<OnboardingStep19> createState() => _OnboardingStep19State();
 }
 
-class _OnboardingStep19State extends State<OnboardingStep19> with SingleTickerProviderStateMixin {
-  bool _subscriptionOpened = false;
+class _OnboardingStep19State extends ConsumerState<OnboardingStep19> with SingleTickerProviderStateMixin {
   bool _isLoading = false;
   late final AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    // Initialize controller (needed for your reverse() call later)
     _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-
-    // Check for existing session immediately
     _checkLoginStatus();
   }
 
@@ -34,40 +34,43 @@ class _OnboardingStep19State extends State<OnboardingStep19> with SingleTickerPr
     super.dispose();
   }
 
-  // ✅ NEW METHOD: Check if user exists and skip
-  Future<void> _checkLoginStatus() async {
-    final user = AuthService.getCurrentUser(); // Assuming this is sync or returns User?
+  // ✅ 2. Centralized completion method
+  void _finishOnboarding() {
+    // Tell the state we are done
+    ref.read(userProvider.notifier).completeOnboarding();
 
-    if (!user!.isAnonymous) {
-      // Use addPostFrameCallback to ensure navigation happens AFTER the build
+    // Safely route to the main app, clearing the onboarding stack
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const WidgetTree()),
+      (route) => false,
+    );
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final user = AuthService.getCurrentUser(); 
+
+    if (user != null && !user.isAnonymous) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
-          widget.nextPage();
+          _finishOnboarding(); // ✅ Use the new method
         }
       });
     }
   }
 
   Future<void> _handleAction() async {
-    // Skip subscription if already opened once
-    if (_subscriptionOpened) {
-      widget.nextPage();
-      return;
-    }
-
     // Open subscription page and wait for close
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            SubscriptionPage(onFinished: () => Navigator.pop(context)),
+        builder: (_) => SubscriptionPage(onFinished: () => Navigator.pop(context)),
       ),
     );
 
-    // Mark as completed after returning
-    setState(() {
-      _subscriptionOpened = true;
-    });
+    // ✅ 3. Automatically finish onboarding once they return from the subscription page!
+    if (mounted) {
+      _finishOnboarding();
+    }
   }
 
   Future<void> _handleGoogleSignIn() async {
@@ -77,20 +80,17 @@ class _OnboardingStep19State extends State<OnboardingStep19> with SingleTickerPr
     try {
       final currentUser = AuthService.getCurrentUser();
 
-      // ✅ Check if we are currently anonymous
       if (currentUser != null && currentUser.isAnonymous) {
-        // 1. Link the account to keep existing data
         await AuthService.linkGoogleAccount();
         debugPrint("Anonymous account linked to Google successfully.");
       } else {
-        // 2. Fresh sign in (Fallback)
         await AuthService.signInWithGoogle();
         debugPrint("Performed a fresh Google Sign-In.");
       }
 
       if (!mounted) return;
 
-      // Proceed to subscription or next page
+      // Proceed to subscription
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -98,17 +98,16 @@ class _OnboardingStep19State extends State<OnboardingStep19> with SingleTickerPr
         ),
       );
 
-      setState(() => _subscriptionOpened = true);
+      // ✅ Finish onboarding after subscription
+      if (mounted) {
+        _finishOnboarding();
+      }
     } catch (e) {
-      // Handle "credential-already-in-use" error specifically here!
-      // This happens if their Google account is already registered.
-      // _handleAuthError(e);
       debugPrint("Google Sign-In Error: $e");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

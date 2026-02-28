@@ -185,8 +185,8 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
           ),
           const SettingsDivider(),
           SettingsItemTile(
-            label: "Measurement unit",
-            description: "All values will be converted to imperial (currently on metrics)",
+            label: "Imperial Units",
+            description: "All data will be converted to imperial (currently on metrics)",
             widget: Switch(
               value: settings.measurementUnit?.isImperial ?? false,
               onChanged: (v) => _updateSettings(isImperial: v),

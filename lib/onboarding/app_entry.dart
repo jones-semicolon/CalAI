@@ -15,10 +15,53 @@ class AppEntry extends StatefulWidget {
 }
 
 class _AppEntryState extends State<AppEntry> {
+  // ✅ 1. Store the initial route calculation in a variable
+  late Future<Widget> _initialRoute;
+
+  @override
+  void initState() {
+    super.initState();
+    // ✅ 2. Run the check EXACTLY ONCE when the app boots up
+    _initialRoute = _determineRoute();
+  }
+
+  Future<Widget> _determineRoute() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    // If no one is logged in, start onboarding from the beginning
+    if (user == null) {
+      return const OnboardingPage(startIndex: 0);
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    bool completed = prefs.getBool('onboarding_completed') ?? false;
+
+    if (!completed) {
+      try {
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        final data = doc.data();
+        final isDone = data?['profile']?['onboardingCompleted'] == true;
+
+        if (isDone) {
+          completed = true;
+          await prefs.setBool('onboarding_completed', true);
+        }
+      } catch (e) {
+        debugPrint("Error checking onboarding: $e");
+      }
+    }
+
+    return completed ? const WidgetTree() : const OnboardingPage(startIndex: 1);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+    return FutureBuilder<Widget>(
+      future: _initialRoute,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -26,50 +69,13 @@ class _AppEntryState extends State<AppEntry> {
           );
         }
 
-        final user = snapshot.data;
-
-        if (user == null) {
-          return const OnboardingPage(startIndex: 0);
+        if (snapshot.hasData) {
+          return snapshot.data!;
         }
 
-        return FutureBuilder<bool>(
-          future: _checkOnboarding(user),
-          builder: (context, onboardingSnap) {
-            if (!onboardingSnap.hasData) {
-              return const Scaffold(
-                body: Center(child: CupertinoActivityIndicator(radius: 15)),
-              );
-            }
-
-            final completed = onboardingSnap.data!;
-
-            return completed
-                ? const WidgetTree()
-                : const OnboardingPage(startIndex: 1);
-          },
-        );
+        // Safe fallback
+        return const OnboardingPage(startIndex: 0);
       },
     );
-  }
-
-  Future<bool> _checkOnboarding(User user) async {
-    final prefs = await SharedPreferences.getInstance();
-    bool completed = prefs.getBool('onboarding_completed') ?? false;
-
-    if (!completed) {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      final data = doc.data();
-      final isDone = data?['profile']?['onboardingCompleted'] == true;
-
-      if (isDone) {
-        completed = true;
-        await prefs.setBool('onboarding_completed', true);
-      }
-    }
-    return completed;
   }
 }

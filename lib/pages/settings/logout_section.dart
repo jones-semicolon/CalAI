@@ -1,15 +1,18 @@
+import 'package:calai/main.dart';
 import 'package:calai/onboarding/app_entry.dart';
-import 'package:calai/pages/auth/auth.dart';
 import 'package:calai/pages/settings/settings_item.dart';
+import 'package:calai/providers/auth_state_providers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_sizes.dart';
 
-class LogoutSection extends StatelessWidget {
+class LogoutSection extends ConsumerWidget {
   const LogoutSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -19,12 +22,12 @@ class LogoutSection extends StatelessWidget {
       child: SettingsItemTile(
         label: "Logout",
         icon: Icons.logout,
-        onTap: () => _showLogoutConfirmation(context),
+        onTap: () => _showLogoutConfirmation(context, ref),
       ),
     );
   }
 
-  void _showLogoutConfirmation(BuildContext context) {
+  void _showLogoutConfirmation(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -39,23 +42,35 @@ class LogoutSection extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.pop(context); // Close dialog before starting process
+                // Navigator.pop(context); 
+                appNavigatorKey.currentState?.pop();
 
-                await AuthService.signOut();
+                showDialog(
+                  context: context,
+                  barrierDismissible: false, // Prevents user from tapping outside to close
+                  builder: (BuildContext context) {
+                    return const Center(
+                      child: CupertinoActivityIndicator(),
+                    );
+                  },
+                );
 
-                if (context.mounted) {
-                  // Clear stack and navigate to Entry
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const AppEntry()),
-                        (route) => false, // Set to false to clear previous routes
-                  );
-                }
+                // 3. Run the heavy background tasks (clearing cache, terminating Firestore)
+                await ref.read(authServiceProvider).logout();
+
+                // if (!context.mounted) return;
+
+                appNavigatorKey.currentState?.pop();
+                appNavigatorKey.currentState?.pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const AppEntry()),
+                  (route) => false, 
+                );
               },
               child: const Text(
                 "Logout",
                 style: TextStyle(color: Colors.red),
               ),
-            ),
+            )
           ],
         );
       },

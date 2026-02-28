@@ -40,17 +40,8 @@ class GlobalDataNotifier extends AsyncNotifier<GlobalDataState> {
       _userSub?.cancel();
     });
 
-    // Wait for Firebase Auth to be fully initialized
-    final authAsync = ref.watch(authStateProvider);
-    final user = await authAsync.when(
-      data: (user) => user,
-      loading: () async {
-        // Wait a short moment until auth is ready
-        await Future.delayed(const Duration(milliseconds: 100));
-        return ref.watch(authStateProvider).value;
-      },
-      error: (_, __) => null,
-    );
+    // ✅ Clean, synchronous read of the current auth value
+    final user = ref.watch(authStateProvider).value;
 
     if (user == null) {
       debugPrint("🔒 GlobalData disposed (no auth)");

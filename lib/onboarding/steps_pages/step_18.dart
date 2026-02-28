@@ -246,7 +246,7 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
         ),
         ConfirmationButtonWidget(enabled: true, onConfirm: () {
           ref.read(userProvider.notifier).updateNutritionGoals(user.goal.targets);
-          ref.read(userProvider.notifier).completeOnboarding();
+          // ref.read(userProvider.notifier).completeOnboarding();
           widget.nextPage();
         }),
       ],
