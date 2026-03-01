@@ -18,15 +18,18 @@ class SmartNutritionScheduler {
       );
       return;
     }
+    final l10n = await _notificationService.loadL10n();
 
-    final body =
-        'Target ${goals.calories} kcal, ${goals.protein}g protein, '
-        '${goals.carbs}g carbs, ${goals.fats}g fat. '
-        'Log your latest meal to keep your plan accurate.';
+    final body = l10n.smartNutritionDailyBody(
+      goals.calories,
+      goals.protein,
+      goals.carbs,
+      goals.fats,
+    );
 
     await _notificationService.scheduleDailyReminder(
       notificationId: ReminderNotificationIds.smartNutritionDaily,
-      title: 'Smart nutrition check-in',
+      title: l10n.smartNutritionDailyTitle,
       body: body,
       time: settings.smartNutritionTime,
       payload: 'smart_nutrition:daily',

@@ -1,5 +1,6 @@
 import '../models/goal_alert.dart';
 import '../models/nutrition_intake_snapshot.dart';
+import '../../../l10n/app_localizations.dart';
 
 class GoalAlertEvaluator {
   const GoalAlertEvaluator({
@@ -10,7 +11,10 @@ class GoalAlertEvaluator {
   final double nearCalorieThreshold;
   final double proteinLowThreshold;
 
-  List<GoalAlert> evaluate(NutritionIntakeSnapshot snapshot) {
+  List<GoalAlert> evaluate(
+    NutritionIntakeSnapshot snapshot,
+    AppLocalizations l10n,
+  ) {
     final alerts = <GoalAlert>[];
     final goals = snapshot.goals;
 
@@ -26,9 +30,10 @@ class GoalAlertEvaluator {
       alerts.add(
         GoalAlert(
           type: GoalAlertType.exceededCalorieLimit,
-          title: 'Calorie goal exceeded',
-          body:
-              'You are ${snapshot.consumedCalories - goals.calories} kcal over your daily target.',
+          title: l10n.alertCalorieGoalExceededTitle,
+          body: l10n.alertCalorieGoalExceededBody(
+            snapshot.consumedCalories - goals.calories,
+          ),
         ),
       );
     } else if (calorieProgress >= nearCalorieThreshold) {
@@ -36,9 +41,8 @@ class GoalAlertEvaluator {
       alerts.add(
         GoalAlert(
           type: GoalAlertType.nearCalorieLimit,
-          title: 'You are near your calorie limit',
-          body:
-              'Only $remaining kcal left today. Plan your next meal carefully.',
+          title: l10n.alertNearCalorieLimitTitle,
+          body: l10n.alertNearCalorieLimitBody(remaining),
         ),
       );
     }
@@ -50,9 +54,8 @@ class GoalAlertEvaluator {
       alerts.add(
         GoalAlert(
           type: GoalAlertType.belowProteinTarget,
-          title: 'Protein target is behind',
-          body:
-              'You still need about $missing g protein to hit today\'s target.',
+          title: l10n.alertProteinBehindTitle,
+          body: l10n.alertProteinBehindBody(missing),
         ),
       );
     }
@@ -61,9 +64,10 @@ class GoalAlertEvaluator {
       alerts.add(
         GoalAlert(
           type: GoalAlertType.exceededCarbTarget,
-          title: 'Carb target exceeded',
-          body:
-              'Carbs are ${snapshot.consumedCarbsGrams - goals.carbs} g over target.',
+          title: l10n.alertCarbTargetExceededTitle,
+          body: l10n.alertCarbTargetExceededBody(
+            snapshot.consumedCarbsGrams - goals.carbs,
+          ),
         ),
       );
     }
@@ -72,9 +76,10 @@ class GoalAlertEvaluator {
       alerts.add(
         GoalAlert(
           type: GoalAlertType.exceededFatTarget,
-          title: 'Fat target exceeded',
-          body:
-              'Fat is ${snapshot.consumedFatGrams - goals.fats} g over target.',
+          title: l10n.alertFatTargetExceededTitle,
+          body: l10n.alertFatTargetExceededBody(
+            snapshot.consumedFatGrams - goals.fats,
+          ),
         ),
       );
     }

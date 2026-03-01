@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class BottomActions extends StatelessWidget {
   final VoidCallback onRevert;
@@ -27,7 +28,7 @@ class BottomActions extends StatelessWidget {
               side: BorderSide(color: scheme.onTertiaryFixed, width: 1.5),
             ),
             child: Text(
-              'Revert',
+              context.l10n.revertLabel,
               style: TextStyle(
                 color: scheme.primary,
                 fontWeight: FontWeight.w900,
@@ -47,7 +48,7 @@ class BottomActions extends StatelessWidget {
               ),
             ),
             child: Text(
-              'Done',
+              context.l10n.doneLabel,
               style: TextStyle(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 fontWeight: FontWeight.w900,

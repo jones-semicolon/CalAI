@@ -1,4 +1,5 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,20 +29,13 @@ class _DemotivatedState extends ConsumerState<Demotivated> {
     // Sync initial state from provider if available
     final currentStrategy = user.goal.maintenanceStrategy;
     if (selectedObstacle == null && currentStrategy != null) {
-      // Try to find the enum matching the saved string
-      try {
-        selectedObstacle = ObstacleType.values.firstWhere(
-                (e) => e.title == currentStrategy
-        );
-      } catch (_) {
-        // Handle case where string doesn't match any enum
-      }
+      selectedObstacle = currentStrategy;
     }
 
     return SafeArea(
       child: Column(
         children: [
-          const Header(title: "What's stopping you from reaching your goals?"),
+          Header(title: context.l10n.step95ObstaclesTitle),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),

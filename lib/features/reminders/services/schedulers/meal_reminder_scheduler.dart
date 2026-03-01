@@ -18,11 +18,12 @@ class MealReminderScheduler {
       await _notificationService.cancelById(ReminderNotificationIds.breakfast);
       return;
     }
+    final l10n = await _notificationService.loadL10n();
 
     await _notificationService.scheduleDailyReminder(
       notificationId: ReminderNotificationIds.breakfast,
-      title: 'Breakfast reminder',
-      body: 'Log breakfast to start your calorie and macro tracking early.',
+      title: l10n.notificationBreakfastTitle,
+      body: l10n.notificationBreakfastBody,
       time: settings.breakfastReminderTime,
       payload: 'meal:breakfast',
       highPriority: true,
@@ -34,11 +35,12 @@ class MealReminderScheduler {
       await _notificationService.cancelById(ReminderNotificationIds.lunch);
       return;
     }
+    final l10n = await _notificationService.loadL10n();
 
     await _notificationService.scheduleDailyReminder(
       notificationId: ReminderNotificationIds.lunch,
-      title: 'Lunch reminder',
-      body: 'Lunch time. Add your meal to keep your daily progress accurate.',
+      title: l10n.notificationLunchTitle,
+      body: l10n.notificationLunchBody,
       time: settings.lunchReminderTime,
       payload: 'meal:lunch',
       highPriority: true,
@@ -50,11 +52,12 @@ class MealReminderScheduler {
       await _notificationService.cancelById(ReminderNotificationIds.dinner);
       return;
     }
+    final l10n = await _notificationService.loadL10n();
 
     await _notificationService.scheduleDailyReminder(
       notificationId: ReminderNotificationIds.dinner,
-      title: 'Dinner reminder',
-      body: 'Log dinner and close your day with complete nutrition data.',
+      title: l10n.notificationDinnerTitle,
+      body: l10n.notificationDinnerBody,
       time: settings.dinnerReminderTime,
       payload: 'meal:dinner',
       highPriority: true,
@@ -66,12 +69,12 @@ class MealReminderScheduler {
       await _notificationService.cancelById(ReminderNotificationIds.snack);
       return;
     }
+    final l10n = await _notificationService.loadL10n();
 
     await _notificationService.scheduleDailyReminder(
       notificationId: ReminderNotificationIds.snack,
-      title: 'Snack reminder',
-      body:
-          'Add your snack so calories and macros stay aligned with your goals.',
+      title: l10n.notificationSnackTitle,
+      body: l10n.notificationSnackBody,
       time: settings.snackReminderTime,
       payload: 'meal:snack',
       highPriority: true,

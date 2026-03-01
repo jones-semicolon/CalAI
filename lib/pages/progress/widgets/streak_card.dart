@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'card_decorations.dart';
 
 /// A card widget to display the user's current day streak.
@@ -98,8 +99,8 @@ class _StreakTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text(
-      'Day streak',
+    return Text(
+      context.l10n.dayStreakTitle,
       style: TextStyle(
         fontWeight: FontWeight.bold,
         color: Color.fromARGB(255, 249, 149, 11),
@@ -116,7 +117,16 @@ class _WeeklyStreakView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    final l10n = context.l10n;
+    final days = [
+      l10n.dayInitialSun,
+      l10n.dayInitialMon,
+      l10n.dayInitialTue,
+      l10n.dayInitialWed,
+      l10n.dayInitialThu,
+      l10n.dayInitialFri,
+      l10n.dayInitialSat,
+    ];
     // ✅ Calculate today's index once (0 for Sunday, 6 for Saturday)
     final int todayIndex = DateTime.now().weekday % 7;
 

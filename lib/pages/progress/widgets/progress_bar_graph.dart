@@ -7,6 +7,7 @@ import 'package:calai/pages/progress/widgets/graph_header.dart';
 import 'package:calai/pages/progress/widgets/graph_legend.dart';
 import 'package:calai/pages/progress/widgets/progress_message_pill.dart';
 import 'package:calai/pages/progress/widgets/time_range_selector.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -36,6 +37,7 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final logic = ProgressBarGraphLogic(
       allLogs: widget.dailyNutrition,
       selectedRange: _selectedRange,
@@ -64,11 +66,11 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
     return Column(
       children: [
         SegmentedSelector<WeekRange>(
-          options: const [
-            RangeOption(value: WeekRange.thisWeek, label: 'This Week'),
-            RangeOption(value: WeekRange.lastWeek, label: 'Last Week'),
-            RangeOption(value: WeekRange.twoWeeksAgo, label: '2 wks ago'),
-            RangeOption(value: WeekRange.threeWeeksAgo, label: '3 wks ago'),
+          options: [
+            RangeOption(value: WeekRange.thisWeek, label: l10n.thisWeekLabel),
+            RangeOption(value: WeekRange.lastWeek, label: l10n.lastWeekLabel),
+            RangeOption(value: WeekRange.twoWeeksAgo, label: l10n.twoWeeksAgoLabel),
+            RangeOption(value: WeekRange.threeWeeksAgo, label: l10n.threeWeeksAgoLabel),
           ],
           selected: _selectedRange,
           onChanged: (value) => setState(() => _selectedRange = value),
@@ -86,9 +88,9 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GraphHeader(
-                title: 'Total Calories',
+                title: l10n.totalCaloriesLabel,
                 totalValue: logic.totalCalories,
-                unit: 'cals',
+                unit: l10n.calsLabel,
                 percentage: percentage,
               ),
               const SizedBox(height: 20),
@@ -130,19 +132,19 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
                   GraphLegend(
                     icon: NutritionType.protein.icon,
                     color: NutritionType.protein.color,
-                    label: 'Protein',
+                    label: l10n.proteinLabel,
                   ),
                   SizedBox(width: 12),
                   GraphLegend(
                     icon: NutritionType.carbs.icon,
                     color: NutritionType.carbs.color,
-                    label: 'Carbs',
+                    label: l10n.carbsLabel,
                   ),
                   SizedBox(width: 12),
                   GraphLegend(
                     icon: NutritionType.fats.icon,
                     color: NutritionType.fats.color,
-                    label: 'Fats',
+                    label: l10n.fatsLabel,
                   ),
                 ],
               ),
@@ -159,6 +161,7 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
   }
 
   FlTitlesData _buildTitlesData(double interval) {
+    final l10n = context.l10n;
     return FlTitlesData(
       topTitles: const AxisTitles(
         sideTitles: SideTitles(showTitles: false),
@@ -194,7 +197,15 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
           showTitles: true,
           reservedSize: 40,
           getTitlesWidget: (v, _) {
-            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            final days = [
+              l10n.dayShortSun,
+              l10n.dayShortMon,
+              l10n.dayShortTue,
+              l10n.dayShortWed,
+              l10n.dayShortThu,
+              l10n.dayShortFri,
+              l10n.dayShortSat,
+            ];
             if (v < 0 || v > 6) {
               return const SizedBox.shrink();
             }
@@ -215,6 +226,7 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
   }
 
   BarTouchData _buildTouchData(BuildContext context, ProgressBarGraphLogic logic) {
+    final l10n = context.l10n;
     return BarTouchData(
       enabled: true,
       touchTooltipData: BarTouchTooltipData(
@@ -222,7 +234,15 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
         tooltipBorderRadius: const BorderRadius.all(Radius.circular(10)),
         tooltipPadding: const EdgeInsets.all(10),
         getTooltipItem: (group, groupIndex, rod, rodIndex) {
-          const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          final days = [
+            l10n.dayShortSun,
+            l10n.dayShortMon,
+            l10n.dayShortTue,
+            l10n.dayShortWed,
+            l10n.dayShortThu,
+            l10n.dayShortFri,
+            l10n.dayShortSat,
+          ];
 
           final calories = rod.toY;
           final protein = logic.getDayProtein(group.x);
@@ -230,10 +250,10 @@ class _ProgressBarGraphState extends State<ProgressBarGraph> {
           final fats = logic.getDayFats(group.x);
 
           return BarTooltipItem(
-            'Calories: ${calories.toStringAsFixed(0)}\n'
-            'Protein: ${protein.toStringAsFixed(0)}g\n'
-            'Carbs: ${carbs.toStringAsFixed(0)}g\n'
-            'Fats: ${fats.toStringAsFixed(0)}g\n',
+            '${l10n.caloriesLabel}: ${calories.toStringAsFixed(0)}\n'
+            '${l10n.proteinLabel}: ${protein.toStringAsFixed(0)}g\n'
+            '${l10n.carbsLabel}: ${carbs.toStringAsFixed(0)}g\n'
+            '${l10n.fatsLabel}: ${fats.toStringAsFixed(0)}g\n',
             TextStyle(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.w500,

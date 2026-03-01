@@ -1,5 +1,6 @@
 import 'package:calai/pages/home/floating_grid/log_exercise/log_exercise.dart';
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 import '../floating_grid/camera/scan_screen.dart';
 import '../floating_grid/food_database/food_database.dart';
@@ -14,6 +15,7 @@ class FloatingActionGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AnimatedPadding(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOut,
@@ -34,7 +36,7 @@ class FloatingActionGrid extends StatelessWidget {
                   children: [
                     ActionGridButton(
                       icon: Icons.fitness_center,
-                      label: "Log Exercise",
+                      label: l10n.logExerciseLabel,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -46,7 +48,7 @@ class FloatingActionGrid extends StatelessWidget {
                     ),
                     ActionGridButton(
                       icon: Icons.bookmark_outline,
-                      label: "Saved Foods",
+                      label: l10n.savedFoodsLabel,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -64,7 +66,7 @@ class FloatingActionGrid extends StatelessWidget {
                   children: [
                     ActionGridButton(
                       icon: Icons.search,
-                      label: "Food Database",
+                      label: l10n.foodDatabaseLabel,
                       onTap: () {
                         // debugPrint("Food Database tapped");
 
@@ -79,7 +81,7 @@ class FloatingActionGrid extends StatelessWidget {
                     ),
                     ActionGridButton(
                       icon: Icons.qr_code_scanner,
-                      label: "Scan Food",
+                      label: l10n.scanFoodLabel,
                       onTap: () {
                         Navigator.push(
                           context,

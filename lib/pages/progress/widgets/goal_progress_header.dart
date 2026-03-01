@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class GoalProgressHeader extends StatelessWidget {
   final double progressPercent;
@@ -21,7 +22,7 @@ class GoalProgressHeader extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            'Goal Progress',
+            context.l10n.goalProgressTitle,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -58,7 +59,10 @@ class GoalProgressHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 5),
-                  const Text('of goal', style: TextStyle(fontSize: 11)),
+                  Text(
+                    context.l10n.ofGoalLabel,
+                    style: const TextStyle(fontSize: 11),
+                  ),
                   const SizedBox(width: 5),
                   Icon(Icons.edit,
                       size: 16,

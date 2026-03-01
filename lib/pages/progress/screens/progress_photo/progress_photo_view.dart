@@ -1,4 +1,5 @@
 import 'package:calai/widgets/header_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,8 +27,8 @@ class _ProgressPhotoViewState extends ConsumerState<ProgressPhotoView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("No Progress Photos Yet"),
-                    Text("Tap the + button to ad your fist photo"),
+                    Text(context.l10n.progressPhotosTitle),
+                    Text(context.l10n.progressPhotoPrompt),
                   ],
                 ),
               ),

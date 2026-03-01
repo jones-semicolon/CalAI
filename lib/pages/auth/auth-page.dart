@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'auth.dart'; // <--- 1. IMPORT YOUR AUTH FILE
 
 class AuthPage extends ConsumerStatefulWidget {
@@ -50,7 +51,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
     if (!emailValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid email address')),
+        SnackBar(content: Text(context.l10n.authInvalidEmailMessage)),
       );
       return;
     }
@@ -67,15 +68,15 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Check your email'),
-            content: Text('We sent a sign-in link to $email'),
+            title: Text(context.l10n.authCheckYourEmailTitle),
+            content: Text(context.l10n.authSignInLinkSentMessage(email)),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.pop(context); // Close dialog
                   // Optional: Navigator.pop(context); // Go back to login screen
                 },
-                child: const Text('OK'),
+                child: Text(context.l10n.okLabel),
               ),
             ],
           ),
@@ -84,7 +85,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.genericErrorMessage(e.toString()))),
         );
       }
     } finally {
@@ -132,7 +133,7 @@ class _AuthPageAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      title: const Text(""),
+      title: const SizedBox.shrink(),
       elevation: 0,
     );
   }
@@ -153,14 +154,14 @@ class _PageBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "What's your email?", // Changed "Email" to be more conversational
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          Text(
+            context.l10n.authWhatsYourEmail,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
-          const Text(
-            "We'll send you a link to sign in without a password.",
-            style: TextStyle(color: Colors.grey),
+          Text(
+            context.l10n.authPasswordlessHint,
+            style: const TextStyle(color: Colors.grey),
           ),
           const SizedBox(height: 30),
           _EmailInputField(controller: controller),
@@ -182,7 +183,7 @@ class _EmailInputField extends StatelessWidget {
       keyboardType: TextInputType.emailAddress, // Optimize keyboard for email
       autofocus: true, // Focus automatically so user can type immediately
       decoration: InputDecoration(
-        hintText: "name@example.com",
+        hintText: context.l10n.emailExampleHint,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(width: 1),
@@ -272,10 +273,10 @@ class _DoneButton extends StatelessWidget {
             strokeWidth: 2,
           ),
         )
-            : const Text(
-          "Continue",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
+            : Text(
+                context.l10n.continueLabel,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
       ),
     );
   }

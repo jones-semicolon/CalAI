@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:calai/l10n/l10n.dart';
 
 import '../../../../../api/food_api.dart';
 import '../scanner_info/info_widget.dart';
@@ -156,6 +157,7 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final controller = _cameraService.controller;
 
     return Stack(
@@ -195,10 +197,10 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
                     top: labelTop,
                     left: 0,
                     right: 0,
-                    child: const IgnorePointer(
+                    child: IgnorePointer(
                       child: Center(
                         child: Text(
-                          'Barcode Scanner',
+                          l10n.barcodeScannerLabel,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -240,7 +242,7 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
                 children: [
                   Expanded(
                     child: ActionButton(
-                      label: 'Scan Food',
+                      label: l10n.scanFoodLabel,
                       icon: Icons.center_focus_strong,
                       selected: _mode == ScanMode.scanFood,
                       onTap: () => setState(() => _mode = ScanMode.scanFood),
@@ -248,7 +250,7 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
                   ),
                   Expanded(
                     child: ActionButton(
-                      label: 'Barcode',
+                      label: l10n.barcodeLabel,
                       icon: Icons.qr_code,
                       selected: _mode == ScanMode.barcode,
                       onTap: () => setState(() => _mode = ScanMode.barcode),
@@ -256,7 +258,7 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
                   ),
                   Expanded(
                     child: ActionButton(
-                      label: 'Food Label',
+                      label: l10n.foodLabel,
                       icon: Icons.local_offer,
                       selected: _mode == ScanMode.foodLabel,
                       onTap: () => setState(() => _mode = ScanMode.foodLabel),
@@ -264,7 +266,7 @@ class _CameraScannerWidgetState extends State<CameraScannerWidget> {
                   ),
                   Expanded(
                     child: ActionButton(
-                      label: 'Gallery',
+                      label: l10n.galleryLabel,
                       icon: Icons.image,
                       selected: _mode == ScanMode.gallery,
                       onTap: () {

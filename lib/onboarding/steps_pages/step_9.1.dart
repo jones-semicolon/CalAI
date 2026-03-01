@@ -1,12 +1,11 @@
 import 'package:calai/onboarding/onboarding_widgets/header.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/weight_picker_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
-import '../onboarding_widgets/continue_button.dart';
-import '../onboarding_widgets/weight_picker/weight_selection_view.dart';
 
 class WeightPickerPage extends ConsumerWidget {
   final VoidCallback nextPage;
@@ -21,7 +20,7 @@ class WeightPickerPage extends ConsumerWidget {
     return SafeArea(
       child: Column(
         children: [
-          const Header(title: 'What is your desired weight?'),
+          Header(title: context.l10n.step91DesiredWeightQuestion),
 
           const Spacer(),
 
@@ -31,9 +30,9 @@ class WeightPickerPage extends ConsumerWidget {
             referenceWeight: user.body.currentWeight,
             unit: user.body.weightUnit,
             labelBuilder: (current, selected) {
-              if (selected > current) return "Gain Weight";
-              if (selected < current) return "Lose Weight";
-              return "Maintain Weight";
+              if (selected > current) return context.l10n.goalGainWeight;
+              if (selected < current) return context.l10n.goalLoseWeight;
+              return context.l10n.goalMaintainWeight;
             },
             onWeightChanged: (kg) {
               userNotifier.updateLocal((s) => s.copyWith(goal: s.goal.copyWith(targets: s.goal.targets.copyWith(targetWeight: kg))));

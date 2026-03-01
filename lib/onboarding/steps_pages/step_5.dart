@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 import '../../widgets/confirmation_button_widget.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/weight_charts.dart';
 
@@ -20,7 +20,7 @@ class _OnboardingStep5State extends State<OnboardingStep5> {
     return SafeArea(
       child: Column(
         children: [
-          Header(title: 'Cal AI creates long-term results'),
+          Header(title: context.l10n.step5CalAiLongTermResults),
 
           /// SCROLLABLE CONTENT
           Expanded(

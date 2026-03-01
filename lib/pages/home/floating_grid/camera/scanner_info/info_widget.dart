@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class BestScanningPracticesScreen extends StatelessWidget {
   const BestScanningPracticesScreen({super.key});
@@ -43,6 +44,7 @@ class BestScanningPracticesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final textColor = Theme.of(context).colorScheme.onPrimary;
     return Column(
       children: [
@@ -50,12 +52,12 @@ class BestScanningPracticesWidget extends StatelessWidget {
         const SizedBox(height: 20),
         _TipsTitle(textColor: textColor),
         const SizedBox(height: 12),
-        _TipItem('Keep the food inside the scan lines', color: textColor),
+        _TipItem(l10n.scanTipKeepFoodInside, color: textColor),
         _TipItem(
-          'Hold your phone still so the image is not blurry',
+          l10n.scanTipHoldPhoneStill,
           color: textColor,
         ),
-        _TipItem("Don't take the picture at obscure angles", color: textColor),
+        _TipItem(l10n.scanTipAvoidObscureAngles, color: textColor),
         const Spacer(),
         _ScanNowButton(onScanNow: onScanNow),
       ],
@@ -77,7 +79,7 @@ class _HeaderRow extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            'Best scanning practices',
+            context.l10n.bestScanningPracticesTitle,
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w900,
@@ -113,7 +115,7 @@ class _TipsTitle extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
-        'General tips:',
+        context.l10n.generalTipsTitle,
         style: TextStyle(fontSize: 24, color: textColor),
       ),
     );
@@ -133,7 +135,7 @@ class _TipItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('•  ', style: TextStyle(fontSize: 22, color: color)),
+          Icon(Icons.circle, size: 8, color: color),
           Expanded(
             child: Text(text, style: TextStyle(fontSize: 22, color: color)),
           ),
@@ -162,9 +164,9 @@ class _ScanNowButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-        child: const Text(
-          'Scan now',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+        child: Text(
+          context.l10n.scanNowLabel,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
         ),
       ),
     );

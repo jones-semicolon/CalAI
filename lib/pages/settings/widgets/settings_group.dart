@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:calai/features/home_widget/providers/home_widget_permission_provider.dart';
 import 'package:calai/features/home_widget/services/home_widget_permission_settings_service.dart';
 import 'package:calai/features/home_widget/services/home_widget_service.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/pages/settings/screens/edit_goals.dart';
 import 'package:calai/pages/settings/settings_item.dart';
 import 'package:calai/pages/settings/widgets/settings_divider.dart';
@@ -109,6 +110,7 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
   }
 
   Future<void> _openHomeWidgetPicker() async {
+    final l10n = context.l10n;
     final tempSelected = <HomeWidgetKind>{..._selectedWidgetKinds};
     bool isRequesting = false;
 
@@ -157,7 +159,9 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
                   messenger.showSnackBar(
                     SnackBar(
                       content: Text(
-                        '${_widgetDisplayName(selected)} removed from selection.',
+                        l10n.removedFromSelection(
+                          _widgetDisplayName(context, selected),
+                        ),
                       ),
                     ),
                   );
@@ -175,7 +179,9 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
                 messenger.showSnackBar(
                   SnackBar(
                     content: Text(
-                      'To remove ${_widgetDisplayName(selected)}, remove it from your home screen. Selection syncs automatically.',
+                      l10n.removeFromHomeScreenInstruction(
+                        _widgetDisplayName(context, selected),
+                      ),
                     ),
                   ),
                 );
@@ -200,7 +206,9 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
                 messenger.showSnackBar(
                   SnackBar(
                     content: Text(
-                      'To add ${_widgetDisplayName(selected)}, long-press the Home Screen, tap +, then select Cal AI.',
+                      l10n.addFromHomeScreenInstruction(
+                        _widgetDisplayName(context, selected),
+                      ),
                     ),
                   ),
                 );
@@ -222,14 +230,20 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
 
               late final String message;
               if (hasPermission) {
-                message = '${_widgetDisplayName(selected)} widget added.';
+                message = l10n.widgetAdded(
+                  _widgetDisplayName(context, selected),
+                );
               } else {
                 final openedSettings =
                     await HomeWidgetPermissionSettingsService.openSpecialPermissions();
                 if (!mounted) return;
                 message = openedSettings
-                    ? 'Permission needed to add ${_widgetDisplayName(selected)}. We opened settings for you.'
-                    : 'Could not open permission settings. Please enable permissions manually to add ${_widgetDisplayName(selected)}.';
+                    ? l10n.permissionNeededToAddWidget(
+                        _widgetDisplayName(context, selected),
+                      )
+                    : l10n.couldNotOpenPermissionSettings(
+                        _widgetDisplayName(context, selected),
+                      );
               }
 
               final messenger = ScaffoldMessenger.of(this.context);
@@ -269,7 +283,7 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Choose Home Widgets',
+                        l10n.chooseHomeWidgets,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -280,33 +294,33 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
                       Text(
                         isRequesting
                             ? (_isIOS
-                                  ? 'Updating widget selection...'
-                                  : 'Requesting widget permission...')
-                            : 'Tap options to add or remove widgets.',
+                                  ? l10n.updatingWidgetSelection
+                                  : l10n.requestingWidgetPermission)
+                            : l10n.tapOptionsToAddRemoveWidgets,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(height: 8),
                       _WidgetOptionTile(
-                        title: 'Widget 1',
-                        subtitle: 'Calorie tracker widget',
+                        title: l10n.widget1,
+                        subtitle: l10n.calorieTrackerWidget,
                         isSelected: tempSelected.contains(
                           HomeWidgetKind.calories,
                         ),
                         onTap: () => onToggle(HomeWidgetKind.calories),
                       ),
                       _WidgetOptionTile(
-                        title: 'Widget 2',
-                        subtitle: 'Nutrition tracker widget',
+                        title: l10n.widget2,
+                        subtitle: l10n.nutritionTrackerWidget,
                         isSelected: tempSelected.contains(
                           HomeWidgetKind.nutrition,
                         ),
                         onTap: () => onToggle(HomeWidgetKind.nutrition),
                       ),
                       _WidgetOptionTile(
-                        title: 'Widget 3',
-                        subtitle: 'Streak tracker widget',
+                        title: l10n.widget3,
+                        subtitle: l10n.streakTrackerWidget,
                         isSelected: tempSelected.contains(
                           HomeWidgetKind.streak,
                         ),
@@ -354,42 +368,47 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
     return values.map(_widgetKindFromValue).toSet();
   }
 
-  static String _widgetLabel(HomeWidgetKind kind) {
+  String _widgetLabel(BuildContext context, HomeWidgetKind kind) {
+    final l10n = context.l10n;
     switch (kind) {
       case HomeWidgetKind.calories:
-        return 'Widget 1';
+        return l10n.widget1;
       case HomeWidgetKind.nutrition:
-        return 'Widget 2';
+        return l10n.widget2;
       case HomeWidgetKind.streak:
-        return 'Widget 3';
+        return l10n.widget3;
     }
   }
 
-  static String _widgetDisplayName(HomeWidgetKind kind) {
+  String _widgetDisplayName(BuildContext context, HomeWidgetKind kind) {
+    final l10n = context.l10n;
     switch (kind) {
       case HomeWidgetKind.calories:
-        return 'Calorie Tracker';
+        return l10n.calorieTrackerWidget;
       case HomeWidgetKind.nutrition:
-        return 'Nutrition Tracker';
+        return l10n.nutritionTrackerWidget;
       case HomeWidgetKind.streak:
-        return 'Streak Tracker';
+        return l10n.streakTrackerWidget;
     }
   }
 
   bool get _isIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 
-  String _selectedWidgetsSummary() {
-    if (_selectedWidgetKinds.isEmpty) return 'No widgets on home screen';
+  String _selectedWidgetsSummary(BuildContext context) {
+    if (_selectedWidgetKinds.isEmpty) {
+      return context.l10n.noWidgetsOnHomeScreen;
+    }
 
     final labels = HomeWidgetKind.values
         .where(_selectedWidgetKinds.contains)
-        .map(_widgetLabel)
+        .map((kind) => _widgetLabel(context, kind))
         .join(', ');
-    return 'Selected: $labels';
+    return context.l10n.selectedWidgets(labels);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -400,7 +419,7 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
         children: [
           SettingsItemTile(
             icon: Icons.person_outline,
-            label: "Personal Details",
+            label: l10n.personalDetails,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const PersonalDetailsPage()),
@@ -409,7 +428,7 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
           const SettingsDivider(),
           SettingsItemTile(
             icon: Icons.pie_chart_outline,
-            label: "Adjust Macronutrients",
+            label: l10n.adjustMacronutrients,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const EditGoalsView()),
@@ -418,7 +437,7 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
           const SettingsDivider(),
           SettingsItemTile(
             icon: Icons.monitor_weight_outlined,
-            label: "Weight History",
+            label: l10n.weightHistory,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const WeightHistoryView()),
@@ -427,14 +446,14 @@ class _SettingsGroupState extends ConsumerState<SettingsGroup>
           const SettingsDivider(),
           SettingsItemTile(
             icon: Icons.widgets_outlined,
-            label: "Home Widget",
-            description: _selectedWidgetsSummary(),
+            label: l10n.homeWidget,
+            description: _selectedWidgetsSummary(context),
             onTap: _openHomeWidgetPicker,
           ),
           const SettingsDivider(),
           SettingsItemTile(
             icon: Icons.language_outlined,
-            label: "Language",
+            label: l10n.language,
             onTap: () => _showLanguageDialog(context),
           ),
         ],

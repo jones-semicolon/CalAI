@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class ReferralCodeInput extends StatefulWidget {
   final void Function(String referralCode) onSubmit;
@@ -42,6 +43,7 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = context.l10n;
 
     return AnimatedBuilder(
       animation: Listenable.merge([_focusNode, _controller]),
@@ -78,7 +80,7 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
                           color: theme.colorScheme.secondary.withOpacity(0.5),
                           fontWeight: FontWeight.w500,
                         ),
-                        child: const Text('Referral Code'),
+                        child: Text(l10n.referralCodeLabel),
                       ),
                     ),
                     TextField(
@@ -117,7 +119,7 @@ class _ReferralCodeInputState extends State<ReferralCodeInput> {
                       ),
                     ),
                     child: Text(
-                      'Submit',
+                      l10n.submitLabel,
                       style: TextStyle(
                         color: theme.scaffoldBackgroundColor,
                         fontWeight: FontWeight.w500,

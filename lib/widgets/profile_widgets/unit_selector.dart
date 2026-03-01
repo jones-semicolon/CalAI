@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class UnitSelector extends StatelessWidget {
   final bool isMetric;
@@ -15,7 +16,7 @@ class UnitSelector extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Imperial", style: !isMetric ? activeStyle : inactiveStyle),
+        Text(context.l10n.imperialLabel, style: !isMetric ? activeStyle : inactiveStyle),
         const SizedBox(width: 12),
         Switch(
           value: isMetric,
@@ -23,7 +24,7 @@ class UnitSelector extends StatelessWidget {
           activeColor: theme.colorScheme.primary,
         ),
         const SizedBox(width: 12),
-        Text("Metric", style: isMetric ? activeStyle : inactiveStyle),
+        Text(context.l10n.metricLabel, style: isMetric ? activeStyle : inactiveStyle),
       ],
     );
   }

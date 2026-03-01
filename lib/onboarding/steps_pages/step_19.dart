@@ -1,7 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 import '../../pages/auth/auth.dart';
-import '../../pages/shell/widget_tree.dart';
 import '../onboarding_widgets/create_account.dart';
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/subscription_page.dart';
@@ -17,7 +16,6 @@ class OnboardingStep19 extends StatefulWidget {
 
 class _OnboardingStep19State extends State<OnboardingStep19> with SingleTickerProviderStateMixin {
   bool _subscriptionOpened = false;
-  bool _isLoading = false;
   late final AnimationController _controller;
 
   @override
@@ -74,7 +72,6 @@ class _OnboardingStep19State extends State<OnboardingStep19> with SingleTickerPr
 
   Future<void> _handleGoogleSignIn() async {
     if (!mounted) return;
-    setState(() => _isLoading = true);
 
     try {
       final currentUser = AuthService.getCurrentUser();
@@ -106,8 +103,6 @@ class _OnboardingStep19State extends State<OnboardingStep19> with SingleTickerPr
       // This happens if their Google account is already registered.
       // _handleAuthError(e);
       debugPrint("Google Sign-In Error: $e");
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -118,7 +113,7 @@ class _OnboardingStep19State extends State<OnboardingStep19> with SingleTickerPr
       child: Column(
         children: [
           const SizedBox(height: 30),
-          const Header(title: 'Create an account'),
+          Header(title: context.l10n.step19CreateAccountTitle),
           const Spacer(),
 
           // CTA actions

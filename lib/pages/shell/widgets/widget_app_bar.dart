@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // Add this
 import 'package:calai/widgets/radial_background/radial_background.dart';
+import 'package:calai/l10n/l10n.dart';
 // Import your navigation provider
 import '../../../providers/navigation_provider.dart';
-import '../../home/widgets/day_streak.dart';
 import 'app_title.dart';
 import 'generic_app_bar_title.dart';
 import 'streak_indicator_button.dart';
@@ -39,20 +39,20 @@ class WidgetTreeAppBar extends ConsumerWidget { // Changed to ConsumerWidget
           centerTitle: false,
 
           // Simplified: No more ValueListenableBuilder
-          title: _getAppBarTitle(pageIndex),
+          title: _getAppBarTitle(context, pageIndex),
         );
       },
     );
   }
 
-  Widget _getAppBarTitle(int index) {
+  Widget _getAppBarTitle(BuildContext context, int index) {
     switch (index) {
       case 0:
         return const _HomeAppBarTitle();
       case 1:
-        return const GenericAppBarTitle(title: 'Progress');
+        return GenericAppBarTitle(title: context.l10n.progressTab);
       case 2:
-        return const GenericAppBarTitle(title: 'Settings');
+        return GenericAppBarTitle(title: context.l10n.settingsTab);
       default:
         return const SizedBox.shrink();
     }

@@ -1,6 +1,7 @@
 import 'package:calai/pages/shell/widgets/streak_indicator_button.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class DayStreakDialog extends StatelessWidget {
   final List<bool> dayStreak;
@@ -47,12 +48,12 @@ class DayStreakDialog extends StatelessWidget {
         : theme.disabledColor; // Grey
 
     final String title = isStreakActive
-        ? "$streakCount Day Streak"
-        : "Streak Lost";
+        ? context.l10n.dayStreakWithCount(streakCount)
+        : context.l10n.streakLostTitle;
 
     final String subtitle = isStreakActive
-        ? "You're on fire! Keep logging to maintain your momentum."
-        : "Don't give up. Log your meals today to get back on track.";
+        ? context.l10n.streakActiveSubtitle
+        : context.l10n.streakLostSubtitle;
 
     return Center(
       child: Material(
@@ -129,7 +130,16 @@ class _WeeklyStreakView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    final l10n = context.l10n;
+    final days = [
+      l10n.dayInitialSun,
+      l10n.dayInitialMon,
+      l10n.dayInitialTue,
+      l10n.dayInitialWed,
+      l10n.dayInitialThu,
+      l10n.dayInitialFri,
+      l10n.dayInitialSat,
+    ];
     final int todayIndex = DateTime.now().weekday % 7;
 
     return Row(

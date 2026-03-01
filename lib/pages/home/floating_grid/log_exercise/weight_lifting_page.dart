@@ -1,6 +1,7 @@
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,22 +24,10 @@ class WeightLiftingPage extends ConsumerStatefulWidget {
 class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
   // --- DATA ---
   // Updated to use dynamic values so we can store the Enum
-  final List<Map<String, dynamic>> _intensityOptions = [
-    {
-      'title': 'High',
-      'subtitle': 'Training to failure, breathing heavily',
-      'value': Intensity.high,
-    },
-    {
-      'title': 'Medium',
-      'subtitle': 'Breaking a sweat, many reps',
-      'value': Intensity.medium,
-    },
-    {
-      'title': 'Low',
-      'subtitle': 'Not breaking a sweat, giving little effort',
-      'value': Intensity.low,
-    },
+  final List<Intensity> _intensityValues = [
+    Intensity.high,
+    Intensity.medium,
+    Intensity.low,
   ];
 
   // Changed to integers for logic
@@ -94,6 +83,21 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
   @override
   Widget build(BuildContext context) {
     final int activeIndex = _getCurrentZoneIndex();
+    final l10n = context.l10n;
+    final intensityOptions = [
+      {
+        'title': l10n.intensityHighLabel,
+        'subtitle': l10n.weightIntensityHighDescription,
+      },
+      {
+        'title': l10n.intensityMediumLabel,
+        'subtitle': l10n.weightIntensityMediumDescription,
+      },
+      {
+        'title': l10n.intensityLowLabel,
+        'subtitle': l10n.weightIntensityLowDescription,
+      },
+    ];
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -105,8 +109,8 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
               children: [
                 Icon(Icons.directions_run, color: Theme.of(context).colorScheme.primary, size: 24),
                 const SizedBox(width: 5),
-                const Text(
-                  "Weight Lifting",
+                Text(
+                  l10n.weightLiftingTitle,
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 18,
@@ -123,11 +127,11 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: const [
+                      children: [
                         Icon(Icons.electric_bolt_outlined, size: 24),
                         SizedBox(width: 5),
                         Text(
-                          'Set Intensity',
+                          l10n.setIntensityLabel,
                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -149,7 +153,7 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: List.generate(_intensityOptions.length, (index) {
+                              children: List.generate(intensityOptions.length, (index) {
                                 final isSelected = activeIndex == index;
                                 return GestureDetector(
                                   onTap: () {
@@ -173,7 +177,7 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
                                             color: Theme.of(context).colorScheme.primary,
                                           ),
                                           child: Text(
-                                            _intensityOptions[index]['title'] as String,
+                                            intensityOptions[index]['title'] as String,
                                           ),
                                         ),
                                         const SizedBox(height: 5),
@@ -181,7 +185,7 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
                                           duration: const Duration(milliseconds: 300),
                                           opacity: isSelected ? 1.0 : 0.5,
                                           child: Text(
-                                            _intensityOptions[index]['subtitle'] as String,
+                                            intensityOptions[index]['subtitle'] as String,
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
@@ -263,11 +267,11 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
 
                     // --- DURATION HEADER ---
                     Row(
-                      children: const [
+                      children: [
                         Icon(Icons.timer_outlined, size: 24),
                         SizedBox(width: 8),
                         Text(
-                          'Duration',
+                          l10n.durationLabel,
                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -301,7 +305,7 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
                                 ),
                               ),
                               child: Text(
-                                "${_durations[index]} mins",
+                                "${_durations[index]} ${l10n.minutesShortLabel}",
                                 style: TextStyle(
                                   color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.w600,
@@ -349,7 +353,7 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
               ),
             ),
             // --- FIXED BOTTOM BUTTON ---
-            ConfirmationButtonWidget(onConfirm: _onLogEntry, text: "Add")
+            ConfirmationButtonWidget(onConfirm: _onLogEntry, text: l10n.addLabel)
           ],
         ),
       ),
@@ -365,7 +369,7 @@ class _WeightLiftingPageState extends ConsumerState<WeightLiftingPage> {
     if (duration <= 0) return;
 
     final activeIndex = _getCurrentZoneIndex();
-    final Intensity intensityEnum = _intensityOptions[activeIndex]['value'];
+    final Intensity intensityEnum = _intensityValues[activeIndex];
 
     // Call the provider
     await ref.read(exerciseLogProvider.notifier).logExercise(

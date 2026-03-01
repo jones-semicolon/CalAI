@@ -1,6 +1,7 @@
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,9 +97,9 @@ class _PageBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Edit name",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          Text(
+            context.l10n.editNameTitle,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 30),
           _NameInputField(controller: controller),
@@ -179,7 +180,7 @@ class _DoneFooter extends StatelessWidget {
               width: 20,
               child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
           )
-              : const Text("Done", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              : Text(context.l10n.doneLabel, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ),
       ),
     );

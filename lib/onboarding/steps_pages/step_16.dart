@@ -1,8 +1,8 @@
 import 'package:calai/onboarding/onboarding_widgets/header.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/referal_widget.dart';
 
 class OnboardingStep16 extends ConsumerWidget {
@@ -18,9 +18,9 @@ class OnboardingStep16 extends ConsumerWidget {
     return SafeArea(
       child: Column(
         children: [
-          const Header(
-            title: 'Enter referral code (optional)',
-            subtitle: 'You can skip this step',
+          Header(
+            title: context.l10n.step16ReferralTitle,
+            subtitle: context.l10n.step16ReferralSubtitle,
           ),
           const Spacer(),
 

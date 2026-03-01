@@ -1,4 +1,5 @@
 import 'package:calai/enums/user_enums.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/pages/settings/settings_item.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
@@ -107,11 +108,15 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
       // The main layout is a Column, now composed of smaller, focused widgets.
       child: Column(
         children: [
-          const SettingsItemTile(label: "Preferences", icon: Icons.settings_outlined, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),),
+          SettingsItemTile(
+            label: context.l10n.preferencesLabel,
+            icon: Icons.settings_outlined,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          ),
           const SettingsDivider(),
           SettingsItemTile(
-            label: "Appearance",
-            description: "Choose light, dark, or system appearance",
+            label: context.l10n.appearanceLabel,
+            description: context.l10n.appearanceDescription,
             widget: DropdownButtonHideUnderline(
               child: ButtonTheme(
                 alignedDropdown: true, // ✅ Fixes the width/alignment offset
@@ -131,7 +136,7 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
                       child: Container(
                         alignment: Alignment.center, // ✅ Aligns popup items to right
                         child: Text(
-                          e,
+                          _appearanceLabel(context, e),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -149,8 +154,8 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
           ),
           const SettingsDivider(),
           SettingsItemTile(
-            label: "Add Burned Calories",
-            description: "Add burned calories to daily goal",
+            label: context.l10n.addBurnedCaloriesLabel,
+            description: context.l10n.addBurnedCaloriesDescription,
             widget: Switch(
               value: settings.isAddCalorieBurn ?? false,
               onChanged: (v) => _updateSettings(isAddCalorieBurn: v),
@@ -167,8 +172,8 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
           ),
           const SettingsDivider(),
           SettingsItemTile(
-            label: "Rollover Calories",
-            description: "Add up to 200 leftover calories into today's goal",
+            label: context.l10n.rolloverCaloriesLabel,
+            description: context.l10n.rolloverCaloriesDescription,
             widget: Switch(
               value: settings.isRollover ?? false,
               onChanged: (v) => _updateSettings(isRollover: v),
@@ -185,8 +190,8 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
           ),
           const SettingsDivider(),
           SettingsItemTile(
-            label: "Measurement unit",
-            description: "All values will be converted to imperial (currently on metrics)",
+            label: context.l10n.measurementUnitLabel,
+            description: context.l10n.measurementUnitDescription,
             widget: Switch(
               value: settings.measurementUnit?.isImperial ?? false,
               onChanged: (v) => _updateSettings(isImperial: v),
@@ -204,5 +209,16 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
         ],
       ),
     );
+  }
+
+  String _appearanceLabel(BuildContext context, String raw) {
+    switch (raw) {
+      case "Light":
+        return context.l10n.lightLabel;
+      case "Dark":
+        return context.l10n.darkLabel;
+      default:
+        return context.l10n.automaticLabel;
+    }
   }
 }

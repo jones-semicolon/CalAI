@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
+import 'package:calai/l10n/l10n.dart';
 
 /// A simple, tappable list item for the "Invite friends" action.
 class InviteFriendsItem extends StatelessWidget {
@@ -33,7 +34,7 @@ class InviteFriendsItem extends StatelessWidget {
             child: Icon(Icons.group_outlined, size: 20, color: primaryColor),
           ),
           const SizedBox(width: 10),
-          Text("Invite friends", style: textStyle),
+          Text(context.l10n.inviteFriendsLabel, style: textStyle),
           const Spacer(),
         ],
       ),

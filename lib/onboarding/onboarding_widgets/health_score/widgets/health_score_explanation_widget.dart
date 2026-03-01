@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'factors_card.dart';
 import 'score_indicator.dart';
 
@@ -9,13 +10,13 @@ class HealthScoreExplanationWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Our health score is a complex formula taking into account '
-          'several factors given a multitude of common foods.',
+          l10n.healthScoreExplanationIntro,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -24,18 +25,18 @@ class HealthScoreExplanationWidget extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Text(
-          'Below are the factors we take into account when calculating health score:',
+          l10n.healthScoreExplanationFactorsLead,
           style: TextStyle(fontSize: 14, color: colors.onSecondary),
         ),
         const SizedBox(height: 20),
-        const FactorsCard(),
+        FactorsCard(),
         const SizedBox(height: 28),
-        const ScoreIndicator(
+        ScoreIndicator(
           icon: FontAwesomeIcons.appleWhole,
-          title: 'Net carbs',
+          title: l10n.netCarbsLabel,
         ),
         const SizedBox(height: 15),
-        const ScoreIndicator(icon: Icons.grain, title: 'Sodium'),
+        ScoreIndicator(icon: Icons.grain, title: l10n.sodiumLabel),
       ],
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class CreateAccount extends StatelessWidget {
   final VoidCallback? onGoogleSignIn;
@@ -12,6 +13,7 @@ class CreateAccount extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final bg = theme.scaffoldBackgroundColor;
+    final l10n = context.l10n;
 
     return Center(
       child: Column(
@@ -27,7 +29,7 @@ class CreateAccount extends StatelessWidget {
                 Icon(FontAwesomeIcons.google, size: 18, color: bg),
                 const SizedBox(width: 12),
                 Text(
-                  'Sign in with Google',
+                  l10n.signInWithGoogle,
                   style: TextStyle(
                     color: bg,
                     fontSize: 14,
@@ -46,7 +48,7 @@ class CreateAccount extends StatelessWidget {
             backgroundColor: bg,
             borderColor: scheme.primary,
             child: Text(
-              'Skip',
+              l10n.skipLabel,
               style: TextStyle(
                 color: scheme.primary,
                 fontSize: 14,

@@ -1,4 +1,4 @@
-import 'package:calai/pages/progress/screens/bmi_info_view.dart';
+﻿import 'package:calai/pages/progress/screens/bmi_info_view.dart';
 import 'package:calai/providers/progress_data_provider.dart';
 import 'package:calai/pages/progress/widgets/progress_bar_graph.dart';
 import 'package:calai/pages/progress/widgets/progress_bmi_card.dart';
@@ -7,9 +7,9 @@ import 'package:calai/pages/progress/widgets/progress_photo.dart';
 import 'package:calai/pages/progress/widgets/streak_card.dart';
 import 'package:calai/pages/progress/widgets/weight_card.dart';
 import 'package:calai/providers/user_provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calai/l10n/l10n.dart';
 
 import '../../core/constants/app_sizes.dart';
 import '../../providers/global_provider.dart';
@@ -44,7 +44,9 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
             child: Center(child: CircularProgressIndicator()),
           ),
           error: (e, _) => SliverFillRemaining(
-            child: Center(child: Text("Unable to load progress: $e")),
+            child: Center(
+              child: Text(context.l10n.unableToLoadProgress(e.toString())),
+            ),
           ),
           data: (global) {
             // 2. Instantiate the logic provider (no Firestore calls here anymore)

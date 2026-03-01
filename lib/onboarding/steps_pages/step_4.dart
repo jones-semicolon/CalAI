@@ -1,12 +1,9 @@
-import 'dart:async';
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 
 class OnboardingStep4 extends ConsumerStatefulWidget {
@@ -21,18 +18,25 @@ class _OnboardingStep4State extends ConsumerState<OnboardingStep4> {
   bool isEnable = false;
   int? selectedIndex;
 
-  // Added 'value' to OptionCard to hold the boolean
-  final List<OptionCard> options = [
-    OptionCard(title: 'Yes', icon: Icons.thumb_up, value: true),
-    OptionCard(title: 'No', icon: Icons.thumb_down, value: false),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final options = <OptionCard>[
+      OptionCard(
+        title: context.l10n.yesLabel,
+        icon: Icons.thumb_up,
+        value: true,
+      ),
+      OptionCard(
+        title: context.l10n.noLabel,
+        icon: Icons.thumb_down,
+        value: false,
+      ),
+    ];
+
     return SafeArea(
       child: Column(
         children: [
-          const Header(title: 'Have you tried other calorie tracking apps?'),
+          Header(title: context.l10n.step4TriedOtherCalorieApps),
 
           Expanded(
             child: CustomScrollView(

@@ -5,6 +5,7 @@ import 'package:calai/providers/global_provider.dart';
 import 'package:calai/providers/user_provider.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,6 +26,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
     final globalAsync = ref.watch(globalDataProvider);
     final user = ref.watch(userProvider);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -35,7 +37,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
               Expanded(
                 child: globalAsync.when(
                   loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (err, _) => Center(child: Text("Error loading data")),
+                  error: (err, _) => Center(child: Text(l10n.errorLoadingData)),
                   data: (global) {
                     // --- DATA PREPARATION ---
                     final progress = global.todayProgress;
@@ -56,7 +58,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 20,
                         children: [
-                          const SizedBox(width: double.infinity, child: Text("Daily Breakdown", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold))),
+                          SizedBox(width: double.infinity, child: Text(l10n.dailyBreakdownTitle, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold))),
 
                           // --- MACROS CARD ---
                           Container(
@@ -72,7 +74,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                                             child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text("Calories", style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                                                  Text(l10n.caloriesLabel, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                                                   Text(
                                                       "${progress.calories.round()} / ${calorieGoal.round()} kcal",
                                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)
@@ -116,7 +118,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                                     ),
                                     backgroundColor: theme.colorScheme.surface,
                                     color: theme.colorScheme.primary,
-                                    text: "Edit Daily Goals",
+                                    text: l10n.editDailyGoalsLabel,
                                   )
                                 ],
                               )
@@ -132,7 +134,7 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                                   Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text("Water", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                        Text(l10n.waterLabel, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                         const SizedBox(height: 4),
                                         Text(
                                             "${user.settings.measurementUnit?.liquidToDisplay(progress.water).round() ?? progress.water.round()} / ${user.settings.measurementUnit?.liquidToDisplay(user.goal.targets.water).round() ?? user.goal.targets.water.round()} ${user.settings.measurementUnit?.liquidLabel ?? MeasurementUnit.metric.liquidLabel}",
@@ -163,9 +165,9 @@ class _HealthScoreViewState extends ConsumerState<HealthScoreView> {
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text("Health Score", style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.secondary)),
+                                            Text(l10n.healthScoreTitle, style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.secondary)),
                                             Text(
-                                              getHealthStatus(widget.score),
+                                              getHealthStatus(context, widget.score),
                                               style: TextStyle(
                                                 color: Theme.of(context).colorScheme.primary,
                                                 fontSize: 16,
@@ -252,7 +254,7 @@ class _MacroRow extends StatelessWidget {
           Expanded(child: Text(nutrition.label, style: TextStyle(color: Colors.grey[700]),)),
           // e.g. "45 / 150g"
           Text(
-              "${current.toInt()} / ${target.toInt()} grams",
+              "${current.toInt()} / ${target.toInt()} ${context.l10n.gramsLabel}",
               style: TextStyle(color: current > target ? Colors.red : Colors.grey[700])
           )
         ]
@@ -349,11 +351,13 @@ class _ProgressIndicator extends StatelessWidget {
   }
 }
 
-String getHealthStatus(double score) {
-  if (score == 0) return "Not evaluated";
-  if (score <= 3) return "Critically low";
-  if (score <= 5) return "Needs improvement"; // ✅ Matches your current 4/10
-  if (score <= 7) return "Fair progress";
-  if (score <= 9) return "Good health";
-  return "Excellent health";
+String getHealthStatus(BuildContext context, double score) {
+  final l10n = context.l10n;
+  if (score == 0) return l10n.healthStatusNotEvaluated;
+  if (score <= 3) return l10n.healthStatusCriticallyLow;
+  if (score <= 5) return l10n.healthStatusNeedsImprovement;
+  if (score <= 7) return l10n.healthStatusFairProgress;
+  if (score <= 9) return l10n.healthStatusGoodHealth;
+  return l10n.healthStatusExcellentHealth;
 }
+

@@ -1,12 +1,660 @@
 {
   "@@locale": "en",
+  "appTitle": "Cal AI",
+  "homeTab": "Home",
+  "progressTab": "Progress",
+  "settingsTab": "Settings",
+  "language": "Language",
   "welcomeMessage": "Welcome to Cal AI",
   "trackMessage": "Track smarter. Eat better.",
   "getStarted": "Get Started",
   "alreadyAccount": "Already have an account?",
   "signIn": "Sign in",
   "chooseLanguage": "Choose language",
+  "personalDetails": "Personal Details",
+  "adjustMacronutrients": "Adjust Macronutrients",
+  "weightHistory": "Weight History",
+  "homeWidget": "Home Widget",
+  "chooseHomeWidgets": "Choose Home Widgets",
+  "tapOptionsToAddRemoveWidgets": "Tap options to add or remove widgets.",
+  "updatingWidgetSelection": "Updating widget selection...",
+  "requestingWidgetPermission": "Requesting widget permission...",
+  "widget1": "Widget 1",
+  "widget2": "Widget 2",
+  "widget3": "Widget 3",
+  "calorieTrackerWidget": "Calorie Tracker",
+  "nutritionTrackerWidget": "Nutrition Tracker",
+  "streakTrackerWidget": "Streak Tracker",
+  "removedFromSelection": "{widgetName} removed from selection.",
+  "@removedFromSelection": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "removeFromHomeScreenInstruction": "To remove {widgetName}, remove it from your home screen. Selection syncs automatically.",
+  "@removeFromHomeScreenInstruction": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "addFromHomeScreenInstruction": "To add {widgetName}, long-press the Home Screen, tap +, then select Cal AI.",
+  "@addFromHomeScreenInstruction": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "widgetAdded": "{widgetName} widget added.",
+  "@widgetAdded": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "permissionNeededToAddWidget": "Permission needed to add {widgetName}. We opened settings for you.",
+  "@permissionNeededToAddWidget": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "couldNotOpenPermissionSettings": "Could not open permission settings. Please enable permissions manually to add {widgetName}.",
+  "@couldNotOpenPermissionSettings": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "noWidgetsOnHomeScreen": "No widgets on home screen",
+  "selectedWidgets": "Selected: {widgets}",
+  "@selectedWidgets": {
+    "placeholders": {
+      "widgets": {}
+    }
+  },
+  "backupData": "Backup your data",
+  "signInToSync": "Sign in to sync your progress & goals",
+  "accountSuccessfullyBackedUp": "Account successfully backed up!",
+  "failedToLinkAccount": "Failed to link account.",
+  "googleAccountAlreadyLinked": "This Google account is already linked to another Cal AI profile.",
+  "caloriesLabel": "Calories",
+  "eatenLabel": "eaten",
+  "leftLabel": "left",
+  "proteinLabel": "Protein",
+  "carbsLabel": "Carbs",
+  "fatsLabel": "Fats",
+  "fiberLabel": "Fiber",
+  "sugarLabel": "Sugar",
+  "sodiumLabel": "Sodium",
+  "stepsLabel": "Steps",
+  "stepsTodayLabel": "Steps Today",
+  "caloriesBurnedLabel": "Calories Burned",
+  "stepTrackingActive": "Step tracking active!",
+  "waterLabel": "Water",
+  "servingSizeLabel": "Serving Size",
+  "waterSettingsTitle": "Water settings",
+  "hydrationQuestion": "How much water do you need to stay hydrated?",
+  "hydrationInfo": "Everyone's needs are slightly different, but we recommend aiming for at least 64 fl oz (8 cups) of water each day.",
+  "healthScoreTitle": "Health score",
+  "healthSummaryNoData": "No data logged for today. Start tracking your meals to see your health insights!",
+  "healthSummaryLowIntake": "Your intake is quite low. Focus on hitting your calorie and protein targets to maintain energy and muscle.",
+  "healthSummaryLowProtein": "Carbs and fat are on track, but you're low in protein. Increasing protein can help with muscle retention.",
+  "healthSummaryGreat": "Great job! Your nutrition is well-balanced today.",
+  "recentlyLoggedTitle": "Recently logged",
+  "errorLoadingLogs": "Error loading logs: {error}",
+  "@errorLoadingLogs": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "deleteLabel": "Delete",
+  "tapToAddFirstEntry": "Tap + to add your first entry",
+  "unableToLoadProgress": "Unable to load progress: {error}",
+  "@unableToLoadProgress": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "myWeightTitle": "My Weight",
+  "goalWithValue": "Goal {value}",
+  "@goalWithValue": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "noGoalSet": "No Goal Set",
+  "logWeightCta": "Log Weight",
+  "dayStreakTitle": "Day streak",
+  "progressPhotosTitle": "Progress Photos",
+  "progressPhotoPrompt": "Want to add a photo to track your progress?",
+  "uploadPhotoCta": "Upload a Photo",
+  "goalProgressTitle": "Goal Progress",
+  "ofGoalLabel": "of goal",
+  "logoutLabel": "Logout",
+  "logoutTitle": "Logout",
+  "logoutConfirmMessage": "Are you sure you want to log out?",
+  "cancelLabel": "Cancel",
+  "preferencesLabel": "Preferences",
+  "appearanceLabel": "Appearance",
+  "appearanceDescription": "Choose light, dark, or system appearance",
+  "lightLabel": "Light",
+  "darkLabel": "Dark",
+  "automaticLabel": "Automatic",
+  "addBurnedCaloriesLabel": "Add Burned Calories",
+  "addBurnedCaloriesDescription": "Add burned calories to daily goal",
+  "rolloverCaloriesLabel": "Rollover Calories",
+  "rolloverCaloriesDescription": "Add up to 200 leftover calories into today's goal",
+  "measurementUnitLabel": "Measurement unit",
+  "measurementUnitDescription": "All values will be converted to imperial (currently on metrics)",
+  "inviteFriendsLabel": "Invite friends",
+  "defaultUserName": "user",
+  "enterYourNameLabel": "Enter your name",
+  "yearsOldLabel": "{years} years old",
+  "@yearsOldLabel": {
+    "placeholders": {
+      "years": {}
+    }
+  },
+  "termsAndConditionsLabel": "Terms and Conditions",
+  "privacyPolicyLabel": "Privacy Policy",
+  "supportEmailLabel": "Support Email",
+  "featureRequestLabel": "Feature Request",
+  "deleteAccountQuestion": "Delete Account?",
+  "deleteAccountTitle": "Delete Account",
+  "deleteAccountMessage": "Are you absolutely sure? This will permanently delete your Cal AI history, weight logs, and custom goals. This action cannot be undone.",
+  "deletePermanentlyLabel": "Delete Permanently",
+  "onboardingChooseGenderTitle": "Choose your Gender",
+  "onboardingChooseGenderSubtitle": "This will be used to calibrate your custom plan.",
+  "genderFemale": "Female",
+  "genderMale": "Male",
+  "genderOther": "Other",
+  "onboardingWorkoutsPerWeekTitle": "How many workouts do you do per week?",
+  "onboardingWorkoutsPerWeekSubtitle": "This will be used to calibrate your custom plan.",
+  "workoutRangeLowTitle": "0-2",
+  "workoutRangeLowSubtitle": "Workouts now and then",
+  "workoutRangeModerateTitle": "3-5",
+  "workoutRangeModerateSubtitle": "A few workouts per week",
+  "workoutRangeHighTitle": "6+",
+  "workoutRangeHighSubtitle": "Dedicated athlete",
+  "onboardingHearAboutUsTitle": "Where did you hear about us?",
+  "sourceTikTok": "Tik Tok",
+  "sourceYouTube": "YouTube",
+  "sourceGoogle": "Google",
+  "sourcePlayStore": "Play Store",
+  "sourceFacebook": "Facebook",
+  "sourceFriendFamily": "Friend or family",
+  "sourceTv": "TV",
+  "sourceInstagram": "Instagram",
+  "sourceX": "X",
+  "sourceOther": "Other",
+  "yourBmiTitle": "Your BMI",
+  "yourWeightIsLabel": "Your weight is",
+  "bmiUnderweightLabel": "Underweight",
+  "bmiHealthyLabel": "Healthy",
+  "bmiOverweightLabel": "Overweight",
+  "bmiObeseLabel": "Obese",
   "calorieTrackingMadeEasy": "Calorie tracking made easy",
   "onboardingStep1Title": "Track your meals",
-  "onboardingStep1Description": "Log your meals easily and track your nutrition."
+  "onboardingStep1Description": "Log your meals easily and track your nutrition.",
+  "signInWithGoogle": "Sign in with Google",
+  "signInWithEmail": "Sign in with Email",
+  "signInFailed": "Sign in failed: {error}",
+  "@signInFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "continueLabel": "Continue",
+  "skipLabel": "Skip",
+  "noLabel": "No",
+  "yesLabel": "Yes",
+  "submitLabel": "Submit",
+  "referralCodeLabel": "Referral Code",
+  "heightLabel": "Height",
+  "weightLabel": "Weight",
+  "imperialLabel": "Imperial",
+  "metricLabel": "Metric",
+  "month1Label": "Month 1",
+  "month6Label": "Month 6",
+  "traditionalDietLabel": "Traditional Diet",
+  "weightChartSummary": "80% of Cal AI users maintain their weight loss even 6 months later",
+  "comparisonWithoutCalAi": "Without\\nCal AI",
+  "comparisonWithCalAi": "With\\nCal AI",
+  "comparisonLeftValue": "20%",
+  "comparisonRightValue": "2X",
+  "comparisonBottomLine1": "Cal AI makes it easy and holds",
+  "comparisonBottomLine2": "you accountable",
+  "speedSlowSteady": "Slow and steady",
+  "speedRecommended": "Recommended",
+  "speedAggressiveWarning": "You may feel very tired and develop loose skin",
+  "subscriptionHeadline": "Unlock CalAI to reach\\nyour goals faster.",
+  "subscriptionPriceHint": "Just PHP {yearlyPrice} per year (PHP {monthlyPrice}/mo)",
+  "@subscriptionPriceHint": {
+    "placeholders": {
+      "yearlyPrice": {},
+      "monthlyPrice": {}
+    }
+  },
+  "goalGainWeight": "Gain Weight",
+  "goalLoseWeight": "Lose Weight",
+  "goalMaintainWeight": "Maintain Weight",
+  "editGoalTitle": "Edit {title} Goal",
+  "@editGoalTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "revertLabel": "Revert",
+  "doneLabel": "Done",
+  "dashboardShouldGainWeight": "gain",
+  "dashboardShouldLoseWeight": "lose",
+  "dashboardShouldMaintainWeight": "maintain",
+  "dashboardCongratsPlanReady": "Congratulations\\nyour custom plan is ready!",
+  "dashboardYouShouldGoal": "You should {action}:",
+  "@dashboardYouShouldGoal": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "dashboardWeightGoalByDate": "{value} {unit} by {date}",
+  "@dashboardWeightGoalByDate": {
+    "placeholders": {
+      "value": {},
+      "unit": {},
+      "date": {}
+    }
+  },
+  "dashboardDailyRecommendation": "Daily Recommendation",
+  "dashboardEditAnytime": "You can edit this any time",
+  "dashboardHowToReachGoals": "How to reach your goals:",
+  "dashboardReachGoalLifeScore": "Get your weekly life score and improve your routine.",
+  "dashboardReachGoalTrackFood": "Track your food",
+  "dashboardReachGoalFollowCalories": "Follow your daily calorie recommendation",
+  "dashboardReachGoalBalanceMacros": "Balance your carbs, protein, fat",
+  "dashboardPlanSourcesTitle": "Plan based on the following sources, among other peer-reviewed medical studies:",
+  "dashboardSourceBasalMetabolicRate": "Basal metabolic rate",
+  "dashboardSourceCalorieCountingHarvard": "Calorie counting - Harvard",
+  "dashboardSourceInternationalSportsNutrition": "International Society of Sports Nutrition",
+  "dashboardSourceNationalInstitutesHealth": "National Institutes of Health",
+  "factorsNetCarbsMass": "Net carbs / mass",
+  "factorsNetCarbDensity": "Net carb density",
+  "factorsSodiumMass": "Sodium / mass",
+  "factorsSodiumDensity": "Sodium density",
+  "factorsSugarMass": "Sugar / mass",
+  "factorsSugarDensity": "Sugar density",
+  "factorsProcessedScore": "Processed score",
+  "factorsIngredientQuality": "Ingredient quality",
+  "factorsProcessedScoreDescription": "The processed score takes into account dyes, nitrates, seed oils, artificial flavoring / sweeteners, and other factors.",
+  "healthScoreExplanationIntro": "Our health score is a complex formula taking into account several factors given a multitude of common foods.",
+  "healthScoreExplanationFactorsLead": "Below are the factors we take into account when calculating health score:",
+  "netCarbsLabel": "Net carbs",
+  "howDoesItWork": "How does it work?",
+  "goodLabel": "Good",
+  "badLabel": "Bad",
+  "dailyRecommendationFor": "Daily recommendation for",
+  "loadingCustomizingHealthPlan": "Customizing health plan...",
+  "loadingApplyingBmrFormula": "Applying BMR formula...",
+  "loadingEstimatingMetabolicAge": "Estimating your metabolic age...",
+  "loadingFinalizingResults": "Finalizing results...",
+  "loadingSetupForYou": "We're setting everything\\nup for you",
+  "step4TriedOtherCalorieApps": "Have you tried other calorie tracking apps?",
+  "step5CalAiLongTermResults": "Cal AI creates long-term results",
+  "step6HeightWeightTitle": "Height & Weight",
+  "step6HeightWeightSubtitle": "This will be taken into account when calculating your daily nutrition goals.",
+  "step7WhenWereYouBorn": "When were you born?",
+  "step8GoalQuestionTitle": "What is your goal?",
+  "step8GoalQuestionSubtitle": "This helps us generate a plan for your calorie intake.",
+  "step9SpecificDietQuestion": "Do you follow a specific diet?",
+  "step9DietClassic": "Classic",
+  "step9DietPescatarian": "Pescatarian",
+  "step9DietVegetarian": "Vegetarian",
+  "step9DietVegan": "Vegan",
+  "step91DesiredWeightQuestion": "What is your desired weight?",
+  "step92GoalActionGaining": "Gaining",
+  "step92GoalActionLosing": "Losing",
+  "step92RealisticTargetSuffix": " is a realistic target. It's not hard at all!",
+  "step92SocialProof": "90% of users say the change is obvious after using Cal AI, and it's not easy to rebound.",
+  "step93GoalVerbGain": "Gain",
+  "step93GoalVerbLose": "Lose",
+  "step93SpeedQuestionTitle": "How fast do you want to reach your goal?",
+  "step93WeightSpeedPerWeek": "{action} weight speed per week",
+  "@step93WeightSpeedPerWeek": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "step94ComparisonTitle": "Lose twice as much weight with Cal AI vs on your own",
+  "step95ObstaclesTitle": "What's stopping you from reaching your goals?",
+  "step10AccomplishTitle": "What would you like to accomplish?",
+  "step10OptionHealthier": "Eat and live healthier",
+  "step10OptionEnergyMood": "Boost my energy and mood",
+  "step10OptionConsistency": "Stay motivated and consistent",
+  "step10OptionBodyConfidence": "Feel better about my body",
+  "step11PotentialTitle": "You have great potential to crush your goal",
+  "step12ThankYouTitle": "Thank you for\\ntrusting us!",
+  "step12PersonalizeSubtitle": "Now let's personalize Cal AI for you...",
+  "step12PrivacyCardTitle": "Your privacy and security matter to us.",
+  "step12PrivacyCardBody": "We promise to always keep your\\npersonal information private and secure.",
+  "step13ReachGoalsWithNotifications": "Reach your goals with notifications",
+  "step13NotificationPrompt": "Cal AI would like to send you notifications",
+  "allowLabel": "Allow",
+  "dontAllowLabel": "Don't Allow",
+  "step14AddBurnedCaloriesQuestion": "Add calories burned back to your daily goal?",
+  "step15RolloverQuestion": "Rollover extra calories to the next day?",
+  "step15RolloverUpTo": "Rollover up to ",
+  "step15RolloverCap": "200 cals",
+  "step16ReferralTitle": "Enter referral code (optional)",
+  "step16ReferralSubtitle": "You can skip this step",
+  "step17AllDone": "All done!",
+  "step17GeneratePlanTitle": "Time to generate your custom plan!",
+  "step18CalculationError": "Could not calculate plan. Please check your connection.",
+  "step18TryAgain": "Try Again",
+  "step19CreateAccountTitle": "Create an account",
+  "authInvalidEmailMessage": "Please enter a valid email address",
+  "authCheckYourEmailTitle": "Check your email",
+  "authSignInLinkSentMessage": "We sent a sign-in link to {email}",
+  "@authSignInLinkSentMessage": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "okLabel": "OK",
+  "genericErrorMessage": "Error: {error}",
+  "@genericErrorMessage": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authWhatsYourEmail": "What's your email?",
+  "authPasswordlessHint": "We'll send you a link to sign in without a password.",
+  "emailExampleHint": "name@example.com",
+  "notSetLabel": "Not set",
+  "goalWeightLabel": "Goal Weight",
+  "changeGoalLabel": "Change Goal",
+  "currentWeightLabel": "Current Weight",
+  "dateOfBirthLabel": "Date of birth",
+  "genderLabel": "Gender",
+  "dailyStepGoalLabel": "Daily Step Goal",
+  "stepGoalLabel": "Step Goal",
+  "setHeightTitle": "Set Height",
+  "setGenderTitle": "Set Gender",
+  "setBirthdayTitle": "Set Birthday",
+  "setWeightTitle": "Set Weight",
+  "editNameTitle": "Edit name",
+  "calorieGoalLabel": "Calorie goal",
+  "proteinGoalLabel": "Protein goal",
+  "carbGoalLabel": "Carb goal",
+  "fatGoalLabel": "Fat goal",
+  "sugarLimitLabel": "Sugar limit",
+  "fiberGoalLabel": "Fiber goal",
+  "sodiumLimitLabel": "Sodium limit",
+  "hideMicronutrientsLabel": "Hide micronutrients",
+  "viewMicronutrientsLabel": "View micronutrients",
+  "autoGenerateGoalsLabel": "Auto Generate Goals",
+  "failedToGenerateGoals": "Failed to generate goals: {error}",
+  "@failedToGenerateGoals": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "calculatingCustomGoals": "Calculating your custom goals...",
+  "logExerciseLabel": "Log Exercise",
+  "savedFoodsLabel": "Saved Foods",
+  "foodDatabaseLabel": "Food Database",
+  "scanFoodLabel": "Scan Food",
+  "exerciseTitle": "Exercise",
+  "runTitle": "Run",
+  "weightLiftingTitle": "Weight Lifting",
+  "describeTitle": "Describe",
+  "runDescription": "Running, jogging, sprinting, etc.",
+  "weightLiftingDescription": "Machines, free weights, etc.",
+  "describeWorkoutDescription": "Write your workout in text",
+  "setIntensityLabel": "Set Intensity",
+  "durationLabel": "Duration",
+  "minutesShortLabel": "mins",
+  "minutesAbbrevSuffix": "m",
+  "addLabel": "Add",
+  "intensityLabel": "Intensity",
+  "intensityHighLabel": "High",
+  "intensityMediumLabel": "Medium",
+  "intensityLowLabel": "Low",
+  "runIntensityHighDescription": "Sprinting - 14 mph (4 minutes miles)",
+  "runIntensityMediumDescription": "Jogging - 6 mph (10 minutes miles)",
+  "runIntensityLowDescription": "Chill walk - 3 mph (20 minutes miles)",
+  "weightIntensityHighDescription": "Training to failure, breathing heavily",
+  "weightIntensityMediumDescription": "Breaking a sweat, many reps",
+  "weightIntensityLowDescription": "Not breaking a sweat, giving little effort",
+  "exerciseLoggedSuccessfully": "Exercise logged successfully!",
+  "exerciseParsedAndLogged": "Exercise parsed and logged!",
+  "describeExerciseTitle": "Describe Exercise",
+  "whatDidYouDoHint": "What did you do?",
+  "describeExerciseExample": "Example: Outdoor hiking for 5 hours, felt exhausted",
+  "servingLabel": "Serving",
+  "productNotFoundMessage": "Product not found.",
+  "couldNotIdentify": "Could not identify \"{text}\".",
+  "@couldNotIdentify": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "identifyingFoodMessage": "Identifying food...",
+  "loggedSuccessfullyMessage": "Logged successfully!",
+  "barcodeScannerLabel": "Barcode Scanner",
+  "barcodeLabel": "Barcode",
+  "foodLabel": "Food Label",
+  "galleryLabel": "Gallery",
+  "bestScanningPracticesTitle": "Best scanning practices",
+  "generalTipsTitle": "General tips:",
+  "scanTipKeepFoodInside": "Keep the food inside the scan lines",
+  "scanTipHoldPhoneStill": "Hold your phone still so the image is not blurry",
+  "scanTipAvoidObscureAngles": "Don't take the picture at obscure angles",
+  "scanNowLabel": "Scan now",
+  "allTabLabel": "All",
+  "myMealsTabLabel": "My meals",
+  "myFoodsTabLabel": "My foods",
+  "savedScansTabLabel": "Saved scans",
+  "logEmptyFoodLabel": "Log empty food",
+  "searchResultsLabel": "Search Results",
+  "suggestionsLabel": "Suggestions",
+  "noItemsFoundLabel": "No items found.",
+  "noSuggestionsAvailableLabel": "No suggestions available",
+  "noSavedScansYetLabel": "No saved scans yet",
+  "describeWhatYouAteHint": "Describe what you ate",
+  "foodAddedToDate": "Added {foodName} to {dateId}",
+  "@foodAddedToDate": {
+    "placeholders": {
+      "dateId": {},
+      "foodName": {}
+    }
+  },
+  "failedToAddFood": "Failed to add food. Try again.",
+  "invalidFoodIdMessage": "Invalid Food ID",
+  "foodNotFoundMessage": "Food not found",
+  "couldNotLoadFoodDetails": "Could not load food details",
+  "gramsShortLabel": "G",
+  "standardLabel": "Standard",
+  "selectedFoodTitle": "Selected food",
+  "measurementLabel": "Measurement",
+  "otherNutritionFactsLabel": "Other nutrition facts",
+  "numberOfServingsLabel": "Number of servings",
+  "logLabel": "Log",
+  "nutrientsTitle": "Nutrients",
+  "totalNutritionLabel": "Total Nutrition",
+  "enterFoodNameHint": "Enter food name",
+  "kcalLabel": "kcal",
+  "statsLabel": "Stats",
+  "intensityModerateLabel": "Moderate",
+  "thisWeekLabel": "This Week",
+  "lastWeekLabel": "Last Week",
+  "twoWeeksAgoLabel": "2 wks ago",
+  "threeWeeksAgoLabel": "3 wks ago",
+  "totalCaloriesLabel": "Total Calories",
+  "calsLabel": "cals",
+  "dayShortSun": "Sun",
+  "dayShortMon": "Mon",
+  "dayShortTue": "Tue",
+  "dayShortWed": "Wed",
+  "dayShortThu": "Thu",
+  "dayShortFri": "Fri",
+  "dayShortSat": "Sat",
+  "ninetyDaysLabel": "90 Days",
+  "sixMonthsLabel": "6 Months",
+  "oneYearLabel": "1 Year",
+  "allTimeLabel": "All time",
+  "waitingForFirstLogLabel": "Waiting for your first log...",
+  "editGoalPickerTitle": "Edit Goal Picker",
+  "bmiDisclaimerTitle": "Disclaimer",
+  "bmiDisclaimerBody": "As with most measures of health, BMI is not a perfect test. For example, results can be thrown off by pregnancy or high muscle mass, and it may not be a good measure of health for child or the elderly.",
+  "bmiWhyItMattersTitle": "So then, why does BMI matter?",
+  "bmiWhyItMattersBody": "In general, the higher your BMI, the higher the risk of developing a range of conditions linked with excess weight, including:\\n� diabetes\\n� arthritis\\n� liver disease\\n� several types of cancer (such as those of the breast, colon, and prostate)\\n� high blood pressure (hypertension)\\n� high cholesterol\\n� sleep apnea",
+  "noWeightHistoryYet": "No weight history recorded yet.",
+  "overLabel": "over",
+  "dailyBreakdownTitle": "Daily Breakdown",
+  "editDailyGoalsLabel": "Edit Daily Goals",
+  "errorLoadingData": "Error loading data",
+  "gramsLabel": "grams",
+  "healthStatusNotEvaluated": "Not evaluated",
+  "healthStatusCriticallyLow": "Critically low",
+  "healthStatusNeedsImprovement": "Needs improvement",
+  "healthStatusFairProgress": "Fair progress",
+  "healthStatusGoodHealth": "Good health",
+  "healthStatusExcellentHealth": "Excellent health",
+  "remindersTitle": "Reminders",
+  "failedLoadReminderSettings": "Failed to load reminder settings.",
+  "smartNutritionRemindersTitle": "Smart nutrition reminders",
+  "dailyReminderAtLabel": "Daily reminder at",
+  "setSmartNutritionTimeLabel": "Set smart nutrition time",
+  "waterRemindersTitle": "Water reminders",
+  "everyLabel": "Every",
+  "hourUnitLabel": "hour(s)",
+  "fromLabel": "from",
+  "setWaterStartTimeLabel": "Set water start time",
+  "breakfastReminderTitle": "Breakfast reminder",
+  "lunchReminderTitle": "Lunch reminder",
+  "dinnerReminderTitle": "Dinner reminder",
+  "snackReminderTitle": "Snack reminder",
+  "goalTrackingAlertsTitle": "Goal tracking alerts",
+  "goalTrackingAlertsSubtitle": "Near/exceed calorie and macro goal alerts",
+  "stepsExerciseReminderTitle": "Steps / exercise reminder",
+  "dailyAtLabel": "Daily at",
+  "setActivityReminderTimeLabel": "Set activity reminder time",
+  "intervalLabel": "Interval:",
+  "setTimeLabel": "Set time",
+  "languageNameEnglish": "English",
+  "languageNameSpanish": "Español",
+  "languageNamePortuguese": "Português",
+  "languageNameFrench": "Français",
+  "languageNameGerman": "Deutsch",
+  "languageNameItalian": "Italiano",
+  "languageNameHindi": "Hindi",
+  "progressMessageStart": "Getting started is the hardest part. You're ready for this!",
+  "progressMessageKeepPushing": "You're making progress. Now's the time to keep pushing!",
+  "progressMessagePayingOff": "Your dedication is paying off. Keep going!",
+  "progressMessageFinalStretch": "It's the final stretch. Push yourself!",
+  "progressMessageCongrats": "You did it! Congratulations!",
+  "dayStreakWithCount": "{count} Day Streak",
+  "streakLostTitle": "Streak Lost",
+  "streakActiveSubtitle": "You're on fire! Keep logging to maintain your momentum.",
+  "streakLostSubtitle": "Don't give up. Log your meals today to get back on track.",
+  "dayInitialSun": "S",
+  "dayInitialMon": "M",
+  "dayInitialTue": "T",
+  "dayInitialWed": "W",
+  "dayInitialThu": "T",
+  "dayInitialFri": "F",
+  "dayInitialSat": "S",
+  "alertCalorieGoalExceededTitle": "Calorie goal exceeded",
+  "alertCalorieGoalExceededBody": "You are {over} kcal over your daily target.",
+  "alertNearCalorieLimitTitle": "You are near your calorie limit",
+  "alertNearCalorieLimitBody": "Only {remaining} kcal left today. Plan your next meal carefully.",
+  "alertProteinBehindTitle": "Protein target is behind",
+  "alertProteinBehindBody": "You still need about {missing} g protein to hit today's target.",
+  "alertCarbTargetExceededTitle": "Carb target exceeded",
+  "alertCarbTargetExceededBody": "Carbs are {over} g over target.",
+  "alertFatTargetExceededTitle": "Fat target exceeded",
+  "alertFatTargetExceededBody": "Fat is {over} g over target.",
+  "smartNutritionTipTitle": "Smart nutrition tip",
+  "smartNutritionKcalLeft": "{calories} kcal left",
+  "smartNutritionKcalOver": "{calories} kcal over",
+  "smartNutritionProteinRemaining": "{protein} g protein remaining",
+  "smartNutritionProteinGoalReached": "protein goal reached",
+  "smartNutritionCombinedMessage": "{calorieMessage} and {proteinMessage}. Log your next meal to stay on track.",
+  "notificationStepsExerciseTitle": "Steps and exercise reminder",
+  "notificationStepsExerciseBody": "Log your steps or workout to complete today's activity target.",
+  "notificationBreakfastTitle": "Breakfast reminder",
+  "notificationBreakfastBody": "Log breakfast to start your calorie and macro tracking early.",
+  "notificationLunchTitle": "Lunch reminder",
+  "notificationLunchBody": "Lunch time. Add your meal to keep your daily progress accurate.",
+  "notificationDinnerTitle": "Dinner reminder",
+  "notificationDinnerBody": "Log dinner and close your day with complete nutrition data.",
+  "notificationSnackTitle": "Snack reminder",
+  "notificationSnackBody": "Add your snack so calories and macros stay aligned with your goals.",
+  "smartNutritionDailyTitle": "Smart nutrition check-in",
+  "smartNutritionDailyBody": "Target {calories} kcal, {protein}g protein, {carbs}g carbs, {fats}g fat. Log your latest meal to keep your plan accurate.",
+  "notificationWaterTitle": "Water reminder",
+  "notificationWaterBody": "Hydration check. Log a glass of water in Cal AI.",
+  "homeWidgetLogFoodCta": "Log your food",
+  "homeWidgetCaloriesTodayTitle": "Calories today",
+  "homeWidgetCaloriesSubtitle": "{calories} / {goal} kcal",
+  "@dayStreakWithCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "@alertCalorieGoalExceededBody": {
+    "placeholders": {
+      "over": {}
+    }
+  },
+  "@alertNearCalorieLimitBody": {
+    "placeholders": {
+      "remaining": {}
+    }
+  },
+  "@alertProteinBehindBody": {
+    "placeholders": {
+      "missing": {}
+    }
+  },
+  "@alertCarbTargetExceededBody": {
+    "placeholders": {
+      "over": {}
+    }
+  },
+  "@alertFatTargetExceededBody": {
+    "placeholders": {
+      "over": {}
+    }
+  },
+  "@smartNutritionKcalLeft": {
+    "placeholders": {
+      "calories": {}
+    }
+  },
+  "@smartNutritionKcalOver": {
+    "placeholders": {
+      "calories": {}
+    }
+  },
+  "@smartNutritionProteinRemaining": {
+    "placeholders": {
+      "protein": {}
+    }
+  },
+  "@smartNutritionCombinedMessage": {
+    "placeholders": {
+      "calorieMessage": {},
+      "proteinMessage": {}
+    }
+  },
+  "@smartNutritionDailyBody": {
+    "placeholders": {
+      "calories": {},
+      "protein": {},
+      "carbs": {},
+      "fats": {}
+    }
+  },
+  "@homeWidgetCaloriesSubtitle": {
+    "placeholders": {
+      "calories": {},
+      "goal": {}
+    }
+  }
 }

@@ -6,6 +6,7 @@ import 'package:calai/widgets/profile_widgets/birthday_picker_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calai/l10n/l10n.dart';
 
 import '../../../widgets/header_widget.dart';
 import '../../../widgets/profile_widgets/height_picker.dart';
@@ -33,7 +34,7 @@ class _DatePickerViewState extends ConsumerState<DatePickerView> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
-          CustomAppBar(title: Text("Set Birthday")),
+          CustomAppBar(title: Text(context.l10n.setBirthdayTitle)),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

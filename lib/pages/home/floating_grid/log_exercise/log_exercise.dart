@@ -1,6 +1,7 @@
 import 'package:calai/pages/home/floating_grid/log_exercise/run_page.dart';
 import 'package:calai/pages/home/floating_grid/log_exercise/weight_lifting_page.dart';
 import 'package:calai/widgets/circle_back_button.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../widgets/header_widget.dart';
@@ -16,13 +17,14 @@ class LogExercisePage extends StatefulWidget {
 class _LogExercisePageState extends State<LogExercisePage> {
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           // Remove MainAxisAlignment.center from here if you want the AppBar at the top
           children: [
-            const CustomAppBar(title: Text("Exercise")),
+            CustomAppBar(title: Text(l10n.exerciseTitle)),
             const SizedBox(height: 20),
 
             // ✅ Use Expanded or just a simple Column here
@@ -34,7 +36,7 @@ class _LogExercisePageState extends State<LogExercisePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Log Exercise",
+                      l10n.logExerciseLabel,
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -46,20 +48,20 @@ class _LogExercisePageState extends State<LogExercisePage> {
                     // Exercise Cards
                     _buildExerciseCard(
                       icon: Icons.directions_run,
-                      title: "Run",
-                      subtitle: "Running, jogging, sprinting, etc.",
+                      title: l10n.runTitle,
+                      subtitle: l10n.runDescription,
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RunExercisePage())),
                     ),
                     _buildExerciseCard(
                       icon: Icons.fitness_center,
-                      title: "Weight Lifting",
-                      subtitle: "Machines, free weights, etc.",
+                      title: l10n.weightLiftingTitle,
+                      subtitle: l10n.weightLiftingDescription,
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WeightLiftingPage())),
                     ),
                     _buildExerciseCard(
                       icon: Icons.edit,
-                      title: "Describe",
-                      subtitle: "Write your workout in text",
+                      title: l10n.describeTitle,
+                      subtitle: l10n.describeWorkoutDescription,
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DescribePage())),
                     ),
                     Spacer(flex: 2,)

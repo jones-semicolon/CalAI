@@ -1,6 +1,7 @@
 import 'package:calai/models/nutrition_model.dart';
 import 'package:calai/pages/settings/screens/generate_goals_view.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/widgets/edit_value_view.dart'; // Using your EditModal
@@ -24,6 +25,7 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
     // Watching the user provider for current targets
     final user = ref.watch(userProvider);
     final targets = user.goal.targets;
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -36,8 +38,8 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Edit nutrition goals",
+                  Text(
+                    l10n.adjustMacronutrients,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -48,13 +50,13 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
 
                   // Primary Macro Cards
                   _GoalCard(
-                    label: "Calorie goal",
+                    label: l10n.calorieGoalLabel,
                     value: targets.calories,
                     color: Colors.black,
                     icon: Icons.local_fire_department,
                     onTap: () => _showEdit(
                       context,
-                      "Calories",
+                      l10n.caloriesLabel,
                       targets.calories,
                       Colors.black,
                       (v) {
@@ -71,13 +73,13 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                     ),
                   ),
                   _GoalCard(
-                    label: "Protein goal",
+                    label: l10n.proteinGoalLabel,
                     value: targets.protein,
                     color: NutritionType.protein.color,
                     icon: NutritionType.protein.icon,
                     onTap: () => _showEdit(
                       context,
-                      "Protein",
+                      l10n.proteinLabel,
                       targets.protein,
                       Theme.of(context).colorScheme.primary,
                       (v) {
@@ -94,13 +96,13 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                     ),
                   ),
                   _GoalCard(
-                    label: "Carb goal",
+                    label: l10n.carbGoalLabel,
                     value: targets.carbs,
                     color: NutritionType.carbs.color,
                     icon: NutritionType.carbs.icon,
                     onTap: () => _showEdit(
                       context,
-                      "Carbs",
+                      l10n.carbsLabel,
                       targets.carbs,
                       Theme.of(context).colorScheme.primary,
                       (v) {
@@ -117,13 +119,13 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                     ),
                   ),
                   _GoalCard(
-                    label: "Fat goal",
+                    label: l10n.fatGoalLabel,
                     value: targets.fats,
                     color: NutritionType.fats.color,
                     icon: NutritionType.fats.icon,
                     onTap: () => _showEdit(
                       context,
-                      "Fats",
+                      l10n.fatsLabel,
                       targets.fats,
                       Colors.black,
                       (v) {
@@ -146,9 +148,7 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                       onPressed: () =>
                           setState(() => _showMicros = !_showMicros),
                       icon: Text(
-                        _showMicros
-                            ? "Hide micronutrients"
-                            : "View micronutrients",
+                        _showMicros ? l10n.hideMicronutrientsLabel : l10n.viewMicronutrientsLabel,
                         style: const TextStyle(color: Colors.grey),
                       ),
                       label: Icon(
@@ -164,13 +164,13 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                   if (_showMicros) ...[
                     const SizedBox(height: 10),
                     _GoalCard(
-                      label: "Sugar limit",
+                      label: l10n.sugarLimitLabel,
                       value: targets.sugar,
                       color: MicroNutritionType.sugar.color,
                       icon: MicroNutritionType.sugar.icon,
                       onTap: () => _showEdit(
                         context,
-                        "Sugar",
+                        l10n.sugarLabel,
                         targets.sugar,
                         Colors.purple,
                             (v) {
@@ -187,13 +187,13 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                       ),
                     ),
                     _GoalCard(
-                      label: "Fiber goal",
+                      label: l10n.fiberGoalLabel,
                       value: targets.fiber,
                       color: MicroNutritionType.fiber.color,
                       icon: MicroNutritionType.fiber.icon,
                       onTap: () => _showEdit(
                         context,
-                        "Fiber",
+                        l10n.fiberLabel,
                         targets.fiber,
                         Colors.green,
                             (v) {
@@ -210,13 +210,13 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
                       ),
                     ),
                     _GoalCard(
-                      label: "Sodium limit",
+                      label: l10n.sodiumLimitLabel,
                       value: targets.sodium,
                       color: MicroNutritionType.sodium.color,
                       icon: MicroNutritionType.sodium.icon,
                       onTap: () => _showEdit(
                         context,
-                        "Sodium",
+                        l10n.sodiumLabel,
                         targets.sodium,
                         Colors.blueGrey,
                             (v) {
@@ -244,7 +244,7 @@ class _EditGoalsViewState extends ConsumerState<EditGoalsView> {
               context,
               MaterialPageRoute(builder: (_) => const GenerateGoalsView()),
             ),
-            text: "Auto Generate Goals",
+            text: l10n.autoGenerateGoalsLabel,
           ),
         ],
       ),

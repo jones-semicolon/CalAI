@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:calai/enums/user_enums.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/providers/user_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +84,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildBurnedHeader(theme, burned), // Extracted for readability
+          _buildBurnedHeader(context, theme, burned), // Extracted for readability
           const SizedBox(height: 15),
 
           entriesAsync.when(
@@ -113,8 +114,8 @@ class _CaloriesBurnedCard extends ConsumerWidget {
                   // ✅ LOGGED STEPS: Always at the top, only one, hidden if 0
                   if (stepsToday > 0)
                     _ActivityItemRow(
-                      title: "Steps",
-                      value: "+$stepsToday cal",
+                      title: context.l10n.stepsLabel,
+                      value: "+$stepsToday ${context.l10n.caloriesLabel.toLowerCase()}",
                       icon: Icons.directions_walk,
                     ),
 
@@ -124,7 +125,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
                       .map(
                         (ex) => _ActivityItemRow(
                           title: ex.type.label,
-                          value: "+${ex.caloriesBurned.round()} kcal",
+                          value: "+${ex.caloriesBurned.round()} ${context.l10n.caloriesLabel.toLowerCase()}",
                           icon: ex.type.icon,
                         ),
                       ),
@@ -138,7 +139,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
   }
 }
 
-Widget _buildBurnedHeader(ThemeData theme, num burned) {
+Widget _buildBurnedHeader(BuildContext context, ThemeData theme, num burned) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -164,7 +165,7 @@ Widget _buildBurnedHeader(ThemeData theme, num burned) {
               ),
             ),
             Text(
-              "Calories Burned",
+              context.l10n.caloriesBurnedLabel,
               style: TextStyle(color: theme.colorScheme.primary, fontSize: 12),
             ),
           ],
@@ -186,7 +187,7 @@ class _StepsTodayCard extends ConsumerWidget {
     return GestureDetector(
       onTap: () => _handlePermissionRequest(context, ref),
       child: ActivityCard(
-        title: "Steps Today",
+        title: context.l10n.stepsTodayLabel,
         currentValue: steps,
         icon: Icons.directions_walk,
         color: Theme.of(context).colorScheme.primary, // Standard "Active" green
@@ -211,7 +212,9 @@ class _StepsTodayCard extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Step tracking active!')));
+        ).showSnackBar(
+          SnackBar(content: Text(context.l10n.stepTrackingActive)),
+        );
       }
     } else if (status.isPermanentlyDenied) {
       openAppSettings();
@@ -254,7 +257,7 @@ class _WaterIntakeSection extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Water", style: theme.textTheme.labelSmall),
+              Text(context.l10n.waterLabel, style: theme.textTheme.labelSmall),
               Row(
                 children: [
                   Text(
@@ -333,8 +336,8 @@ void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Serving Size",
+                        Text(
+                          context.l10n.servingSizeLabel,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -378,7 +381,7 @@ void _showWaterSettings(BuildContext context, MeasurementUnit? unitSystem) {
                 ],
 
                 const SizedBox(height: 30),
-                _buildHydrationInfo(),
+                _buildHydrationInfo(context),
                 const SizedBox(height: 30),
               ],
             ),
@@ -418,9 +421,9 @@ Widget _buildSheetHeader(BuildContext context) {
           child: const Icon(Icons.close, size: 20, color: Colors.black54),
         ),
       ),
-      const Expanded(
+      Expanded(
         child: Text(
-          "Water settings",
+          context.l10n.waterSettingsTitle,
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
@@ -433,17 +436,17 @@ Widget _buildSheetHeader(BuildContext context) {
 }
 
 // Helper for the "How much water..." text section
-Widget _buildHydrationInfo() {
+Widget _buildHydrationInfo(BuildContext context) {
   return Column(
     children: [
-      const Text(
-        "How much water do you need to stay hydrated?",
+      Text(
+        context.l10n.hydrationQuestion,
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
       ),
       const SizedBox(height: 10),
       Text(
-        "Everyone's needs are slightly different, but we recommended aiming for at least 64 fl oz (8 cups) of water each day",
+        context.l10n.hydrationInfo,
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 14, color: Colors.grey[600], height: 1.4),
       ),

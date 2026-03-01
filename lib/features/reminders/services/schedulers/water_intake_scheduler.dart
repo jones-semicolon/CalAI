@@ -14,11 +14,12 @@ class WaterIntakeScheduler {
     }
 
     final times = settings.buildWaterReminderTimes();
+    final l10n = await _notificationService.loadL10n();
     for (var index = 0; index < times.length; index++) {
       await _notificationService.scheduleDailyReminder(
         notificationId: ReminderNotificationIds.waterReminderBase + index,
-        title: 'Water reminder',
-        body: 'Hydration check. Log a glass of water in Cal AI.',
+        title: l10n.notificationWaterTitle,
+        body: l10n.notificationWaterBody,
         time: times[index],
         payload: 'water:$index',
         highPriority: true,

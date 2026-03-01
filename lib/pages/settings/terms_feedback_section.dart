@@ -1,4 +1,5 @@
 import 'package:calai/enums/user_enums.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_sizes.dart';
@@ -16,14 +17,12 @@ class TermsFeedbackSection extends ConsumerWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Delete Account"),
-          content: const Text(
-            "Are you absolutely sure? This will permanently delete your Cal AI history, weight logs, and custom goals. This action cannot be undone.",
-          ),
+          title: Text(context.l10n.deleteAccountTitle),
+          content: Text(context.l10n.deleteAccountMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+              child: Text(context.l10n.cancelLabel),
             ),
             TextButton(
               // Inside your AlertDialog's "Delete Permanently" button
@@ -48,9 +47,12 @@ class TermsFeedbackSection extends ConsumerWidget {
                   }
                 }
               },
-              child: const Text(
-                "Delete Permanently",
-                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              child: Text(
+                context.l10n.deletePermanentlyLabel,
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -71,7 +73,7 @@ class TermsFeedbackSection extends ConsumerWidget {
         children: [
           SettingsItemTile(
             icon: Icons.description_outlined,
-            label: "Terms and Conditions",
+            label: context.l10n.termsAndConditionsLabel,
             onTap: () {
               // TODO: navigate to Terms
               print("Terms tapped");
@@ -80,7 +82,7 @@ class TermsFeedbackSection extends ConsumerWidget {
           const SettingsDivider(),
           SettingsItemTile(
             icon: Icons.privacy_tip_outlined,
-            label: "Privacy Policy",
+            label: context.l10n.privacyPolicyLabel,
             onTap: () {
               // TODO: navigate to Privacy Policy
               print("Privacy tapped");
@@ -89,7 +91,7 @@ class TermsFeedbackSection extends ConsumerWidget {
           const SettingsDivider(),
           SettingsItemTile(
             icon: Icons.email_outlined,
-            label: "Support Email",
+            label: context.l10n.supportEmailLabel,
             onTap: () {
               // TODO: open email client
               print("Support tapped");
@@ -98,7 +100,7 @@ class TermsFeedbackSection extends ConsumerWidget {
           const SettingsDivider(),
           SettingsItemTile(
             icon: Icons.lightbulb_outline,
-            label: "Feature Request",
+            label: context.l10n.featureRequestLabel,
             onTap: () {
               // TODO: open feedback form
               print("Feature Request tapped");
@@ -108,7 +110,7 @@ class TermsFeedbackSection extends ConsumerWidget {
             const SettingsDivider(),
             SettingsItemTile(
               icon: Icons.delete_outline,
-              label: "Delete Account?",
+              label: context.l10n.deleteAccountQuestion,
               onTap: () => _showDeleteAccountConfirmation(context, ref),
             ),
           ],

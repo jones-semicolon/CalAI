@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/pages/auth/auth-page.dart';
 // Make sure this import points to where you saved the GoogleSignInService class
 import 'package:calai/pages/auth/auth.dart';
@@ -107,7 +108,7 @@ class _SignInPageState extends State<SignInPage>
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Sign in failed: ${e.toString()}'),
+            content: Text(context.l10n.signInFailed(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -164,7 +165,7 @@ class _SignInPageState extends State<SignInPage>
                           children: [
                             const Spacer(),
                             Text(
-                              'Sign in',
+                              context.l10n.signIn,
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             const Spacer(),
@@ -200,13 +201,13 @@ class _SignInPageState extends State<SignInPage>
                             children: [
                               SignInButton(
                                 icon: FontAwesomeIcons.google,
-                                text: 'Sign in with Google',
+                                text: context.l10n.signInWithGoogle,
                                 onTap: _handleGoogleSignIn,
                               ),
                               const SizedBox(height: 20),
                               SignInButton(
                                 icon: Icons.email_outlined,
-                                text: 'Sign in with Email',
+                                text: context.l10n.signInWithEmail,
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(

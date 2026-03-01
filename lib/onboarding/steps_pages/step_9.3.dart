@@ -1,11 +1,11 @@
 import 'package:calai/onboarding/onboarding_widgets/header.dart';
 import 'package:calai/onboarding/onboarding_widgets/speed_prog_slider.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
-import '../onboarding_widgets/continue_button.dart';
 
 class ProgressSpeed extends ConsumerWidget {
   final VoidCallback nextPage;
@@ -13,8 +13,10 @@ class ProgressSpeed extends ConsumerWidget {
 
   static const double _lbPerKg = 2.20462;
 
-  String _goalLabel(double goal, double targetGoal) =>
-      targetGoal > goal ? 'Gain' : 'Lose';
+  String _goalLabel(double goal, double targetGoal, BuildContext context) =>
+      targetGoal > goal
+          ? context.l10n.step93GoalVerbGain
+          : context.l10n.step93GoalVerbLose;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,18 +34,22 @@ class ProgressSpeed extends ConsumerWidget {
     final unitLabel = unit.value;
 
     // 3. Compare safely
-    final weightLabel = _goalLabel(userData.body.currentWeight, targetWeight.toDouble());
+    final weightLabel = _goalLabel(
+      userData.body.currentWeight,
+      targetWeight.toDouble(),
+      context,
+    );
 
     return SafeArea(
       child: Column(
         children: [
-          const Header(title: 'How fast do you want to reach your goal?'),
+          Header(title: context.l10n.step93SpeedQuestionTitle),
           const Spacer(),
 
           Column(
             children: [
               Text(
-                '$weightLabel weight speed per week',
+                context.l10n.step93WeightSpeedPerWeek(weightLabel),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

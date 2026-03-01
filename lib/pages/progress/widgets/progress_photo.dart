@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 import '../screens/progress_photo/progress_photo_view.dart';
 
@@ -58,7 +59,7 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     // Styling is preserved from the original implementation.
     return Text(
-      'Progress Photos',
+      context.l10n.progressPhotosTitle,
       style: TextStyle(
         fontSize: 22,
         color: Theme.of(context).colorScheme.primary,
@@ -97,7 +98,7 @@ class _InfoColumn extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Want to add a photo to track your progress?',
+            context.l10n.progressPhotoPrompt,
             softWrap: true,
             // Styling is preserved from the original implementation.
             style: TextStyle(
@@ -143,7 +144,7 @@ class _UploadButton extends StatelessWidget {
             ),
             const SizedBox(width: 2),
             Text(
-              'Upload a Photo',
+              context.l10n.uploadPhotoCta,
               // Styling for the button text is preserved.
               style: TextStyle(
                 color: Theme.of(

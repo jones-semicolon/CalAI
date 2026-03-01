@@ -1,11 +1,11 @@
-import 'package:calai/widgets/confirmation_button_widget.dart';
+﻿import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 
 class OnboardingStep2 extends ConsumerStatefulWidget {
@@ -20,20 +20,10 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
   bool isEnable = false;
   int? selectedIndex;
 
-  final List<OptionCard> options = [
-    OptionCard(
-      title: '0-2',
-      subtitle: 'Workouts now and then',
-      icon: Icons.fiber_manual_record,
-      value: WorkoutFrequency.low,
-    ),
-    OptionCard(
-      title: '3-5',
-      subtitle: 'A few workouts per week',
-      icon: Icons.scatter_plot,
-      value: WorkoutFrequency.moderate,
-    ),
-    OptionCard(title: '6+', subtitle: 'Dedicated athlete', icon: Icons.apps, value: WorkoutFrequency.high),
+  final List<WorkoutFrequency> _workoutOptions = const [
+    WorkoutFrequency.low,
+    WorkoutFrequency.moderate,
+    WorkoutFrequency.high,
   ];
   @override
   void initState() {
@@ -43,7 +33,7 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
     final physicalActivity = ref.read(userProvider).goal.activityLevel;
 
     // Find index of option matching saved gender
-    final matchIndex = options.indexWhere((o) => o.value == physicalActivity);
+    final matchIndex = _workoutOptions.indexWhere((o) => o == physicalActivity);
 
     if (matchIndex != -1) {
       selectedIndex = matchIndex;
@@ -57,8 +47,8 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
       child: Column(
         children: [
           Header(
-            title: 'How many workouts do you do per week?',
-            subtitle: 'This will be used to calibrate your custom plan.',
+            title: context.l10n.onboardingWorkoutsPerWeekTitle,
+            subtitle: context.l10n.onboardingWorkoutsPerWeekSubtitle,
           ),
 
           /// SCROLLABLE CONTENT
@@ -74,8 +64,8 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(options.length, (index) {
-                        final item = options[index];
+                      children: List.generate(_workoutOptions.length, (index) {
+                        final item = _buildWorkoutOption(context, _workoutOptions[index]);
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 15),
                           child: AnimatedOptionCard(
@@ -109,13 +99,15 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
 
           ConfirmationButtonWidget(onConfirm: () {
             if (selectedIndex != null) {
-              final selectedOption = options[selectedIndex!];
+              final selectedOption = _workoutOptions[selectedIndex!];
 
               // Update UserData.gender in Riverpod
-              ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(activityLevel: selectedOption.value)));
+              ref.read(userProvider.notifier).updateLocal(
+                (s) => s.copyWith(goal: s.goal.copyWith(activityLevel: selectedOption)),
+              );
 
               debugPrint(
-                'WorkoutPerWeek: ${selectedOption.value}',
+                'WorkoutPerWeek: $selectedOption',
               );
             }
             widget.nextPage();
@@ -123,5 +115,34 @@ class _OnboardingStep2State extends ConsumerState<OnboardingStep2> {
         ],
       ),
     );
+  }
+
+  OptionCard _buildWorkoutOption(
+    BuildContext context,
+    WorkoutFrequency frequency,
+  ) {
+    switch (frequency) {
+      case WorkoutFrequency.low:
+        return OptionCard(
+          title: context.l10n.workoutRangeLowTitle,
+          subtitle: context.l10n.workoutRangeLowSubtitle,
+          icon: Icons.fiber_manual_record,
+          value: frequency,
+        );
+      case WorkoutFrequency.moderate:
+        return OptionCard(
+          title: context.l10n.workoutRangeModerateTitle,
+          subtitle: context.l10n.workoutRangeModerateSubtitle,
+          icon: Icons.scatter_plot,
+          value: frequency,
+        );
+      case WorkoutFrequency.high:
+        return OptionCard(
+          title: context.l10n.workoutRangeHighTitle,
+          subtitle: context.l10n.workoutRangeHighSubtitle,
+          icon: Icons.apps,
+          value: frequency,
+        );
+    }
   }
 }

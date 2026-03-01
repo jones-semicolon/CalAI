@@ -1,6 +1,6 @@
 import 'package:calai/enums/user_enums.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/pages/settings/terms_feedback_section.dart';
-import 'package:calai/providers/global_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,7 +93,9 @@ class _LinkAccountButton extends ConsumerWidget {
 
               if (result != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Account successfully backed up!")),
+                  SnackBar(
+                    content: Text(context.l10n.accountSuccessfullyBackedUp),
+                  ),
                 );
               }
             } catch (e) {
@@ -117,13 +119,13 @@ class _LinkAccountButton extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Backup your data",
+                        context.l10n.backupData,
                         style: textStyle?.copyWith(
                           fontSize: 14,
                         ),
                       ),
                       Text(
-                        "Sign in to sync your progress & goals",
+                        context.l10n.signInToSync,
                         style: TextStyle(
                           fontSize: 10,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -142,10 +144,10 @@ class _LinkAccountButton extends ConsumerWidget {
 }
 
 void _handleLinkingError(BuildContext context, dynamic e) {
-  String message = "Failed to link account.";
+  String message = context.l10n.failedToLinkAccount;
 
   if (e is FirebaseAuthException && e.code == 'credential-already-in-use') {
-    message = "This Google account is already linked to another Cal AI profile.";
+    message = context.l10n.googleAccountAlreadyLinked;
     // TODO: Show a dialog asking if they want to switch accounts instead
   }
 

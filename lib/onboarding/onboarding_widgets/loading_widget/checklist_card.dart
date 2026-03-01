@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class ChecklistCard extends StatelessWidget {
   final bool calories;
@@ -19,6 +20,7 @@ class ChecklistCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -37,7 +39,7 @@ class ChecklistCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Daily recommendation for",
+            l10n.dailyRecommendationFor,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -45,11 +47,11 @@ class ChecklistCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          _item("Calories", calories, context),
-          _item("Carbs", carbs, context),
-          _item("Protein", protein, context),
-          _item("Fats", fats, context),
-          _item("Health score", health, context),
+          _item(l10n.caloriesLabel, calories, context),
+          _item(l10n.carbsLabel, carbs, context),
+          _item(l10n.proteinLabel, protein, context),
+          _item(l10n.fatsLabel, fats, context),
+          _item(l10n.healthScoreTitle, health, context),
         ],
       ),
     );

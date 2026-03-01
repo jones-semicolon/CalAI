@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/core/constants/constants.dart';
+import 'package:calai/l10n/l10n.dart';
 import '../../../providers/user_provider.dart';
 import '../edit_name.dart';
 
@@ -26,7 +26,7 @@ class NameAgeCard extends ConsumerWidget {
 
     // 1. Watch the userProvider to get the current name and birthday
     final user = ref.watch(userProvider);
-    final String name = user.profile.name ?? "user";
+    final String name = user.profile.name ?? context.l10n.defaultUserName;
     final int age = _calculateAge(user.profile.birthDate!);
     final bool isNameEmpty = name.trim().isEmpty;
 
@@ -71,7 +71,7 @@ class NameAgeCard extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        isNameEmpty ? "Enter your name" : name,
+                        isNameEmpty ? context.l10n.enterYourNameLabel : name,
                         style: TextStyle(
                           color: colorScheme.onPrimary,
                           fontWeight: FontWeight.bold,
@@ -86,7 +86,7 @@ class NameAgeCard extends ConsumerWidget {
                   const SizedBox(height: 6),
                   // 3. Display the calculated age
                   Text(
-                    "$age years old",
+                    context.l10n.yearsOldLabel(age),
                     style: TextStyle(color: colorScheme.primary),
                   ),
                 ],

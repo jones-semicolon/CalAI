@@ -1,12 +1,14 @@
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/onboarding/onboarding_widgets/calibration_result/hyper_link_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+
 import '../../../enums/user_enums.dart';
 import '../../../providers/user_provider.dart';
 import 'app_constants.dart';
-import 'macro_card.dart';
 import 'health_score_card.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'macro_card.dart';
 
 class MacroData {
   final String title;
@@ -30,6 +32,7 @@ class _ReachGoal extends StatelessWidget {
   final String title;
   final IconData icon;
   final Color color;
+
   const _ReachGoal({
     required this.title,
     required this.icon,
@@ -54,7 +57,6 @@ class _ReachGoal extends StatelessWidget {
           children: [
             Icon(icon, size: 40, color: color),
             const SizedBox(width: AppSpacing.xLarge),
-
             Expanded(
               child: Text(
                 title,
@@ -105,19 +107,38 @@ class _DailyRecommendationDashboardState
     final unit = ref.watch(userProvider).body.weightUnit;
     final user = ref.watch(userProvider);
     final unitLabel = unit.value;
+    final l10n = context.l10n;
 
     final DateTime today = DateTime.now();
     final DateTime datePlus30 = today.add(const Duration(days: 30));
+    final String localeTag = Localizations.localeOf(context).toLanguageTag();
+    final String formattedDate = DateFormat('dd MMMM', localeTag).format(
+      datePlus30,
+    );
 
-    final String formattedDate = DateFormat('dd MMMM').format(datePlus30);
     double weightDiff;
-
     if (weightGoal != Goal.maintain) {
-      final double diffKg = (user.goal.targets.weightGoal - user.body.currentWeight).abs();
-
+      final double diffKg =
+          (user.goal.targets.weightGoal - user.body.currentWeight).abs();
       weightDiff = unit == WeightUnit.kg ? diffKg : diffKg * 2.20462;
     } else {
-      weightDiff = unit == WeightUnit.kg ? user.body.currentWeight : user.body.currentWeight * 2.20462;
+      weightDiff = unit == WeightUnit.kg
+          ? user.body.currentWeight
+          : user.body.currentWeight * 2.20462;
+    }
+
+    String recommendationAction;
+    switch (weightGoal) {
+      case Goal.gainWeight:
+        recommendationAction = l10n.dashboardShouldGainWeight;
+        break;
+      case Goal.loseWeight:
+        recommendationAction = l10n.dashboardShouldLoseWeight;
+        break;
+      case Goal.maintain:
+      default:
+        recommendationAction = l10n.dashboardShouldMaintainWeight;
+        break;
     }
 
     return LayoutBuilder(
@@ -144,15 +165,15 @@ class _DailyRecommendationDashboardState
                     ),
                     const SizedBox(height: AppSpacing.small),
                     Text(
+                      l10n.dashboardCongratsPlanReady,
                       textAlign: TextAlign.center,
-                      "Congratulations\n your custom plan is ready!",
                       style: AppTextStyles.value.copyWith(
                         color: AppColors.primary(context),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.large),
                     Text(
-                      'You should ${weightGoal?.value.split(' ')[0]}:',
+                      l10n.dashboardYouShouldGoal(recommendationAction),
                       style: AppTextStyles.title.copyWith(
                         color: AppColors.primary(context),
                         fontWeight: FontWeight.w700,
@@ -169,7 +190,11 @@ class _DailyRecommendationDashboardState
                         borderRadius: BorderRadius.circular(AppRadius.card),
                       ),
                       child: Text(
-                        '${weightDiff.toStringAsFixed(1)} $unitLabel by $formattedDate',
+                        l10n.dashboardWeightGoalByDate(
+                          weightDiff.toStringAsFixed(1),
+                          unitLabel,
+                          formattedDate,
+                        ),
                         style: AppTextStyles.title.copyWith(
                           color: AppColors.primary(context),
                           fontWeight: FontWeight.w700,
@@ -190,23 +215,22 @@ class _DailyRecommendationDashboardState
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ───────────── Title ─────────────
                       Text(
-                        "Daily Recommendation",
+                        l10n.dashboardDailyRecommendation,
                         style: AppTextStyles.headTitle.copyWith(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                          color: Theme.of(context).colorScheme.primary
+                              .withOpacity(0.8),
                         ),
                       ),
                       Text(
-                        "You can edit this any time",
+                        l10n.dashboardEditAnytime,
                         style: AppTextStyles.title.copyWith(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                          color: Theme.of(context).colorScheme.primary
+                              .withOpacity(0.7),
                           fontSize: 12,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.large),
-
-                      // ───────────── Macro Grid ─────────────
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -229,10 +253,7 @@ class _DailyRecommendationDashboardState
                           );
                         },
                       ),
-
                       const SizedBox(height: AppSpacing.large),
-
-                      // ───────────── Health Score ─────────────
                       HealthScoreCard(
                         progress: widget.healthScoreProgress,
                         score: widget.healthScore,
@@ -256,33 +277,32 @@ class _DailyRecommendationDashboardState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "How to reach your goals:",
+                      l10n.dashboardHowToReachGoals,
                       style: AppTextStyles.headTitle.copyWith(
                         color: AppColors.primary(context),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.large),
                     _ReachGoal(
-                      title:
-                          'Get your weekly life score and improve your routine.',
+                      title: l10n.dashboardReachGoalLifeScore,
                       icon: Icons.heart_broken,
                       color: AppColors.heartIcon,
                     ),
                     const SizedBox(height: AppSpacing.medium),
                     _ReachGoal(
-                      title: 'Track your food',
+                      title: l10n.dashboardReachGoalTrackFood,
                       icon: Icons.restaurant_menu,
                       color: AppColors.healthBarActive,
                     ),
                     const SizedBox(height: AppSpacing.medium),
                     _ReachGoal(
-                      title: 'Follow your daily calorie recommendation',
+                      title: l10n.dashboardReachGoalFollowCalories,
                       icon: Icons.local_fire_department,
                       color: AppColors.primary(context),
                     ),
                     const SizedBox(height: AppSpacing.medium),
                     _ReachGoal(
-                      title: 'Balance your carbs, protein, fat',
+                      title: l10n.dashboardReachGoalBalanceMacros,
                       icon: Icons.pie_chart,
                       color: AppColors.carbs,
                     ),
@@ -302,7 +322,7 @@ class _DailyRecommendationDashboardState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Plan base on the following sources, among other peer-reviewed medical studies:",
+                      l10n.dashboardPlanSourcesTitle,
                       style: AppTextStyles.title.copyWith(
                         color: AppColors.primary(context),
                         fontWeight: FontWeight.w900,
@@ -310,25 +330,26 @@ class _DailyRecommendationDashboardState
                     ),
                     const SizedBox(height: AppSpacing.large),
                     HyperlinkText(
-                      text: '• Basal metabolic rate',
+                      text: l10n.dashboardSourceBasalMetabolicRate,
                       url:
                           'https://www.healthline.com/health/what-is-basal-metabolic-rate',
                     ),
                     const SizedBox(height: AppSpacing.small),
                     HyperlinkText(
-                      text: '• Calorie counting - Harvard',
+                      text: l10n.dashboardSourceCalorieCountingHarvard,
                       url:
                           'https://www.health.harvard.edu/staying-healthy/calorie-counting-made-easy',
                     ),
                     const SizedBox(height: AppSpacing.small),
                     HyperlinkText(
-                      text: '• International Society of Sports Nutrition',
+                      text: l10n.dashboardSourceInternationalSportsNutrition,
                       url: 'https://pubmed.ncbi.nlm.nih.gov/28630601/',
                     ),
                     const SizedBox(height: AppSpacing.small),
                     HyperlinkText(
-                      text: '• National Institutes of Health',
-                      url: 'https://www.nhlbi.nih.gov/files/docs/guidelines/ob_gdlns.pdf',
+                      text: l10n.dashboardSourceNationalInstitutesHealth,
+                      url:
+                          'https://www.nhlbi.nih.gov/files/docs/guidelines/ob_gdlns.pdf',
                     ),
                   ],
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✅ Added
 import '../../../providers/navigation_provider.dart'; // ✅ Your new provider
+import '../l10n/l10n.dart';
 
 class NavBarWidget extends ConsumerWidget { // ✅ Changed to ConsumerWidget
   const NavBarWidget({super.key});
@@ -9,6 +10,7 @@ class NavBarWidget extends ConsumerWidget { // ✅ Changed to ConsumerWidget
   Widget build(BuildContext context, WidgetRef ref) {
     // ✅ Watch the current index
     final page = ref.watch(selectedPageProvider);
+    final l10n = context.l10n;
 
     return IntrinsicHeight(
       child: Row(
@@ -19,7 +21,7 @@ class NavBarWidget extends ConsumerWidget { // ✅ Changed to ConsumerWidget
             child: _NavItem(
               icon: Icons.home_outlined,
               selectedIcon: Icons.home,
-              label: "Home",
+              label: l10n.homeTab,
               index: 0,
               selectedIndex: page,
             ),
@@ -28,7 +30,7 @@ class NavBarWidget extends ConsumerWidget { // ✅ Changed to ConsumerWidget
             child: _NavItem(
               icon: Icons.show_chart_outlined,
               selectedIcon: Icons.show_chart,
-              label: "Progress",
+              label: l10n.progressTab,
               index: 1,
               selectedIndex: page,
             ),
@@ -37,7 +39,7 @@ class NavBarWidget extends ConsumerWidget { // ✅ Changed to ConsumerWidget
             child: _NavItem(
               icon: Icons.settings_outlined,
               selectedIcon: Icons.settings,
-              label: "Settings",
+              label: l10n.settingsTab,
               index: 2,
               selectedIndex: page,
             ),

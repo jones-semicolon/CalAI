@@ -1,8 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:calai/l10n/app_localizations.dart';
 
 enum HomeWidgetKind { calories, nutrition, streak }
 
@@ -35,6 +38,7 @@ class HomeWidgetService {
   static const String _fatsKey = 'calai_widget_fats';
   static const String _fatsGoalKey = 'calai_widget_fats_goal';
   static const String _streakCountKey = 'calai_widget_streak_count';
+  static const String _localePreferenceKey = 'app_locale';
 
   static String get _todayDateId =>
       DateFormat('yyyy-MM-dd').format(DateTime.now().toLocal());
@@ -54,7 +58,7 @@ class HomeWidgetService {
     required int calories,
     required int calorieGoal,
     required String dateId,
-    String ctaText = 'Log your food',
+    String? ctaText,
     int protein = 0,
     int proteinGoal = 0,
     int carbs = 0,
@@ -67,9 +71,11 @@ class HomeWidgetService {
     if (!_isTodayDate(dateId)) return;
 
     await initialize();
+    final l10n = await _loadL10n();
+    final resolvedCtaText = ctaText ?? l10n.homeWidgetLogFoodCta;
     await HomeWidget.saveWidgetData<int>(_caloriesKey, calories);
     await HomeWidget.saveWidgetData<int>(_calorieGoalKey, calorieGoal);
-    await HomeWidget.saveWidgetData<String>(_ctaKey, ctaText);
+    await HomeWidget.saveWidgetData<String>(_ctaKey, resolvedCtaText);
     await HomeWidget.saveWidgetData<int>(_proteinKey, protein);
     await HomeWidget.saveWidgetData<int>(_proteinGoalKey, proteinGoal);
     await HomeWidget.saveWidgetData<int>(_carbsKey, carbs);
@@ -79,10 +85,10 @@ class HomeWidgetService {
     await HomeWidget.saveWidgetData<int>(_streakCountKey, streakCount);
 
     // Backward-compatible keys for the current native layout.
-    await HomeWidget.saveWidgetData<String>(_titleKey, 'Calories today');
+    await HomeWidget.saveWidgetData<String>(_titleKey, l10n.homeWidgetCaloriesTodayTitle);
     await HomeWidget.saveWidgetData<String>(
       _subtitleKey,
-      '$calories / $calorieGoal kcal',
+      l10n.homeWidgetCaloriesSubtitle(calories, calorieGoal),
     );
   }
 
@@ -167,7 +173,7 @@ class HomeWidgetService {
   static Future<bool> setupAndRequestPinWidget({
     required int calories,
     required int calorieGoal,
-    String ctaText = 'Log your food',
+    String? ctaText,
     HomeWidgetKind kind = HomeWidgetKind.calories,
   }) async {
     await saveCalorieWidgetData(
@@ -230,6 +236,28 @@ class HomeWidgetService {
   static Future<bool> isWidgetPinned({required HomeWidgetKind kind}) async {
     final pinnedKinds = await getPinnedWidgetKinds();
     return pinnedKinds.contains(kind);
+  }
+
+  static Future<AppLocalizations> _loadL10n() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedCode = prefs.getString(_localePreferenceKey);
+    final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+
+    Locale locale;
+    if (savedCode != null && savedCode.isNotEmpty) {
+      locale = Locale(savedCode);
+    } else {
+      locale = Locale(deviceLocale.languageCode);
+    }
+
+    final supportedCodes = AppLocalizations.supportedLocales
+        .map((l) => l.languageCode)
+        .toSet();
+    final resolved = supportedCodes.contains(locale.languageCode)
+        ? locale
+        : const Locale('en');
+
+    return AppLocalizations.delegate.load(resolved);
   }
 }
 

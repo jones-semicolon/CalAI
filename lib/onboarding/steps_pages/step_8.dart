@@ -1,11 +1,11 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 
 class OnboardingStep8 extends ConsumerStatefulWidget {
@@ -20,10 +20,10 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
   bool isEnable = false;
   int? selectedIndex;
 
-  final List<OptionCard> options = [
-    OptionCard(title: 'Lose Weight', value: Goal.loseWeight),
-    OptionCard(title: 'Maintain', value: Goal.maintain),
-    OptionCard(title: 'Gain Weight', value: Goal.gainWeight),
+  final List<Goal> options = [
+    Goal.loseWeight,
+    Goal.maintain,
+    Goal.gainWeight,
   ];
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
 
     final Goal? goal = ref.read(userProvider).goal.type;
 
-    final matchOption = options.indexWhere((i) => i.value == goal);
+    final matchOption = options.indexWhere((i) => i == goal);
     if (matchOption != -1) {
       selectedIndex = matchOption;
       isEnable = true;
@@ -44,8 +44,8 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
       child: Column(
         children: [
           Header(
-            title: 'What is your goal?',
-            subtitle: 'This helps us generate a plan for your calorie intake.',
+            title: context.l10n.step8GoalQuestionTitle,
+            subtitle: context.l10n.step8GoalQuestionSubtitle,
           ),
 
           /// SCROLLABLE CONTENT
@@ -68,9 +68,7 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
                           child: AnimatedOptionCard(
                             index: index,
                             child: OptionCard(
-                              icon: item.icon,
-                              title: item.title,
-                              subtitle: item.subtitle,
+                              title: _goalTitle(context, item),
                               isSelected: selectedIndex == index,
                               onTap: () {
                                 WidgetsBinding.instance.addPostFrameCallback((
@@ -97,7 +95,9 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
           ConfirmationButtonWidget(onConfirm: () {
             if (selectedIndex != null) {
               final updateGoal = options[selectedIndex!];
-              ref.read(userProvider.notifier).updateLocal((s) => s.copyWith(goal: s.goal.copyWith(type: updateGoal.value)));
+              ref
+                  .read(userProvider.notifier)
+                  .updateLocal((s) => s.copyWith(goal: s.goal.copyWith(type: updateGoal)));
               debugPrint('Goal: $updateGoal');
             }
             widget.nextPage();
@@ -105,5 +105,16 @@ class _OnboardingStep8State extends ConsumerState<OnboardingStep8> {
         ],
       ),
     );
+  }
+
+  String _goalTitle(BuildContext context, Goal goal) {
+    switch (goal) {
+      case Goal.loseWeight:
+        return context.l10n.goalLoseWeight;
+      case Goal.maintain:
+        return context.l10n.goalMaintainWeight;
+      case Goal.gainWeight:
+        return context.l10n.goalGainWeight;
+    }
   }
 }

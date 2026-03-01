@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 /// The main title widget for the app bar, displaying the app's logo and name.
 class AppTitle extends StatelessWidget {
@@ -18,7 +19,7 @@ class AppTitle extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          'Cal AI',
+          context.l10n.appTitle,
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,

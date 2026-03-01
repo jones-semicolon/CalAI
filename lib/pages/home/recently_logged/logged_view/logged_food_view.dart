@@ -1,5 +1,6 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/edit_value_view.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -55,10 +56,10 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   Widget _buildFoodTitle() {
     if (isNewEntry) {
       return TextField(
-        decoration: const InputDecoration(
-          hintText: "Enter food name",
+        decoration: InputDecoration(
+          hintText: context.l10n.enterFoodNameHint,
           border: InputBorder.none,
-          hintStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.grey),
+          hintStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.grey),
         ),
         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5),
         onChanged: (val) => _tempLog = _tempLog.copyWith(name: val),
@@ -123,6 +124,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final hasImage = _tempLog.imageUrl != null;
+    final l10n = context.l10n;
 
     // 1. Calculate the Ratio
     // If original amount was 100 and new is 200, ratio is 2.0
@@ -176,7 +178,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
                     _buildFoodTitle(),
                     const SizedBox(height: 25),
 
-                    _buildSectionLabel(theme, "Measurement"),
+                    _buildSectionLabel(theme, l10n.measurementLabel),
                     const SizedBox(height: 10),
                     _buildMeasurementTabs(), // ✅ Displaying the portion tab here
                     const SizedBox(height: 14),
@@ -193,7 +195,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
                     ],
 
                     const SizedBox(height: 26),
-                    _buildSectionLabel(theme, "Total Nutrition"),
+                    _buildSectionLabel(theme, l10n.totalNutritionLabel),
                     const SizedBox(height: 10),
                     _buildDetailedNutritionList(previewLog),
                   ],
@@ -237,7 +239,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 
   Widget _buildServingsRow(ThemeData theme) => Row(
     children: [
-      const Text("Number of Servings", style: TextStyle(fontWeight: FontWeight.bold)),
+      Text(context.l10n.numberOfServingsLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
       const Spacer(),
       _ServingsInputBox(
         value: _servingsCount,
@@ -260,7 +262,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Health Score', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(context.l10n.healthScoreTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
               Text('$score/10', style: TextStyle(fontWeight: FontWeight.bold, color: color)),
             ],
           ),
@@ -293,7 +295,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Calories",
+                  Text(context.l10n.caloriesLabel,
                       style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)
                   ),
                   // ✅ This now displays the local state value
@@ -310,7 +312,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
             right: 0,
             child: GestureDetector(
               onTap: () => _showEditModal(
-                title: 'Calories',
+                title: context.l10n.caloriesLabel,
                 initialValue: data.calories,
                 onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(calories: val)),
               ),
@@ -330,21 +332,21 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     children: [
       Expanded(child: _MacroTile(value: "${data.protein.round()}g", nutritionType: NutritionType.protein,
         onEdit: () => _showEditModal(
-          title: 'Protein',
+          title: context.l10n.proteinLabel,
           initialValue: data.protein,
           onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(protein: val))),
       )),
       const SizedBox(width: 8),
       Expanded(child: _MacroTile(value: "${data.carbs.round()}g", nutritionType: NutritionType.carbs,
         onEdit: () => _showEditModal(
-            title: 'Carbs',
+            title: context.l10n.carbsLabel,
             initialValue: data.carbs,
             onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(carbs: val))),
       )),
       const SizedBox(width: 8),
       Expanded(child: _MacroTile(value: "${data.fats.round()}g", nutritionType: NutritionType.fats,
         onEdit: () => _showEditModal(
-            title: 'Fats',
+            title: context.l10n.fatsLabel,
             initialValue: data.fats,
             onSave: (val) => setState(() => _tempLog = _tempLog.copyWith(fats: val))),
       )),
@@ -353,9 +355,9 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 
   Widget _buildDetailedNutritionList(FoodLog data) => Column(
     children: [
-      _nutriRow("Sugar", "${data.sugar.toStringAsFixed(2)}g"),
-      _nutriRow("Fiber", "${data.fiber.toStringAsFixed(2)}g"),
-      _nutriRow("Sodium", "${data.sodium.toStringAsFixed(2)}mg"),
+      _nutriRow(context.l10n.sugarLabel, "${data.sugar.toStringAsFixed(2)}g"),
+      _nutriRow(context.l10n.fiberLabel, "${data.fiber.toStringAsFixed(2)}g"),
+      _nutriRow(context.l10n.sodiumLabel, "${data.sodium.toStringAsFixed(2)}mg"),
       for (var n in data.otherNutrients) _nutriRow(n.name, "${n.amount.toStringAsFixed(1)}${n.unit}"),
     ],
   );
@@ -378,7 +380,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
             onPressed: () => Navigator.pop(context),
             icon: Icon(Icons.arrow_back_ios_new, color: hasImage ? Colors.white : Colors.black, size: 20),
           ),
-          Text("Nutrients", style: TextStyle(fontWeight: FontWeight.bold, color: hasImage ? Colors.white : Colors.black)),
+          Text(context.l10n.nutrientsTitle, style: TextStyle(fontWeight: FontWeight.bold, color: hasImage ? Colors.white : Colors.black)),
           const SizedBox(width: 40), // Spacer
         ],
       ),
@@ -386,7 +388,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   }
 
   Widget _buildBottomActionButtons(FoodLog log) {
-    return ConfirmationButtonWidget(onConfirm: () => _onSave(log), text: "Done");
+    return ConfirmationButtonWidget(onConfirm: () => _onSave(log), text: context.l10n.doneLabel);
     // return Container(
     //   padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
     //   color: Colors.white,

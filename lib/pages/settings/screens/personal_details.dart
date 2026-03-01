@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart'; // For date formatting
+import 'package:calai/l10n/l10n.dart';
 
 // Keep your existing imports...
 import '../../../providers/user_provider.dart';
@@ -31,7 +32,7 @@ class PersonalDetailsPage extends ConsumerWidget { // Changed to ConsumerWidget
 
     final String dobStr = user.profile.birthDate != null
         ? DateFormat('MMM dd, yyyy').format(user.profile.birthDate!)
-        : 'Not set';
+        : context.l10n.notSetLabel;
 
     final String? genderStr = user.profile.gender?.label;
 
@@ -40,7 +41,7 @@ class PersonalDetailsPage extends ConsumerWidget { // Changed to ConsumerWidget
       body: SingleChildScrollView(
         child: Column(
           children: [
-            CustomAppBar(title: const Text("Personal details")),
+            CustomAppBar(title: Text(context.l10n.personalDetails)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -55,7 +56,7 @@ class PersonalDetailsPage extends ConsumerWidget { // Changed to ConsumerWidget
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Goal Weight', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                              Text(context.l10n.goalWeightLabel, style: const TextStyle(color: Colors.grey, fontSize: 12)),
                               const SizedBox(height: 4),
                               Text('${displayGoalWeight.round()} ${unitSystem?.weightLabel ?? MeasurementUnit.metric.weightLabel}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                             ],
@@ -67,7 +68,7 @@ class PersonalDetailsPage extends ConsumerWidget { // Changed to ConsumerWidget
                               padding: const EdgeInsets.symmetric(horizontal: 12),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                             ),
-                            child: const Text('Change Goal', style: TextStyle(color: Colors.white, fontSize: 14)),
+                            child: Text(context.l10n.changeGoalLabel, style: const TextStyle(color: Colors.white, fontSize: 14)),
                           ),
                         ],
                       ),
@@ -78,25 +79,25 @@ class PersonalDetailsPage extends ConsumerWidget { // Changed to ConsumerWidget
                     context: context,
                     child: Column(
                       children: [
-                        _buildListTile('Current Weight', '${displayWeight.round()} ${unitSystem?.weightLabel ?? MeasurementUnit.metric.weightLabel}',
+                        _buildListTile(context.l10n.currentWeightLabel, '${displayWeight.round()} ${unitSystem?.weightLabel ?? MeasurementUnit.metric.weightLabel}',
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WeightPickerView()))),
                         _buildDivider(),
-                        _buildListTile('Height', '${displayHeight.round()} ${unitSystem?.heightLabel ?? MeasurementUnit.metric.heightLabel}',
+                        _buildListTile(context.l10n.heightLabel, '${displayHeight.round()} ${unitSystem?.heightLabel ?? MeasurementUnit.metric.heightLabel}',
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HeightPickerView()))),
                         _buildDivider(),
-                        _buildListTile('Date of birth', dobStr,
+                        _buildListTile(context.l10n.dateOfBirthLabel, dobStr,
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DatePickerView()))),
                         _buildDivider(),
-                        _buildListTile('Gender', genderStr ?? 'Male',
+                        _buildListTile(context.l10n.genderLabel, genderStr ?? context.l10n.genderMale,
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GenderPickerView()))),
                         _buildDivider(),
                         _buildListTile(
-                          'Daily Step Goal',
-                          '${target.steps.round()} steps',
+                          context.l10n.dailyStepGoalLabel,
+                          '${target.steps.round()} ${context.l10n.stepsLabel.toLowerCase()}',
                           isLast: true,
                           onTap: () => _showEdit(
                             context,
-                            "Step Goal",
+                            context.l10n.stepGoalLabel,
                             target.steps.toDouble(),
                             Theme.of(context).colorScheme.primary,
                                 (val) {

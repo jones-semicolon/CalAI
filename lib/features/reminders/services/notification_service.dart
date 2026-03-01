@@ -4,6 +4,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:calai/l10n/app_localizations.dart';
 
 import '../models/goal_alert.dart';
 import '../models/nutrition_intake_snapshot.dart';
@@ -49,6 +50,7 @@ class NotificationService {
       );
 
   static const _goalAlertLastSentPrefix = 'goal_alert_last_sent_';
+  static const _localePreferenceKey = 'app_locale';
   static const int _legacyDailyScheduleWindowDays = 14;
   bool _initialized = false;
 
@@ -176,10 +178,11 @@ class NotificationService {
 
   Future<void> showSmartNutritionNudge(NutritionIntakeSnapshot snapshot) async {
     await initialize();
-    final body = _smartNutritionBody(snapshot);
+    final l10n = await loadL10n();
+    final body = _smartNutritionBody(snapshot, l10n);
     await _plugin.show(
       ReminderNotificationIds.smartNutritionContextual,
-      'Smart nutrition tip',
+      l10n.smartNutritionTipTitle,
       body,
       _details(),
       payload: 'smart_nutrition:nudge',
@@ -191,7 +194,8 @@ class NotificationService {
     bool avoidDuplicateAlertsInSameDay = true,
   }) async {
     await initialize();
-    final alerts = _goalAlertEvaluator.evaluate(snapshot);
+    final l10n = await loadL10n();
+    final alerts = _goalAlertEvaluator.evaluate(snapshot, l10n);
     if (alerts.isEmpty) {
       return;
     }
@@ -378,16 +382,41 @@ class NotificationService {
     return '${date.year}-$month-$day';
   }
 
-  String _smartNutritionBody(NutritionIntakeSnapshot snapshot) {
+  Future<AppLocalizations> loadL10n() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedCode = prefs.getString(_localePreferenceKey);
+    final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
+
+    Locale locale;
+    if (savedCode != null && savedCode.isNotEmpty) {
+      locale = Locale(savedCode);
+    } else {
+      locale = Locale(deviceLocale.languageCode);
+    }
+
+    final supportedCodes = AppLocalizations.supportedLocales
+        .map((l) => l.languageCode)
+        .toSet();
+    final resolved = supportedCodes.contains(locale.languageCode)
+        ? locale
+        : const Locale('en');
+
+    return AppLocalizations.delegate.load(resolved);
+  }
+
+  String _smartNutritionBody(
+    NutritionIntakeSnapshot snapshot,
+    AppLocalizations l10n,
+  ) {
     final caloriesRemaining = snapshot.caloriesRemaining;
     final proteinRemaining = snapshot.proteinRemaining;
     final calorieMessage = caloriesRemaining > 0
-        ? '$caloriesRemaining kcal left'
-        : '${caloriesRemaining.abs()} kcal over';
+        ? l10n.smartNutritionKcalLeft(caloriesRemaining)
+        : l10n.smartNutritionKcalOver(caloriesRemaining.abs());
     final proteinMessage = proteinRemaining > 0
-        ? '$proteinRemaining g protein remaining'
-        : 'protein goal reached';
+        ? l10n.smartNutritionProteinRemaining(proteinRemaining)
+        : l10n.smartNutritionProteinGoalReached;
 
-    return '$calorieMessage and $proteinMessage. Log your next meal to stay on track.';
+    return l10n.smartNutritionCombinedMessage(calorieMessage, proteinMessage);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 import '../../../widgets/animated_number.dart';
 
@@ -191,7 +192,8 @@ class _Title extends StatelessWidget {
                   ),
                 ),
                 TextSpan(
-                  text: " ${isTap ? 'eaten' : (overEat ? 'over' : 'left')}",
+                  text:
+                      " ${isTap ? context.l10n.eatenLabel : (overEat ? context.l10n.overLabel : context.l10n.leftLabel)}",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.primary,

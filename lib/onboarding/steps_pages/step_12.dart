@@ -1,6 +1,6 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
-import '../onboarding_widgets/continue_button.dart';
 
 class OnboardingStep12 extends StatelessWidget {
   final VoidCallback nextPage;
@@ -21,7 +21,7 @@ class OnboardingStep12 extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'Thank you for\ntrusting us!',
+                  context.l10n.step12ThankYouTitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
@@ -33,7 +33,7 @@ class OnboardingStep12 extends StatelessWidget {
                 const SizedBox(height: 12),
 
                 Text(
-                  'Now let\'s personalize Cal AI for you...',
+                  context.l10n.step12PersonalizeSubtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -54,7 +54,7 @@ class OnboardingStep12 extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'Your privacy and security matter to us.',
+                        context.l10n.step12PrivacyCardTitle,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
@@ -66,7 +66,7 @@ class OnboardingStep12 extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       Text(
-                        'We promise to always keep your\npersonal information private and secure.',
+                        context.l10n.step12PrivacyCardBody,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,

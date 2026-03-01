@@ -1,11 +1,11 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -21,30 +21,18 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
   bool isEnable = false;
   int? selectedIndex;
 
-  final List<OptionCard> options = [
-    OptionCard(
-      title: 'Eat and live healthier',
-      icon: FontAwesomeIcons.appleWhole,
-      value: GoalFocus.healthier,
-    ),
-    OptionCard(title: 'Boost my energy and mood', icon: FontAwesomeIcons.sun, value: GoalFocus.energy),
-    OptionCard(
-      title: 'Stay motivated and consistent',
-      icon: FontAwesomeIcons.personRunning,
-      value: GoalFocus.consistency,
-    ),
-    OptionCard(
-      title: 'feel better about my body',
-      icon: FontAwesomeIcons.personPraying,
-      value: GoalFocus.bodyConfidence,
-    ),
+  final List<GoalFocus> options = [
+    GoalFocus.healthier,
+    GoalFocus.energy,
+    GoalFocus.consistency,
+    GoalFocus.bodyConfidence,
   ];
   @override
   void initState() {
     super.initState();
     final accomplish = ref.read(userProvider).goal.motivation;
 
-    final matchOption = options.indexWhere((i) => i.value == accomplish);
+    final matchOption = options.indexWhere((i) => i == accomplish);
     if (matchOption != -1) {
       selectedIndex = matchOption;
       isEnable = true;
@@ -57,7 +45,7 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
     return SafeArea(
       child: Column(
         children: [
-          Header(title: 'What would you like to accomplish?'),
+          Header(title: context.l10n.step10AccomplishTitle),
 
           /// SCROLLABLE CONTENT
           Expanded(
@@ -79,9 +67,8 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
                           child: AnimatedOptionCard(
                             index: index,
                             child: OptionCard(
-                              icon: item.icon,
-                              title: item.title,
-                              subtitle: item.subtitle,
+                              icon: _goalFocusIcon(item),
+                              title: _goalFocusTitle(context, item),
                               isSelected: selectedIndex == index,
                               onTap: () {
                                 WidgetsBinding.instance.addPostFrameCallback((
@@ -108,7 +95,9 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
           ConfirmationButtonWidget(onConfirm: () {
             if (selectedIndex != null) {
               final data = options[selectedIndex!];
-              userNotifier.updateLocal((s) => s.copyWith(goal: s.goal.copyWith(motivation: data.value)));
+              userNotifier.updateLocal(
+                (s) => s.copyWith(goal: s.goal.copyWith(motivation: data)),
+              );
               debugPrint('Like to accomplish: $data');
             }
             widget.nextPage();
@@ -116,5 +105,31 @@ class _OnboardingStep10State extends ConsumerState<OnboardingStep10> {
         ],
       ),
     );
+  }
+
+  IconData _goalFocusIcon(GoalFocus goalFocus) {
+    switch (goalFocus) {
+      case GoalFocus.healthier:
+        return FontAwesomeIcons.appleWhole;
+      case GoalFocus.energy:
+        return FontAwesomeIcons.sun;
+      case GoalFocus.consistency:
+        return FontAwesomeIcons.personRunning;
+      case GoalFocus.bodyConfidence:
+        return FontAwesomeIcons.personPraying;
+    }
+  }
+
+  String _goalFocusTitle(BuildContext context, GoalFocus goalFocus) {
+    switch (goalFocus) {
+      case GoalFocus.healthier:
+        return context.l10n.step10OptionHealthier;
+      case GoalFocus.energy:
+        return context.l10n.step10OptionEnergyMood;
+      case GoalFocus.consistency:
+        return context.l10n.step10OptionConsistency;
+      case GoalFocus.bodyConfidence:
+        return context.l10n.step10OptionBodyConfidence;
+    }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'factor_row.dart';
 
 class FactorsCard extends StatelessWidget {
@@ -9,6 +10,7 @@ class FactorsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = context.l10n;
 
     return Container(
       decoration: BoxDecoration(
@@ -18,29 +20,29 @@ class FactorsCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
               children: [
                 FactorRow(
                   icon: FontAwesomeIcons.appleWhole,
-                  title: 'Net carbs / mass',
-                  subtitle: 'Net carb density',
+                  title: l10n.factorsNetCarbsMass,
+                  subtitle: l10n.factorsNetCarbDensity,
                 ),
                 FactorRow(
                   icon: Icons.grain,
-                  title: 'Sodium / mass',
-                  subtitle: 'Sodium density',
+                  title: l10n.factorsSodiumMass,
+                  subtitle: l10n.factorsSodiumDensity,
                 ),
                 FactorRow(
                   icon: Icons.icecream,
-                  title: 'Sugar / mass',
-                  subtitle: 'Sugar density',
+                  title: l10n.factorsSugarMass,
+                  subtitle: l10n.factorsSugarDensity,
                 ),
                 FactorRow(
                   icon: Icons.science,
-                  title: 'Processed score',
-                  subtitle: 'Ingredient quality',
+                  title: l10n.factorsProcessedScore,
+                  subtitle: l10n.factorsIngredientQuality,
                 ),
               ],
             ),
@@ -55,8 +57,7 @@ class FactorsCard extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              'The processed score takes into account dyes, nitrates, seed oils, '
-              'artificial flavoring / sweeteners, and other factors.',
+              l10n.factorsProcessedScoreDescription,
               style: TextStyle(fontSize: 11, color: colors.onPrimary),
             ),
           ),

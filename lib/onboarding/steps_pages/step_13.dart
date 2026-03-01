@@ -1,16 +1,16 @@
-import 'package:calai/providers/global_provider.dart';
-import 'package:calai/widgets/confirmation_button_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:calai/features/reminders/data/reminder_settings_repository.dart';
 import 'package:calai/features/reminders/models/reminder_settings.dart';
 import 'package:calai/features/reminders/services/notification_service.dart';
 import 'package:calai/features/reminders/services/reminder_scheduler.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✅ Added
+import 'package:calai/l10n/l10n.dart';
+import 'package:calai/providers/global_provider.dart';
+import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../models/nutrition_model.dart';
 import '../onboarding_widgets/header.dart';
 
-// ✅ Changed to ConsumerStatefulWidget
 class OnboardingStep13 extends ConsumerStatefulWidget {
   final VoidCallback nextPage;
   const OnboardingStep13({super.key, required this.nextPage});
@@ -19,7 +19,6 @@ class OnboardingStep13 extends ConsumerStatefulWidget {
   ConsumerState<OnboardingStep13> createState() => _OnboardingStep13State();
 }
 
-// ✅ Changed to ConsumerState
 class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
     with SingleTickerProviderStateMixin {
   bool isAllowNotification = true;
@@ -48,23 +47,18 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
     super.dispose();
   }
 
-  // --- Logic ---
-
   Future<void> _processNotificationAndContinue() async {
     if (_isSubmitting) return;
-
     setState(() => _isSubmitting = true);
 
     try {
       final notificationService = NotificationService();
       bool granted = false;
 
-      // 1. Request Permission if toggled "Allow"
       if (isAllowNotification) {
         granted = await notificationService.requestPermissions();
       }
 
-      // 2. Prepare Settings & Scheduler
       final repository = ReminderSettingsRepository();
       final scheduler = ReminderScheduler(notificationService);
       final currentSettings = await repository.load();
@@ -74,15 +68,11 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
         enabled: granted,
       );
 
-      // 3. Save to Local Storage
       await repository.save(updatedSettings);
       await notificationService.initialize();
 
-      // 4. Sync with Provider Data
       if (granted) {
-        // ✅ ref is now accessible here
         final globalState = ref.read(globalDataProvider).value;
-
         if (globalState != null) {
           await scheduler.syncAll(
             settings: updatedSettings,
@@ -100,13 +90,16 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
 
       widget.nextPage();
     } catch (e) {
-      debugPrint("❌ Notification Onboarding Error: $e");
+      debugPrint('Notification Onboarding Error: $e');
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
-  ReminderSettings _withAllReminderToggles(ReminderSettings settings, {required bool enabled}) {
+  ReminderSettings _withAllReminderToggles(
+    ReminderSettings settings, {
+    required bool enabled,
+  }) {
     return settings.copyWith(
       smartNutritionEnabled: enabled,
       waterRemindersEnabled: enabled,
@@ -122,18 +115,18 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final l10n = context.l10n;
 
     return SafeArea(
       child: Column(
         children: [
           const Spacer(),
-          const Header(
-            title: 'Reach your goals with notifications',
+          Header(
+            title: l10n.step13ReachGoalsWithNotifications,
             textAlign: TextAlign.center,
             crossAxisAlignment: CrossAxisAlignment.center,
           ),
           const SizedBox(height: 10),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25),
             child: Stack(
@@ -147,9 +140,12 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 20,
+                          horizontal: 40,
+                        ),
                         child: Text(
-                          'Cal AI would like to send you Notifications',
+                          l10n.step13NotificationPrompt,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
@@ -158,11 +154,25 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
                           ),
                         ),
                       ),
-                      Divider(height: 1.5, color: Theme.of(context).colorScheme.primary.withOpacity(0.25)),
+                      Divider(
+                        height: 1.5,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.25),
+                      ),
                       Row(
                         children: [
-                          _buildToggleButton(label: "Don't Allow", isActive: !isAllowNotification, isLeft: true),
-                          _buildToggleButton(label: "Allow", isActive: isAllowNotification, isLeft: false),
+                          _buildToggleButton(
+                            label: l10n.dontAllowLabel,
+                            isActive: !isAllowNotification,
+                            isLeft: true,
+                          ),
+                          _buildToggleButton(
+                            label: l10n.allowLabel,
+                            isActive: isAllowNotification,
+                            isLeft: false,
+                          ),
                         ],
                       ),
                     ],
@@ -173,26 +183,31 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
                   left: (screenWidth / 1.5),
                   child: SlideTransition(
                     position: _bounceAnimation,
-                    child: const Icon(Icons.pan_tool_alt_rounded, size: 40, color: Color.fromARGB(255, 255, 201, 40)),
+                    child: const Icon(
+                      Icons.pan_tool_alt_rounded,
+                      size: 40,
+                      color: Color.fromARGB(255, 255, 201, 40),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-
           const Spacer(),
-
-          // ✅ Updated to use the new unified method
           ConfirmationButtonWidget(
             enabled: !_isSubmitting,
             onConfirm: _processNotificationAndContinue,
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildToggleButton({required String label, required bool isActive, required bool isLeft}) {
+  Widget _buildToggleButton({
+    required String label,
+    required bool isActive,
+    required bool isLeft,
+  }) {
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => isAllowNotification = !isLeft),
@@ -203,7 +218,9 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
               bottomLeft: isLeft ? const Radius.circular(15) : Radius.zero,
               bottomRight: !isLeft ? const Radius.circular(15) : Radius.zero,
             ),
-            color: isActive ? Theme.of(context).colorScheme.primary : Colors.transparent,
+            color: isActive
+                ? Theme.of(context).colorScheme.primary
+                : Colors.transparent,
           ),
           child: Center(
             child: Text(

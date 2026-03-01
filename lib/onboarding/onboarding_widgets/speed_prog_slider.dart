@@ -1,8 +1,8 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:calai/l10n/l10n.dart';
 
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
@@ -38,10 +38,11 @@ class _ProgSpeedSliderState extends ConsumerState<ProgSpeedSlider> {
     return SpeedLevel.aggressive;
   }
 
-  String _bottomLabelFromKg(double kg) {
-    if (kg <= 0.4) return 'Slow and Steady';
-    if (kg <= 1.0) return 'Recommended';
-    return 'You may feel very tired and develop loose skin';
+  String _bottomLabelFromKg(double kg, BuildContext context) {
+    final l10n = context.l10n;
+    if (kg <= 0.4) return l10n.speedSlowSteady;
+    if (kg <= 1.0) return l10n.speedRecommended;
+    return l10n.speedAggressiveWarning;
   }
 
   @override
@@ -173,8 +174,8 @@ class _ProgSpeedSliderState extends ConsumerState<ProgSpeedSlider> {
           // 2. The Content
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Text(
-              _bottomLabelFromKg(speedKg),
+              child: Text(
+              _bottomLabelFromKg(speedKg, context),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w700,

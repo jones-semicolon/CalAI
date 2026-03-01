@@ -1,5 +1,6 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,21 +21,16 @@ class _GenderPickerViewState extends ConsumerState<GenderPickerView> {
   bool isEnable = false;
   int? selectedIndex;
 
-  final List<OptionCard> options = [
-    OptionCard(title: 'Female', value: Gender.female),
-    OptionCard(title: 'Male', value: Gender.male),
-    OptionCard(title: 'Other', value: Gender.other),
-  ];
-
   @override
   void initState() {
     super.initState();
 
     // Get saved gender from UserData
     final savedGender = ref.read(userProvider).profile.gender;
+    final values = [Gender.female, Gender.male, Gender.other];
 
     // Find index of option matching saved gender
-    final matchIndex = options.indexWhere((o) => o.value == savedGender);
+    final matchIndex = savedGender == null ? -1 : values.indexOf(savedGender);
 
     if (matchIndex != -1) {
       selectedIndex = matchIndex;
@@ -44,11 +40,17 @@ class _GenderPickerViewState extends ConsumerState<GenderPickerView> {
 
   @override
   Widget build(BuildContext context) {
+    final options = [
+      OptionCard(title: context.l10n.genderFemale, value: Gender.female),
+      OptionCard(title: context.l10n.genderMale, value: Gender.male),
+      OptionCard(title: context.l10n.genderOther, value: Gender.other),
+    ];
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
-          CustomAppBar(title: Text("Set Gender")),
+          CustomAppBar(title: Text(context.l10n.setGenderTitle)),
 
           /// SCROLLABLE CONTENT
           Expanded(

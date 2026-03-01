@@ -1,3 +1,4 @@
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 
 class SubscriptionPage extends StatelessWidget {
@@ -10,6 +11,7 @@ class SubscriptionPage extends StatelessWidget {
     const yearlyPrice = 1750.00;
     final monthlyPrice = yearlyPrice / 12;
     final scheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -19,8 +21,6 @@ class SubscriptionPage extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 30),
-
-              // Close action
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(
@@ -31,10 +31,8 @@ class SubscriptionPage extends StatelessWidget {
                   onPressed: onFinished,
                 ),
               ),
-
-              // Headline
               Text(
-                'Unlock CalAI to reach\nyour goals faster.',
+                l10n.subscriptionHeadline,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 26,
@@ -42,10 +40,7 @@ class SubscriptionPage extends StatelessWidget {
                   color: scheme.primary,
                 ),
               ),
-
               const Spacer(),
-
-              // Primary CTA
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -58,7 +53,7 @@ class SubscriptionPage extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Continue',
+                    l10n.continueLabel,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -67,20 +62,18 @@ class SubscriptionPage extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 15),
-
-              // Pricing hint
               Text(
-                'Just ₱${yearlyPrice.toStringAsFixed(2)} per year '
-                '(₱${monthlyPrice.toStringAsFixed(2)}/mo)',
+                l10n.subscriptionPriceHint(
+                  yearlyPrice.toStringAsFixed(2),
+                  monthlyPrice.toStringAsFixed(2),
+                ),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: scheme.onTertiaryFixed,
                 ),
               ),
-
               const SizedBox(height: 30),
             ],
           ),

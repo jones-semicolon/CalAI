@@ -1,6 +1,7 @@
 import 'package:calai/widgets/circle_back_button.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -39,6 +40,7 @@ class _DescribePageState extends ConsumerState<DescribePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     // 1. Listen for state changes (Loading/Success/Error)
     ref.listen<ExerciseLogState>(exerciseLogProvider, (previous, next) {
       if (next.status == ExerciseLogStatus.loading) {
@@ -51,13 +53,13 @@ class _DescribePageState extends ConsumerState<DescribePage> {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
         Navigator.pop(context); // Close DescribePage
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Exercise parsed and logged!')),
+          SnackBar(content: Text(l10n.exerciseParsedAndLogged)),
         );
         ref.read(exerciseLogProvider.notifier).reset();
       } else if (next.status == ExerciseLogStatus.error) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${next.errorMessage}')),
+          SnackBar(content: Text(l10n.genericErrorMessage(next.errorMessage ?? ''))),
         );
       }
     });
@@ -74,9 +76,9 @@ class _DescribePageState extends ConsumerState<DescribePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Describe Exercise',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Text(
+                    l10n.describeExerciseTitle,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
                   Container(
@@ -90,16 +92,16 @@ class _DescribePageState extends ConsumerState<DescribePage> {
                       controller: _descriptionController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'What did you do?',
+                        hintText: l10n.whatDidYouDoHint,
                         contentPadding: const EdgeInsets.symmetric(vertical: 16),
                         hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
                       ),
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    'Example: Outdoor hiking for 5 hours, felt exhausted',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  Text(
+                    l10n.describeExerciseExample,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
               ),

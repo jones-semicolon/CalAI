@@ -1,7 +1,8 @@
+﻿import 'package:calai/l10n/l10n.dart';
 import 'package:calai/pages/home/health_score/health_score_view.dart';
 import 'package:flutter/material.dart';
-import 'package:calai/core/constants/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../enums/food_enums.dart';
 import '../../../models/nutrition_model.dart';
 import '../../../providers/global_provider.dart';
@@ -11,7 +12,6 @@ import '../widgets/activity_card.dart';
 class CarouselHealth extends ConsumerWidget {
   final bool isTap;
   final VoidCallback onTap;
-  // Use the HealthData state object directly
 
   const CarouselHealth({
     super.key,
@@ -21,18 +21,17 @@ class CarouselHealth extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 1. Get Today's Progress from Global State
     final globalState = ref.watch(globalDataProvider).value;
     final progress = globalState?.todayProgress ?? NutritionProgress.empty;
 
-    // 2. Get Targets from User Model
     final user = ref.watch(userProvider);
     final targets = user.goal.targets;
 
     double calculateScore() {
       if (targets.fiber == 0) return 0.0;
-      double fiberScore = (progress.fiber / targets.fiber).clamp(0.0, 1.0);
-      double sodiumScore = (1.0 - (progress.sodium / targets.sodium)).clamp(0.0, 1.0);
+      final fiberScore = (progress.fiber / targets.fiber).clamp(0.0, 1.0);
+      final sodiumScore =
+          (1.0 - (progress.sodium / targets.sodium)).clamp(0.0, 1.0);
       return (fiberScore + sodiumScore) / 2 * 10;
     }
 
@@ -55,8 +54,12 @@ class CarouselHealth extends ConsumerWidget {
               calories: progress.calories,
               score: currentScore,
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => HealthScoreView(score: currentScore)));
-                debugPrint("Navigating to Health Score Page...");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HealthScoreView(score: currentScore),
+                  ),
+                );
               },
             ),
           ],
@@ -83,36 +86,36 @@ class _NutrientCardsRow extends StatelessWidget {
       children: [
         Expanded(
           child: CalorieCard(
-            title: MicroNutritionType.fiber.label,
-            nutrients: targets.fiber, // Goal from HealthData
-            progress: progress.fiber, // Intake from HealthData
+            title: context.l10n.fiberLabel,
+            nutrients: targets.fiber,
+            progress: progress.fiber,
             color: MicroNutritionType.fiber.color,
             icon: MicroNutritionType.fiber.icon,
-            unit: "g",
+            unit: 'g',
             isTap: isTap,
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: CalorieCard(
-            title: MicroNutritionType.sugar.label,
+            title: context.l10n.sugarLabel,
             nutrients: targets.sugar,
             progress: progress.sugar,
             color: MicroNutritionType.sugar.color,
             icon: MicroNutritionType.sugar.icon,
-            unit: "g",
+            unit: 'g',
             isTap: isTap,
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: CalorieCard(
-            title: MicroNutritionType.sodium.label,
+            title: context.l10n.sodiumLabel,
             nutrients: targets.sodium,
             progress: progress.sodium,
             color: MicroNutritionType.sodium.color,
             icon: MicroNutritionType.sodium.icon,
-            unit: "mg",
+            unit: 'mg',
             isTap: isTap,
           ),
         ),
@@ -121,11 +124,10 @@ class _NutrientCardsRow extends StatelessWidget {
   }
 }
 
-/// Displays the "Health Score" card with its progress bar and summary text.
 class _HealthScoreCard extends StatelessWidget {
   final double score;
-  final double protein; // Added
-  final double calories; // Added
+  final double protein;
+  final double calories;
   final VoidCallback onTap;
 
   const _HealthScoreCard({
@@ -137,8 +139,7 @@ class _HealthScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Generate the message based on current data
-    final String summaryMessage = _getHealthSummary(score, protein, calories);
+    final summaryMessage = _getHealthSummary(context, score, protein, calories);
 
     return InkWell(
       onTap: onTap,
@@ -156,7 +157,7 @@ class _HealthScoreCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Health score',
+                  context.l10n.healthScoreTitle,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.primary,
@@ -192,7 +193,7 @@ class _HealthScoreCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              summaryMessage, // ✅ Displays the dynamic summary
+              summaryMessage,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onPrimary,
                 fontSize: 14,
@@ -205,19 +206,23 @@ class _HealthScoreCard extends StatelessWidget {
   }
 }
 
-String _getHealthSummary(double score, double protein, double calories) {
+String _getHealthSummary(
+  BuildContext context,
+  double score,
+  double protein,
+  double calories,
+) {
   if (score == 0) {
-    return 'No data logged for today. Start tracking your meals to see your health insights!';
+    return context.l10n.healthSummaryNoData;
   }
 
   if (score < 5) {
-    return 'Your intake is quite low. Focus on hitting your calorie and protein targets to maintain energy and muscle.';
+    return context.l10n.healthSummaryLowIntake;
   }
 
-  // Example of specific macro feedback
   if (protein < 30) {
-    return 'Carbs and fat are on track, but you’re low in protein. Increasing protein can help with muscle retention.';
+    return context.l10n.healthSummaryLowProtein;
   }
 
-  return 'Great job! Your nutrition is well-balanced today.';
+  return context.l10n.healthSummaryGreat;
 }

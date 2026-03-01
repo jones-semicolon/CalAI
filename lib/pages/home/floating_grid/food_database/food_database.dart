@@ -3,6 +3,7 @@ import 'package:calai/pages/home/recently_logged/logged_view/logged_food_view.da
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calai/l10n/l10n.dart';
 
 // Update these paths to match your project structure
 import 'package:calai/api/food_api.dart';
@@ -33,14 +34,6 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
   List<Food> _searchResults = [];
 
   Timer? _debounce;
-
-  // Constants
-  static const List<String> _tabs = [
-    "All",
-    "My meals",
-    "My foods",
-    "Saved scans",
-  ];
 
   // IDs are Strings in your new model
   static const List<String> _featuredFoodIds = [
@@ -124,7 +117,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
     final List<FoodPortionItem> portions = item.portions.cast<FoodPortionItem>();
 
     if (portions.isEmpty) {
-      return const FoodPortionItem(label: "Serving", gramWeight: 100);
+      return FoodPortionItem(label: context.l10n.servingLabel, gramWeight: 100);
     }
 
     // Try to find a portion that isn't just "100g" or "Quantity not specified"
@@ -156,7 +149,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Added ${item.name} to $activeDateId"),
+            content: Text(context.l10n.foodAddedToDate(item.name, activeDateId ?? '')),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -165,7 +158,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
       debugPrint("Error adding food: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to add food. Try again.")),
+          SnackBar(content: Text(context.l10n.failedToAddFood)),
         );
       }
     }
@@ -192,6 +185,13 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final tabs = [
+      l10n.allTabLabel,
+      l10n.myMealsTabLabel,
+      l10n.myFoodsTabLabel,
+      l10n.savedScansTabLabel,
+    ];
     final bool isShowingSearchResults = _searchController.text.isNotEmpty;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -199,7 +199,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
         child: Column(
           children: [
             CustomAppBar(
-              title: const Text("Food Database"),
+              title: Text(l10n.foodDatabaseLabel),
             ),
             const SizedBox(height: 8),
             Padding(
@@ -208,11 +208,11 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
                 children: [
                   _buildSearchBox(theme),
                   const SizedBox(height: 14),
-                  _buildTabs(),
+                  _buildTabs(tabs),
                   const SizedBox(height: 14),
                   _OutlinedPillButton(
                     icon: Icons.edit,
-                    text: "Log empty food",
+                    text: l10n.logEmptyFoodLabel,
                     onTap: _onLogEmptyFood,
                   ),
                   const SizedBox(height: 18),
@@ -222,7 +222,9 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
                       ? Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      isShowingSearchResults ? "Search Results" : "Suggestions",
+                      isShowingSearchResults
+                          ? l10n.searchResultsLabel
+                          : l10n.suggestionsLabel,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
@@ -252,7 +254,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
         return const Expanded(child: Center(child: CircularProgressIndicator()));
       }
       if (_searchResults.isEmpty) {
-        return const Expanded(child: Center(child: Text("No items found.")));
+        return Expanded(child: Center(child: Text(context.l10n.noItemsFoundLabel)));
       }
       return _buildFoodList(_searchResults, theme);
     }
@@ -302,8 +304,8 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
     }
 
     if (_suggestedFoods.isEmpty) {
-      return const Expanded(
-        child: Center(child: Text("No suggestions available")),
+      return Expanded(
+        child: Center(child: Text(context.l10n.noSuggestionsAvailableLabel)),
       );
     }
 
@@ -323,7 +325,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
     // 3. Error State
     if (savedFoodsAsync.hasError) {
       return Expanded(
-        child: Center(child: Text("Error: ${savedFoodsAsync.error}")),
+        child: Center(child: Text(context.l10n.genericErrorMessage(savedFoodsAsync.error.toString()))),
       );
     }
 
@@ -332,9 +334,12 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
 
     // 5. Empty State
     if (foods.isEmpty) {
-      return const Expanded(
+      return Expanded(
         child: Center(
-          child: Text("No saved scans yet", style: TextStyle(fontSize: 16)),
+          child: Text(
+            context.l10n.noSavedScansYetLabel,
+            style: const TextStyle(fontSize: 16),
+          ),
         ),
       );
     }
@@ -352,11 +357,11 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
         children: [
           CircleBackButton(onTap: () => Navigator.pop(context)),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Center(
               child: Text(
-                "Food Database",
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22),
+                context.l10n.foodDatabaseLabel,
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 22),
               ),
             ),
           ),
@@ -369,20 +374,20 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
   Widget _buildSearchBox(ThemeData theme) {
     return _SearchInput(
       controller: _searchController,
-      hint: "Describe what you ate",
+      hint: context.l10n.describeWhatYouAteHint,
       onChanged: _onSearchChanged,
     );
   }
 
-  Widget _buildTabs() {
+  Widget _buildTabs(List<String> tabs) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: List.generate(_tabs.length, (index) {
+        children: List.generate(tabs.length, (index) {
           return Padding(
-            padding: EdgeInsets.only(right: index == _tabs.length - 1 ? 0 : 22),
+            padding: EdgeInsets.only(right: index == tabs.length - 1 ? 0 : 22),
             child: _TabItem(
-              label: _tabs[index],
+              label: tabs[index],
               isSelected: index == _selectedTabIndex,
               onTap: () => setState(() => _selectedTabIndex = index),
             ),
@@ -562,7 +567,7 @@ class FoodTile extends StatelessWidget {
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          "${calories.round()} cal  ·  ${unit ?? 'Serving'}",
+                          "${calories.round()} ${context.l10n.calsLabel.toLowerCase()}  ·  ${unit ?? context.l10n.servingLabel}",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(

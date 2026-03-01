@@ -1,23 +1,30 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LanguageCard extends StatelessWidget {
+import '../l10n/l10n.dart';
+import '../providers/locale_provider.dart';
+
+class LanguageCard extends ConsumerWidget {
   final VoidCallback onClose;
 
   const LanguageCard({super.key, required this.onClose});
 
-  // Static list of languages
-  static const List<Map<String, String>> languages = [
-    {'flag': '🇺🇸', 'name': 'English'},
-    {'flag': '🇪🇸', 'name': 'Español'},
-    {'flag': '🇵🇹', 'name': 'Português'},
-    {'flag': '🇫🇷', 'name': 'Français'},
-    {'flag': '🇩🇪', 'name': 'Deutsch'},
-    {'flag': '🇮🇹', 'name': 'Italiano'},
-    {'flag': '🇮🇳', 'name': 'Hindi'},
+  static const List<_LanguageOption> _languages = [
+    _LanguageOption(locale: Locale('en'), flag: '🇺🇸'),
+    _LanguageOption(locale: Locale('es'), flag: '🇪🇸'),
+    _LanguageOption(locale: Locale('pt'), flag: '🇵🇹'),
+    _LanguageOption(locale: Locale('fr'), flag: '🇫🇷'),
+    _LanguageOption(locale: Locale('de'), flag: '🇩🇪'),
+    _LanguageOption(locale: Locale('it'), flag: '🇮🇹'),
+    _LanguageOption(locale: Locale('hi'), flag: '🇮🇳'),
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedLocale = ref.watch(localeProvider);
+    final selectedLanguageCode =
+        (selectedLocale ?? Localizations.localeOf(context)).languageCode;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -29,14 +36,13 @@ class LanguageCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // shrink to content
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // HEADER
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Choose language',
+                    context.l10n.chooseLanguage,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.w700,
@@ -62,22 +68,28 @@ class LanguageCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-
-              // LANGUAGE LIST
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: List.generate(
-                  languages.length * 2 - 1, // include gaps
+                  _languages.length * 2 - 1,
                   (index) {
                     if (index.isEven) {
-                      final lang = languages[index ~/ 2];
+                      final lang = _languages[index ~/ 2];
+                      final languageName = _languageName(context, lang.locale.languageCode);
                       return LanguageItem(
-                        flag: lang['flag']!,
-                        language: lang['name']!,
+                        flag: lang.flag,
+                        language: languageName,
+                        isSelected:
+                            lang.locale.languageCode == selectedLanguageCode,
+                        onTap: () async {
+                          await ref
+                              .read(localeProvider.notifier)
+                              .setLocale(lang.locale);
+                          onClose();
+                        },
                       );
-                    } else {
-                      return const SizedBox(height: 10); // gap
                     }
+                    return const SizedBox(height: 10);
                   },
                 ),
               ),
@@ -87,13 +99,41 @@ class LanguageCard extends StatelessWidget {
       ),
     );
   }
+
+  String _languageName(BuildContext context, String code) {
+    switch (code) {
+      case 'es':
+        return context.l10n.languageNameSpanish;
+      case 'pt':
+        return context.l10n.languageNamePortuguese;
+      case 'fr':
+        return context.l10n.languageNameFrench;
+      case 'de':
+        return context.l10n.languageNameGerman;
+      case 'it':
+        return context.l10n.languageNameItalian;
+      case 'hi':
+        return context.l10n.languageNameHindi;
+      case 'en':
+      default:
+        return context.l10n.languageNameEnglish;
+    }
+  }
 }
 
 class LanguageItem extends StatelessWidget {
   final String flag;
   final String language;
+  final bool isSelected;
+  final VoidCallback onTap;
 
-  const LanguageItem({super.key, required this.flag, required this.language});
+  const LanguageItem({
+    super.key,
+    required this.flag,
+    required this.language,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -101,14 +141,16 @@ class LanguageItem extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
-        onTap: () {
-          // TODO: handle language selection
-        },
+        onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onTertiary,
+            color: isSelected
+                ? Theme.of(context).colorScheme.secondaryContainer
+                : Theme.of(context).colorScheme.onTertiary,
             border: Border.all(
-              color: Theme.of(context).splashColor,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).splashColor,
               width: 1.5,
             ),
             borderRadius: BorderRadius.circular(10),
@@ -123,6 +165,7 @@ class LanguageItem extends StatelessWidget {
                 language,
                 style: TextStyle(
                   fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
@@ -132,4 +175,14 @@ class LanguageItem extends StatelessWidget {
       ),
     );
   }
+}
+
+class _LanguageOption {
+  final Locale locale;
+  final String flag;
+
+  const _LanguageOption({
+    required this.locale,
+    required this.flag,
+  });
 }

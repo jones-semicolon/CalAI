@@ -2,6 +2,7 @@ import 'package:calai/widgets/animated_number.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/core/constants/constants.dart';
+import 'package:calai/l10n/l10n.dart';
 import '../../../enums/food_enums.dart';
 import '../../../models/global_state_model.dart';
 import '../../../providers/global_provider.dart';
@@ -199,7 +200,7 @@ class _CalorieInfo extends StatelessWidget {
           Row(
             children: [
               Text(
-                "Calories ",
+                "${context.l10n.caloriesLabel} ",
                 style: TextStyle(
                   fontSize: 12,
                   color: Theme.of(context).colorScheme.primary,
@@ -211,7 +212,7 @@ class _CalorieInfo extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                value: isTap ? "eaten" : "left",
+                value: isTap ? context.l10n.eatenLabel : context.l10n.leftLabel,
                 reverse: isTap,
                 inAnim: false,
               ),
@@ -299,7 +300,7 @@ class _MacroNutrientCardsRow extends StatelessWidget {
       children: [
         Expanded(
           child: CalorieCard(
-            title: NutritionType.protein.label,
+            title: context.l10n.proteinLabel,
             nutrients: targets.protein,
             progress: progress.protein,
             color: NutritionType.protein.color,
@@ -311,7 +312,7 @@ class _MacroNutrientCardsRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: CalorieCard(
-            title: NutritionType.carbs.label,
+            title: context.l10n.carbsLabel,
             nutrients: targets.carbs,
             progress: progress.carbs,
             color: NutritionType.carbs.color,
@@ -323,7 +324,7 @@ class _MacroNutrientCardsRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: CalorieCard(
-            title: NutritionType.fats.label,
+            title: context.l10n.fatsLabel,
             nutrients: targets.fats,
             progress: progress.fats,
             color: NutritionType.fats.color,

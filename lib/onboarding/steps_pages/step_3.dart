@@ -1,12 +1,10 @@
-import 'package:calai/widgets/confirmation_button_widget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 
 class OnboardingStep3 extends ConsumerStatefulWidget {
@@ -21,17 +19,17 @@ class _OnboardingStep3State extends ConsumerState<OnboardingStep3> {
   bool isEnable = false;
   int? selectedIndex;
 
-  final List<OptionCard> options = [
-    OptionCard(title: 'Tik Tok', icon: FontAwesomeIcons.tiktok),
-    OptionCard(title: 'YouTube', icon: FontAwesomeIcons.youtube),
-    OptionCard(title: 'Google', icon: FontAwesomeIcons.google),
-    OptionCard(title: 'Play Store', icon: FontAwesomeIcons.googlePay),
-    OptionCard(title: 'Facebook', icon: FontAwesomeIcons.facebook),
-    OptionCard(title: 'Friend or family', icon: Icons.family_restroom),
-    OptionCard(title: 'TV', icon: Icons.tv),
-    OptionCard(title: 'Instagram', icon: FontAwesomeIcons.instagram),
-    OptionCard(title: 'X', icon: FontAwesomeIcons.xTwitter),
-    OptionCard(title: 'Other', icon: Icons.dynamic_feed_outlined),
+  final List<_SourceOption> _options = const [
+    _SourceOption.tikTok,
+    _SourceOption.youtube,
+    _SourceOption.google,
+    _SourceOption.playStore,
+    _SourceOption.facebook,
+    _SourceOption.friendOrFamily,
+    _SourceOption.tv,
+    _SourceOption.instagram,
+    _SourceOption.x,
+    _SourceOption.other,
   ];
 
   @override
@@ -39,7 +37,7 @@ class _OnboardingStep3State extends ConsumerState<OnboardingStep3> {
     return SafeArea(
       child: Column(
         children: [
-          Header(title: 'Where did you hear about us?'),
+          Header(title: context.l10n.onboardingHearAboutUsTitle),
 
           /// SCROLLABLE CONTENT
           Expanded(
@@ -54,8 +52,8 @@ class _OnboardingStep3State extends ConsumerState<OnboardingStep3> {
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(options.length, (index) {
-                        final item = options[index];
+                      children: List.generate(_options.length, (index) {
+                        final item = _buildSourceOption(context, _options[index]);
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 15),
                           child: AnimatedOptionCard(
@@ -97,7 +95,7 @@ class _OnboardingStep3State extends ConsumerState<OnboardingStep3> {
           //       //   final uid = FirebaseAuth.instance.currentUser?.uid;
           //       //
           //       //   if (uid != null) {
-          //       //     // ✅ DIRECT TO FIRESTORE: Save marketing data to a separate collection
+          //       //     // âœ… DIRECT TO FIRESTORE: Save marketing data to a separate collection
           //       //     // We don't save this to the User model to keep the health data clean.
           //       //     try {
           //       //       await FirebaseFirestore.instance
@@ -124,4 +122,72 @@ class _OnboardingStep3State extends ConsumerState<OnboardingStep3> {
       ),
     );
   }
+
+  OptionCard _buildSourceOption(BuildContext context, _SourceOption option) {
+    switch (option) {
+      case _SourceOption.tikTok:
+        return OptionCard(
+          title: context.l10n.sourceTikTok,
+          icon: FontAwesomeIcons.tiktok,
+        );
+      case _SourceOption.youtube:
+        return OptionCard(
+          title: context.l10n.sourceYouTube,
+          icon: FontAwesomeIcons.youtube,
+        );
+      case _SourceOption.google:
+        return OptionCard(
+          title: context.l10n.sourceGoogle,
+          icon: FontAwesomeIcons.google,
+        );
+      case _SourceOption.playStore:
+        return OptionCard(
+          title: context.l10n.sourcePlayStore,
+          icon: FontAwesomeIcons.googlePay,
+        );
+      case _SourceOption.facebook:
+        return OptionCard(
+          title: context.l10n.sourceFacebook,
+          icon: FontAwesomeIcons.facebook,
+        );
+      case _SourceOption.friendOrFamily:
+        return OptionCard(
+          title: context.l10n.sourceFriendFamily,
+          icon: Icons.family_restroom,
+        );
+      case _SourceOption.tv:
+        return OptionCard(
+          title: context.l10n.sourceTv,
+          icon: Icons.tv,
+        );
+      case _SourceOption.instagram:
+        return OptionCard(
+          title: context.l10n.sourceInstagram,
+          icon: FontAwesomeIcons.instagram,
+        );
+      case _SourceOption.x:
+        return OptionCard(
+          title: context.l10n.sourceX,
+          icon: FontAwesomeIcons.xTwitter,
+        );
+      case _SourceOption.other:
+        return OptionCard(
+          title: context.l10n.sourceOther,
+          icon: Icons.dynamic_feed_outlined,
+        );
+    }
+  }
+}
+
+enum _SourceOption {
+  tikTok,
+  youtube,
+  google,
+  playStore,
+  facebook,
+  friendOrFamily,
+  tv,
+  instagram,
+  x,
+  other,
 }

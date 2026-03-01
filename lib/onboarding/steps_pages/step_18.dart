@@ -1,14 +1,13 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/edit_value_view.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/push_page_route.dart';
 import '../../enums/food_enums.dart';
 import '../../pages/auth/auth.dart';
 import '../../providers/user_provider.dart';
 import '../onboarding_widgets/calibration_result/dashboard_widget.dart';
-import '../onboarding_widgets/edit_goal/edit_goal_screen.dart';
 import '../onboarding_widgets/loading_widget/health_plan_loading_widget.dart';
 
 class OnboardingStep18 extends ConsumerStatefulWidget {
@@ -58,7 +57,7 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
       if (mounted) {
         setState(() {
           _isCalculating = false;
-          _error = "Could not calculate plan. Please check your connection.";
+          _error = context.l10n.step18CalculationError;
         });
       }
     }
@@ -121,7 +120,7 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                 });
                 startComputation(); // Retry
               },
-              child: const Text("Try Again"),
+              child: Text(context.l10n.step18TryAgain),
             ),
           ],
         ),
@@ -156,13 +155,13 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                 child: DailyRecommendationDashboard(
                   macros: [
                     MacroData(
-                      title: 'Calories',
+                      title: context.l10n.caloriesLabel,
                       value: targets.calories.round().toString(),
                       progress: 0.5,
                       color: Theme.of(context).colorScheme.primary,
                       icon: Icons.local_fire_department,
                       onTap: () => _editValue(
-                        title: 'Calories',
+                        title: context.l10n.caloriesLabel,
                         initialValue: targets.calories,
                         icon: Icons.local_fire_department,
                         color: Theme.of(context).colorScheme.primary,
@@ -182,13 +181,13 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                       ),
                     ),
                     MacroData(
-                      title: 'Carbs',
+                      title: context.l10n.carbsLabel,
                       value: '${targets.carbs.round()}g',
                       progress: 0.5, // Logic can be refined later
                       color: NutritionType.carbs.color,
                       icon: NutritionType.carbs.icon,
                       onTap: () => _editValue(
-                        title: 'Carbs',
+                        title: context.l10n.carbsLabel,
                         initialValue: targets.carbs,
                         icon: NutritionType.carbs.icon,
                         color: Theme.of(context).colorScheme.primary,
@@ -208,13 +207,13 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                       ),
                     ),
                     MacroData(
-                      title: 'Protein',
+                      title: context.l10n.proteinLabel,
                       value: '${targets.protein.round()}g',
                       progress: 0.5,
                       color: NutritionType.protein.color,
                       icon: NutritionType.protein.icon,
                       onTap: () => _editValue(
-                        title: 'Protein',
+                        title: context.l10n.proteinLabel,
                         initialValue: targets.protein,
                         icon: NutritionType.protein.icon,
                         color: Theme.of(context).colorScheme.primary,
@@ -234,13 +233,13 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
                       ),
                     ),
                     MacroData(
-                      title: 'Fats',
+                      title: context.l10n.fatsLabel,
                       value: '${targets.fats.round()}g',
                       progress: 0.5,
                       color: NutritionType.fats.color,
                       icon: NutritionType.fats.icon,
                       onTap: () => _editValue(
-                        title: 'Fats',
+                        title: context.l10n.fatsLabel,
                         initialValue: targets.fats,
                         icon: NutritionType.fats.icon,
                         color: Theme.of(context).colorScheme.primary,

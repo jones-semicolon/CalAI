@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class HeightPicker extends StatefulWidget {
   final bool isMetric;
@@ -67,7 +68,7 @@ class _HeightPickerState extends State<HeightPicker> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text("Height", style: Theme.of(context).textTheme.titleMedium),
+        Text(context.l10n.heightLabel, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 20),
         widget.isMetric
             ? _buildWheel(

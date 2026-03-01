@@ -1,5 +1,6 @@
 import 'package:calai/features/reminders/models/reminder_settings.dart';
 import 'package:calai/features/reminders/presentation/reminder_settings_controller.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,7 +44,7 @@ class _ReminderSettingsSectionState
         error: (error, stackTrace) => Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
-            'Failed to load reminder settings.',
+            context.l10n.failedLoadReminderSettings,
             style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
         ),
@@ -76,7 +77,7 @@ class _ReminderSettingsContent extends ConsumerWidget {
               ),
               const SizedBox(width: 12),
               Text(
-                'Reminders',
+                context.l10n.remindersTitle,
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -89,15 +90,15 @@ class _ReminderSettingsContent extends ConsumerWidget {
         _divider(context),
         _switchRow(
           context: context,
-          title: 'Smart nutrition reminders',
+          title: context.l10n.smartNutritionRemindersTitle,
           subtitle:
-              'Daily reminder at ${_formatTime(context, settings.smartNutritionTime)}',
+              '${context.l10n.dailyReminderAtLabel} ${_formatTime(context, settings.smartNutritionTime)}',
           value: settings.smartNutritionEnabled,
           onChanged: controller.toggleSmartNutrition,
         ),
         _timeAction(
           context: context,
-          label: 'Set smart nutrition time',
+          label: context.l10n.setSmartNutritionTimeLabel,
           value: settings.smartNutritionTime,
           onPicked: (value) {
             controller.setSmartNutritionTime(value);
@@ -106,16 +107,16 @@ class _ReminderSettingsContent extends ConsumerWidget {
         _divider(context),
         _switchRow(
           context: context,
-          title: 'Water reminders',
+          title: context.l10n.waterRemindersTitle,
           subtitle:
-              'Every ${settings.waterReminderIntervalHours} hour(s) from ${_formatTime(context, settings.waterReminderStartTime)}',
+              '${context.l10n.everyLabel} ${settings.waterReminderIntervalHours} ${context.l10n.hourUnitLabel} ${context.l10n.fromLabel} ${_formatTime(context, settings.waterReminderStartTime)}',
           value: settings.waterRemindersEnabled,
           onChanged: controller.toggleWaterReminders,
         ),
         _waterIntervalPicker(context, ref),
         _timeAction(
           context: context,
-          label: 'Set water start time',
+          label: context.l10n.setWaterStartTimeLabel,
           value: settings.waterReminderStartTime,
           onPicked: (value) {
             controller.setWaterStartTime(value);
@@ -124,7 +125,7 @@ class _ReminderSettingsContent extends ConsumerWidget {
         _divider(context),
         _mealTile(
           context: context,
-          title: 'Breakfast reminder',
+          title: context.l10n.breakfastReminderTitle,
           enabled: settings.breakfastReminderEnabled,
           time: settings.breakfastReminderTime,
           onToggle: (value) {
@@ -136,7 +137,7 @@ class _ReminderSettingsContent extends ConsumerWidget {
         ),
         _mealTile(
           context: context,
-          title: 'Lunch reminder',
+          title: context.l10n.lunchReminderTitle,
           enabled: settings.lunchReminderEnabled,
           time: settings.lunchReminderTime,
           onToggle: (value) {
@@ -148,7 +149,7 @@ class _ReminderSettingsContent extends ConsumerWidget {
         ),
         _mealTile(
           context: context,
-          title: 'Dinner reminder',
+          title: context.l10n.dinnerReminderTitle,
           enabled: settings.dinnerReminderEnabled,
           time: settings.dinnerReminderTime,
           onToggle: (value) {
@@ -160,7 +161,7 @@ class _ReminderSettingsContent extends ConsumerWidget {
         ),
         _mealTile(
           context: context,
-          title: 'Snack reminder',
+          title: context.l10n.snackReminderTitle,
           enabled: settings.snackReminderEnabled,
           time: settings.snackReminderTime,
           onToggle: (value) {
@@ -173,22 +174,22 @@ class _ReminderSettingsContent extends ConsumerWidget {
         _divider(context),
         _switchRow(
           context: context,
-          title: 'Goal tracking alerts',
-          subtitle: 'Near/exceed calorie and macro goal alerts',
+          title: context.l10n.goalTrackingAlertsTitle,
+          subtitle: context.l10n.goalTrackingAlertsSubtitle,
           value: settings.goalTrackingAlertsEnabled,
           onChanged: controller.toggleGoalTrackingAlerts,
         ),
         _switchRow(
           context: context,
-          title: 'Steps / exercise reminder',
+          title: context.l10n.stepsExerciseReminderTitle,
           subtitle:
-              'Daily at ${_formatTime(context, settings.activityReminderTime)}',
+              '${context.l10n.dailyAtLabel} ${_formatTime(context, settings.activityReminderTime)}',
           value: settings.activityReminderEnabled,
           onChanged: controller.toggleActivityReminder,
         ),
         _timeAction(
           context: context,
-          label: 'Set activity reminder time',
+          label: context.l10n.setActivityReminderTimeLabel,
           value: settings.activityReminderTime,
           onPicked: (value) {
             controller.setActivityReminderTime(value);
@@ -206,7 +207,7 @@ class _ReminderSettingsContent extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         children: [
-          Text('Interval:', style: _titleStyle(textColor)),
+          Text(context.l10n.intervalLabel, style: _titleStyle(textColor)),
           const SizedBox(width: 12),
           DropdownButtonHideUnderline(
             child: DropdownButton<int>(
@@ -219,7 +220,7 @@ class _ReminderSettingsContent extends ConsumerWidget {
                 (index) => DropdownMenuItem<int>(
                   value: index + 1,
                   child: Text(
-                    '${index + 1} hour(s)',
+                    '${index + 1} ${context.l10n.hourUnitLabel}',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -260,7 +261,7 @@ class _ReminderSettingsContent extends ConsumerWidget {
         ),
         _timeAction(
           context: context,
-          label: 'Set time',
+          label: context.l10n.setTimeLabel,
           value: time,
           onPicked: onTimePicked,
         ),

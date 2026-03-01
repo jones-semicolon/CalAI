@@ -1,10 +1,10 @@
-import 'package:calai/widgets/confirmation_button_widget.dart';
+﻿import 'package:calai/widgets/confirmation_button_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
 import '../onboarding_widgets/dynamic_card.dart';
 import '../onboarding_widgets/animated_option_card.dart';
-import '../onboarding_widgets/continue_button.dart';
 import '../onboarding_widgets/header.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,10 +21,10 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
   bool isEnable = false;
   int? selectedIndex;
 
-  final List<OptionCard> options = [
-    OptionCard(title: 'Female', value: Gender.female),
-    OptionCard(title: 'Male', value: Gender.male),
-    OptionCard(title: 'Other', value: Gender.other),
+  final List<Gender> _genderOptions = const [
+    Gender.female,
+    Gender.male,
+    Gender.other,
   ];
 
   @override
@@ -35,7 +35,7 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
     final savedGender = ref.read(userProvider).profile.gender;
 
     // Find index of option matching saved gender
-    final matchIndex = options.indexWhere((o) => o.value == savedGender);
+    final matchIndex = _genderOptions.indexWhere((o) => o == savedGender);
 
     if (matchIndex != -1) {
       selectedIndex = matchIndex;
@@ -49,8 +49,8 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
       child: Column(
         children: [
           Header(
-            title: 'Choose your Gender',
-            subtitle: 'This will be used to calibrate your custom plan.',
+            title: context.l10n.onboardingChooseGenderTitle,
+            subtitle: context.l10n.onboardingChooseGenderSubtitle,
           ),
 
           /// SCROLLABLE CONTENT
@@ -66,8 +66,8 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(options.length, (index) {
-                        final item = options[index];
+                      children: List.generate(_genderOptions.length, (index) {
+                        final item = _buildGenderOption(context, _genderOptions[index]);
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 15),
                           child: AnimatedOptionCard(
@@ -97,18 +97,18 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
           ConfirmationButtonWidget(
             onConfirm: () {
               if (selectedIndex != null) {
-                final selectedOption = options[selectedIndex!];
+                final selectedGender = _genderOptions[selectedIndex!];
 
                 ref
                     .read(userProvider.notifier)
                     .updateLocal(
                       (s) => s.copyWith(
                         profile: s.profile.copyWith(
-                          gender: selectedOption.value,
+                          gender: selectedGender,
                         ),
                       ),
                     );
-                debugPrint('Gender: ${selectedOption.value}');
+                debugPrint('Gender: $selectedGender');
               }
               widget.nextPage();
             },
@@ -117,5 +117,16 @@ class _OnboardingStep1State extends ConsumerState<OnboardingStep1> {
         ],
       ),
     );
+  }
+
+  OptionCard _buildGenderOption(BuildContext context, Gender gender) {
+    switch (gender) {
+      case Gender.female:
+        return OptionCard(title: context.l10n.genderFemale, value: gender);
+      case Gender.male:
+        return OptionCard(title: context.l10n.genderMale, value: gender);
+      case Gender.other:
+        return OptionCard(title: context.l10n.genderOther, value: gender);
+    }
   }
 }

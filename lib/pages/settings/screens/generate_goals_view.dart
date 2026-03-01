@@ -1,5 +1,6 @@
 import 'package:calai/onboarding/steps_pages/step_2.dart';
 import 'package:calai/services/calai_firestore_service.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,7 +72,7 @@ class _GenerateGoalsViewState extends ConsumerState<GenerateGoalsView> {
       // Show an error snackbar if something goes wrong
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Failed to generate goals: $e")));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.failedToGenerateGoals(e.toString()))));
     }
   }
 
@@ -135,14 +136,14 @@ class _GenerateGoalsViewState extends ConsumerState<GenerateGoalsView> {
             if (_isGenerating)
               Container(
                 color: Colors.black.withOpacity(0.5),
-                child: const Center(
+                child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       CircularProgressIndicator(color: Colors.white),
                       SizedBox(height: 20),
                       Text(
-                        "Calculating your custom goals...",
+                        context.l10n.calculatingCustomGoals,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

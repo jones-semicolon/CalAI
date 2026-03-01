@@ -1,37 +1,36 @@
+﻿import 'package:calai/l10n/l10n.dart';
 import 'package:calai/onboarding/auth_entry/sign_in_sheet.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:calai/providers/locale_provider.dart';
 import 'package:flutter/material.dart';
-import '../../pages/auth/auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../widgets/language_card.dart';
 
-class AuthEntryPage extends StatefulWidget {
+class AuthEntryPage extends ConsumerStatefulWidget {
   final VoidCallback onGetStarted;
 
   const AuthEntryPage({super.key, required this.onGetStarted});
 
   @override
-  State<AuthEntryPage> createState() => _AuthEntryPageState();
+  ConsumerState<AuthEntryPage> createState() => _AuthEntryPageState();
 }
 
-class _AuthEntryPageState extends State<AuthEntryPage> {
+class _AuthEntryPageState extends ConsumerState<AuthEntryPage> {
   bool _showLanguagePicker = false;
 
   @override
   Widget build(BuildContext context) {
+    final locale = ref.watch(localeProvider) ?? Localizations.localeOf(context);
+    final localeCode = locale.languageCode.toUpperCase();
+    final localeFlag = _flagForLanguageCode(locale.languageCode);
+
     return SafeArea(
       child: Stack(
         children: [
-          /// MAIN CONTENT
           Padding(
-            padding: const EdgeInsets.only(
-              right: 24,
-              left: 24,
-              top: 5,
-              bottom: 25,
-            ),
+            padding: const EdgeInsets.only(right: 24, left: 24, top: 5, bottom: 25),
             child: Column(
               children: [
-                /// TOP RIGHT LANGUAGE BUTTON
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -40,21 +39,16 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
                       borderRadius: BorderRadius.circular(10),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(10),
-                        onTap: () {
-                          setState(() => _showLanguagePicker = true);
-                        },
+                        onTap: () => setState(() => _showLanguagePicker = true),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 5,
-                            horizontal: 10,
-                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                           child: Row(
-                            children: const [
-                              Text('🇺🇸', style: TextStyle(fontSize: 11)),
-                              SizedBox(width: 4),
+                            children: [
+                              Text(localeFlag, style: const TextStyle(fontSize: 11)),
+                              const SizedBox(width: 4),
                               Text(
-                                'EN',
-                                style: TextStyle(
+                                localeCode,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 11,
                                 ),
@@ -66,32 +60,28 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
                     ),
                   ],
                 ),
-
                 const Spacer(),
-
                 Text(
+                  context.l10n.calorieTrackingMadeEasy,
                   textAlign: TextAlign.center,
-                  'Calorie tracking made easy',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStatePropertyAll(
                         Theme.of(context).colorScheme.primary,
                       ),
                     ),
-                    onPressed: () => widget.onGetStarted(),
+                    onPressed: widget.onGetStarted,
                     child: Text(
-                      'Get Started',
+                      context.l10n.getStarted,
                       style: TextStyle(
                         letterSpacing: 1,
                         fontWeight: FontWeight.bold,
@@ -100,15 +90,13 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 10),
-
                 Wrap(
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
-                      'Already have an account? ',
+                      '${context.l10n.alreadyAccount} ',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                       ),
@@ -130,13 +118,11 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
                       },
                       child: Text.rich(
                         TextSpan(
-                          text: 'Sign in',
+                          text: context.l10n.signIn,
                           style: TextStyle(
                             decoration: TextDecoration.underline,
                             decorationThickness: 1.5,
-                            decorationColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
+                            decorationColor: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.primary,
                           ),
@@ -148,21 +134,37 @@ class _AuthEntryPageState extends State<AuthEntryPage> {
               ],
             ),
           ),
-
-          /// LANGUAGE PICKER OVERLAY
           if (_showLanguagePicker)
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 child: LanguageCard(
-                  onClose: () {
-                    setState(() => _showLanguagePicker = false);
-                  },
+                  onClose: () => setState(() => _showLanguagePicker = false),
                 ),
               ),
             ),
         ],
       ),
     );
+  }
+
+  String _flagForLanguageCode(String code) {
+    switch (code) {
+      case 'es':
+        return '🇪🇸';
+      case 'pt':
+        return '🇵🇹';
+      case 'fr':
+        return '🇫🇷';
+      case 'de':
+        return '🇩🇪';
+      case 'it':
+        return '🇮🇹';
+      case 'hi':
+        return '🇮🇳';
+      case 'en':
+      default:
+        return '🇺🇸';
+    }
   }
 }

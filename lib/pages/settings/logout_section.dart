@@ -1,6 +1,7 @@
 import 'package:calai/onboarding/app_entry.dart';
 import 'package:calai/pages/auth/auth.dart';
 import 'package:calai/pages/settings/settings_item.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_sizes.dart';
@@ -17,7 +18,7 @@ class LogoutSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
       ),
       child: SettingsItemTile(
-        label: "Logout",
+        label: context.l10n.logoutLabel,
         icon: Icons.logout,
         onTap: () => _showLogoutConfirmation(context),
       ),
@@ -30,12 +31,12 @@ class LogoutSection extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          title: const Text("Logout"),
-          content: const Text("Are you sure you want to log out?"),
+          title: Text(context.l10n.logoutTitle),
+          content: Text(context.l10n.logoutConfirmMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context), // Close dialog
-              child: const Text("Cancel"),
+              child: Text(context.l10n.cancelLabel),
             ),
             TextButton(
               onPressed: () async {
@@ -51,9 +52,9 @@ class LogoutSection extends StatelessWidget {
                   );
                 }
               },
-              child: const Text(
-                "Logout",
-                style: TextStyle(color: Colors.red),
+              child: Text(
+                context.l10n.logoutLabel,
+                style: const TextStyle(color: Colors.red),
               ),
             ),
           ],
