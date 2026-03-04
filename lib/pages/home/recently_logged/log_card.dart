@@ -7,6 +7,7 @@ import '../../../models/exercise_model.dart';
 import '../../../models/food_model.dart';
 import 'logged_view/logged_exercise_view.dart';
 import 'logged_view/logged_food_view.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class FoodLogCard extends StatelessWidget {
   final FoodLog food;
@@ -27,7 +28,7 @@ class FoodLogCard extends StatelessWidget {
       ),
       title: food.name,
       subtitle: DateFormat.jm().format(food.timestamp),
-      calories: "${food.calories.round()} calories",
+      calories: "${food.calories.round()} ${context.l10n.caloriesLabel.toLowerCase()}",
       bottom: Row(
         children: [
           _macro(NutritionType.protein, "${food.protein.round()}g"),
@@ -60,7 +61,7 @@ class ExerciseLogCard extends StatelessWidget {
       ),
       title: type.label,
       subtitle: exercise.formattedTime,
-      calories: "${exercise.caloriesBurned.round()} kcal",
+      calories: "${exercise.caloriesBurned.round()} ${context.l10n.kcalLabel}",
       bottom: Row(
         children: [
           Icon(Icons.bolt, size: 14, color: Colors.grey[500]),
@@ -69,7 +70,7 @@ class ExerciseLogCard extends StatelessWidget {
           const SizedBox(width: 12),
           Icon(Icons.access_time, size: 14, color: Colors.grey[500]),
           const SizedBox(width: 4),
-          Text("${exercise.durationMins}m"),
+          Text("${exercise.durationMins}${context.l10n.minutesAbbrevSuffix}"),
         ],
       ),
     );
@@ -121,7 +122,7 @@ class _BaseLogCard extends StatelessWidget {
                 backgroundColor: Colors.redAccent,
                 foregroundColor: Colors.white,
                 icon: Icons.delete_outline,
-                label: 'Delete',
+                label: context.l10n.deleteLabel,
                 borderRadius: BorderRadius.circular(cardRadius),
               ),
             ],
@@ -207,8 +208,8 @@ class EmptyState extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: theme.splashColor),
           ),
-          child: const Text(
-            "Tap + to add your first entry",
+          child: Text(
+            context.l10n.tapToAddFirstEntry,
             textAlign: TextAlign.center,
           ),
         ),

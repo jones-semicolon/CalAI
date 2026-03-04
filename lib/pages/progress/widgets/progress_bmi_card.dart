@@ -4,7 +4,7 @@ import 'package:calai/pages/progress/widgets/bmi_legend.dart';
 import 'package:calai/pages/progress/widgets/bmi_linear_progress.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../enums/user_enums.dart';
 import '../../../providers/global_provider.dart';
 import '../../../providers/user_provider.dart';
@@ -88,7 +88,7 @@ class ProgressBmiCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Your BMI',
+                context.l10n.yourBmiTitle,
                 style: TextStyle(
                   fontSize: titleSize,
                   fontWeight: FontWeight.bold,
@@ -111,7 +111,7 @@ class ProgressBmiCard extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8), 
                     Text(
-                      'Your weight is',
+                      context.l10n.yourWeightIsLabel,
                       style: TextStyle(
                         fontSize: 14,
                         color: theme.shadowColor,
@@ -161,13 +161,13 @@ class ProgressBmiCard extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      BmiLegend(color: BmiCalculator.blue, label: 'Underweight'),
+                      BmiLegend(color: BmiCalculator.blue, label: context.l10n.bmiUnderweightLabel),
                       const SizedBox(width: 8), 
-                      BmiLegend(color: BmiCalculator.green, label: 'Healthy'),
+                      BmiLegend(color: BmiCalculator.green, label: context.l10n.bmiHealthyLabel),
                       const SizedBox(width: 8),
-                      BmiLegend(color: BmiCalculator.orange, label: 'Overweight'),
+                      BmiLegend(color: BmiCalculator.orange, label: context.l10n.bmiOverweightLabel),
                       const SizedBox(width: 8),
-                      BmiLegend(color: BmiCalculator.red, label: 'Obese'),
+                      BmiLegend(color: BmiCalculator.red, label: context.l10n.bmiObeseLabel),
                     ],
                   ),
                 ),

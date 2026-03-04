@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/enums/user_enums.dart';
 import 'package:calai/providers/user_provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -81,7 +81,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildBurnedHeader(theme, burned, stepsCalories),
+          _buildBurnedHeader(context, theme, burned, stepsCalories),
           const SizedBox(height: 15),
 
           entriesAsync.when(
@@ -106,9 +106,9 @@ class _CaloriesBurnedCard extends ConsumerWidget {
                   // Uses the calories variable we fixed above.
                   if (stepsCalories > 0)
                     _ActivityItemRow(
-                      title: "Steps",
+                      title: context.l10n.stepsLabel,
                       // I updated 'cal' to 'kcal' to match the exercises below
-                      value: "+${stepsCalories.round()} kcal",
+                      value: "+${stepsCalories.round()} ${context.l10n.caloriesLabel.toLowerCase()}",
                       icon: Icons.directions_walk,
                     ),
 
@@ -118,7 +118,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
                       .take(stepsCalories > 0 ? 2 : 3)
                       .map((ex) => _ActivityItemRow(
                     title: ex.type.label,
-                    value: "+${ex.caloriesBurned.round()} kcal",
+                    value: "+${ex.caloriesBurned.round()} ${context.l10n.caloriesLabel.toLowerCase()}",
                     icon: ex.type.icon,
                   )),
                 ],
@@ -131,7 +131,7 @@ class _CaloriesBurnedCard extends ConsumerWidget {
   }
 }
 
-Widget _buildBurnedHeader(ThemeData theme, double burned, double stepsCalories) {
+Widget _buildBurnedHeader(BuildContext context, ThemeData theme, double burned, double stepsCalories) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -157,7 +157,7 @@ Widget _buildBurnedHeader(ThemeData theme, double burned, double stepsCalories) 
               ),
             ),
             Text(
-              "Calories Burned",
+              context.l10n.caloriesBurnedLabel,
               style: TextStyle(
                 color: theme.colorScheme.primary,
                 fontSize: 12,
@@ -201,7 +201,7 @@ class _StepsTodayCard extends ConsumerWidget {
       fit: StackFit.expand, 
       children: [
         ActivityCard(
-          title: isToday ? "Steps Today" : "Steps",
+          title: isToday ? context.l10n.stepsTodayLabel : context.l10n.stepsLabel,
           currentValue: displaySteps,
           icon: Icons.directions_walk,
           color: theme.colorScheme.primary,
@@ -360,7 +360,7 @@ class _WaterIntakeSection extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Water", style: theme.textTheme.labelSmall),
+              Text(context.l10n.waterLabel, style: theme.textTheme.labelSmall),
               Row(
                 children: [
                   Text(
@@ -449,7 +449,7 @@ void _showWaterSettings(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Serving Size", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text(context.l10n.servingSizeLabel, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         Row(
                           children: [
                             Text(
@@ -486,7 +486,7 @@ void _showWaterSettings(
                   ),
                 ],
                 const SizedBox(height: 10,),
-                _buildHydrationInfo(unitSystem ?? MeasurementUnit.metric),
+                _buildHydrationInfo(unitSystem ?? MeasurementUnit.metric, context),
                 const SizedBox(height: 30),
               ],
             ),
@@ -547,17 +547,17 @@ Widget _buildSheetHeader(BuildContext context) {
 }
 
 // Helper for the "How much water..." text section
-Widget _buildHydrationInfo(MeasurementUnit measurementUnit) {
+Widget _buildHydrationInfo(MeasurementUnit measurementUnit, BuildContext context) {
   return Column(
     children: [
-      const Text(
-        "How much water do you need to stay hydrated?",
+      Text(
+        context.l10n.hydrationQuestion,
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
       ),
       const SizedBox(height: 10),
       Text(
-        "Everyone's needs are slightly different, but we recommended aiming for at least ${measurementUnit.liquidToDisplay(1900).round()} ${measurementUnit.liquidLabel} (8 cups) of water each day",
+        context.l10n.hydrationInfo,
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 14, color: Colors.grey[600], height: 1.4),
       ),

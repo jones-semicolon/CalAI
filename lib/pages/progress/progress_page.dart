@@ -3,14 +3,14 @@ import 'package:calai/providers/progress_data_provider.dart';
 import 'package:calai/pages/progress/widgets/progress_bar_graph.dart';
 import 'package:calai/pages/progress/widgets/progress_bmi_card.dart';
 import 'package:calai/pages/progress/widgets/progress_line_graph.dart';
-import 'package:calai/pages/progress/widgets/progress_photo.dart';
+// import 'package:calai/pages/progress/widgets/progress_photo.dart';
 import 'package:calai/pages/progress/widgets/streak_card.dart';
 import 'package:calai/pages/progress/widgets/weight_card.dart';
 import 'package:calai/providers/user_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../../l10n/l10n.dart';
 import '../../core/constants/app_sizes.dart';
 import '../../providers/global_provider.dart';
 import '../shell/widgets/widget_app_bar.dart';
@@ -43,7 +43,7 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
             child: Center(child: CupertinoActivityIndicator(radius: 15)),
           ),
           error: (e, _) => SliverFillRemaining(
-            child: Center(child: Text("Unable to load progress: $e")),
+            child: Center(child: Text(context.l10n.unableToLoadProgress(e.toString()))),
           ),
           data: (global) {
             final provider = ProgressPageDataProvider();

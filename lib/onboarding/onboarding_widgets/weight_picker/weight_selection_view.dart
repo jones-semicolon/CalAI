@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calai/l10n/l10n.dart';
 
 import '../../../enums/user_enums.dart';
 import '../../../providers/user_provider.dart';
@@ -139,10 +140,14 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
   // goal label
   // ----------------------------
 
-  String _goalLabel(double currentWeightKg, double targetKg) {
-    if (targetKg > currentWeightKg) return 'Gain Weight';
-    if (targetKg < currentWeightKg) return 'Lose Weight';
-    return 'Maintain Weight';
+  String _goalLabel(
+    double currentWeightKg,
+    double targetKg,
+    BuildContext context,
+  ) {
+    if (targetKg > currentWeightKg) return context.l10n.goalGainWeight;
+    if (targetKg < currentWeightKg) return context.l10n.goalLoseWeight;
+    return context.l10n.goalMaintainWeight;
   }
 
   // ----------------------------
@@ -250,7 +255,7 @@ class _WeightSelectionViewState extends ConsumerState<WeightSelectionView> {
               return Column(
                 children: [
                   Text(
-                    _goalLabel(user.body.currentWeight, valueKg),
+                    _goalLabel(user.body.currentWeight, valueKg, context),
                     style: TextStyle(
                       fontSize: 16,
                       color: theme.colorScheme.primary,

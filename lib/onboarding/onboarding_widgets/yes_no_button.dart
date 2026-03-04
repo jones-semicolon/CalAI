@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class NoYesButton extends StatelessWidget {
   final VoidCallback onNo;
   final VoidCallback onYes;
-  final String noText;
-  final String yesText;
+  final String? noText;
+  final String? yesText;
 
   const NoYesButton({
     super.key,
     required this.onNo,
     required this.onYes,
-    this.noText = 'No',
-    this.yesText = 'Yes',
+    this.noText,
+    this.yesText,
   });
 
   @override
@@ -43,7 +44,7 @@ class NoYesButton extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  noText,
+                  noText ?? context.l10n.noLabel,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -67,7 +68,7 @@ class NoYesButton extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  yesText,
+                  yesText ?? context.l10n.yesLabel,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class ScoreIndicator extends StatelessWidget {
   final String title;
@@ -52,11 +53,11 @@ class ScoreIndicator extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Good',
+              context.l10n.goodLabel,
               style: TextStyle(fontSize: 12, color: colors.onSecondary),
             ),
             Text(
-              'Bad',
+              context.l10n.badLabel,
               style: TextStyle(fontSize: 12, color: colors.onSecondary),
             ),
           ],

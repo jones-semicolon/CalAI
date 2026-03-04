@@ -1,12 +1,660 @@
 {
   "@@locale": "hi",
-  "welcomeMessage": "Cal AI में आपका स्वागत है",
-  "trackMessage": "और स्मार्ट तरीके से ट्रैक करें। बेहतर खाएं।",
-  "getStarted": "शुरू करें",
-  "alreadyAccount": "क्या पहले से एक खाता है?",
-  "signIn": "साइन इन करें",
+  "appTitle": "Cal AI",
+  "homeTab": "होम",
+  "progressTab": "प्रगति",
+  "settingsTab": "सेटिंग्स",
+  "language": "भाषा",
+  "welcomeMessage": "कैल एआई में आपका स्वागत है",
+  "trackMessage": "होशियारी से ट्रैक करें. बेहतर खाओ।",
+  "getStarted": "शुरू हो जाओ",
+  "alreadyAccount": "क्या आपके पास पहले से एक खाता मौजूद है?",
+  "signIn": "दाखिल करना",
   "chooseLanguage": "भाषा चुनें",
-  "calorieTrackingMadeEasy": "कैलोरी ट्रैकिंग आसान है",
-  "onboardingStep1Title": "अपने भोजन को ट्रैक करें",
-  "onboardingStep1Description": "अपने भोजन को आसानी से लॉग करें और अपने पोषण को ट्रैक करें।"
+  "personalDetails": "व्यक्तिगत विवरण",
+  "adjustMacronutrients": "मैक्रोन्यूट्रिएंट्स को समायोजित करें",
+  "weightHistory": "वज़न इतिहास",
+  "homeWidget": "होम विजेट",
+  "chooseHomeWidgets": "होम विजेट चुनें",
+  "tapOptionsToAddRemoveWidgets": "विजेट जोड़ने या हटाने के लिए विकल्प टैप करें।",
+  "updatingWidgetSelection": "विजेट चयन अपडेट किया जा रहा है...",
+  "requestingWidgetPermission": "विजेट अनुमति का अनुरोध किया जा रहा है...",
+  "widget1": "विजेट 1",
+  "widget2": "विजेट 2",
+  "widget3": "विजेट 3",
+  "calorieTrackerWidget": "कैलोरी ट्रैकर",
+  "nutritionTrackerWidget": "पोषण ट्रैकर",
+  "streakTrackerWidget": "स्ट्रीक ट्रैकर",
+  "removedFromSelection": "{widgetName} को चयन से हटा दिया गया।",
+  "@removedFromSelection": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "removeFromHomeScreenInstruction": "{widgetName} को हटाने के लिए, इसे अपनी होम स्क्रीन से हटा दें। चयन स्वचालित रूप से सिंक हो जाता है.",
+  "@removeFromHomeScreenInstruction": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "addFromHomeScreenInstruction": "{widgetName} जोड़ने के लिए, होम स्क्रीन को देर तक दबाएँ, + टैप करें, फिर Cal AI चुनें।",
+  "@addFromHomeScreenInstruction": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "widgetAdded": "{widgetName} विजेट जोड़ा गया।",
+  "@widgetAdded": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "permissionNeededToAddWidget": "{widgetName} जोड़ने के लिए अनुमति की आवश्यकता है। हमने आपके लिए सेटिंग खोली हैं.",
+  "@permissionNeededToAddWidget": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "couldNotOpenPermissionSettings": "अनुमति सेटिंग्स नहीं खोली जा सकीं. कृपया {widgetName} जोड़ने के लिए अनुमतियाँ मैन्युअल रूप से सक्षम करें।",
+  "@couldNotOpenPermissionSettings": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "noWidgetsOnHomeScreen": "होम स्क्रीन पर कोई विजेट नहीं",
+  "selectedWidgets": "चयनित: {widgets}",
+  "@selectedWidgets": {
+    "placeholders": {
+      "widgets": {}
+    }
+  },
+  "backupData": "अपने डेटा का बैकअप लें",
+  "signInToSync": "अपनी प्रगति और लक्ष्यों को समन्वयित करने के लिए साइन इन करें",
+  "accountSuccessfullyBackedUp": "खाते का सफलतापूर्वक बैकअप हो गया!",
+  "failedToLinkAccount": "खाता लिंक करने में विफल.",
+  "googleAccountAlreadyLinked": "यह Google खाता पहले से ही किसी अन्य Cal AI प्रोफ़ाइल से लिंक है।",
+  "caloriesLabel": "कैलोरी",
+  "eatenLabel": "खाया",
+  "leftLabel": "शेष",
+  "proteinLabel": "प्रोटीन",
+  "carbsLabel": "कार्बोहाइड्रेट",
+  "fatsLabel": "वसा",
+  "fiberLabel": "रेशा",
+  "sugarLabel": "चीनी",
+  "sodiumLabel": "सोडियम",
+  "stepsLabel": "कदम",
+  "stepsTodayLabel": "आज के कदम",
+  "caloriesBurnedLabel": "कैलोरी जला दिया",
+  "stepTrackingActive": "चरण ट्रैकिंग सक्रिय!",
+  "waterLabel": "पानी",
+  "servingSizeLabel": "सेवारत आकार",
+  "waterSettingsTitle": "जल सेटिंग",
+  "hydrationQuestion": "हाइड्रेटेड रहने के लिए आपको कितना पानी चाहिए?",
+  "hydrationInfo": "हर किसी की ज़रूरतें थोड़ी अलग होती हैं, लेकिन हम हर दिन कम से कम 64 फ़्लूड आउंस (8 कप) पानी पीने का लक्ष्य रखने की सलाह देते हैं।",
+  "healthScoreTitle": "स्वास्थ्य स्कोर",
+  "healthSummaryNoData": "आज के लिए कोई डेटा लॉग नहीं किया गया. अपने स्वास्थ्य संबंधी जानकारी देखने के लिए अपने भोजन पर नज़र रखना शुरू करें!",
+  "healthSummaryLowIntake": "आपका सेवन काफी कम है. ऊर्जा और मांसपेशियों को बनाए रखने के लिए अपने कैलोरी और प्रोटीन लक्ष्य को हासिल करने पर ध्यान दें।",
+  "healthSummaryLowProtein": "कार्ब्स और वसा सही रास्ते पर हैं, लेकिन आपमें प्रोटीन कम है। प्रोटीन बढ़ाने से मांसपेशियों को बनाए रखने में मदद मिल सकती है।",
+  "healthSummaryGreat": "अच्छा काम! आज आपका पोषण संतुलित है।",
+  "recentlyLoggedTitle": "हाल ही में लॉग किया गया",
+  "errorLoadingLogs": "लॉग लोड करने में त्रुटि: {error}",
+  "@errorLoadingLogs": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "deleteLabel": "मिटाना",
+  "tapToAddFirstEntry": "अपनी पहली प्रविष्टि जोड़ने के लिए + टैप करें",
+  "unableToLoadProgress": "प्रगति लोड करने में असमर्थ: {error}",
+  "@unableToLoadProgress": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "myWeightTitle": "मेरा वज़न",
+  "goalWithValue": "लक्ष्य {value}",
+  "@goalWithValue": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "noGoalSet": "कोई लक्ष्य निर्धारित नहीं",
+  "logWeightCta": "वजन लॉग करें",
+  "dayStreakTitle": "दिन का सिलसिला",
+  "progressPhotosTitle": "प्रगति तस्वीरें",
+  "progressPhotoPrompt": "क्या आप अपनी प्रगति को ट्रैक करने के लिए कोई फ़ोटो जोड़ना चाहते हैं?",
+  "uploadPhotoCta": "फोटो अपलोड करें",
+  "goalProgressTitle": "लक्ष्य प्रगति",
+  "ofGoalLabel": "लक्ष्य का",
+  "logoutLabel": "लॉग आउट",
+  "logoutTitle": "लॉग आउट",
+  "logoutConfirmMessage": "क्या आप लॉग आउट करना चाहते हैं?",
+  "cancelLabel": "रद्द करना",
+  "preferencesLabel": "प्राथमिकताएँ",
+  "appearanceLabel": "उपस्थिति",
+  "appearanceDescription": "हल्का, गहरा या सिस्टम स्वरूप चुनें",
+  "lightLabel": "रोशनी",
+  "darkLabel": "अँधेरा",
+  "automaticLabel": "स्वचालित",
+  "addBurnedCaloriesLabel": "जली हुई कैलोरी जोड़ें",
+  "addBurnedCaloriesDescription": "दैनिक लक्ष्य में जली हुई कैलोरी जोड़ें",
+  "rolloverCaloriesLabel": "रोलओवर कैलोरी",
+  "rolloverCaloriesDescription": "आज के लक्ष्य में 200 तक बची हुई कैलोरी जोड़ें",
+  "measurementUnitLabel": "मापन इकाई",
+  "measurementUnitDescription": "सभी मानों को इंपीरियल में बदल दिया जाएगा (वर्तमान में मेट्रिक्स पर)",
+  "inviteFriendsLabel": "मित्रों को आमंत्रित करें",
+  "defaultUserName": "उपयोगकर्ता",
+  "enterYourNameLabel": "अपना नाम दर्ज करें",
+  "yearsOldLabel": "{years} वर्ष पुराना",
+  "@yearsOldLabel": {
+    "placeholders": {
+      "years": {}
+    }
+  },
+  "termsAndConditionsLabel": "नियम और शर्तें",
+  "privacyPolicyLabel": "गोपनीयता नीति",
+  "supportEmailLabel": "समर्थन ईमेल",
+  "featureRequestLabel": "सुविधा का अनुरोध",
+  "deleteAccountQuestion": "खाता हटा दो?",
+  "deleteAccountTitle": "खाता हटा दो",
+  "deleteAccountMessage": "क्या आप पूर्णतः आश्वस्त हैं? यह आपके Cal AI इतिहास, वज़न लॉग और कस्टम लक्ष्यों को स्थायी रूप से हटा देगा। इस एक्शन को वापस नहीं किया जा सकता।",
+  "deletePermanentlyLabel": "स्थायी रूप से हटाएँ",
+  "onboardingChooseGenderTitle": "अपना लिंग चुनें",
+  "onboardingChooseGenderSubtitle": "इसका उपयोग आपके कस्टम प्लान को कैलिब्रेट करने के लिए किया जाएगा।",
+  "genderFemale": "महिला",
+  "genderMale": "पुरुष",
+  "genderOther": "अन्य",
+  "onboardingWorkoutsPerWeekTitle": "आप प्रति सप्ताह कितने वर्कआउट करते हैं?",
+  "onboardingWorkoutsPerWeekSubtitle": "इसका उपयोग आपके कस्टम प्लान को कैलिब्रेट करने के लिए किया जाएगा।",
+  "workoutRangeLowTitle": "0-2",
+  "workoutRangeLowSubtitle": "समय-समय पर वर्कआउट करें",
+  "workoutRangeModerateTitle": "3-5",
+  "workoutRangeModerateSubtitle": "प्रति सप्ताह कुछ वर्कआउट",
+  "workoutRangeHighTitle": "6+",
+  "workoutRangeHighSubtitle": "समर्पित एथलीट",
+  "onboardingHearAboutUsTitle": "आपने हमारे बारे में कहां सुना?",
+  "sourceTikTok": "टिक टोक",
+  "sourceYouTube": "यूट्यूब",
+  "sourceGoogle": "गूगल",
+  "sourcePlayStore": "खेल स्टोर",
+  "sourceFacebook": "फेसबुक",
+  "sourceFriendFamily": "दोस्त या परिवार",
+  "sourceTv": "टीवी",
+  "sourceInstagram": "Instagram",
+  "sourceX": "एक्स",
+  "sourceOther": "अन्य",
+  "yourBmiTitle": "अपना बीएमआई",
+  "yourWeightIsLabel": "आपका वजन है",
+  "bmiUnderweightLabel": "वजन",
+  "bmiHealthyLabel": "स्वस्थ",
+  "bmiOverweightLabel": "अधिक वजन",
+  "bmiObeseLabel": "मोटा",
+  "calorieTrackingMadeEasy": "कैलोरी ट्रैकिंग आसान हो गई",
+  "onboardingStep1Title": "अपने भोजन पर नज़र रखें",
+  "onboardingStep1Description": "अपने भोजन को आसानी से लॉग करें और अपने पोषण को ट्रैक करें।",
+  "signInWithGoogle": "Google से साइन इन करें",
+  "signInWithEmail": "ईमेल से साइन इन करें",
+  "signInFailed": "साइन इन विफल: {error}",
+  "@signInFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "continueLabel": "जारी रखना",
+  "skipLabel": "छोडना",
+  "noLabel": "नहीं",
+  "yesLabel": "हाँ",
+  "submitLabel": "जमा करना",
+  "referralCodeLabel": "रेफरल कोड",
+  "heightLabel": "ऊंचाई",
+  "weightLabel": "वज़न",
+  "imperialLabel": "इम्पीरियल",
+  "metricLabel": "मीट्रिक",
+  "month1Label": "महीना 1",
+  "month6Label": "महीना 6",
+  "traditionalDietLabel": "पारंपरिक आहार",
+  "weightChartSummary": "Cal AI के 80% उपयोगकर्ता 6 महीने बाद भी अपना वजन कम रखते हैं",
+  "comparisonWithoutCalAi": "बिना\\nकैल एआई",
+  "comparisonWithCalAi": "कैल एआई के साथ",
+  "comparisonLeftValue": "60 पाउंड",
+  "comparisonRightValue": "50 पाउंड",
+  "comparisonBottomLine1": "Cal AI इसे आसान और धारणीय बनाता है",
+  "comparisonBottomLine2": "आप जवाबदेह हैं",
+  "speedSlowSteady": "धीमी और स्थिर",
+  "speedRecommended": "अनुशंसित",
+  "speedAggressiveWarning": "आप बहुत थका हुआ महसूस कर सकते हैं और त्वचा ढीली हो सकती है",
+  "subscriptionHeadline": "अपने लक्ष्यों तक तेजी से पहुंचने के लिए CalAI को अनलॉक करें।",
+  "subscriptionPriceHint": "केवल PHP {yearlyPrice} प्रति वर्ष (PHP {monthlyPrice}/महीना)",
+  "@subscriptionPriceHint": {
+    "placeholders": {
+      "yearlyPrice": {},
+      "monthlyPrice": {}
+    }
+  },
+  "goalGainWeight": "वजन बढ़ना",
+  "goalLoseWeight": "वजन कम करें",
+  "goalMaintainWeight": "वज़न बनाए रखें",
+  "editGoalTitle": "{title} लक्ष्य संपादित करें",
+  "@editGoalTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "revertLabel": "फिर लौट आना",
+  "doneLabel": "हो गया",
+  "dashboardShouldGainWeight": "पाना",
+  "dashboardShouldLoseWeight": "खोना",
+  "dashboardShouldMaintainWeight": "बनाए रखना",
+  "dashboardCongratsPlanReady": "बधाई हो\\nआपका कस्टम प्लान तैयार है!",
+  "dashboardYouShouldGoal": "आपको {action} करना चाहिए:",
+  "@dashboardYouShouldGoal": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "dashboardWeightGoalByDate": "{value} {unit} {date} द्वारा",
+  "@dashboardWeightGoalByDate": {
+    "placeholders": {
+      "value": {},
+      "unit": {},
+      "date": {}
+    }
+  },
+  "dashboardDailyRecommendation": "दैनिक सिफ़ारिश",
+  "dashboardEditAnytime": "आप इसे किसी भी समय संपादित कर सकते हैं",
+  "dashboardHowToReachGoals": "अपने लक्ष्य तक कैसे पहुँचें:",
+  "dashboardReachGoalLifeScore": "अपना साप्ताहिक जीवन स्कोर प्राप्त करें और अपनी दिनचर्या में सुधार करें।",
+  "dashboardReachGoalTrackFood": "अपने भोजन पर नज़र रखें",
+  "dashboardReachGoalFollowCalories": "अपनी दैनिक कैलोरी अनुशंसा का पालन करें",
+  "dashboardReachGoalBalanceMacros": "अपने कार्ब्स, प्रोटीन, वसा को संतुलित करें",
+  "dashboardPlanSourcesTitle": "अन्य सहकर्मी-समीक्षित चिकित्सा अध्ययनों के बीच, निम्नलिखित स्रोतों के आधार पर योजना बनाएं:",
+  "dashboardSourceBasalMetabolicRate": "आधारीय चयापचयी दर",
+  "dashboardSourceCalorieCountingHarvard": "कैलोरी गिनती - हार्वर्ड",
+  "dashboardSourceInternationalSportsNutrition": "खेल पोषण की अंतर्राष्ट्रीय सोसायटी",
+  "dashboardSourceNationalInstitutesHealth": "नेशनल इंस्टीट्यूट ऑफ हेल्थ",
+  "factorsNetCarbsMass": "शुद्ध कार्ब्स / द्रव्यमान",
+  "factorsNetCarbDensity": "शुद्ध कार्ब घनत्व",
+  "factorsSodiumMass": "सोडियम/द्रव्यमान",
+  "factorsSodiumDensity": "सोडियम घनत्व",
+  "factorsSugarMass": "चीनी/द्रव्यमान",
+  "factorsSugarDensity": "चीनी का घनत्व",
+  "factorsProcessedScore": "संसाधित स्कोर",
+  "factorsIngredientQuality": "संघटक गुणवत्ता",
+  "factorsProcessedScoreDescription": "संसाधित स्कोर रंगों, नाइट्रेट्स, बीज तेल, कृत्रिम स्वाद/मिठास और अन्य कारकों को ध्यान में रखता है।",
+  "healthScoreExplanationIntro": "हमारा स्वास्थ्य स्कोर एक जटिल सूत्र है जो कई सामान्य खाद्य पदार्थों को देखते हुए कई कारकों को ध्यान में रखता है।",
+  "healthScoreExplanationFactorsLead": "स्वास्थ्य स्कोर की गणना करते समय हम निम्नलिखित कारकों को ध्यान में रखते हैं:",
+  "netCarbsLabel": "नेट कार्ब्स",
+  "howDoesItWork": "यह कैसे काम करता है?",
+  "goodLabel": "अच्छा",
+  "badLabel": "खराब",
+  "dailyRecommendationFor": "के लिए दैनिक अनुशंसा",
+  "loadingCustomizingHealthPlan": "स्वास्थ्य योजना को अनुकूलित किया जा रहा है...",
+  "loadingApplyingBmrFormula": "बीएमआर फॉर्मूला लागू करना...",
+  "loadingEstimatingMetabolicAge": "आपकी चयापचय आयु का अनुमान लगाया जा रहा है...",
+  "loadingFinalizingResults": "परिणामों को अंतिम रूप दिया जा रहा है...",
+  "loadingSetupForYou": "हम आपके लिए सब कुछ व्यवस्थित कर रहे हैं",
+  "step4TriedOtherCalorieApps": "क्या आपने अन्य कैलोरी ट्रैकिंग ऐप्स आज़माए हैं?",
+  "step5CalAiLongTermResults": "कैल एआई दीर्घकालिक परिणाम बनाता है",
+  "step6HeightWeightTitle": "ऊंचाई और वजन",
+  "step6HeightWeightSubtitle": "आपके दैनिक पोषण लक्ष्यों की गणना करते समय इसे ध्यान में रखा जाएगा।",
+  "step7WhenWereYouBorn": "आपका जन्म कब हुआ था?",
+  "step8GoalQuestionTitle": "आपका लक्ष्य क्या है?",
+  "step8GoalQuestionSubtitle": "इससे हमें आपके कैलोरी सेवन के लिए एक योजना तैयार करने में मदद मिलती है।",
+  "step9SpecificDietQuestion": "क्या आप किसी विशिष्ट आहार का पालन करते हैं?",
+  "step9DietClassic": "क्लासिक",
+  "step9DietPescatarian": "पेस्केटेरियन",
+  "step9DietVegetarian": "शाकाहारी",
+  "step9DietVegan": "शाकाहारी",
+  "step91DesiredWeightQuestion": "आपका वांछित वजन क्या है?",
+  "step92GoalActionGaining": "प्राप्त",
+  "step92GoalActionLosing": "हार",
+  "step92RealisticTargetSuffix": "एक यथार्थवादी लक्ष्य है. यह बिल्कुल भी कठिन नहीं है!",
+  "step92SocialProof": "90% उपयोगकर्ताओं का कहना है कि Cal AI का उपयोग करने के बाद परिवर्तन स्पष्ट है, और इसे वापस लाना आसान नहीं है।",
+  "step93GoalVerbGain": "पाना",
+  "step93GoalVerbLose": "खोना",
+  "step93SpeedQuestionTitle": "आप कितनी तेजी से अपने लक्ष्य तक पहुंचना चाहते हैं?",
+  "step93WeightSpeedPerWeek": "{action} वजन गति प्रति सप्ताह",
+  "@step93WeightSpeedPerWeek": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "step94ComparisonTitle": "कैल एआई की तुलना में अपने दम पर दोगुना वजन कम करें",
+  "step95ObstaclesTitle": "आपको अपने लक्ष्य तक पहुँचने से कौन रोक रहा है?",
+  "step10AccomplishTitle": "आप क्या हासिल करना चाहेंगे?",
+  "step10OptionHealthier": "खाओ और स्वस्थ रहो",
+  "step10OptionEnergyMood": "मेरी ऊर्जा और मनोदशा बढ़ाएँ",
+  "step10OptionConsistency": "प्रेरित और सुसंगत रहें",
+  "step10OptionBodyConfidence": "अपने शरीर के बारे में बेहतर महसूस करें",
+  "step11PotentialTitle": "आपमें अपने लक्ष्य को कुचलने की काफी क्षमता है",
+  "step12ThankYouTitle": "हम पर भरोसा करने के लिए धन्यवाद!",
+  "step12PersonalizeSubtitle": "आइए अब आपके लिए Cal AI को वैयक्तिकृत करें...",
+  "step12PrivacyCardTitle": "आपकी गोपनीयता और सुरक्षा हमारे लिए मायने रखती है।",
+  "step12PrivacyCardBody": "हम आपकी व्यक्तिगत जानकारी को हमेशा निजी और सुरक्षित रखने का वादा करते हैं।",
+  "step13ReachGoalsWithNotifications": "सूचनाओं के साथ अपने लक्ष्य तक पहुँचें",
+  "step13NotificationPrompt": "कैल एआई आपको सूचनाएं भेजना चाहता है",
+  "allowLabel": "अनुमति दें",
+  "dontAllowLabel": "अनुमति न दें",
+  "step14AddBurnedCaloriesQuestion": "क्या आप जली हुई कैलोरी को अपने दैनिक लक्ष्य में वापस जोड़ते हैं?",
+  "step15RolloverQuestion": "अतिरिक्त कैलोरी को अगले दिन में स्थानांतरित करें?",
+  "step15RolloverUpTo": "तक रोलओवर करें",
+  "step15RolloverCap": "200 कैल्स",
+  "step16ReferralTitle": "रेफरल कोड दर्ज करें (वैकल्पिक)",
+  "step16ReferralSubtitle": "आप इस चरण को छोड़ सकते हैं",
+  "step17AllDone": "सब कुछ कर दिया!",
+  "step17GeneratePlanTitle": "अपनी कस्टम योजना तैयार करने का समय!",
+  "step18CalculationError": "योजना की गणना नहीं की जा सकी. कृपया अपना कनेक्शन जांचें.",
+  "step18TryAgain": "पुनः प्रयास करें",
+  "step19CreateAccountTitle": "खाता बनाएं",
+  "authInvalidEmailMessage": "कृपया एक मान्य ईमेल पता प्रविष्ट करें",
+  "authCheckYourEmailTitle": "अपने ईमेल की जाँच करें",
+  "authSignInLinkSentMessage": "हमने {email} को एक साइन-इन लिंक भेजा",
+  "@authSignInLinkSentMessage": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "okLabel": "ठीक है",
+  "genericErrorMessage": "त्रुटि: {error}",
+  "@genericErrorMessage": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authWhatsYourEmail": "आपका ईमेल क्या है?",
+  "authPasswordlessHint": "हम आपको बिना पासवर्ड के साइन इन करने के लिए एक लिंक भेजेंगे।",
+  "emailExampleHint": "नाम@उदाहरण.com",
+  "notSetLabel": "सेट नहीं",
+  "goalWeightLabel": "भार मकसद",
+  "changeGoalLabel": "लक्ष्य बदलें",
+  "currentWeightLabel": "वर्तमान वजन",
+  "dateOfBirthLabel": "जन्मतिथि",
+  "genderLabel": "लिंग",
+  "dailyStepGoalLabel": "दैनिक कदम लक्ष्य",
+  "stepGoalLabel": "कदम लक्ष्य",
+  "setHeightTitle": "ऊंचाई निर्धारित करें",
+  "setGenderTitle": "लिंग निर्धारित करें",
+  "setBirthdayTitle": "जन्मदिन निर्धारित करें",
+  "setWeightTitle": "वजन निर्धारित करें",
+  "editNameTitle": "नाम संपादित करें",
+  "calorieGoalLabel": "कैलोरी लक्ष्य",
+  "proteinGoalLabel": "प्रोटीन लक्ष्य",
+  "carbGoalLabel": "कार्ब लक्ष्य",
+  "fatGoalLabel": "मोटा लक्ष्य",
+  "sugarLimitLabel": "चीनी सीमा",
+  "fiberGoalLabel": "फाइबर लक्ष्य",
+  "sodiumLimitLabel": "सोडियम सीमा",
+  "hideMicronutrientsLabel": "सूक्ष्म पोषक तत्व छुपाएं",
+  "viewMicronutrientsLabel": "सूक्ष्म पोषक तत्व देखें",
+  "autoGenerateGoalsLabel": "ऑटो लक्ष्य बनाएं",
+  "failedToGenerateGoals": "लक्ष्य उत्पन्न करने में विफल: {error}",
+  "@failedToGenerateGoals": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "calculatingCustomGoals": "अपने कस्टम लक्ष्यों की गणना करें...",
+  "logExerciseLabel": "लॉग व्यायाम",
+  "savedFoodsLabel": "सहेजे गए भोजन",
+  "foodDatabaseLabel": "खाद्य डेटाबेस",
+  "scanFoodLabel": "भोजन को स्कैन करें",
+  "exerciseTitle": "व्यायाम",
+  "runTitle": "दौड़",
+  "weightLiftingTitle": "वजन उठाना",
+  "describeTitle": "वर्णन",
+  "runDescription": "दौड़ना, जॉगिंग, दौड़ना, आदि.",
+  "weightLiftingDescription": "मशीनें, मुफ्त वजन, आदि.",
+  "describeWorkoutDescription": "अपना वर्कआउट लिखें text",
+  "setIntensityLabel": "सेट तीव्रता",
+  "durationLabel": "अवधि",
+  "minutesShortLabel": "मिनट",
+  "minutesAbbrevSuffix": "मि.",
+  "addLabel": "जोड़ें",
+  "intensityLabel": "तीव्रता",
+  "intensityHighLabel": "उच्च",
+  "intensityMediumLabel": "मध्यम",
+  "intensityLowLabel": "कम",
+  "runIntensityHighDescription": "स्प्रिंटिंग - 14 मील प्रति घंटे (4 मिनट मील)",
+  "runIntensityMediumDescription": "जॉगिंग - 6 मील प्रति घंटे (10 मिनट) मील)",
+  "runIntensityLowDescription": "ठंडी चाल - 3 मील प्रति घंटे (20 मिनट मील)",
+  "weightIntensityHighDescription": "असफलता की ओर प्रशिक्षण, भारी सांसें",
+  "weightIntensityMediumDescription": "पसीना तोड़ना, कई प्रतिनिधि",
+  "weightIntensityLowDescription": "कोई पसीना नहीं बहा रहा, थोड़ा प्रयास कर रहा हूं",
+  "exerciseLoggedSuccessfully": "व्यायाम सफलतापूर्वक लॉग किया गया!",
+  "exerciseParsedAndLogged": "व्यायाम को पार्स किया गया और लॉग किया गया!",
+  "describeExerciseTitle": "व्यायाम का वर्णन करें",
+  "whatDidYouDoHint": "आपने क्या किया?",
+  "describeExerciseExample": "उदाहरण: 5 घंटे तक आउटडोर पदयात्रा, थकावट महसूस हुई",
+  "servingLabel": "सेवित",
+  "productNotFoundMessage": "उत्पाद नहीं मिला।",
+  "couldNotIdentify": "\"{text}\" की पहचान नहीं हो सकी।",
+  "@couldNotIdentify": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "identifyingFoodMessage": "भोजन की पहचान...",
+  "loggedSuccessfullyMessage": "सफलतापूर्वक लॉग इन किया गया!",
+  "barcodeScannerLabel": "बारकोड स्कैनर",
+  "barcodeLabel": "बारकोड",
+  "foodLabel": "खाद्य लेबल",
+  "galleryLabel": "गैलरी",
+  "bestScanningPracticesTitle": "सर्वोत्तम स्कैनिंग प्रथाएँ",
+  "generalTipsTitle": "सामान्य युक्तियाँ:",
+  "scanTipKeepFoodInside": "भोजन को स्कैन लाइनों के अंदर रखें",
+  "scanTipHoldPhoneStill": "अपने फ़ोन को स्थिर रखें ताकि छवि धुंधली न हो",
+  "scanTipAvoidObscureAngles": "अस्पष्ट कोणों पर चित्र न लें",
+  "scanNowLabel": "अब स्कैन करें",
+  "allTabLabel": "सभी",
+  "myMealsTabLabel": "मेरा भोजन",
+  "myFoodsTabLabel": "मेरे भोजन",
+  "savedScansTabLabel": "स्कैन सहेजे गए",
+  "logEmptyFoodLabel": "खाली भोजन लॉग करें",
+  "searchResultsLabel": "खोज के परिणाम",
+  "suggestionsLabel": "सुझाव",
+  "noItemsFoundLabel": "कोई आइटम नहीं मिला।",
+  "noSuggestionsAvailableLabel": "कोई सुझाव उपलब्ध नहीं है",
+  "noSavedScansYetLabel": "अभी तक कोई सहेजा गया स्कैन नहीं",
+  "describeWhatYouAteHint": "वर्णन करें कि आपने क्या खाया",
+  "foodAddedToDate": "{foodName} को {dateId} में जोड़ा गया",
+  "@foodAddedToDate": {
+    "placeholders": {
+      "dateId": {},
+      "foodName": {}
+    }
+  },
+  "failedToAddFood": "भोजन जोड़ने में विफल. पुनः प्रयास करें।",
+  "invalidFoodIdMessage": "अमान्य खाद्य आईडी",
+  "foodNotFoundMessage": "खाना नहीं मिला",
+  "couldNotLoadFoodDetails": "भोजन का विवरण लोड नहीं किया जा सका",
+  "gramsShortLabel": "जी",
+  "standardLabel": "मानक",
+  "selectedFoodTitle": "चयनित भोजन",
+  "measurementLabel": "माप",
+  "otherNutritionFactsLabel": "अन्य पोषण संबंधी तथ्य",
+  "numberOfServingsLabel": "सर्विंग्स की संख्या",
+  "logLabel": "लॉग करें",
+  "nutrientsTitle": "पोषक तत्व",
+  "totalNutritionLabel": "कुल पोषण",
+  "enterFoodNameHint": "भोजन का नाम दर्ज करें",
+  "kcalLabel": "किलो कैलोरी",
+  "statsLabel": "आँकड़े",
+  "intensityModerateLabel": "मध्यम",
+  "thisWeekLabel": "इस सप्ताह",
+  "lastWeekLabel": "पिछले सप्ताह",
+  "twoWeeksAgoLabel": "2 सप्ताह पहले",
+  "threeWeeksAgoLabel": "3 सप्ताह पहले",
+  "totalCaloriesLabel": "कुल कैलोरी",
+  "calsLabel": "कैलोरी",
+  "dayShortSun": "रवि",
+  "dayShortMon": "सोम",
+  "dayShortTue": "मंगल",
+  "dayShortWed": "बुध",
+  "dayShortThu": "गुरु",
+  "dayShortFri": "शुक्र",
+  "dayShortSat": "शनि",
+  "ninetyDaysLabel": "90 दिन",
+  "sixMonthsLabel": "6 महीने",
+  "oneYearLabel": "1 वर्ष",
+  "allTimeLabel": "पूरे समय",
+  "waitingForFirstLogLabel": "आपके पहले लॉग की प्रतीक्षा है...",
+  "editGoalPickerTitle": "लक्ष्य चयनकर्ता संपादित करें",
+  "bmiDisclaimerTitle": "अस्वीकरण",
+  "bmiDisclaimerBody": "स्वास्थ्य के अधिकांश मापों की तरह, बीएमआई एक आदर्श परीक्षण नहीं है। उदाहरण के लिए, गर्भावस्था या उच्च मांसपेशी द्रव्यमान के कारण परिणाम ख़राब हो सकते हैं, और यह बच्चे या बुजुर्गों के लिए स्वास्थ्य का अच्छा उपाय नहीं हो सकता है।",
+  "bmiWhyItMattersTitle": "तो फिर, बीएमआई क्यों मायने रखता है?",
+  "bmiWhyItMattersBody": "सामान्य तौर पर, आपका बीएमआई जितना अधिक होगा, अतिरिक्त वजन से जुड़ी कई स्थितियों के विकसित होने का जोखिम उतना अधिक होगा, जिनमें शामिल हैं: मधुमेह\\nगठिया\\nयकृत रोग\\nकई प्रकार के कैंसर (जैसे कि स्तन, बृहदान्त्र और प्रोस्टेट), उच्च रक्तचाप (उच्च रक्तचाप) उच्च कोलेस्ट्रॉल\\nस्लीप एपनिया",
+  "noWeightHistoryYet": "अभी तक कोई वजन इतिहास दर्ज नहीं किया गया है।",
+  "overLabel": "ऊपर",
+  "dailyBreakdownTitle": "दैनिक टूटना",
+  "editDailyGoalsLabel": "दैनिक लक्ष्य संपादित करें",
+  "errorLoadingData": "डेटा लोड करने में त्रुटि",
+  "gramsLabel": "ग्राम",
+  "healthStatusNotEvaluated": "मूल्यांकन नहीं",
+  "healthStatusCriticallyLow": "गंभीर रूप से कम",
+  "healthStatusNeedsImprovement": "सुधार की जरूरत",
+  "healthStatusFairProgress": "उचित प्रगति",
+  "healthStatusGoodHealth": "अच्छा स्वास्थ्य",
+  "healthStatusExcellentHealth": "उत्कृष्ट स्वास्थ्य",
+  "remindersTitle": "अनुस्मारक",
+  "failedLoadReminderSettings": "अनुस्मारक सेटिंग लोड करने में विफल.",
+  "smartNutritionRemindersTitle": "स्मार्ट पोषण अनुस्मारक",
+  "dailyReminderAtLabel": "पर दैनिक अनुस्मारक",
+  "setSmartNutritionTimeLabel": "स्मार्ट पोषण समय निर्धारित करें",
+  "waterRemindersTitle": "जल अनुस्मारक",
+  "everyLabel": "प्रत्येक",
+  "hourUnitLabel": "घंटे)",
+  "fromLabel": "से",
+  "setWaterStartTimeLabel": "पानी शुरू करने का समय निर्धारित करें",
+  "breakfastReminderTitle": "नाश्ता अनुस्मारक",
+  "lunchReminderTitle": "दोपहर के भोजन का अनुस्मारक",
+  "dinnerReminderTitle": "रात्रि भोज अनुस्मारक",
+  "snackReminderTitle": "नाश्ते का अनुस्मारक",
+  "goalTrackingAlertsTitle": "लक्ष्य ट्रैकिंग अलर्ट",
+  "goalTrackingAlertsSubtitle": "कैलोरी और मैक्रो लक्ष्य अलर्ट के निकट/अधिक",
+  "stepsExerciseReminderTitle": "कदम/व्यायाम अनुस्मारक",
+  "dailyAtLabel": "प्रतिदिन पर",
+  "setActivityReminderTimeLabel": "गतिविधि अनुस्मारक समय निर्धारित करें",
+  "intervalLabel": "अंतराल:",
+  "setTimeLabel": "निर्धारित समय",
+  "dayInitialSun": "र",
+  "dayInitialMon": "सो",
+  "dayInitialTue": "मं",
+  "dayInitialWed": "बु",
+  "dayInitialThu": "गु",
+  "dayInitialFri": "शु",
+  "dayInitialSat": "श",
+  "languageNameEnglish": "अंग्रेज़ी",
+  "languageNameSpanish": "स्पेनिश",
+  "languageNamePortuguese": "पुर्तगाली",
+  "languageNameFrench": "फ़्रेंच",
+  "languageNameGerman": "जर्मन",
+  "languageNameItalian": "इतालवी",
+  "languageNameHindi": "हिन्दी",
+  "progressMessageStart": "शुरुआत करना सबसे कठिन हिस्सा है. आप इसके लिए तैयार हैं!",
+  "progressMessageKeepPushing": "आप प्रगति कर रहे हैं. अब प्रयास जारी रखने का समय है!",
+  "progressMessagePayingOff": "आपका समर्पण रंग ला रहा है. जाता रहना!",
+  "progressMessageFinalStretch": "यह अंतिम पड़ाव है. अपने आप को धक्का!",
+  "progressMessageCongrats": "तुमने यह किया! बधाई हो!",
+  "dayStreakWithCount": "{count} दिन की स्ट्रीक",
+  "streakLostTitle": "स्ट्रीक टूट गई",
+  "streakActiveSubtitle": "आपका सब कुछ बहुत बढ़िया चल रहा है! अपनी गति बनाए रखने के लिए लॉगिंग करते रहें।",
+  "streakLostSubtitle": "हिम्मत मत हारो। पटरी पर वापस आने के लिए आज ही अपना भोजन लॉग करें।",
+  "alertCalorieGoalExceededTitle": "कैलोरी लक्ष्य पार हो गया",
+  "alertCalorieGoalExceededBody": "आप अपने दैनिक लक्ष्य से {over} किलो कैलोरी अधिक हैं।",
+  "alertNearCalorieLimitTitle": "आप अपनी कैलोरी सीमा के करीब हैं",
+  "alertNearCalorieLimitBody": "आज केवल {remaining} किलो कैलोरी बची है। अपने अगले भोजन की सावधानीपूर्वक योजना बनाएं।",
+  "alertProteinBehindTitle": "प्रोटीन लक्ष्य पीछे है",
+  "alertProteinBehindBody": "आज के लक्ष्य तक पहुँचने के लिए आपको अभी भी लगभग {missing} g प्रोटीन की आवश्यकता है।",
+  "alertCarbTargetExceededTitle": "कार्ब लक्ष्य पार हो गया",
+  "alertCarbTargetExceededBody": "कार्ब्स लक्ष्य से {over} g अधिक हैं।",
+  "alertFatTargetExceededTitle": "मोटा लक्ष्य पार हो गया",
+  "alertFatTargetExceededBody": "वसा लक्ष्य से {over} ग्राम अधिक है।",
+  "smartNutritionTipTitle": "स्मार्ट पोषण टिप",
+  "smartNutritionKcalLeft": "{calories} किलो कैलोरी शेष",
+  "smartNutritionKcalOver": "{calories} किलो कैलोरी खत्म",
+  "smartNutritionProteinRemaining": "{protein} जी प्रोटीन शेष",
+  "smartNutritionProteinGoalReached": "प्रोटीन लक्ष्य पूरा हो गया",
+  "smartNutritionCombinedMessage": "{calorieMessage} और {proteinMessage}। ट्रैक पर बने रहने के लिए अपना अगला भोजन लॉग करें।",
+  "notificationStepsExerciseTitle": "कदम और व्यायाम अनुस्मारक",
+  "notificationStepsExerciseBody": "आज के गतिविधि लक्ष्य को पूरा करने के लिए अपने कदम या कसरत लॉग करें।",
+  "notificationBreakfastTitle": "नाश्ता अनुस्मारक",
+  "notificationBreakfastBody": "अपनी कैलोरी और मैक्रो ट्रैकिंग जल्दी शुरू करने के लिए नाश्ता लॉग करें।",
+  "notificationLunchTitle": "दोपहर के भोजन का अनुस्मारक",
+  "notificationLunchBody": "लंच टाइम। अपनी दैनिक प्रगति को सटीक रखने के लिए अपना भोजन जोड़ें।",
+  "notificationDinnerTitle": "रात्रि भोज अनुस्मारक",
+  "notificationDinnerBody": "रात्रिभोज लॉग करें और संपूर्ण पोषण डेटा के साथ अपना दिन समाप्त करें।",
+  "notificationSnackTitle": "नाश्ते का अनुस्मारक",
+  "notificationSnackBody": "अपना नाश्ता जोड़ें ताकि कैलोरी और मैक्रोज़ आपके लक्ष्यों के अनुरूप रहें।",
+  "smartNutritionDailyTitle": "स्मार्ट पोषण चेक-इन",
+  "smartNutritionDailyBody": "लक्ष्य {calories} किलो कैलोरी, {protein}g प्रोटीन, {carbs}g कार्बोहाइड्रेट, {fats}g वसा। अपनी योजना को सटीक बनाए रखने के लिए अपना नवीनतम भोजन लॉग करें।",
+  "notificationWaterTitle": "जल अनुस्मारक",
+  "notificationWaterBody": "जलयोजन जांच. Cal AI में एक गिलास पानी लॉग करें।",
+  "homeWidgetLogFoodCta": "अपना भोजन लॉग करें",
+  "homeWidgetCaloriesTodayTitle": "आज कैलोरी",
+  "homeWidgetCaloriesSubtitle": "{calories} / {goal} किलो कैलोरी",
+  "@dayStreakWithCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "@alertCalorieGoalExceededBody": {
+    "placeholders": {
+      "over": {}
+    }
+  },
+  "@alertNearCalorieLimitBody": {
+    "placeholders": {
+      "remaining": {}
+    }
+  },
+  "@alertProteinBehindBody": {
+    "placeholders": {
+      "missing": {}
+    }
+  },
+  "@alertCarbTargetExceededBody": {
+    "placeholders": {
+      "over": {}
+    }
+  },
+  "@alertFatTargetExceededBody": {
+    "placeholders": {
+      "over": {}
+    }
+  },
+  "@smartNutritionKcalLeft": {
+    "placeholders": {
+      "calories": {}
+    }
+  },
+  "@smartNutritionKcalOver": {
+    "placeholders": {
+      "calories": {}
+    }
+  },
+  "@smartNutritionProteinRemaining": {
+    "placeholders": {
+      "protein": {}
+    }
+  },
+  "@smartNutritionCombinedMessage": {
+    "placeholders": {
+      "calorieMessage": {},
+      "proteinMessage": {}
+    }
+  },
+  "@smartNutritionDailyBody": {
+    "placeholders": {
+      "calories": {},
+      "protein": {},
+      "carbs": {},
+      "fats": {}
+    }
+  },
+  "@homeWidgetCaloriesSubtitle": {
+    "placeholders": {
+      "calories": {},
+      "goal": {}
+    }
+  }
 }

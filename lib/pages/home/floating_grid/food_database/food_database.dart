@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/api/food_api.dart';
 import 'package:calai/models/food_model.dart';
 import 'package:calai/pages/home/recently_logged/logged_view/logged_food_view.dart';
@@ -33,7 +33,6 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
 
   Timer? _debounce;
 
-  static const List<String> _tabs = ["All", "My meals", "My foods", "Saved scans"];
   static const List<String> _featuredFoodIds = ["2707537", "2709223", "2707152", "2709215", "2709614"];
 
   @override
@@ -114,6 +113,13 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final tabs = [
+      l10n.allTabLabel,
+      l10n.myMealsTabLabel,
+      l10n.myFoodsTabLabel,
+      l10n.savedScansTabLabel,
+    ];
     final bool isSearching = _searchController.text.isNotEmpty;
     final String sectionTitle = _selectedTabIndex == 0 && !isSearching ? "Suggestions" : (isSearching && _selectedTabIndex != 3 ? "Search Results" : "");
 
@@ -122,7 +128,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
       body: SafeArea(
         child: Column(
           children: [
-            const CustomAppBar(title: Text("Food Database")),
+            CustomAppBar(title: Text(l10n.foodDatabaseLabel)),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -130,11 +136,11 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
                 children: [
                   _buildSearchBox(theme),
                   const SizedBox(height: 14),
-                  _buildTabs(),
+                  _buildTabs(tabs),
                   const SizedBox(height: 14),
                   _OutlinedPillButton(
                     icon: Icons.edit,
-                    text: "Log empty food",
+                    text: l10n.logEmptyFoodLabel,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoggedFoodView())),
                   ),
                   const SizedBox(height: 18),
@@ -222,7 +228,7 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
                     backgroundColor: Colors.redAccent,
                     foregroundColor: Colors.white,
                     icon: Icons.delete,
-                    label: 'Delete',
+                    label: context.l10n.deleteLabel,
                     borderRadius: BorderRadius.circular(18),
                   ),
                 ],
@@ -245,15 +251,23 @@ class _FoodDatabasePageState extends ConsumerState<FoodDatabasePage> {
 
   Widget _buildSearchBox(ThemeData theme) => _SearchInput(controller: _searchController, hint: "Search foods...", onChanged: _onSearchChanged);
 
-  Widget _buildTabs() => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    child: Row(
-      children: List.generate(_tabs.length, (index) => Padding(
-        padding: EdgeInsets.only(right: index == _tabs.length - 1 ? 0 : 22),
-        child: _TabItem(label: _tabs[index], isSelected: index == _selectedTabIndex, onTap: () => setState(() => _selectedTabIndex = index)),
-      )),
-    ),
-  );
+  Widget _buildTabs(List<String> tabs) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: List.generate(tabs.length, (index) {
+          return Padding(
+            padding: EdgeInsets.only(right: index == tabs.length - 1 ? 0 : 22),
+            child: _TabItem(
+              label: tabs[index],
+              isSelected: index == _selectedTabIndex,
+              onTap: () => setState(() => _selectedTabIndex = index),
+            ),
+          );
+        }),
+      ),
+    );
+  }
 }
 
 // ===========================================================================
@@ -425,7 +439,7 @@ class FoodTile extends StatelessWidget {
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          "${calories.round()} cal  ·  ${unit ?? 'Serving'}",
+                          "${calories.round()} cal  ·  ${unit ?? context.l10n.servingLabel}",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(

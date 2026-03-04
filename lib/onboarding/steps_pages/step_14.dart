@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'; // Added Riverpod
 import '../../providers/user_provider.dart';           // Import your provider
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/yes_no_button.dart';
+import 'package:calai/l10n/l10n.dart'; // Import localization
 
 class OnboardingStep14 extends ConsumerWidget { // Changed to ConsumerStatefulWidget
   final VoidCallback nextPage;
@@ -13,7 +14,7 @@ class OnboardingStep14 extends ConsumerWidget { // Changed to ConsumerStatefulWi
     return SafeArea(
       child: Column(
         children: [
-          const Header(title: 'Add calories burned back to your daily goal?'),
+          Header(title: context.l10n.step14AddBurnedCaloriesQuestion), // Localized title
           const Spacer(),
           NoYesButton(
             onNo: () {

@@ -11,11 +11,12 @@ class ActivityReminderScheduler {
       await _notificationService.cancelById(ReminderNotificationIds.activity);
       return;
     }
+    final l10n = await _notificationService.loadL10n();
 
     await _notificationService.scheduleDailyReminder(
       notificationId: ReminderNotificationIds.activity,
-      title: 'Steps and exercise reminder',
-      body: 'Log your steps or workout to complete today\'s activity target.',
+      title: l10n.notificationStepsExerciseTitle,
+      body: l10n.notificationStepsExerciseBody,
       time: settings.activityReminderTime,
       payload: 'activity:daily',
       highPriority: true,

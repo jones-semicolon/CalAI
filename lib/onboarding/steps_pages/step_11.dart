@@ -1,6 +1,7 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import '../onboarding_widgets/header.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class OnboardingStep11 extends StatefulWidget {
   final VoidCallback nextPage;
@@ -16,7 +17,7 @@ class _OnboardingStep11State extends State<OnboardingStep11> {
     return SafeArea(
       child: Column(
         children: [
-          Header(title: 'You have great potential to crush your goal'),
+          Header(title: context.l10n.step11PotentialTitle),
           Spacer(),
           
           ConfirmationButtonWidget(onConfirm: () => widget.nextPage())

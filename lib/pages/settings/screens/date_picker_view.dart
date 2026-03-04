@@ -3,7 +3,7 @@ import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/profile_widgets/birthday_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../widgets/header_widget.dart';
 
 class DatePickerView extends ConsumerStatefulWidget {
@@ -29,7 +29,7 @@ class _DatePickerViewState extends ConsumerState<DatePickerView> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
-          CustomAppBar(title: Text("Set Birthday")),
+          CustomAppBar(title: Text(context.l10n.setBirthdayTitle)),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

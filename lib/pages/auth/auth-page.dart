@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'auth.dart'; // <--- 1. IMPORT YOUR AUTH FILE
+import 'auth.dart'; 
+import '../../l10n/l10n.dart';
 
 class AuthPage extends ConsumerStatefulWidget {
   const AuthPage({super.key});
@@ -51,7 +52,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
     if (!emailValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid email address')),
+        SnackBar(content: Text(context.l10n.authInvalidEmailMessage)),
       );
       return;
     }
@@ -68,8 +69,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Check your email'),
-            content: Text('We sent a sign-in link to $email'),
+            title: Text(context.l10n.authCheckYourEmailTitle),
+            content: Text(context.l10n.authSignInLinkSentMessage(email)),
             actions: [
               TextButton(
                 onPressed: () {
@@ -85,7 +86,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.genericErrorMessage(e.toString()))),
         );
       }
     } finally {
@@ -133,7 +134,7 @@ class _AuthPageAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      title: const Text(""),
+      title: const SizedBox.shrink(),
       elevation: 0,
     );
   }
@@ -154,13 +155,13 @@ class _PageBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "What's your email?", // Changed "Email" to be more conversational
+          Text(
+            context.l10n.authWhatsYourEmail,
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
-          const Text(
-            "We'll send you a link to sign in without a password.",
+          Text(
+            context.l10n.authPasswordlessHint,
             style: TextStyle(color: Colors.grey),
           ),
           const SizedBox(height: 30),
@@ -183,7 +184,7 @@ class _EmailInputField extends StatelessWidget {
       keyboardType: TextInputType.emailAddress, // Optimize keyboard for email
       autofocus: true, // Focus automatically so user can type immediately
       decoration: InputDecoration(
-        hintText: "name@example.com",
+        hintText: context.l10n.emailExampleHint,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(width: 1),
@@ -270,8 +271,8 @@ class _DoneButton extends StatelessWidget {
           width: 20,
           child: CupertinoActivityIndicator(radius: 15)
         )
-            : const Text(
-          "Continue",
+            :  Text(
+          context.l10n.continueLabel,
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),

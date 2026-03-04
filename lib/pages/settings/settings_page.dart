@@ -13,6 +13,7 @@ import 'logout_section.dart';
 import 'widgets/name_age_card.dart';
 import 'widgets/invite_friends_item.dart';
 import 'widgets/settings_group.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class SettingsPage extends ConsumerWidget { 
   const SettingsPage({super.key});
@@ -120,13 +121,13 @@ class _LinkAccountButton extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Backup your data",
+                        context.l10n.backupData,
                         style: textStyle?.copyWith(
                           fontSize: 14,
                         ),
                       ),
                       Text(
-                        "Sign in to sync your progress & goals",
+                        context.l10n.signInToSync,
                         style: TextStyle(
                           fontSize: 10,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -166,7 +167,7 @@ void _showSwitchAccountDialog(BuildContext context, AuthCredential? credential) 
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text("Cancel"),
+          child: Text(context.l10n.cancelLabel),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(

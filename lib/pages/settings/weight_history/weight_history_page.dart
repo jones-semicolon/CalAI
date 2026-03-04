@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../providers/global_provider.dart';
 
 class WeightHistoryView extends ConsumerStatefulWidget {
@@ -26,13 +26,13 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
       body: SafeArea(
         child: Column(
           children: [
-            const CustomAppBar(title: Text("Weight History")),
+            CustomAppBar(title: Text(context.l10n.weightHistory)),
 
             // 2. Handle Loading/Error/Data states
             Expanded(
               child: globalAsync.when(
                 loading: () => const Center(child: CupertinoActivityIndicator(radius: 15)),
-                error: (error, _) => Center(child: Text("Error: $error")),
+                error: (error, _) => Center(child: Text(context.l10n.unableToLoadProgress(error))),
                 data: (global) {
                   // 3. Get logs and Sort them (Newest first)
                   final logs = global.weightLogs;
@@ -41,7 +41,7 @@ class _WeightHistoryViewState extends ConsumerState<WeightHistoryView> {
                   if (logs.isEmpty) {
                     return Center(
                       child: Text(
-                        "No weight history recorded yet.",
+                        context.l10n.noWeightHistoryYet,
                         style: TextStyle(color: Theme.of(context).hintColor),
                       ),
                     );

@@ -3,6 +3,7 @@ import 'package:calai/pages/progress/screens/weight_picker_view.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
 import 'card_decorations.dart';
+import 'package:calai/l10n/l10n.dart';
 
 /// A card widget to display the user's current weight, goal, and progress.
 ///
@@ -72,7 +73,7 @@ class _WeightInfo extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'My Weight',
+            context.l10n.myWeightTitle,
             style: TextStyle(
               color: colorScheme.primary,
               fontSize: 12,
@@ -118,7 +119,7 @@ class _WeightInfo extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                goalWeight > 0 ? 'Goal ${formatKg(goalWeight)}' : 'No Goal Set',
+                goalWeight > 0 ? context.l10n.goalWithValue(formatKg(goalWeight)) : context.l10n.noGoalSet,
                 style: TextStyle(fontSize: 12, color: colorScheme.primary),
               ),
             ],
@@ -154,7 +155,7 @@ class _LogWeightButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Log Weight',
+              context.l10n.logWeightCta,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 import 'gradient_progress_line.dart';
 import 'checklist_card.dart';
@@ -64,10 +65,10 @@ class _HealthPlanLoadingWidgetState extends State<HealthPlanLoadingWidget>
 
   String get statusLabel {
     final p = percentage;
-    if (p <= 24) return "Customizing health plan...";
-    if (p <= 49) return "Applying BMR formula...";
-    if (p <= 74) return "Estimating your metabolic age...";
-    return "Finalizing results...";
+    if (p <= 24) return context.l10n.loadingCustomizingHealthPlan;
+    if (p <= 49) return context.l10n.loadingApplyingBmrFormula;
+    if (p <= 74) return context.l10n.loadingEstimatingMetabolicAge;
+    return context.l10n.loadingFinalizingResults;
   }
 
   bool isChecked(String key) {
@@ -112,7 +113,7 @@ class _HealthPlanLoadingWidgetState extends State<HealthPlanLoadingWidget>
                 const SizedBox(height: 12),
 
                 Text(
-                  "We're setting everything\nup for you",
+                  context.l10n.loadingSetupForYou,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,

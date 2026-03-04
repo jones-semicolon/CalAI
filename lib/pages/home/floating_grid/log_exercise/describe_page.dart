@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../providers/exercise_provider.dart';
+import '../../../../l10n/l10n.dart';
 
 class DescribePage extends ConsumerStatefulWidget {
   const DescribePage({super.key});
@@ -25,16 +26,14 @@ class _DescribePageState extends ConsumerState<DescribePage> {
     final String description = _descriptionController.text.trim();
     if (description.isEmpty) return;
 
-    // Use the provider logic for "Natural Language" logging
-    // We pass duration 0 so the API knows to parse the description instead
     await ref.read(exerciseLogProvider.notifier).logExerciseDescription(
-      description: description, // Pass the new description field
+      description: description, 
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    // 1. Listen for state changes (Loading/Success/Error)
+    final l10n = context.l10n;
     ref.listen<ExerciseLogState>(exerciseLogProvider, (previous, next) {
       if (next.status == ExerciseLogStatus.loading) {
         showDialog(
@@ -43,16 +42,16 @@ class _DescribePageState extends ConsumerState<DescribePage> {
           builder: (_) => const Center(child: CupertinoActivityIndicator(radius: 15)),
         );
       } else if (next.status == ExerciseLogStatus.success) {
-        Navigator.of(context, rootNavigator: true).pop(); // Close loading
-        Navigator.pop(context); // Close DescribePage
+        Navigator.of(context, rootNavigator: true).pop();
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Exercise parsed and logged!')),
+          SnackBar(content: Text(l10n.exerciseParsedAndLogged)),
         );
         ref.read(exerciseLogProvider.notifier).reset();
       } else if (next.status == ExerciseLogStatus.error) {
-        Navigator.of(context, rootNavigator: true).pop(); // Close loading
+        Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${next.errorMessage}')),
+          SnackBar(content: Text(l10n.genericErrorMessage(next.errorMessage ?? ''))),
         );
       }
     });
@@ -69,9 +68,9 @@ class _DescribePageState extends ConsumerState<DescribePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Describe Exercise',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Text(
+                    l10n.describeExerciseTitle,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
                   Container(
@@ -85,16 +84,16 @@ class _DescribePageState extends ConsumerState<DescribePage> {
                       controller: _descriptionController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'What did you do?',
+                        hintText: l10n.whatDidYouDoHint,
                         contentPadding: const EdgeInsets.symmetric(vertical: 16),
                         hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
                       ),
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    'Example: Outdoor hiking for 5 hours, felt exhausted',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  Text(
+                    l10n.describeExerciseExample,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
               ),

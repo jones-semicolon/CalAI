@@ -6,8 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/user_provider.dart';
 import '../../services/calai_firestore_service.dart';
 import '../../theme/theme_service.dart';
-import '../../main.dart'; // To call MyApp.of(context) for theme changes
+import '../../main.dart';
 import 'widgets/settings_divider.dart';
+import 'package:calai/l10n/l10n.dart';
+
 
 /// A widget that displays a section of user-configurable preferences.
 ///
@@ -107,11 +109,11 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
       // The main layout is a Column, now composed of smaller, focused widgets.
       child: Column(
         children: [
-          const SettingsItemTile(label: "Preferences", icon: Icons.settings_outlined, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),),
+          SettingsItemTile(label: context.l10n.preferencesLabel, icon: Icons.settings_outlined, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),),
           const SettingsDivider(),
           SettingsItemTile(
-            label: "Appearance",
-            description: "Choose light, dark, or system appearance",
+            label: context.l10n.appearanceLabel,
+            description: context.l10n.appearanceDescription,
             widget: DropdownButtonHideUnderline(
               child: ButtonTheme(
                 alignedDropdown: true, // ✅ Fixes the width/alignment offset
@@ -149,8 +151,8 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
           ),
           const SettingsDivider(),
           SettingsItemTile(
-            label: "Add Burned Calories",
-            description: "Add burned calories to daily goal",
+            label: context.l10n.addBurnedCaloriesLabel,
+            description: context.l10n.addBurnedCaloriesDescription,
             widget: Switch(
               value: settings.isAddCalorieBurn ?? false,
               onChanged: (v) => _updateSettings(isAddCalorieBurn: v),
@@ -167,8 +169,8 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
           ),
           const SettingsDivider(),
           SettingsItemTile(
-            label: "Rollover Calories",
-            description: "Add up to 200 leftover calories into today's goal",
+            label: context.l10n.rolloverCaloriesLabel,
+            description: context.l10n.rolloverCaloriesDescription,
             widget: Switch(
               value: settings.isRollover ?? false,
               onChanged: (v) => _updateSettings(isRollover: v),
@@ -185,8 +187,8 @@ class _PreferencesSectionState extends ConsumerState<PreferencesSection> {
           ),
           const SettingsDivider(),
           SettingsItemTile(
-            label: "Imperial Units",
-            description: "All data will be converted to imperial (currently on metrics)",
+            label: context.l10n.measurementUnitLabel,
+            description: context.l10n.measurementUnitDescription,
             widget: Switch(
               value: settings.measurementUnit?.isImperial ?? false,
               onChanged: (v) => _updateSettings(isImperial: v),

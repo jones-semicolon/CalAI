@@ -6,6 +6,7 @@ import '../../../models/nutrition_model.dart';
 import '../../../providers/global_provider.dart';
 import '../../../providers/user_provider.dart';
 import '../widgets/activity_card.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class CarouselHealth extends ConsumerWidget {
   final bool isTap;
@@ -82,7 +83,7 @@ class _NutrientCardsRow extends StatelessWidget {
       children: [
         Expanded(
           child: CalorieCard(
-            title: MicroNutritionType.fiber.label,
+            title: MicroNutritionType.fiber.getLabel(context),
             nutrients: targets.fiber, // Goal from HealthData
             progress: progress.fiber, // Intake from HealthData
             color: MicroNutritionType.fiber.color,
@@ -94,7 +95,7 @@ class _NutrientCardsRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: CalorieCard(
-            title: MicroNutritionType.sugar.label,
+            title: MicroNutritionType.sugar.getLabel(context),
             nutrients: targets.sugar,
             progress: progress.sugar,
             color: MicroNutritionType.sugar.color,
@@ -106,7 +107,7 @@ class _NutrientCardsRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: CalorieCard(
-            title: MicroNutritionType.sodium.label,
+            title: MicroNutritionType.sodium.getLabel(context),
             nutrients: targets.sodium,
             progress: progress.sodium,
             color: MicroNutritionType.sodium.color,
@@ -137,7 +138,7 @@ class _HealthScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Generate the message based on current data
-    final String summaryMessage = _getHealthSummary(score, protein, calories);
+    final String summaryMessage = _getHealthSummary(context, score, protein, calories);
 
     return InkWell(
       onTap: onTap,
@@ -155,7 +156,7 @@ class _HealthScoreCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Health score',
+                  context.l10n.healthScoreTitle,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.primary,
@@ -204,19 +205,19 @@ class _HealthScoreCard extends StatelessWidget {
   }
 }
 
-String _getHealthSummary(double score, double protein, double calories) {
+String _getHealthSummary(BuildContext context, double score, double protein, double calories) {
   if (score == 0) {
-    return 'No data logged for today. Start tracking your meals to see your health insights!';
+    return context.l10n.healthSummaryNoData; 
   }
 
   if (score < 5) {
-    return 'Your intake is quite low. Focus on hitting your calorie and protein targets to maintain energy and muscle.';
+    return context.l10n.healthSummaryLowIntake; 
   }
 
   // Example of specific macro feedback
   if (protein < 30) {
-    return 'Carbs and fat are on track, but you’re low in protein. Increasing protein can help with muscle retention.';
+    return context.l10n.healthSummaryLowProtein;
   }
 
-  return 'Great job! Your nutrition is well-balanced today.';
+  return context.l10n.healthSummaryGreat;
 }

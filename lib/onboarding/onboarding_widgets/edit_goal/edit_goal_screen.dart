@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'widgets/summary_card.dart';
 import 'widgets/input_field.dart';
 import 'widgets/bottom_actions.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class EditGoalScreen extends StatefulWidget {
   final num initialValue;
@@ -72,7 +73,7 @@ class _EditGoalScreenState extends State<EditGoalScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Edit ${widget.title} Goal',
+                    context.l10n.editGoalTitle(widget.title),
                     style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 24),

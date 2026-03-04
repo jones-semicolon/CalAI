@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../widgets/animated_number.dart';
 
 /// A card widget to display a specific nutrient's status, including its
@@ -195,7 +195,7 @@ class _Title extends StatelessWidget {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                     // Logic remains the same
-                    value: isTap ? "eaten" : (overEat ? "over" : "left"),
+                    value: isTap ? context.l10n.eatenLabel : (overEat ? context.l10n.overLabel : context.l10n.leftLabel),
                     reverse: isTap,
                     inAnim: false,
                   ),

@@ -7,6 +7,7 @@ import '../../../../enums/food_enums.dart';
 import '../../../../models/food_model.dart';
 import '../../../../services/calai_firestore_service.dart';
 import 'camera_scanner/camera_scanner_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class ScanScreen extends ConsumerStatefulWidget {
   const ScanScreen({super.key});
@@ -32,7 +33,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
       final initialLog = food.createLog(
         amount: 1.0,
-        unit: food.portions.isNotEmpty ? food.portions.first.label : "Serving",
+        unit: food.portions.isNotEmpty ? food.portions.first.label : context.l10n.servingLabel,
         gramWeight: food.portions.isNotEmpty ? food.portions.first.gramWeight : 100.0,
       );
 
@@ -55,7 +56,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Product not found.')),
+          SnackBar(content: Text(context.l10n.productNotFoundMessage)),
         );
       }
     }
@@ -80,7 +81,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
     final initialLog = foodToSave.createLog(
       amount: 1.0,
-      unit: "Serving",
+      unit: context.l10n.servingLabel,
       gramWeight: 100.0,
     );
 
@@ -107,12 +108,12 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       final List<Food> results = await FoodApi.search(text);
 
       if (results.isEmpty) {
-        throw Exception("No food found for this label.");
+        throw Exception(context.l10n.foodNotFoundMessage);
       }
 
       final bestMatch = results.first;
 
-      final portion = _getDisplayPortion(bestMatch);
+      final portion = _getDisplayPortion(context, bestMatch);
 
       debugPrint("Best Match: ${bestMatch.toJson().toString()}");
 
@@ -142,7 +143,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not identify "$text".')),
+          SnackBar(content: Text(context.l10n.couldNotIdentify(text))),
         );
       }
     }
@@ -172,7 +173,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                     const CupertinoActivityIndicator(radius: 20, color: Colors.white),
                     const SizedBox(height: 16),
                     Text(
-                      _isLoading ? 'Identifying food...' : 'Logged successfully!',
+                      _isLoading ? context.l10n.identifyingFoodMessage : context.l10n.loggedSuccessfullyMessage,
                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -185,13 +186,13 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   }
 }
 
-FoodPortionItem _getDisplayPortion(Food item) {
+FoodPortionItem _getDisplayPortion(BuildContext context, Food item) {
   // ✅ FIX: Don't call .fromJson() here.
   // The model already parsed it. Just cast the list to the correct type.
   final List<FoodPortionItem> portions = item.portions.cast<FoodPortionItem>();
 
   if (portions.isEmpty) {
-    return const FoodPortionItem(label: "Serving", gramWeight: 100);
+    return FoodPortionItem(label: context.l10n.servingLabel, gramWeight: 100);
   }
 
   // Try to find a portion that isn't just "100g" or "Quantity not specified"

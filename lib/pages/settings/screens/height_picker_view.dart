@@ -2,7 +2,7 @@ import 'package:calai/providers/user_provider.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../widgets/header_widget.dart';
 import '../../../widgets/profile_widgets/height_picker.dart';
 
@@ -28,7 +28,7 @@ class _HeightPickerView extends ConsumerState<HeightPickerView> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
-          CustomAppBar(title: Text("Set Height")),
+          CustomAppBar(title: Text(context.l10n.setHeightTitle)),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

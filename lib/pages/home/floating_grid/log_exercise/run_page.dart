@@ -1,5 +1,5 @@
 import 'package:calai/widgets/header_widget.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,22 +16,10 @@ class RunExercisePage extends ConsumerStatefulWidget {
 
 class _RunExercisePageState extends ConsumerState<RunExercisePage> {
   // --- DATA ---
-  final List<Map<String, dynamic>> _intensityOptions = [
-    {
-      'title': 'High',
-      'subtitle': 'Sprinting - 14 mph (4 minutes miles)',
-      'value': Intensity.high,
-    },
-    {
-      'title': 'Medium',
-      'subtitle': 'Jogging - 6 mph (10 minutes miles)',
-      'value': Intensity.medium,
-    },
-    {
-      'title': 'Low',
-      'subtitle': 'Chill walk - 3 mph (20 minutes miles)',
-      'value': Intensity.low,
-    },
+  final List<Intensity> _intensityValues = [
+    Intensity.high,
+    Intensity.medium,
+    Intensity.low,
   ];
 
   final List<int> _durations = [15, 30, 60, 90];
@@ -86,24 +74,39 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
   @override
   Widget build(BuildContext context) {
     final int activeIndex = _getCurrentZoneIndex();
+    final l10n = context.l10n;
+    final intensityOptions = [
+      {
+        'title': l10n.intensityHighLabel,
+        'subtitle': l10n.runIntensityHighDescription,
+      },
+      {
+        'title': l10n.intensityMediumLabel,
+        'subtitle': l10n.runIntensityMediumDescription,
+      },
+      {
+        'title': l10n.intensityLowLabel,
+        'subtitle': l10n.runIntensityLowDescription,
+      },
+    ];
     ref.listen<ExerciseLogState>(exerciseLogProvider, (previous, next) {
       if (next.status == ExerciseLogStatus.loading) {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (_) => const Center(child: CupertinoActivityIndicator(radius: 15)),
+          builder: (_) => const Center(child: CircularProgressIndicator()),
         );
       } else if (next.status == ExerciseLogStatus.success) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
         Navigator.pop(context); // Close Page
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Exercise logged successfully!')),
+          SnackBar(content: Text(l10n.exerciseLoggedSuccessfully)),
         );
         ref.read(exerciseLogProvider.notifier).reset();
       } else if (next.status == ExerciseLogStatus.error) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${next.errorMessage}')),
+          SnackBar(content: Text(l10n.genericErrorMessage(next.errorMessage ?? ''))),
         );
       }
     });
@@ -118,9 +121,9 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
               children: [
                 Icon(Icons.directions_run, color: Theme.of(context).colorScheme.primary, size: 24),
                 const SizedBox(width: 5),
-                const Text(
-                  "Run",
-                  style: TextStyle(
+                Text(
+                  l10n.runTitle,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 18,
                   ),
@@ -137,11 +140,11 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: const [
+                      children: [
                         Icon(Icons.electric_bolt_outlined, size: 24),
                         SizedBox(width: 5),
                         Text(
-                          'Set Intensity',
+                          l10n.setIntensityLabel,
                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -163,7 +166,7 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: List.generate(_intensityOptions.length, (index) {
+                              children: List.generate(intensityOptions.length, (index) {
                                 final isSelected = activeIndex == index;
                                 return GestureDetector(
                                   onTap: () {
@@ -187,7 +190,7 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
                                             color: Theme.of(context).colorScheme.primary,
                                           ),
                                           child: Text(
-                                            _intensityOptions[index]['title'] as String,
+                                            intensityOptions[index]['title'] as String,
                                           ),
                                         ),
                                         const SizedBox(height: 5),
@@ -195,7 +198,7 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
                                           duration: const Duration(milliseconds: 300),
                                           opacity: isSelected ? 1.0 : 0.5,
                                           child: Text(
-                                            _intensityOptions[index]['subtitle'] as String,
+                                            intensityOptions[index]['subtitle'] as String,
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
@@ -277,11 +280,11 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
 
                     // --- DURATION HEADER ---
                     Row(
-                      children: const [
+                      children: [
                         Icon(Icons.timer_outlined, size: 24),
                         SizedBox(width: 8),
                         Text(
-                          'Duration',
+                          l10n.durationLabel,
                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -315,7 +318,7 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
                                 ),
                               ),
                               child: Text(
-                                "${_durations[index]} mins",
+                                "${_durations[index]} ${l10n.minutesShortLabel}",
                                 style: TextStyle(
                                   color: isSelected ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.w600,
@@ -364,7 +367,7 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
             ),
 
             // --- FIXED BOTTOM BUTTON ---
-            ConfirmationButtonWidget(onConfirm: _onLogEntry, text: "Add")
+            ConfirmationButtonWidget(onConfirm: _onLogEntry, text: l10n.addLabel)
           ],
         ),
       ),
@@ -380,7 +383,7 @@ class _RunExercisePageState extends ConsumerState<RunExercisePage> {
     if (duration <= 0) return;
 
     final activeIndex = _getCurrentZoneIndex();
-    final Intensity intensityEnum = _intensityOptions[activeIndex]['value'];
+    final Intensity intensityEnum = _intensityValues[activeIndex];
 
     // Call the provider
     await ref.read(exerciseLogProvider.notifier).logExercise(

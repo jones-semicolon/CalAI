@@ -3,7 +3,7 @@ import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../providers/global_provider.dart';
 import '../../providers/user_provider.dart';
 /// A page that allows the user to edit their name.
@@ -89,8 +89,8 @@ class _PageBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Edit name",
+          Text(
+            context.l10n.editNameTitle,
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 30),

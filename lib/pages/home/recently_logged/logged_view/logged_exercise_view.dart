@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../../enums/exercise_enums.dart';
 import '../../../../models/exercise_model.dart';
 import '../../../../providers/user_provider.dart';
@@ -70,20 +70,20 @@ class _EditExercisePageState extends ConsumerState<EditExercisePage> { // ✅ Ch
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Stats", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(context.l10n.statsLabel, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
 
                   // Side-by-side Inputs
                   Row(
                     children: [
-                      Expanded(child: _buildInput("Calories", _calController, "kcal")),
+                      Expanded(child: _buildInput(context.l10n.caloriesLabel, _calController, context.l10n.kcalLabel)),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildInput("Duration", _minController, "mins")),
+                      Expanded(child: _buildInput(context.l10n.durationLabel, _minController, context.l10n.minutesShortLabel)),
                     ],
                   ),
 
                   const SizedBox(height: 32),
-                  const Text("Intensity", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(context.l10n.intensityLabel, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
 
                   // Custom Intensity Selector
@@ -133,7 +133,7 @@ class _IntensityPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final levels = ['Low', 'Moderate', 'High'];
+    final levels = ['Low', 'Medium', 'High'];
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(

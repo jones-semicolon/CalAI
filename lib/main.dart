@@ -1,9 +1,6 @@
 import 'package:calai/l10n/app_localizations.dart';
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/onboarding/app_entry.dart';
-import 'package:calai/providers/entry_streams_provider.dart';
-import 'package:calai/providers/global_provider.dart';
-import 'package:calai/providers/reminder_provider.dart';
-import 'package:calai/providers/user_provider.dart';
 import 'package:calai/widgets/debug/debug_overlay.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +14,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:calai/providers/shared_prefs_provider.dart';
+import 'package:calai/providers/locale_provider.dart';
 
 final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -100,13 +98,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late ThemeMode _themeMode;
-  Locale? _locale;
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
     super.initState();
     _themeMode = widget.initialThemeMode;
-    _locale = widget.initialLocale;
   }
 
   void setThemeMode(ThemeMode mode) {
@@ -115,51 +112,46 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  void setLocale(Locale? locale) {
-    setState(() => _locale = locale);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Cal AI - Calorie Tracker',
-      navigatorKey: appNavigatorKey,
-      debugShowCheckedModeBanner: false,
-      themeMode: _themeMode,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-
-      locale: _locale,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-
-      builder: (context, child) {
         return Consumer(
-          builder: (context, ref, _) {
-            ref.listen(userProvider, (previous, next) {
-              if (previous != null && previous.id.isNotEmpty && next.id.isEmpty) {
-                
-                ref.invalidate(globalDataProvider);
-                ref.invalidate(dailyEntriesProvider);
-                
-                debugPrint("Cleanup: User signed out, listeners closed.");
-              }
-            });
+      builder: (context, ref, _) {
+        final locale = ref.watch(localeProvider);
 
-            ref.watch(reminderSyncProvider);
+        return MaterialApp(
+          key: ValueKey<String>(locale?.languageCode ?? 'system'),
+          debugShowCheckedModeBanner: false,
+          navigatorKey: _navigatorKey,
+          themeMode: _themeMode,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          locale: locale,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          onGenerateTitle: (context) => context.l10n.appTitle,
 
+          // ✅ GLOBAL OVERLAY INJECTION
+          builder: (context, child) {
+            // We wrap the entire app in a Stack
             return Stack(
               children: [
+                // 1. The actual screen (AppEntry, Dashboard, etc.)
                 if (child != null) child,
+
+                // 2. The Debug Overlay (Only show in Debug Mode)
                 if (kDebugMode)
-                  const DebugOverlay(),
+                  const Positioned(
+                    right: 0,
+                    top: 100, // Adjust start position so it doesn't block AppBar
+                    child: DebugOverlay(),
+                  ),
               ],
             );
           },
-        );
-      },
 
-      home: const AppEntry(),
+          home: const AppEntry(),
+        );
+      }
     );
   }
 }

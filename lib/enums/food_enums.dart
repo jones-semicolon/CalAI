@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/app_localizations.dart';
 
 enum SourceType {
   foodDatabase("foodDatabase"),
@@ -34,14 +35,15 @@ enum NutritionType {
     }
   }
 
-  String get label {
+  String getLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (this) {
       case NutritionType.protein:
-        return "Protein";
+        return l10n.proteinLabel;
       case NutritionType.carbs:
-        return "Carbs";
+        return l10n.carbsLabel;
       case NutritionType.fats:
-        return "Fats";
+        return l10n.fatsLabel;
     }
   }
 
@@ -80,14 +82,15 @@ enum MicroNutritionType {
     }
   }
 
-  String get label {
+  String getLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (this) {
       case MicroNutritionType.fiber:
-        return "Fiber";
+        return l10n.fiberLabel;
       case MicroNutritionType.sugar:
-        return "Sugar";
+        return l10n.sugarLabel;
       case MicroNutritionType.sodium:
-        return "Sodium";
+        return l10n.sodiumLabel;
     }
   }
 

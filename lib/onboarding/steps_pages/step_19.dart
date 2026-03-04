@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; 
-
+import 'package:calai/l10n/l10n.dart';
 import '../../pages/auth/auth.dart';
 import '../../providers/user_provider.dart';
 import '../../pages/shell/widget_tree.dart'; 
@@ -18,7 +18,6 @@ class OnboardingStep19 extends ConsumerStatefulWidget {
 }
 
 class _OnboardingStep19State extends ConsumerState<OnboardingStep19> with SingleTickerProviderStateMixin {
-  bool _isLoading = false;
   late final AnimationController _controller;
 
   @override
@@ -75,7 +74,6 @@ class _OnboardingStep19State extends ConsumerState<OnboardingStep19> with Single
 
   Future<void> _handleGoogleSignIn() async {
     if (!mounted) return;
-    setState(() => _isLoading = true);
 
     try {
       final currentUser = AuthService.getCurrentUser();
@@ -104,9 +102,7 @@ class _OnboardingStep19State extends ConsumerState<OnboardingStep19> with Single
       }
     } catch (e) {
       debugPrint("Google Sign-In Error: $e");
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    } 
   }
 
   @override
@@ -115,7 +111,7 @@ class _OnboardingStep19State extends ConsumerState<OnboardingStep19> with Single
       child: Column(
         children: [
           const SizedBox(height: 30),
-          const Header(title: 'Create an account'),
+          Header(title: context.l10n.step19CreateAccountTitle, textAlign: TextAlign.center),
           const Spacer(),
 
           // CTA actions

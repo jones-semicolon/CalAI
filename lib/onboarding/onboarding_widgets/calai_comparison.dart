@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class ComparisonCard extends StatefulWidget {
   const ComparisonCard({super.key});
@@ -71,6 +72,7 @@ class _ComparisonCardState extends State<ComparisonCard>
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final secondary = colors.secondary;
+    final l10n = context.l10n;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -113,23 +115,23 @@ class _ComparisonCardState extends State<ComparisonCard>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             _ProgressColumn(
-                              title: 'Without\nCal AI',
+                              title: l10n.comparisonWithoutCalAi,
                               barWidth: barWidth,
                               targetFillFraction: 0.30,
                               fillColor:
                                   colors.secondary.withOpacity(0.25),
-                              valueLabel: '20%',
+                              valueLabel: l10n.comparisonLeftValue,
                               barAnimation: _leftBarAnim,
                               labelAnimation: _leftLabelAnim,
                               textColor: colors.primary,
                             ),
                             const SizedBox(width: 20),
                             _ProgressColumn(
-                              title: 'With\nCal AI',
+                              title: l10n.comparisonWithCalAi,
                               barWidth: barWidth,
                               targetFillFraction: 1.0,
                               fillColor: colors.primary,
-                              valueLabel: '2X',
+                              valueLabel: l10n.comparisonRightValue,
                               barAnimation: _rightBarAnim,
                               labelAnimation: _rightLabelAnim,
                               textColor: theme.scaffoldBackgroundColor,
@@ -139,11 +141,11 @@ class _ComparisonCardState extends State<ComparisonCard>
                         const SizedBox(height: 25),
                         _AnimatedText(
                           animation: _bottomLeftDescAnim,
-                          text: 'Cal AI makes it easy and holds',
+                          text: l10n.comparisonBottomLine1,
                         ),
                         _AnimatedText(
                           animation: _bottomRightDescAnim,
-                          text: 'you accountable',
+                          text: l10n.comparisonBottomLine2,
                         ),
                       ],
                     ),

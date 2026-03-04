@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_constants.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class HealthScoreCard extends StatelessWidget {
   final double progress;
@@ -58,7 +59,7 @@ class HealthScoreCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Health Score',
+                        context.l10n.healthScoreTitle,
                         style: AppTextStyles.title.copyWith(
                           color: AppColors.primary(context),
                         ),

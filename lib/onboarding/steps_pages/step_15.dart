@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // Added
+import 'package:calai/l10n/l10n.dart';
 import '../../providers/user_provider.dart';           // Added
 import '../onboarding_widgets/header.dart';
 import '../onboarding_widgets/yes_no_button.dart';
@@ -17,7 +18,7 @@ class OnboardingStep15 extends ConsumerWidget { // Changed to ConsumerWidget
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Header(title: 'Rollover extra calories to the next day?'),
+            Header(title: context.l10n.step15RolloverQuestion),
 
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -31,15 +32,15 @@ class OnboardingStep15 extends ConsumerWidget { // Changed to ConsumerWidget
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: 'Rollover up to ',
+                      text: context.l10n.step15RolloverUpTo,
                       style: TextStyle(
                         color: theme.colorScheme.primary,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const TextSpan(
-                      text: '200 cals',
+                    TextSpan(
+                      text: context.l10n.step15RolloverCap,
                       style: TextStyle(
                         color: Color.fromARGB(255, 105, 152, 222),
                         fontSize: 12,

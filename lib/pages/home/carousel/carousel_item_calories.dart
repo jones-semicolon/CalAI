@@ -8,6 +8,7 @@ import '../../../providers/global_provider.dart';
 import '../../../providers/user_provider.dart';
 import '../../../models/nutrition_model.dart';
 import '../widgets/activity_card.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class CarouselCalories extends ConsumerWidget {
   final bool isTap;
@@ -194,7 +195,7 @@ class _CalorieInfo extends StatelessWidget {
           Row(
             children: [
               Text(
-                "Calories ",
+                "${context.l10n.caloriesLabel} ",
                 style: TextStyle(
                   fontSize: 12,
                   color: Theme.of(context).colorScheme.primary,
@@ -206,7 +207,7 @@ class _CalorieInfo extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                value: isTap ? "eaten" : (overEat ? "over" : "left"),
+                value: isTap ? context.l10n.eatenLabel : (overEat ? context.l10n.overLabel : context.l10n.leftLabel),
                 reverse: isTap,
                 inAnim: false,
               ),
@@ -294,7 +295,7 @@ class _MacroNutrientCardsRow extends StatelessWidget {
       children: [
         Expanded(
           child: CalorieCard(
-            title: NutritionType.protein.label,
+            title: NutritionType.protein.getLabel(context),
             nutrients: targets.protein,
             progress: progress.protein,
             color: NutritionType.protein.color,
@@ -306,7 +307,7 @@ class _MacroNutrientCardsRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: CalorieCard(
-            title: NutritionType.carbs.label,
+            title: NutritionType.carbs.getLabel(context),
             nutrients: targets.carbs,
             progress: progress.carbs,
             color: NutritionType.carbs.color,
@@ -318,7 +319,7 @@ class _MacroNutrientCardsRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: CalorieCard(
-            title: NutritionType.fats.label,
+            title: NutritionType.fats.getLabel(context),
             nutrients: targets.fats,
             progress: progress.fats,
             color: NutritionType.fats.color,

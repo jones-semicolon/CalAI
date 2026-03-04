@@ -4,7 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
 import 'package:intl/intl.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../models/exercise_model.dart';
 import '../../../providers/progress_data_provider.dart';
 import 'package:calai/pages/progress/widgets/goal_progress_header.dart';
@@ -66,6 +66,7 @@ class _ProgressGraphState extends State<ProgressGraph> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final bool hasNoData = widget.logs.isEmpty;
     final MeasurementUnit unitSystem = widget.unitSystem ?? MeasurementUnit.metric;
 
@@ -96,11 +97,11 @@ class _ProgressGraphState extends State<ProgressGraph> {
     return Column(
       children: [
         SegmentedSelector<TimeRange>(
-          options: const [
-            RangeOption(value: TimeRange.days90, label: '90 Days'),
-            RangeOption(value: TimeRange.months6, label: '6 Months'),
-            RangeOption(value: TimeRange.year1, label: '1 Year'),
-            RangeOption(value: TimeRange.all, label: 'All time'),
+          options: [
+            RangeOption(value: TimeRange.days90, label: l10n.ninetyDaysLabel),
+            RangeOption(value: TimeRange.months6, label: l10n.sixMonthsLabel),
+            RangeOption(value: TimeRange.year1, label: l10n.oneYearLabel),
+            RangeOption(value: TimeRange.all, label: l10n.allTimeLabel),
           ],
           selected: widget.selectedRange,
           onChanged: widget.onRangeChanged,
@@ -132,9 +133,9 @@ class _ProgressGraphState extends State<ProgressGraph> {
                             color: Theme.of(context).cardColor.withOpacity(0.8),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Text(
-                            "Waiting for your first log...",
-                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                          child: Text(
+                            l10n.waitingForFirstLogLabel,
+                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                           ),
                         ),
                       ),

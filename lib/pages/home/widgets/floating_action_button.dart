@@ -1,6 +1,6 @@
 import 'package:calai/pages/home/floating_grid/log_exercise/log_exercise.dart';
 import 'package:flutter/material.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../floating_grid/camera/scan_screen.dart';
 import '../floating_grid/food_database/food_database.dart';
 
@@ -17,7 +17,7 @@ class FloatingActionGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final l10n = context.l10n;
     void handleTap(Widget page) {
       onClose();
       Navigator.push(
@@ -46,12 +46,12 @@ class FloatingActionGrid extends StatelessWidget {
                   children: [
                     ActionGridButton(
                       icon: Icons.fitness_center,
-                      label: "Log Exercise",
+                      label: l10n.logExerciseLabel,
                       onTap: () => handleTap(const LogExercisePage()),
                     ),
                     ActionGridButton(
                       icon: Icons.bookmark_outline,
-                      label: "Saved Foods",
+                      label: l10n.savedFoodsLabel,
                       onTap: () => handleTap(const FoodDatabasePage(selectedTabIndex: 3,)),        
                     ),
                   ],
@@ -63,12 +63,12 @@ class FloatingActionGrid extends StatelessWidget {
                   children: [
                     ActionGridButton(
                       icon: Icons.search,
-                      label: "Food Database",
+                      label: l10n.foodDatabaseLabel,
                       onTap: () => handleTap(const FoodDatabasePage()),
                     ),
                     ActionGridButton(
                       icon: Icons.qr_code_scanner,
-                      label: "Scan Food",
+                      label: l10n.scanFoodLabel,
                       onTap: () => handleTap(const ScanScreen()),
                     ),
                   ],

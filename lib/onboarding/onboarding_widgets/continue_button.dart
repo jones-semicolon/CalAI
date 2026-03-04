@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class ContinueButton extends StatelessWidget {
   final bool enabled;
   final VoidCallback onNext;
-  final String text;
+  final String? text;
 
   const ContinueButton({
     super.key,
     this.enabled = true,
     required this.onNext,
-    this.text = 'Continue',
+    this.text,
   });
 
   @override
@@ -42,11 +43,11 @@ class ContinueButton extends StatelessWidget {
             ),
           ),
           child: Text(
-            text,
+            text ?? context.l10n.continueLabel,
             style: TextStyle(
               color: enabled
                   ? Theme.of(context).scaffoldBackgroundColor
-                  : Theme.of(context).scaffoldBackgroundColor,
+                  : Theme.of(context).disabledColor,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),

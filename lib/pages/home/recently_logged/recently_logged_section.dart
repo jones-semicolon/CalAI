@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../enums/food_enums.dart';
 import '../../../models/exercise_model.dart';
 import '../../../models/food_model.dart';
@@ -47,7 +47,7 @@ class RecentlyUploadedSection extends ConsumerWidget {
           entriesAsync.when(
             skipLoadingOnReload: true,
             loading: () => const EmptyState(),
-            error: (e, _) => Text("Error loading logs: $e"),
+            error: (e, _) => Text(context.l10n.errorLoadingLogs(e.toString())),
             data: (entries) {
               if (entries.isEmpty) {
                 return const EmptyState();

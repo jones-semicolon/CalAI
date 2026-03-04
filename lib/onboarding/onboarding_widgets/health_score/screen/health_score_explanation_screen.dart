@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/health_score_explanation_widget.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class HealthScoreExplanationScreen extends StatelessWidget {
   const HealthScoreExplanationScreen({super.key});
@@ -28,7 +29,7 @@ class HealthScoreExplanationScreen extends StatelessWidget {
           ),
         ),
         title: Text(
-          'How does it work?',
+          context.l10n.howDoesItWork,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,

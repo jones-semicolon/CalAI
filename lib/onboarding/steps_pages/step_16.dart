@@ -1,3 +1,4 @@
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/onboarding/onboarding_widgets/header.dart';
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
@@ -41,9 +42,9 @@ class OnboardingStep16 extends ConsumerWidget {
     return SafeArea(
       child: Column(
         children: [
-          const Header(
-            title: 'Enter referral code (optional)',
-            subtitle: 'You can skip this step',
+          Header(
+            title: context.l10n.step16ReferralTitle,
+            subtitle: context.l10n.step16ReferralSubtitle,
           ),
           const Spacer(),
 
@@ -52,7 +53,7 @@ class OnboardingStep16 extends ConsumerWidget {
 
           const Spacer(),
           // Use your existing confirmation button to move to the next screen
-          ConfirmationButtonWidget(onConfirm: nextPage, text: 'Skip'),
+          ConfirmationButtonWidget(onConfirm: nextPage, text: context.l10n.skipLabel),
         ],
       ),
     );

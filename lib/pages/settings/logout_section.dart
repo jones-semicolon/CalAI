@@ -5,7 +5,7 @@ import 'package:calai/providers/auth_state_providers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../core/constants/app_sizes.dart';
 
 class LogoutSection extends ConsumerWidget {
@@ -20,7 +20,7 @@ class LogoutSection extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
       ),
       child: SettingsItemTile(
-        label: "Logout",
+        label: context.l10n.logoutTitle,
         icon: Icons.logout,
         onTap: () => _showLogoutConfirmation(context, ref),
       ),
@@ -33,12 +33,12 @@ class LogoutSection extends ConsumerWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          title: const Text("Logout"),
-          content: const Text("Are you sure you want to log out?"),
+          title: Text(context.l10n.logoutTitle),
+          content: Text(context.l10n.logoutConfirmMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context), // Close dialog
-              child: const Text("Cancel"),
+              child: Text(context.l10n.cancelLabel),
             ),
             TextButton(
               onPressed: () async {
@@ -66,8 +66,8 @@ class LogoutSection extends ConsumerWidget {
                   (route) => false, 
                 );
               },
-              child: const Text(
-                "Logout",
+              child: Text(
+                context.l10n.logoutLabel,
                 style: TextStyle(color: Colors.red),
               ),
             )

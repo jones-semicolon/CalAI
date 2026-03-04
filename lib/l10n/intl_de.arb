@@ -1,12 +1,660 @@
 {
   "@@locale": "de",
+  "appTitle": "Cal AI",
+  "homeTab": "Startseite",
+  "progressTab": "Fortschritt",
+  "settingsTab": "Einstellungen",
+  "language": "Sprache",
   "welcomeMessage": "Willkommen bei Cal AI",
-  "trackMessage": "Cleverer verfolgen. Besser essen.",
-  "getStarted": "Loslegen",
-  "alreadyAccount": "Hast du schon ein Konto?",
+  "trackMessage": "Track smarter. Besser essen.",
+  "getStarted": "Erste Schritte",
+  "alreadyAccount": "Haben Sie bereits ein Konto?",
   "signIn": "Anmelden",
   "chooseLanguage": "Sprache wählen",
-  "calorieTrackingMadeEasy": "Kalorienzählen leicht gemacht",
-  "onboardingStep1Title": "Verfolge deine Mahlzeiten",
-  "onboardingStep1Description": "Protokolliere deine Mahlzeiten einfach und verfolge deine Ernährung."
+  "personalDetails": "Persönliche Daten",
+  "adjustMacronutrients": "Makronährstoffe anpassen",
+  "weightHistory": "Gewichtsverlauf",
+  "homeWidget": "Startseite-Widget",
+  "chooseHomeWidgets": "Startseite-Widgets wählen",
+  "tapOptionsToAddRemoveWidgets": "Tippen Sie auf Optionen, um Widgets hinzuzufügen oder zu entfernen.",
+  "updatingWidgetSelection": "Widget-Auswahl wird aktualisiert...",
+  "requestingWidgetPermission": "Anfrage für Widget-Berechtigung...",
+  "widget1": "Widget Nr. 1",
+  "widget2": "Widget Nr. 2",
+  "widget3": "Widget Nr. 3",
+  "calorieTrackerWidget": "Kalorien-Tracker",
+  "nutritionTrackerWidget": "Ernährungs-Tracker",
+  "streakTrackerWidget": "Streak-Tracker",
+  "removedFromSelection": "{widgetName} aus der Auswahl entfernt.",
+  "@removedFromSelection": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "removeFromHomeScreenInstruction": "Um {widgetName} zu entfernen, entfernen Sie es von Ihrem Startbildschirm. Die Auswahl wird automatisch synchronisiert.",
+  "@removeFromHomeScreenInstruction": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "addFromHomeScreenInstruction": "Um {widgetName} hinzuzufügen, drücken Sie lange auf den Startbildschirm, tippen Sie auf + und wählen Sie dann Cal AI.",
+  "@addFromHomeScreenInstruction": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "widgetAdded": "{widgetName}-Widget hinzugefügt.",
+  "@widgetAdded": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "permissionNeededToAddWidget": "Berechtigung zum Hinzufügen von {widgetName} erforderlich. Wir haben die Einstellungen für Sie geöffnet.",
+  "@permissionNeededToAddWidget": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "couldNotOpenPermissionSettings": "Die Berechtigungseinstellungen konnten nicht geöffnet werden. Bitte aktivieren Sie die Berechtigungen manuell, um {widgetName}.",
+  "@couldNotOpenPermissionSettings": {
+    "placeholders": {
+      "widgetName": {}
+    }
+  },
+  "noWidgetsOnHomeScreen": "Keine Widgets auf dem Startbildschirm hinzuzufügen",
+  "selectedWidgets": "Ausgewählt: {widgets}",
+  "@selectedWidgets": {
+    "placeholders": {
+      "widgets": {}
+    }
+  },
+  "backupData": "Sichern Sie Ihre Daten",
+  "signInToSync": "Melden Sie sich an, um Ihren Fortschritt und Ihre Ziele zu synchronisieren",
+  "accountSuccessfullyBackedUp": "Konto erfolgreich gesichert!",
+  "failedToLinkAccount": "Konto konnte nicht verknüpft werden.",
+  "googleAccountAlreadyLinked": "Dieses Google-Konto ist bereits mit einem anderen Cal AI-Profil verknüpft.",
+  "caloriesLabel": "Kalorien",
+  "eatenLabel": "gegessen",
+  "leftLabel": "übrig",
+  "proteinLabel": "Eiwei?",
+  "carbsLabel": "Kohlenhydrate",
+  "fatsLabel": "Fette",
+  "fiberLabel": "Ballaststoffe",
+  "sugarLabel": "Zucker",
+  "sodiumLabel": "Natrium",
+  "stepsLabel": "Schritte",
+  "stepsTodayLabel": "Schritte heute",
+  "caloriesBurnedLabel": "Verbrannte Kalorien",
+  "stepTrackingActive": "Schrittverfolgung aktiv!",
+  "waterLabel": "Wasser",
+  "servingSizeLabel": "Portionsgröße",
+  "waterSettingsTitle": "Wassereinstellungen",
+  "hydrationQuestion": "Wie viel Wasser brauchen Sie, um hydriert zu bleiben?",
+  "hydrationInfo": "Jedermann Die Bedürfnisse unterscheiden sich geringfügig, wir empfehlen jedoch, jeden Tag mindestens 8 Tassen Wasser zu sich zu nehmen.",
+  "healthScoreTitle": "Gesundheitsbewertung",
+  "healthSummaryNoData": "Für heute wurden keine Daten erfasst. Fangen Sie an, Ihre Mahlzeiten zu verfolgen, um Erkenntnisse über Ihre Gesundheit zu erhalten!",
+  "healthSummaryLowIntake": "Ihre Aufnahme ist ziemlich gering. Konzentrieren Sie sich darauf, Ihre Kalorien- und Proteinziele zu erreichen, um Energie und Muskeln zu erhalten.",
+  "healthSummaryLowProtein": "Kohlenhydrate und Fett sind auf dem richtigen Weg, aber Ihr Proteingehalt ist niedrig. Eine Erhöhung des Proteingehalts kann beim Muskelerhalt helfen.",
+  "healthSummaryGreat": "Tolle Arbeit! Ihre Ernährung ist heute ausgewogen.",
+  "recentlyLoggedTitle": "Zuletzt protokolliert",
+  "errorLoadingLogs": "Fehler beim Laden der Protokolle: {error}",
+  "@errorLoadingLogs": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "deleteLabel": "Löschen",
+  "tapToAddFirstEntry": "Tippen Sie auf +, um Ihren ersten Eintrag hinzuzufügen",
+  "unableToLoadProgress": "Fortschritt konnte nicht geladen werden: {error}",
+  "@unableToLoadProgress": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "myWeightTitle": "Mein Gewicht",
+  "goalWithValue": "Ziel {value}",
+  "@goalWithValue": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "noGoalSet": "Kein Ziel festgelegt",
+  "logWeightCta": "Protokollgewicht",
+  "dayStreakTitle": "Tag Streak",
+  "progressPhotosTitle": "Fortschrittsfotos",
+  "progressPhotoPrompt": "Möchten Sie ein Foto hinzufügen, um Ihren Fortschritt zu verfolgen?",
+  "uploadPhotoCta": "Ein Foto hochladen",
+  "goalProgressTitle": "Zielfortschritt",
+  "ofGoalLabel": "des Ziels",
+  "logoutLabel": "Abmelden",
+  "logoutTitle": "Abmelden",
+  "logoutConfirmMessage": "Möchten Sie sich wirklich abmelden?",
+  "cancelLabel": "Abbrechen",
+  "preferencesLabel": "Einstellungen",
+  "appearanceLabel": "Aussehen",
+  "appearanceDescription": "Wählen Sie Hell, Dunkel oder Systemdarstellung",
+  "lightLabel": "Hell",
+  "darkLabel": "Dunkel",
+  "automaticLabel": "Automatisch",
+  "addBurnedCaloriesLabel": "Verbrannte Kalorien hinzufügen",
+  "addBurnedCaloriesDescription": "Verbrannte Kalorien zum Tagesziel hinzufügen",
+  "rolloverCaloriesLabel": "Rollover-Kalorien",
+  "rolloverCaloriesDescription": "Bis zu 200 übriggebliebene Kalorien zum heutigen Ziel hinzufügen",
+  "measurementUnitLabel": "Maßeinheit",
+  "measurementUnitDescription": "Alle Werte werden in imperiale Einheiten umgerechnet (derzeit metrisch).",
+  "inviteFriendsLabel": "Freunde einladen",
+  "defaultUserName": "Benutzer",
+  "enterYourNameLabel": "Geben Sie Ihren Namen ein",
+  "yearsOldLabel": "{years} Jahre alt",
+  "@yearsOldLabel": {
+    "placeholders": {
+      "years": {}
+    }
+  },
+  "termsAndConditionsLabel": "Allgemeine Geschäftsbedingungen",
+  "privacyPolicyLabel": "Datenschutzerklärung",
+  "supportEmailLabel": "Support-E-Mail",
+  "featureRequestLabel": "Funktionsanfrage",
+  "deleteAccountQuestion": "Konto löschen?",
+  "deleteAccountTitle": "Konto löschen",
+  "deleteAccountMessage": "Sind Sie absolut sicher? Dadurch werden Ihr Cal AI-Verlauf, Ihre Gewichtsprotokolle und Ihre benutzerdefinierten Ziele dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+  "deletePermanentlyLabel": "Dauerhaft löschen",
+  "onboardingChooseGenderTitle": "Wählen Sie Ihr Geschlecht",
+  "onboardingChooseGenderSubtitle": "Dies wird zur Kalibrierung Ihres benutzerdefinierten Plans verwendet.",
+  "genderFemale": "Weiblich",
+  "genderMale": "Männlich",
+  "genderOther": "Andere",
+  "onboardingWorkoutsPerWeekTitle": "Wie viele Trainingseinheiten machen Sie pro Woche?",
+  "onboardingWorkoutsPerWeekSubtitle": "Dies wird zur Kalibrierung Ihres benutzerdefinierten Plans verwendet.",
+  "workoutRangeLowTitle": "0-2",
+  "workoutRangeLowSubtitle": "Workouts jetzt und dann",
+  "workoutRangeModerateTitle": "3-5",
+  "workoutRangeModerateSubtitle": "A ein paar Trainingseinheiten pro Woche",
+  "workoutRangeHighTitle": "6+",
+  "workoutRangeHighSubtitle": "Engagierter Sportler",
+  "onboardingHearAboutUsTitle": "Wo haben Sie von uns erfahren?",
+  "sourceTikTok": "Tik Tok",
+  "sourceYouTube": "YouTube",
+  "sourceGoogle": "Google",
+  "sourcePlayStore": "Play Store",
+  "sourceFacebook": "Facebook",
+  "sourceFriendFamily": "Freund oder Familie",
+  "sourceTv": "TV",
+  "sourceInstagram": "Instagram",
+  "sourceX": "X",
+  "sourceOther": "Andere",
+  "yourBmiTitle": "Ihr BMI",
+  "yourWeightIsLabel": "Ihr Gewicht ist",
+  "bmiUnderweightLabel": "Untergewicht",
+  "bmiHealthyLabel": "Gesund",
+  "bmiOverweightLabel": "Übergewicht",
+  "bmiObeseLabel": "Adipös",
+  "calorieTrackingMadeEasy": "Kalorienverfolgung leicht gemacht",
+  "onboardingStep1Title": "Verfolgen Sie Ihre Mahlzeiten",
+  "onboardingStep1Description": "Protokollieren Sie Ihre Mahlzeiten einfach und verfolgen Sie Ihre Ernährung.",
+  "signInWithGoogle": "Mit Google anmelden",
+  "signInWithEmail": "Mit E-Mail anmelden",
+  "signInFailed": "Anmeldung fehlgeschlagen: {error}",
+  "@signInFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "continueLabel": "Weiter",
+  "skipLabel": "Überspringen",
+  "noLabel": "Nein",
+  "yesLabel": "Ja",
+  "submitLabel": "Senden",
+  "referralCodeLabel": "Empfehlung Code",
+  "heightLabel": "Höhe",
+  "weightLabel": "Gewicht",
+  "imperialLabel": "US-Einheiten",
+  "metricLabel": "Metrik",
+  "month1Label": "Monat 1",
+  "month6Label": "Monat 6",
+  "traditionalDietLabel": "Traditionelle Diät",
+  "weightChartSummary": "80 % der Cal AI-Benutzer behalten ihren Gewichtsverlust auch 6 Monate später bei",
+  "comparisonWithoutCalAi": "Ohne\\nCal AI",
+  "comparisonWithCalAi": "Mit\\nCal AI",
+  "comparisonLeftValue": "20%",
+  "comparisonRightValue": "2X",
+  "comparisonBottomLine1": "Cal AI macht es einfach und macht",
+  "comparisonBottomLine2": "Sie verantwortlich",
+  "speedSlowSteady": "Langsam und stetig",
+  "speedRecommended": "Empfohlen",
+  "speedAggressiveWarning": "Möglicherweise fühlen Sie sich sehr müde und entwickeln schlaffe Haut",
+  "subscriptionHeadline": "Schalten Sie CalAI frei, um Ihre Ziele schneller zu erreichen.",
+  "subscriptionPriceHint": "Nur PHP {yearlyPrice} pro Jahr (PHP {monthlyPrice}/Monat)",
+  "@subscriptionPriceHint": {
+    "placeholders": {
+      "yearlyPrice": {},
+      "monthlyPrice": {}
+    }
+  },
+  "goalGainWeight": "Nehmen Sie zu",
+  "goalLoseWeight": "Gewicht verlieren",
+  "goalMaintainWeight": "Gewicht halten",
+  "editGoalTitle": "Bearbeiten Sie das {title}-Ziel",
+  "@editGoalTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "revertLabel": "Zurücksetzen",
+  "doneLabel": "Erledigt",
+  "dashboardShouldGainWeight": "gewinnen",
+  "dashboardShouldLoseWeight": "verlieren",
+  "dashboardShouldMaintainWeight": "pflegen",
+  "dashboardCongratsPlanReady": "Herzlichen Glückwunsch\\nIhr individueller Plan ist fertig!",
+  "dashboardYouShouldGoal": "Sie sollten {action}:",
+  "@dashboardYouShouldGoal": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "dashboardWeightGoalByDate": "{value} {unit} von {date}",
+  "@dashboardWeightGoalByDate": {
+    "placeholders": {
+      "value": {},
+      "unit": {},
+      "date": {}
+    }
+  },
+  "dashboardDailyRecommendation": "Tägliche Empfehlung",
+  "dashboardEditAnytime": "Sie können dies jederzeit bearbeiten",
+  "dashboardHowToReachGoals": "So erreichen Sie Ihre Ziele:",
+  "dashboardReachGoalLifeScore": "Holen Sie sich Ihren wöchentlichen Life-Score und verbessern Sie Ihre Routine.",
+  "dashboardReachGoalTrackFood": "Verfolgen Sie Ihr Essen",
+  "dashboardReachGoalFollowCalories": "Befolgen Sie Ihre tägliche Kalorienempfehlung",
+  "dashboardReachGoalBalanceMacros": "Balancieren Sie Ihre Kohlenhydrate, Proteine ​​und Fette",
+  "dashboardPlanSourcesTitle": "Plan basierend auf den folgenden Quellen, neben anderen von Experten begutachteten medizinischen Studien:",
+  "dashboardSourceBasalMetabolicRate": "Grundumsatz",
+  "dashboardSourceCalorieCountingHarvard": "Kalorienzählen – Harvard",
+  "dashboardSourceInternationalSportsNutrition": "Internationale Gesellschaft für Sporternährung",
+  "dashboardSourceNationalInstitutesHealth": "Nationale Gesundheitsinstitute",
+  "factorsNetCarbsMass": "Nettokohlenhydrate/Masse",
+  "factorsNetCarbDensity": "Nettokohlenhydratdichte",
+  "factorsSodiumMass": "Natrium / Masse",
+  "factorsSodiumDensity": "Natriumdichte",
+  "factorsSugarMass": "Zucker / Masse",
+  "factorsSugarDensity": "Zuckerdichte",
+  "factorsProcessedScore": "Verarbeitete Partitur",
+  "factorsIngredientQuality": "Qualität der Zutaten",
+  "factorsProcessedScoreDescription": "Der verarbeitete Wert berücksichtigt Farbstoffe, Nitrate, Samenöle, künstliche Aromen/Süßstoffe und andere Faktoren.",
+  "healthScoreExplanationIntro": "Unser Gesundheitsscore ist eine komplexe Formel, die mehrere Faktoren bei einer Vielzahl gängiger Lebensmittel berücksichtigt.",
+  "healthScoreExplanationFactorsLead": "Nachfolgend sind die Faktoren aufgeführt, die wir bei der Berechnung des Gesundheitsfaktors berücksichtigen:",
+  "netCarbsLabel": "Netto-Kohlenhydrate",
+  "howDoesItWork": "Wie funktioniert es?",
+  "goodLabel": "Gut",
+  "badLabel": "Schlecht",
+  "dailyRecommendationFor": "Tagesempfehlung für",
+  "loadingCustomizingHealthPlan": "Gesundheitsplan anpassen...",
+  "loadingApplyingBmrFormula": "Anwendung der BMR-Formel...",
+  "loadingEstimatingMetabolicAge": "Schätzen Sie Ihr Stoffwechselalter...",
+  "loadingFinalizingResults": "Endgültige Ergebnisse...",
+  "loadingSetupForYou": "Wir richten alles für Sie ein",
+  "step4TriedOtherCalorieApps": "Haben Sie andere Kalorien-Tracking-Apps ausprobiert?",
+  "step5CalAiLongTermResults": "Cal AI schafft langfristige Ergebnisse",
+  "step6HeightWeightTitle": "Größe und Gewicht",
+  "step6HeightWeightSubtitle": "Dies wird bei der Berechnung Ihrer täglichen Ernährungsziele berücksichtigt.",
+  "step7WhenWereYouBorn": "Wann wurdest du geboren?",
+  "step8GoalQuestionTitle": "Was ist Ihr Ziel?",
+  "step8GoalQuestionSubtitle": "Dies hilft uns, einen Plan für Ihre Kalorienzufuhr zu erstellen.",
+  "step9SpecificDietQuestion": "Befolgen Sie eine bestimmte Diät?",
+  "step9DietClassic": "Klassiker",
+  "step9DietPescatarian": "Pescatarianer",
+  "step9DietVegetarian": "Vegetarier",
+  "step9DietVegan": "Vegane Ernährung",
+  "step91DesiredWeightQuestion": "Was ist Ihr Wunschgewicht?",
+  "step92GoalActionGaining": "Gewinnen",
+  "step92GoalActionLosing": "Verlieren",
+  "step92RealisticTargetSuffix": "ist ein realistisches Ziel. Es ist überhaupt nicht schwer!",
+  "step92SocialProof": "90 % der Benutzer sagen, dass die Veränderung nach der Verwendung von Cal AI offensichtlich ist und nicht einfach wieder auftritt.",
+  "step93GoalVerbGain": "Gewinnen",
+  "step93GoalVerbLose": "Verlieren",
+  "step93SpeedQuestionTitle": "Wie schnell möchten Sie Ihr Ziel erreichen?",
+  "step93WeightSpeedPerWeek": "{action} Gewichtsgeschwindigkeit pro Woche",
+  "@step93WeightSpeedPerWeek": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "step94ComparisonTitle": "Verlieren Sie mit Cal AI doppelt so viel Gewicht wie alleine",
+  "step95ObstaclesTitle": "Was hält Sie davon ab, Ihre Ziele zu erreichen?",
+  "step10AccomplishTitle": "Was möchten Sie erreichen?",
+  "step10OptionHealthier": "Gesünder essen und leben",
+  "step10OptionEnergyMood": "Steigern Sie meine Energie und Stimmung",
+  "step10OptionConsistency": "Bleiben Sie motiviert und konsequent",
+  "step10OptionBodyConfidence": "Fühle mich besser in meinem Körper",
+  "step11PotentialTitle": "Sie haben großes Potenzial, Ihr Ziel zu erreichen",
+  "step12ThankYouTitle": "Vielen Dank für Ihr Vertrauen!",
+  "step12PersonalizeSubtitle": "Lassen Sie uns nun Cal AI für Sie personalisieren ...",
+  "step12PrivacyCardTitle": "Ihre Privatsphäre und Sicherheit sind uns wichtig.",
+  "step12PrivacyCardBody": "Wir versprechen, Ihre\\npersönlichen Daten stets vertraulich und sicher zu behandeln.",
+  "step13ReachGoalsWithNotifications": "Erreichen Sie Ihre Ziele mit Benachrichtigungen",
+  "step13NotificationPrompt": "Cal AI möchte Ihnen Benachrichtigungen senden",
+  "allowLabel": "Erlauben",
+  "dontAllowLabel": "Nicht zulassen",
+  "step14AddBurnedCaloriesQuestion": "Verbrannte Kalorien zu Ihrem Tagesziel hinzufügen?",
+  "step15RolloverQuestion": "Überschüssige Kalorien auf den nächsten Tag übertragen?",
+  "step15RolloverUpTo": "Rollover bis",
+  "step15RolloverCap": "200 kcal",
+  "step16ReferralTitle": "Empfehlungscode eingeben (optional)",
+  "step16ReferralSubtitle": "Sie können diesen Schritt überspringen",
+  "step17AllDone": "Alles erledigt!",
+  "step17GeneratePlanTitle": "Zeit, Ihren individuellen Plan zu erstellen!",
+  "step18CalculationError": "Plan konnte nicht berechnet werden. Bitte überprüfen Sie Ihre Verbindung.",
+  "step18TryAgain": "Versuchen Sie es erneut",
+  "step19CreateAccountTitle": "Ein Konto erstellen",
+  "authInvalidEmailMessage": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+  "authCheckYourEmailTitle": "Überprüfen Sie Ihre E-Mails",
+  "authSignInLinkSentMessage": "Wir haben einen Anmeldelink an {email} gesendet",
+  "@authSignInLinkSentMessage": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "okLabel": "OK",
+  "genericErrorMessage": "Fehler: {error}",
+  "@genericErrorMessage": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authWhatsYourEmail": "Wie lautet Ihre E-Mail?",
+  "authPasswordlessHint": "Wir senden Ihnen einen Link zur Anmeldung ohne Passwort.",
+  "emailExampleHint": "name@beispiel.de",
+  "notSetLabel": "Nicht festgelegt",
+  "goalWeightLabel": "Zielgewicht",
+  "changeGoalLabel": "Ziel ändern",
+  "currentWeightLabel": "Aktuelles Gewicht",
+  "dateOfBirthLabel": "Geburtsdatum",
+  "genderLabel": "Geschlecht",
+  "dailyStepGoalLabel": "Tägliches Schrittziel",
+  "stepGoalLabel": "Schrittziel",
+  "setHeightTitle": "Höhe einstellen",
+  "setGenderTitle": "Geschlecht festlegen",
+  "setBirthdayTitle": "Geburtstag festlegen",
+  "setWeightTitle": "Gewicht einstellen",
+  "editNameTitle": "Namen bearbeiten",
+  "calorieGoalLabel": "Kalorienziel",
+  "proteinGoalLabel": "Proteinziel",
+  "carbGoalLabel": "Kohlenhydratziel",
+  "fatGoalLabel": "Fettziel",
+  "sugarLimitLabel": "Zuckergrenze",
+  "fiberGoalLabel": "Ballaststoffziel",
+  "sodiumLimitLabel": "Natriumgrenze",
+  "hideMicronutrientsLabel": "Mikronährstoffe ausblenden",
+  "viewMicronutrientsLabel": "Mikronährstoffe anzeigen",
+  "autoGenerateGoalsLabel": "Ziele automatisch generieren",
+  "failedToGenerateGoals": "Ziele konnten nicht generiert werden: {error}",
+  "@failedToGenerateGoals": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "calculatingCustomGoals": "Ihre benutzerdefinierten Ziele werden berechnet...",
+  "logExerciseLabel": "Training protokollieren",
+  "savedFoodsLabel": "Gespeicherte Lebensmittel",
+  "foodDatabaseLabel": "Essen Datenbank",
+  "scanFoodLabel": "Essen scannen",
+  "exerciseTitle": "Übung",
+  "runTitle": "Laufen",
+  "weightLiftingTitle": "Gewichtheben",
+  "describeTitle": "Beschreiben",
+  "runDescription": "Laufen, Joggen, Sprinten usw.",
+  "weightLiftingDescription": "Maschinen, Hanteln usw.",
+  "describeWorkoutDescription": "Schreiben Sie Ihr Training in Text",
+  "setIntensityLabel": "Einstellen Intensität",
+  "durationLabel": "Dauer",
+  "minutesShortLabel": "Minuten",
+  "minutesAbbrevSuffix": "m",
+  "addLabel": "Hinzufügen",
+  "intensityLabel": "Intensität",
+  "intensityHighLabel": "Hoch",
+  "intensityMediumLabel": "Mittel",
+  "intensityLowLabel": "Niedrig",
+  "runIntensityHighDescription": "Sprinten – 14 Meilen pro Stunde (4 Minuten Meilen)",
+  "runIntensityMediumDescription": "Joggen – 6 Meilen pro Stunde (10 Minuten Meilen)",
+  "runIntensityLowDescription": "Chill Walk – 3 Meilen pro Stunde (20 Minuten). Meilen)",
+  "weightIntensityHighDescription": "Training bis zum Muskelversagen, schwer atmen",
+  "weightIntensityMediumDescription": "Ins Schwitzen geraten, viele Wiederholungen",
+  "weightIntensityLowDescription": "Nicht ins Schwitzen geraten, wenig Anstrengung geben",
+  "exerciseLoggedSuccessfully": "Übung erfolgreich protokolliert!",
+  "exerciseParsedAndLogged": "Übung analysiert und protokolliert!",
+  "describeExerciseTitle": "Übung beschreiben",
+  "whatDidYouDoHint": "Was haben Sie gemacht?",
+  "describeExerciseExample": "Beispiel: 5 Stunden Wandern im Freien, Gefühl der Erschöpfung",
+  "servingLabel": "Portion",
+  "productNotFoundMessage": "Produkt nicht gefunden.",
+  "couldNotIdentify": "„{text}“ konnte nicht identifiziert werden.",
+  "@couldNotIdentify": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "identifyingFoodMessage": "Lebensmittel identifizieren...",
+  "loggedSuccessfullyMessage": "Erfolgreich angemeldet!",
+  "barcodeScannerLabel": "Barcode-Scanner",
+  "barcodeLabel": "Strichcode",
+  "foodLabel": "Lebensmitteletikett",
+  "galleryLabel": "Galerie",
+  "bestScanningPracticesTitle": "Beste Scan-Praktiken",
+  "generalTipsTitle": "Allgemeine Tipps:",
+  "scanTipKeepFoodInside": "Halten Sie die Lebensmittel innerhalb der Scanlinien",
+  "scanTipHoldPhoneStill": "Halten Sie Ihr Telefon ruhig, damit das Bild nicht verschwommen ist",
+  "scanTipAvoidObscureAngles": "Nehmen Sie das Bild nicht aus unklaren Winkeln auf",
+  "scanNowLabel": "Jetzt scannen",
+  "allTabLabel": "Alle",
+  "myMealsTabLabel": "Meine Mahlzeiten",
+  "myFoodsTabLabel": "Meine Lebensmittel",
+  "savedScansTabLabel": "Gespeicherte Scans",
+  "logEmptyFoodLabel": "Leeres Essen protokollieren",
+  "searchResultsLabel": "Suchergebnisse",
+  "suggestionsLabel": "Vorschläge",
+  "noItemsFoundLabel": "Keine Artikel gefunden.",
+  "noSuggestionsAvailableLabel": "Keine Vorschläge verfügbar",
+  "noSavedScansYetLabel": "Noch keine gespeicherten Scans",
+  "describeWhatYouAteHint": "Beschreiben Sie, was Sie gegessen haben",
+  "foodAddedToDate": "{foodName} zu {dateId} hinzugefügt",
+  "@foodAddedToDate": {
+    "placeholders": {
+      "dateId": {},
+      "foodName": {}
+    }
+  },
+  "failedToAddFood": "Essen konnte nicht hinzugefügt werden. Versuchen Sie es erneut.",
+  "invalidFoodIdMessage": "Ungültige Lebensmittel-ID",
+  "foodNotFoundMessage": "Essen nicht gefunden",
+  "couldNotLoadFoodDetails": "Die Lebensmitteldetails konnten nicht geladen werden",
+  "gramsShortLabel": "G",
+  "standardLabel": "Standard",
+  "selectedFoodTitle": "Ausgewählte Speisen",
+  "measurementLabel": "Messung",
+  "otherNutritionFactsLabel": "Weitere Nährwertangaben",
+  "numberOfServingsLabel": "Anzahl der Portionen",
+  "logLabel": "Protokoll",
+  "nutrientsTitle": "Nährstoffe",
+  "totalNutritionLabel": "Gesamternährung",
+  "enterFoodNameHint": "Geben Sie den Lebensmittelnamen ein",
+  "kcalLabel": "kcal",
+  "statsLabel": "Statistiken",
+  "intensityModerateLabel": "Mäßig",
+  "thisWeekLabel": "Diese Woche",
+  "lastWeekLabel": "Letzte Woche",
+  "twoWeeksAgoLabel": "Vor 2 Wochen",
+  "threeWeeksAgoLabel": "Vor 3 Wochen",
+  "totalCaloriesLabel": "Gesamtkalorien",
+  "calsLabel": "Kal.",
+  "dayShortSun": "So",
+  "dayShortMon": "Mo",
+  "dayShortTue": "Di",
+  "dayShortWed": "Mi",
+  "dayShortThu": "Do",
+  "dayShortFri": "Fr",
+  "dayShortSat": "Sa",
+  "ninetyDaysLabel": "90 Tage",
+  "sixMonthsLabel": "6 Monate",
+  "oneYearLabel": "1 Jahr",
+  "allTimeLabel": "Alle Zeiten",
+  "waitingForFirstLogLabel": "Ich warte auf Ihr erstes Protokoll ...",
+  "editGoalPickerTitle": "Zielauswahl bearbeiten",
+  "bmiDisclaimerTitle": "Haftungsausschluss",
+  "bmiDisclaimerBody": "Wie bei den meisten Gesundheitsmaßstäben ist der BMI kein perfekter Test. Beispielsweise können die Ergebnisse durch eine Schwangerschaft oder eine hohe Muskelmasse verfälscht werden, und es ist möglicherweise kein guter Indikator für die Gesundheit von Kindern oder älteren Menschen.",
+  "bmiWhyItMattersTitle": "Warum ist der BMI dann wichtig?",
+  "bmiWhyItMattersBody": "Generell gilt: Je höher Ihr BMI, desto höher ist das Risiko, eine Reihe von Erkrankungen zu entwickeln, die mit Übergewicht in Zusammenhang stehen, darunter:\\n� Diabetes\\n� Arthritis\\n� Lebererkrankungen\\n� verschiedene Arten von Krebs (z. B. Brust-, Dickdarm- und Prostatakrebs)\\n� hoher Blutdruck (Hypertonie)\\n� hoher Cholesterinspiegel\\n� Schlafapnoe",
+  "noWeightHistoryYet": "Es wurde noch kein Gewichtsverlauf aufgezeichnet.",
+  "overLabel": "über",
+  "dailyBreakdownTitle": "Tägliche Aufschlüsselung",
+  "editDailyGoalsLabel": "Bearbeiten Sie die täglichen Ziele",
+  "errorLoadingData": "Fehler beim Laden der Daten",
+  "gramsLabel": "Gramm",
+  "healthStatusNotEvaluated": "Nicht bewertet",
+  "healthStatusCriticallyLow": "Kritisch niedrig",
+  "healthStatusNeedsImprovement": "Verbesserungsbedarf",
+  "healthStatusFairProgress": "Fairer Fortschritt",
+  "healthStatusGoodHealth": "Gute Gesundheit",
+  "healthStatusExcellentHealth": "Ausgezeichnete Gesundheit",
+  "remindersTitle": "Erinnerungen",
+  "failedLoadReminderSettings": "Erinnerungseinstellungen konnten nicht geladen werden.",
+  "smartNutritionRemindersTitle": "Erinnerungen an intelligente Ernährung",
+  "dailyReminderAtLabel": "Tägliche Erinnerung um",
+  "setSmartNutritionTimeLabel": "Zeit für intelligente Ernährung festlegen",
+  "waterRemindersTitle": "Wassererinnerungen",
+  "everyLabel": "Jede",
+  "hourUnitLabel": "Stunde(n)",
+  "fromLabel": "ab",
+  "setWaterStartTimeLabel": "Startzeit für Wasser festlegen",
+  "breakfastReminderTitle": "Erinnerung an das Frühstück",
+  "lunchReminderTitle": "Erinnerung an das Mittagessen",
+  "dinnerReminderTitle": "Abendessen Erinnerung",
+  "snackReminderTitle": "Snack-Erinnerung",
+  "goalTrackingAlertsTitle": "Zielverfolgungswarnungen",
+  "goalTrackingAlertsSubtitle": "Benachrichtigungen zu Kalorien und Makrozielen, die nahe/überschritten sind",
+  "stepsExerciseReminderTitle": "Schritte/Trainingserinnerung",
+  "dailyAtLabel": "Täglich um",
+  "setActivityReminderTimeLabel": "Aktivitätserinnerungszeit festlegen",
+  "intervalLabel": "Intervall:",
+  "setTimeLabel": "Einstellen time",
+  "languageNameEnglish": "Englisch",
+  "languageNameSpanish": "Spanisch",
+  "languageNamePortuguese": "Portugiesisch",
+  "languageNameFrench": "Französisch",
+  "languageNameGerman": "Deutsch",
+  "languageNameItalian": "Italienisch",
+  "languageNameHindi": "Hindi",
+  "progressMessageStart": "Der Anfang ist der schwierigste Teil. Dafür sind Sie bereit!",
+  "progressMessageKeepPushing": "Sie machen Fortschritte. Jetzt ist es an der Zeit, weiter zu pushen!",
+  "progressMessagePayingOff": "Ihr Engagement zahlt sich aus. Weitermachen!",
+  "progressMessageFinalStretch": "Es ist die letzte Etappe. Fordern Sie sich selbst!",
+  "progressMessageCongrats": "Du hast es geschafft! Herzlichen Glückwunsch!",
+  "dayStreakWithCount": "{count}-Tage-Serie",
+  "streakLostTitle": "Serie verloren",
+  "streakActiveSubtitle": "Du bist richtig gut dabei! Protokolliere weiter, um deinen Schwung zu halten.",
+  "streakLostSubtitle": "Gib nicht auf. Melden Sie noch heute Ihre Mahlzeiten an, um wieder auf den richtigen Weg zu kommen.",
+  "dayInitialSun": "S",
+  "dayInitialMon": "M",
+  "dayInitialTue": "D",
+  "dayInitialWed": "M",
+  "dayInitialThu": "D",
+  "dayInitialFri": "F",
+  "dayInitialSat": "S",
+  "alertCalorieGoalExceededTitle": "Kalorienziel überschritten",
+  "alertCalorieGoalExceededBody": "Du bist {over} kcal über deinem Tagesziel.",
+  "alertNearCalorieLimitTitle": "Du bist nahe deinem Kalorienlimit",
+  "alertNearCalorieLimitBody": "Nur noch {remaining} kcal übrig. Planen Sie Ihre nächste Mahlzeit sorgfältig.",
+  "alertProteinBehindTitle": "Protein-Ziel liegt hinter",
+  "alertProteinBehindBody": "Sie benötigen noch etwa {missing} g Protein, um das heutige Ziel zu erreichen.",
+  "alertCarbTargetExceededTitle": "Kohlenhydrat-Ziel überschritten",
+  "alertCarbTargetExceededBody": "Kohlenhydrate liegen {over} g über Ziel.",
+  "alertFatTargetExceededTitle": "Fett-Ziel überschritten",
+  "alertFatTargetExceededBody": "Fett liegt {over} g über Ziel.",
+  "smartNutritionTipTitle": "Intelligenter Ernährungstipp",
+  "smartNutritionKcalLeft": "{calories} kcal links",
+  "smartNutritionKcalOver": "{calories} kcal über",
+  "smartNutritionProteinRemaining": "{protein} g verbleibendes Protein",
+  "smartNutritionProteinGoalReached": "Proteinziel erreicht",
+  "smartNutritionCombinedMessage": "{calorieMessage} und {proteinMessage}. Protokollieren Sie Ihre nächste Mahlzeit, um auf dem Laufenden zu bleiben.",
+  "notificationStepsExerciseTitle": "Schritte und Trainingserinnerung",
+  "notificationStepsExerciseBody": "Protokollieren Sie Ihre Schritte oder Ihr Training, um das heutige Aktivitätsziel zu erreichen.",
+  "notificationBreakfastTitle": "Frühstückserinnerung",
+  "notificationBreakfastBody": "Protokollieren Sie das Frühstück, um früher mit der Kalorien- und Makroverfolgung zu beginnen.",
+  "notificationLunchTitle": "Mittagessenerinnerung",
+  "notificationLunchBody": "Mittagspause. Fügen Sie Ihre Mahlzeit hinzu, um Ihren täglichen Fortschritt genau zu halten.",
+  "notificationDinnerTitle": "Abendessen-Erinnerung",
+  "notificationDinnerBody": "Protokollieren Sie das Abendessen und schließen Sie Ihren Tag mit vollständigen Nährwertdaten ab.",
+  "notificationSnackTitle": "Snack-Erinnerung",
+  "notificationSnackBody": "Fügen Sie Ihren Snack hinzu, damit Kalorien und Makros mit Ihren Zielen übereinstimmen.",
+  "smartNutritionDailyTitle": "Intelligente Ernährungskontrolle",
+  "smartNutritionDailyBody": "Ziel {calories} kcal, {protein}g Protein, {carbs}g Kohlenhydrate, {fats}g Fett. Protokollieren Sie Ihre letzte Mahlzeit, um Ihren Plan korrekt zu halten.",
+  "notificationWaterTitle": "Wassererinnerung",
+  "notificationWaterBody": "Kontrolle der Flüssigkeitszufuhr. Protokollieren Sie ein Glas Wasser in Cal AI.",
+  "homeWidgetLogFoodCta": "Protokollieren Sie Ihre Lebensmittel",
+  "homeWidgetCaloriesTodayTitle": "Kalorien heute",
+  "homeWidgetCaloriesSubtitle": "{calories} von {goal} kcal",
+  "@dayStreakWithCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "@alertCalorieGoalExceededBody": {
+    "placeholders": {
+      "over": {}
+    }
+  },
+  "@alertNearCalorieLimitBody": {
+    "placeholders": {
+      "remaining": {}
+    }
+  },
+  "@alertProteinBehindBody": {
+    "placeholders": {
+      "missing": {}
+    }
+  },
+  "@alertCarbTargetExceededBody": {
+    "placeholders": {
+      "over": {}
+    }
+  },
+  "@alertFatTargetExceededBody": {
+    "placeholders": {
+      "over": {}
+    }
+  },
+  "@smartNutritionKcalLeft": {
+    "placeholders": {
+      "calories": {}
+    }
+  },
+  "@smartNutritionKcalOver": {
+    "placeholders": {
+      "calories": {}
+    }
+  },
+  "@smartNutritionProteinRemaining": {
+    "placeholders": {
+      "protein": {}
+    }
+  },
+  "@smartNutritionCombinedMessage": {
+    "placeholders": {
+      "calorieMessage": {},
+      "proteinMessage": {}
+    }
+  },
+  "@smartNutritionDailyBody": {
+    "placeholders": {
+      "calories": {},
+      "protein": {},
+      "carbs": {},
+      "fats": {}
+    }
+  },
+  "@homeWidgetCaloriesSubtitle": {
+    "placeholders": {
+      "calories": {},
+      "goal": {}
+    }
+  }
 }

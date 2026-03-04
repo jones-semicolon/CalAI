@@ -1,7 +1,7 @@
 import 'package:calai/pages/home/floating_grid/log_exercise/run_page.dart';
 import 'package:calai/pages/home/floating_grid/log_exercise/weight_lifting_page.dart';
 import 'package:flutter/material.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../../widgets/header_widget.dart';
 import 'describe_page.dart';
 
@@ -33,7 +33,7 @@ class _LogExercisePageState extends State<LogExercisePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Log Exercise",
+                      context.l10n.logExerciseLabel,
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -45,20 +45,20 @@ class _LogExercisePageState extends State<LogExercisePage> {
                     // Exercise Cards
                     _buildExerciseCard(
                       icon: Icons.directions_run,
-                      title: "Run",
-                      subtitle: "Running, jogging, sprinting, etc.",
+                      title: context.l10n.runTitle,
+                      subtitle: context.l10n.runDescription,
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RunExercisePage())),
                     ),
                     _buildExerciseCard(
                       icon: Icons.fitness_center,
-                      title: "Weight Lifting",
-                      subtitle: "Machines, free weights, etc.",
+                      title: context.l10n.weightLiftingTitle,
+                      subtitle: context.l10n.weightLiftingDescription,
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WeightLiftingPage())),
                     ),
                     _buildExerciseCard(
                       icon: Icons.edit,
-                      title: "Describe",
-                      subtitle: "Write your workout in text",
+                      title: context.l10n.describeExerciseTitle,
+                      subtitle: context.l10n.describeWorkoutDescription,
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DescribePage())),
                     ),
                     Spacer(flex: 2,)

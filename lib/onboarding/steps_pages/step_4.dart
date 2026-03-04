@@ -1,3 +1,4 @@
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,18 +18,25 @@ class _OnboardingStep4State extends ConsumerState<OnboardingStep4> {
   bool isEnable = false;
   int? selectedIndex;
 
-  // Added 'value' to OptionCard to hold the boolean
-  final List<OptionCard> options = [
-    OptionCard(title: 'Yes', icon: Icons.thumb_up, value: true),
-    OptionCard(title: 'No', icon: Icons.thumb_down, value: false),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final options = <OptionCard>[
+      OptionCard(
+        title: context.l10n.yesLabel,
+        icon: Icons.thumb_up,
+        value: true,
+      ),
+      OptionCard(
+        title: context.l10n.noLabel,
+        icon: Icons.thumb_down,
+        value: false,
+      ),
+    ];
+
     return SafeArea(
       child: Column(
         children: [
-          const Header(title: 'Have you tried other calorie tracking apps?'),
+          Header(title: context.l10n.step4TriedOtherCalorieApps),
 
           Expanded(
             child: CustomScrollView(
@@ -65,6 +73,38 @@ class _OnboardingStep4State extends ConsumerState<OnboardingStep4> {
               ],
             ),
           ),
+
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: ContinueButton(
+          //     enabled: isEnable,
+          //     onNext: () async {
+          //       // if (selectedIndex != null) {
+          //       //   final bool hasTried = options[selectedIndex!].value as bool;
+          //       //   final uid = FirebaseAuth.instance.currentUser?.uid;
+          //       //
+          //       //   if (uid != null) {
+          //       //     // ✅ DIRECT TO FIRESTORE: Keep marketing data separate
+          //       //     try {
+          //       //       await FirebaseFirestore.instance
+          //       //           .collection('onboarding_surveys')
+          //       //           .doc(uid)
+          //       //           .set({
+          //       //         'hasTriedOtherApps': hasTried,
+          //       //         'surveyStep': 4,
+          //       //         'updatedAt': FieldValue.serverTimestamp(),
+          //       //       }, SetOptions(merge: true));
+          //       //
+          //       //       debugPrint('Survey Saved: Has tried apps = $hasTried');
+          //       //     } catch (e) {
+          //       //       debugPrint('Error saving survey step 4: $e');
+          //       //     }
+          //       //   }
+          //       // }
+          //       widget.nextPage();
+          //     },
+          //   ),
+          // ),
           ConfirmationButtonWidget(onConfirm: widget.nextPage, enabled: isEnable,)
         ],
       ),

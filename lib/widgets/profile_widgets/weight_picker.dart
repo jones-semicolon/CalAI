@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class WeightPicker extends StatefulWidget {
   final bool isMetric;
@@ -30,7 +31,7 @@ class _WeightPickerState extends State<WeightPicker> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text("Weight", style: Theme.of(context).textTheme.titleMedium),
+        Text(context.l10n.weightLabel, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 20),
         Center(
           child: widget.isMetric

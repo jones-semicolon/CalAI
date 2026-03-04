@@ -558,7 +558,7 @@ class _MacroTile extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    nutritionType.label,
+                    nutritionType.getLabel(context),
                     style: const TextStyle(
                       fontSize: 10,
                       color: Colors.grey,

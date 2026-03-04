@@ -3,7 +3,7 @@ import 'package:calai/widgets/header_widget.dart';
 import 'package:calai/widgets/weight_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../providers/user_provider.dart';
 
 class WeightPickerView extends ConsumerStatefulWidget {
@@ -26,7 +26,7 @@ class _WeightPickerViewState extends ConsumerState<WeightPickerView> {
     return Scaffold(
       body: Column(
         children: [
-          CustomAppBar(title: const Text("Set Weight")),
+          CustomAppBar(title: Text(context.l10n.setWeightTitle)),
           const Spacer(), // Centers the picker vertically
           WeightPicker(
             initialWeight: body.currentWeight,
@@ -38,7 +38,7 @@ class _WeightPickerViewState extends ConsumerState<WeightPickerView> {
                 _selectedWeight = newWeight;
               });
             },
-            labelBuilder: (curr, selected) => "Current Weight",
+            labelBuilder: (curr, selected) => context.l10n.currentWeightLabel,
           ),
           const Spacer(flex: 2), // Keeps the picker from hugging the bottom button
           ConfirmationButtonWidget(

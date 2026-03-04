@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:calai/core/constants/constants.dart';
 import '../../../providers/user_provider.dart';
 import '../edit_name.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class NameAgeCard extends ConsumerWidget {
   const NameAgeCard({super.key});
@@ -24,7 +25,7 @@ class NameAgeCard extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     final user = ref.watch(userProvider);
-    final String name = user.profile.name ?? "user";
+    final String name = user.profile.name ?? context.l10n.defaultUserName;
     final int age = _calculateAge(user.profile.birthDate!);
     final bool isNameEmpty = name.trim().isEmpty;
     final String? photoURL = user.profile.photoURL;
@@ -72,7 +73,7 @@ class NameAgeCard extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        isNameEmpty ? "Enter your name" : name,
+                        isNameEmpty ? context.l10n.enterYourNameLabel : name,
                         style: TextStyle(
                           color: colorScheme.onPrimary,
                           fontWeight: FontWeight.bold,
@@ -86,7 +87,7 @@ class NameAgeCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    "$age years old",
+                    context.l10n.yearsOldLabel(age),
                     style: TextStyle(color: colorScheme.primary),
                   ),
                 ],

@@ -3,8 +3,7 @@ import 'package:calai/widgets/header_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// Update these imports to match your file structure
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/api/food_api.dart';
 import 'package:calai/core/constants/app_sizes.dart';
 import 'package:calai/models/food_model.dart';
@@ -27,7 +26,6 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
   String? _errorMessage;
   Food? _foodItem;
 
-  // Selection State
   FoodPortionItem? _selectedPortion;
   bool _isGramsMode = true;
   double _servingsCount = 100;
@@ -35,7 +33,6 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
   @override
   void initState() {
     super.initState();
-    // ✅ Check if we already have the data or need to fetch it
     if (SourceType.fromString(widget.foodItem?.source ?? SourceType.foodUpload.value) != SourceType.foodDatabase || widget.foodId == null) {
       _initializeWithProvidedFood();
     } else {
@@ -63,7 +60,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
 
     try {
       final foods = await FoodApi.getFoodsByIds([widget.foodId!]);
-      if (foods.isEmpty) throw Exception("Food not found");
+      if (foods.isEmpty) throw Exception(context.l10n.foodNotFoundMessage);
 
       if (mounted) {
         setState(() {
@@ -76,7 +73,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
       debugPrint("Error: $e");
       if (mounted) {
         setState(() {
-          _errorMessage = "Could not load food details";
+          _errorMessage = context.l10n.couldNotLoadFoodDetails;
           _isLoading = false;
         });
       }
@@ -129,7 +126,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
       child: Row(
         children: [
           _TabButton(
-            label: "G",
+            label: context.l10n.gramsShortLabel,
             isActive: _isGramsMode,
             onTap: () => setState(() {
               _isGramsMode = true;
@@ -141,7 +138,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
           ...portions.map((portion) {
             final bool isActive = !_isGramsMode && _selectedPortion == portion;
             String unit = portion.unitOnly;
-            if (unit == "per100") unit = "Standard";
+            if (unit == "per100") unit = context.l10n.standardLabel;
             final displayLabel = _capitalize(unit);
 
             return Padding(
@@ -172,7 +169,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
 
     final FoodLog previewLog = _foodItem!.createLog(
       amount: _servingsCount,
-      unit: _isGramsMode ? "Grams" : (_selectedPortion?.label ?? "Serving"),
+      unit: _isGramsMode ? context.l10n.gramsLabel : (_selectedPortion?.label ?? context.l10n.servingLabel),
       gramWeight: _isGramsMode ? 1.0 : (_selectedPortion?.gramWeight ?? 100.0),
     );
 
@@ -180,7 +177,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
       body: SafeArea(
         child: Column(
           children: [
-            CustomAppBar(title: Text("Selected food", style: TextStyle(fontWeight: FontWeight.w700)), actions: [_CircleButton(icon: Icons.more_horiz, onTap: () => debugPrint("Options"))],),
+            CustomAppBar(title: Text(context.l10n.selectedFoodTitle, style: TextStyle(fontWeight: FontWeight.w700)), actions: [_CircleButton(icon: Icons.more_horiz, onTap: () => debugPrint("Options"))],),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -189,7 +186,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
                   children: [
                     _buildFoodTitle(),
                     const SizedBox(height: 25),
-                    _buildSectionLabel(theme, "Measurement"),
+                    _buildSectionLabel(theme, context.l10n.measurementLabel),
                     const SizedBox(height: 10),
                     _buildMeasurementTabs(),
                     const SizedBox(height: 14),
@@ -199,7 +196,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
                     const SizedBox(height: 18),
                     _buildMacroRow(previewLog),
                     const SizedBox(height: 26),
-                    _buildSectionLabel(theme, "Other nutrition facts"),
+                    _buildSectionLabel(theme, context.l10n.otherNutritionFactsLabel),
                     const SizedBox(height: 10),
                     _buildDetailedNutritionList(previewLog),
                     const SizedBox(height: 50),
@@ -264,7 +261,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
 
   Widget _buildServingsRow(ThemeData theme) => Row(
     children: [
-      Text("Number of servings", style: TextStyle(fontWeight: FontWeight.w700, color: theme.hintColor)),
+      Text(context.l10n.numberOfServingsLabel, style: TextStyle(fontWeight: FontWeight.w700, color: theme.hintColor)),
       const Spacer(),
       _ServingsInputBox(
         value: _servingsCount,
@@ -293,7 +290,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Calories", style: TextStyle(fontSize: 12, color: theme.hintColor, fontWeight: FontWeight.w600)),
+              Text(context.l10n.caloriesLabel, style: TextStyle(fontSize: 12, color: theme.hintColor, fontWeight: FontWeight.w600)),
               Text("${data.calories.round()}",
                   style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
             ],
@@ -334,7 +331,7 @@ class _SelectedFoodPageState extends ConsumerState<SelectedFoodPage> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: Colors.black, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999))),
         onPressed: () => _onLogFood(previewLog),
-        child: const Text("Log", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Colors.white)),
+        child: Text(context.l10n.logLabel, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Colors.white)),
       ),
     ),
   );
@@ -521,7 +518,7 @@ class _MacroTile extends StatelessWidget {
                 child: Icon(nutrition.icon, size: 18, color: nutrition.color),
               ),
               const SizedBox(width: 5),
-              Text(nutrition.label, style: TextStyle(color: theme.hintColor, fontSize: 12)),
+              Text(nutrition.getLabel(context), style: TextStyle(color: theme.hintColor, fontSize: 12)),
             ],
           ),
           const SizedBox(height: 4),

@@ -1,6 +1,7 @@
 import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class EditModal extends StatefulWidget {
   final double initialValue;
@@ -66,7 +67,7 @@ class _EditModalState extends State<EditModal> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Edit ${widget.title}',
+                      context.l10n.editGoalTitle(widget.title),
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     OutlinedButton.icon(
@@ -78,7 +79,7 @@ class _EditModalState extends State<EditModal> {
                         });
                       },
                       icon: const Icon(Icons.refresh, size: 18),
-                      label: const Text("Revert"),
+                      label: Text(context.l10n.revertLabel),
                       style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                         side: BorderSide(color: theme.colorScheme.primary),

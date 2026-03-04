@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:calai/l10n/l10n.dart';
 
 import '../../enums/user_enums.dart';
 import '../../providers/user_provider.dart';
@@ -92,6 +93,7 @@ class _HeightWeightPickerWidgetState extends ConsumerState<HeightWeightPickerWid
     final user = ref.watch(userProvider);
     final userDataProvider = ref.read(userProvider.notifier);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     const double itemH = 40.0;
     const double pickerH = itemH * 7;
@@ -108,7 +110,7 @@ class _HeightWeightPickerWidgetState extends ConsumerState<HeightWeightPickerWid
         const SizedBox(height: 30),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [_header("Height", theme), _header("Weight", theme)],
+          children: [_header(l10n.heightLabel, theme), _header(l10n.weightLabel, theme)],
         ),
         const SizedBox(height: 16),
 
@@ -198,7 +200,7 @@ class _HeightWeightPickerWidgetState extends ConsumerState<HeightWeightPickerWid
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "Imperial",
+          context.l10n.imperialLabel,
           style: TextStyle(
             color: !isMetric ? theme.colorScheme.primary : theme.shadowColor,
             fontWeight: FontWeight.bold,
@@ -235,7 +237,7 @@ class _HeightWeightPickerWidgetState extends ConsumerState<HeightWeightPickerWid
         ),
         const SizedBox(width: 20),
         Text(
-          "Metric",
+          context.l10n.metricLabel,
           style: TextStyle(
             color: isMetric ? theme.colorScheme.primary : theme.shadowColor,
             fontWeight: FontWeight.bold,

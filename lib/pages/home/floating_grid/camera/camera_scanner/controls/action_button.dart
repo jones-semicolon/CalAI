@@ -33,6 +33,7 @@ class ActionButton extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

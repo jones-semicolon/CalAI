@@ -9,6 +9,7 @@ import '../../../onboarding/steps_pages/step_8.dart';
 import '../../../onboarding/steps_pages/step_9.1.dart';
 import '../../../onboarding/steps_pages/step_9.3.dart';
 import '../../../providers/user_provider.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class GenerateGoalsView extends ConsumerStatefulWidget {
   final int startIndex;
@@ -70,7 +71,7 @@ class _GenerateGoalsViewState extends ConsumerState<GenerateGoalsView> {
       // Show an error snackbar if something goes wrong
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Failed to generate goals: $e")));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.failedToGenerateGoals(e.toString()))));
     }
   }
 
@@ -133,14 +134,14 @@ class _GenerateGoalsViewState extends ConsumerState<GenerateGoalsView> {
             if (_isGenerating)
               Container(
                 color: Colors.black.withOpacity(0.5),
-                child: const Center(
+                child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       CupertinoActivityIndicator(radius: 15),
                       SizedBox(height: 20),
                       Text(
-                        "Calculating your custom goals...",
+                        context.l10n.calculatingCustomGoals,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

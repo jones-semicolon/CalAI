@@ -1,6 +1,7 @@
 import 'package:calai/pages/settings/screens/referral_view.dart';
 import 'package:flutter/material.dart';
 import 'package:calai/core/constants/constants.dart';
+import 'package:calai/l10n/l10n.dart';
 
 class InviteFriendsItem extends StatelessWidget {
   const InviteFriendsItem({super.key});
@@ -41,7 +42,7 @@ class InviteFriendsItem extends StatelessWidget {
               child: Icon(Icons.group_outlined, size: 20, color: primaryColor),
             ),
             const SizedBox(width: 10),
-            Text("Invite friends", style: textStyle),
+            Text(context.l10n.inviteFriendsLabel, style: textStyle),
           ],
         ),
       ),

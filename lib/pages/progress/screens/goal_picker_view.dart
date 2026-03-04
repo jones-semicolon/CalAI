@@ -2,7 +2,7 @@ import 'package:calai/widgets/confirmation_button_widget.dart';
 import 'package:calai/widgets/weight_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import '../../../providers/user_provider.dart';
 import '../../../widgets/header_widget.dart';
 
@@ -30,7 +30,7 @@ class _GoalPickerViewState extends ConsumerState<GoalPickerView> {
       body: Column(
         children: [
           CustomAppBar(
-            title: const Text("Edit Goal Picker")),
+            title: Text(context.l10n.editGoalPickerTitle)),
           const Spacer(),
           WeightPicker(
             // ✅ Start the picker at the current Target Weight
@@ -46,9 +46,9 @@ class _GoalPickerViewState extends ConsumerState<GoalPickerView> {
             },
             // ✅ Dynamic label based on whether they are gaining or losing
             labelBuilder: (current, selected) {
-              if (selected > current) return "Gain Weight";
-              if (selected < current) return "Lose Weight";
-              return "Maintain Weight";
+              if (selected > current) return context.l10n.goalGainWeight;
+              if (selected < current) return context.l10n.goalLoseWeight;
+              return context.l10n.goalMaintainWeight;
             },
           ),
           const Spacer(flex: 2),
