@@ -99,6 +99,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late ThemeMode _themeMode;
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  Locale? _locale;
 
   @override
   void initState() {
@@ -112,43 +113,36 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  void setLocale(Locale? locale) {
+    setState(() => _locale = locale);
+  }
+
   @override
   Widget build(BuildContext context) {
-        return Consumer(
+      return Consumer(
       builder: (context, ref, _) {
         final locale = ref.watch(localeProvider);
 
         return MaterialApp(
-          key: ValueKey<String>(locale?.languageCode ?? 'system'),
           debugShowCheckedModeBanner: false,
-          navigatorKey: _navigatorKey,
+          navigatorKey: appNavigatorKey,
           themeMode: _themeMode,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          locale: locale,
+          locale: locale ?? _locale,
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           onGenerateTitle: (context) => context.l10n.appTitle,
 
-          // ✅ GLOBAL OVERLAY INJECTION
           builder: (context, child) {
-            // We wrap the entire app in a Stack
             return Stack(
               children: [
-                // 1. The actual screen (AppEntry, Dashboard, etc.)
                 if (child != null) child,
 
-                // 2. The Debug Overlay (Only show in Debug Mode)
-                if (kDebugMode)
-                  const Positioned(
-                    right: 0,
-                    top: 100, // Adjust start position so it doesn't block AppBar
-                    child: DebugOverlay(),
-                  ),
+                if (kDebugMode) const DebugOverlay(),
               ],
             );
           },
-
           home: const AppEntry(),
         );
       }

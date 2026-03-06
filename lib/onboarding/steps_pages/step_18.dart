@@ -64,6 +64,7 @@ class OnboardingStep18State extends ConsumerState<OnboardingStep18> {
   }) async {
     final double? newValue = await showModalBottomSheet<double>(
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       context: context,
       builder: (context) => EditModal(
         initialValue: initialValue.toDouble(),

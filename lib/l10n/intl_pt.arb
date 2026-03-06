@@ -214,8 +214,8 @@
   "month6Label": "Mês 6",
   "traditionalDietLabel": "Dieta Tradicional",
   "weightChartSummary": "80% dos usuários do Cal AI mantêm a perda de peso mesmo 6 meses depois",
-  "comparisonWithoutCalAi": "Sem\\nCal AI",
-  "comparisonWithCalAi": "Com\\nCal AI",
+  "comparisonWithoutCalAi": "Sem Cal AI",
+  "comparisonWithCalAi": "Com Cal AI",
   "comparisonLeftValue": "20%",
   "comparisonRightValue": "2X",
   "comparisonBottomLine1": "Cal AI torna tudo mais fácil e seguro",
@@ -223,7 +223,7 @@
   "speedSlowSteady": "Lento e constante",
   "speedRecommended": "Recomendado",
   "speedAggressiveWarning": "Você pode se sentir muito cansado e desenvolver pele flácida",
-  "subscriptionHeadline": "Desbloqueie o CalAI para alcançar\\nseus objetivos com mais rapidez.",
+  "subscriptionHeadline": "Desbloqueie o CalAI para alcançar seus objetivos com mais rapidez.",
   "subscriptionPriceHint": "Apenas PHP {yearlyPrice} por ano (PHP {monthlyPrice}/mês)",
   "@subscriptionPriceHint": {
     "placeholders": {
@@ -234,7 +234,7 @@
   "goalGainWeight": "Ganhar peso",
   "goalLoseWeight": "Perder peso",
   "goalMaintainWeight": "Manter o peso",
-  "editGoalTitle": "Editar meta {title}",
+  "editGoalTitle": "Editar {title}",
   "@editGoalTitle": {
     "placeholders": {
       "title": {}
@@ -245,7 +245,7 @@
   "dashboardShouldGainWeight": "ganho",
   "dashboardShouldLoseWeight": "perder",
   "dashboardShouldMaintainWeight": "manter",
-  "dashboardCongratsPlanReady": "Parabéns\\nseu plano personalizado está pronto!",
+  "dashboardCongratsPlanReady": "Parabéns seu plano personalizado está pronto!",
   "dashboardYouShouldGoal": "Você deve {action}:",
   "@dashboardYouShouldGoal": {
     "placeholders": {
@@ -292,7 +292,7 @@
   "loadingApplyingBmrFormula": "Aplicando a fórmula BMR...",
   "loadingEstimatingMetabolicAge": "Estimando sua idade metabólica...",
   "loadingFinalizingResults": "Finalizando resultados...",
-  "loadingSetupForYou": "Estamos configurando tudo\\npara você",
+  "loadingSetupForYou": "Estamos configurando tudo para você",
   "step4TriedOtherCalorieApps": "Você já experimentou outros aplicativos de rastreamento de calorias?",
   "step5CalAiLongTermResults": "Cal AI cria resultados de longo prazo",
   "step6HeightWeightTitle": "Altura e Peso",
@@ -327,10 +327,10 @@
   "step10OptionConsistency": "Mantenha-se motivado e consistente",
   "step10OptionBodyConfidence": "Sinta-se melhor com meu corpo",
   "step11PotentialTitle": "Você tem um grande potencial para esmagar seu objetivo",
-  "step12ThankYouTitle": "Obrigado por\\nconfiar em nós!",
+  "step12ThankYouTitle": "Obrigado por confiar em nós!",
   "step12PersonalizeSubtitle": "Agora vamos personalizar o Cal AI para você...",
   "step12PrivacyCardTitle": "Sua privacidade e segurança são importantes para nós.",
-  "step12PrivacyCardBody": "Prometemos sempre manter suas\\ninformações pessoais privadas e seguras.",
+  "step12PrivacyCardBody": "Prometemos sempre manter suas informações pessoais privadas e seguras.",
   "step13ReachGoalsWithNotifications": "Alcance seus objetivos com notificações",
   "step13NotificationPrompt": "Cal AI gostaria de enviar notificações para você",
   "allowLabel": "Permitir",
@@ -502,7 +502,7 @@
   "bmiDisclaimerTitle": "Isenção de responsabilidade",
   "bmiDisclaimerBody": "Tal como acontece com a maioria das medidas de saúde, o IMC não é um teste perfeito. Por exemplo, os resultados podem ser prejudicados pela gravidez ou pelo aumento da massa muscular, e pode não ser uma boa medida de saúde para crianças ou idosos.",
   "bmiWhyItMattersTitle": "Então, por que o IMC é importante?",
-  "bmiWhyItMattersBody": "Em geral, quanto maior o seu IMC, maior o risco de desenvolver uma série de doenças relacionadas ao excesso de peso, incluindo:\\n� diabetes\\n� artrite\\n� doença hepática\\n� vários tipos de câncer (como os de mama, cólon e próstata)\\n� pressão alta (hipertensão)\\n� colesterol alto\\n� apneia do sono",
+  "bmiWhyItMattersBody": "Em geral, quanto maior o seu IMC, maior o risco de desenvolver uma série de doenças relacionadas ao excesso de peso, incluindo: � diabetes � artrite � doença hepática � vários tipos de câncer (como os de mama, cólon e próstata) � pressão alta (hipertensão) � colesterol alto � apneia do sono",
   "noWeightHistoryYet": "Nenhum histórico de peso registrado ainda.",
   "overLabel": "sobre",
   "dailyBreakdownTitle": "Repartição Diária",

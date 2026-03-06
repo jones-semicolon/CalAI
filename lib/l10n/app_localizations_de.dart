@@ -518,10 +518,10 @@ class AppLocalizationsDe extends AppLocalizations {
       '80 % der Cal AI-Benutzer behalten ihren Gewichtsverlust auch 6 Monate später bei';
 
   @override
-  String get comparisonWithoutCalAi => 'Ohne\\nCal AI';
+  String get comparisonWithoutCalAi => 'Ohne Cal AI';
 
   @override
-  String get comparisonWithCalAi => 'Mit\\nCal AI';
+  String get comparisonWithCalAi => 'Mit Cal AI';
 
   @override
   String get comparisonLeftValue => '20%';
@@ -565,7 +565,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String editGoalTitle(Object title) {
-    return 'Bearbeiten Sie das $title-Ziel';
+    return 'Bearbeiten Sie das $title';
   }
 
   @override
@@ -585,7 +585,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get dashboardCongratsPlanReady =>
-      'Herzlichen Glückwunsch\\nIhr individueller Plan ist fertig!';
+      'Herzlichen Glückwunsch Ihr individueller Plan ist fertig!';
 
   @override
   String dashboardYouShouldGoal(Object action) {
@@ -820,7 +820,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get step12PrivacyCardBody =>
-      'Wir versprechen, Ihre\\npersönlichen Daten stets vertraulich und sicher zu behandeln.';
+      'Wir versprechen, Ihre persönlichen Daten stets vertraulich und sicher zu behandeln.';
 
   @override
   String get step13ReachGoalsWithNotifications =>
@@ -1293,7 +1293,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get bmiWhyItMattersBody =>
-      'Generell gilt: Je höher Ihr BMI, desto höher ist das Risiko, eine Reihe von Erkrankungen zu entwickeln, die mit Übergewicht in Zusammenhang stehen, darunter:\\n� Diabetes\\n� Arthritis\\n� Lebererkrankungen\\n� verschiedene Arten von Krebs (z. B. Brust-, Dickdarm- und Prostatakrebs)\\n� hoher Blutdruck (Hypertonie)\\n� hoher Cholesterinspiegel\\n� Schlafapnoe';
+      'Generell gilt: Je höher Ihr BMI, desto höher ist das Risiko, eine Reihe von Erkrankungen zu entwickeln, die mit Übergewicht in Zusammenhang stehen, darunter: � Diabetes � Arthritis � Lebererkrankungen � verschiedene Arten von Krebs (z. B. Brust-, Dickdarm- und Prostatakrebs) � hoher Blutdruck (Hypertonie) � hoher Cholesterinspiegel � Schlafapnoe';
 
   @override
   String get noWeightHistoryYet =>

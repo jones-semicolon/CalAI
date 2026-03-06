@@ -514,10 +514,10 @@ class AppLocalizationsEn extends AppLocalizations {
       '80% of Cal AI users maintain their weight loss even 6 months later';
 
   @override
-  String get comparisonWithoutCalAi => 'Without\\nCal AI';
+  String get comparisonWithoutCalAi => 'Without Cal AI';
 
   @override
-  String get comparisonWithCalAi => 'With\\nCal AI';
+  String get comparisonWithCalAi => 'With Cal AI';
 
   @override
   String get comparisonLeftValue => '20%';
@@ -542,8 +542,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'You may feel very tired and develop loose skin';
 
   @override
-  String get subscriptionHeadline =>
-      'Unlock CalAI to reach\\nyour goals faster.';
+  String get subscriptionHeadline => 'Unlock CalAI to reach your goals faster.';
 
   @override
   String subscriptionPriceHint(Object yearlyPrice, Object monthlyPrice) {
@@ -561,7 +560,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String editGoalTitle(Object title) {
-    return 'Edit $title Goal';
+    return 'Edit $title';
   }
 
   @override
@@ -581,7 +580,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardCongratsPlanReady =>
-      'Congratulations\\nyour custom plan is ready!';
+      'Congratulations your custom plan is ready!';
 
   @override
   String dashboardYouShouldGoal(Object action) {
@@ -701,7 +700,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingFinalizingResults => 'Finalizing results...';
 
   @override
-  String get loadingSetupForYou => 'We\'re setting everything\\nup for you';
+  String get loadingSetupForYou => 'We\'re setting everything up for you';
 
   @override
   String get step4TriedOtherCalorieApps =>
@@ -802,7 +801,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'You have great potential to crush your goal';
 
   @override
-  String get step12ThankYouTitle => 'Thank you for\\ntrusting us!';
+  String get step12ThankYouTitle => 'Thank you for trusting us!';
 
   @override
   String get step12PersonalizeSubtitle =>
@@ -814,7 +813,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get step12PrivacyCardBody =>
-      'We promise to always keep your\\npersonal information private and secure.';
+      'We promise to always keep your personal information private and secure.';
 
   @override
   String get step13ReachGoalsWithNotifications =>
@@ -1278,7 +1277,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bmiWhyItMattersBody =>
-      'In general, the higher your BMI, the higher the risk of developing a range of conditions linked with excess weight, including:\\n� diabetes\\n� arthritis\\n� liver disease\\n� several types of cancer (such as those of the breast, colon, and prostate)\\n� high blood pressure (hypertension)\\n� high cholesterol\\n� sleep apnea';
+      'In general, the higher your BMI, the higher the risk of developing a range of conditions linked with excess weight, including: � diabetes � arthritis � liver disease � several types of cancer (such as those of the breast, colon, and prostate) � high blood pressure (hypertension) � high cholesterol � sleep apnea';
 
   @override
   String get noWeightHistoryYet => 'No weight history recorded yet.';

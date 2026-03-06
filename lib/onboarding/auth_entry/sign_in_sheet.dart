@@ -176,7 +176,7 @@ class _SignInPageState extends State<SignInPage>
                                 height: 36,
                                 width: 36,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
+                                  color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.2),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(Icons.close),

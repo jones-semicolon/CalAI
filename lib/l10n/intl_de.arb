@@ -214,8 +214,8 @@
   "month6Label": "Monat 6",
   "traditionalDietLabel": "Traditionelle Diät",
   "weightChartSummary": "80 % der Cal AI-Benutzer behalten ihren Gewichtsverlust auch 6 Monate später bei",
-  "comparisonWithoutCalAi": "Ohne\\nCal AI",
-  "comparisonWithCalAi": "Mit\\nCal AI",
+  "comparisonWithoutCalAi": "Ohne Cal AI",
+  "comparisonWithCalAi": "Mit Cal AI",
   "comparisonLeftValue": "20%",
   "comparisonRightValue": "2X",
   "comparisonBottomLine1": "Cal AI macht es einfach und macht",
@@ -234,7 +234,7 @@
   "goalGainWeight": "Nehmen Sie zu",
   "goalLoseWeight": "Gewicht verlieren",
   "goalMaintainWeight": "Gewicht halten",
-  "editGoalTitle": "Bearbeiten Sie das {title}-Ziel",
+  "editGoalTitle": "Bearbeiten Sie das {title}",
   "@editGoalTitle": {
     "placeholders": {
       "title": {}
@@ -245,7 +245,7 @@
   "dashboardShouldGainWeight": "gewinnen",
   "dashboardShouldLoseWeight": "verlieren",
   "dashboardShouldMaintainWeight": "pflegen",
-  "dashboardCongratsPlanReady": "Herzlichen Glückwunsch\\nIhr individueller Plan ist fertig!",
+  "dashboardCongratsPlanReady": "Herzlichen Glückwunsch Ihr individueller Plan ist fertig!",
   "dashboardYouShouldGoal": "Sie sollten {action}:",
   "@dashboardYouShouldGoal": {
     "placeholders": {
@@ -330,7 +330,7 @@
   "step12ThankYouTitle": "Vielen Dank für Ihr Vertrauen!",
   "step12PersonalizeSubtitle": "Lassen Sie uns nun Cal AI für Sie personalisieren ...",
   "step12PrivacyCardTitle": "Ihre Privatsphäre und Sicherheit sind uns wichtig.",
-  "step12PrivacyCardBody": "Wir versprechen, Ihre\\npersönlichen Daten stets vertraulich und sicher zu behandeln.",
+  "step12PrivacyCardBody": "Wir versprechen, Ihre persönlichen Daten stets vertraulich und sicher zu behandeln.",
   "step13ReachGoalsWithNotifications": "Erreichen Sie Ihre Ziele mit Benachrichtigungen",
   "step13NotificationPrompt": "Cal AI möchte Ihnen Benachrichtigungen senden",
   "allowLabel": "Erlauben",
@@ -502,7 +502,7 @@
   "bmiDisclaimerTitle": "Haftungsausschluss",
   "bmiDisclaimerBody": "Wie bei den meisten Gesundheitsmaßstäben ist der BMI kein perfekter Test. Beispielsweise können die Ergebnisse durch eine Schwangerschaft oder eine hohe Muskelmasse verfälscht werden, und es ist möglicherweise kein guter Indikator für die Gesundheit von Kindern oder älteren Menschen.",
   "bmiWhyItMattersTitle": "Warum ist der BMI dann wichtig?",
-  "bmiWhyItMattersBody": "Generell gilt: Je höher Ihr BMI, desto höher ist das Risiko, eine Reihe von Erkrankungen zu entwickeln, die mit Übergewicht in Zusammenhang stehen, darunter:\\n� Diabetes\\n� Arthritis\\n� Lebererkrankungen\\n� verschiedene Arten von Krebs (z. B. Brust-, Dickdarm- und Prostatakrebs)\\n� hoher Blutdruck (Hypertonie)\\n� hoher Cholesterinspiegel\\n� Schlafapnoe",
+  "bmiWhyItMattersBody": "Generell gilt: Je höher Ihr BMI, desto höher ist das Risiko, eine Reihe von Erkrankungen zu entwickeln, die mit Übergewicht in Zusammenhang stehen, darunter: � Diabetes � Arthritis � Lebererkrankungen � verschiedene Arten von Krebs (z. B. Brust-, Dickdarm- und Prostatakrebs) � hoher Blutdruck (Hypertonie) � hoher Cholesterinspiegel � Schlafapnoe",
   "noWeightHistoryYet": "Es wurde noch kein Gewichtsverlauf aufgezeichnet.",
   "overLabel": "über",
   "dailyBreakdownTitle": "Tägliche Aufschlüsselung",

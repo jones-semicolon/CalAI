@@ -515,7 +515,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'Cal AI के 80% उपयोगकर्ता 6 महीने बाद भी अपना वजन कम रखते हैं';
 
   @override
-  String get comparisonWithoutCalAi => 'बिना\\nकैल एआई';
+  String get comparisonWithoutCalAi => 'बिना कैल एआई';
 
   @override
   String get comparisonWithCalAi => 'कैल एआई के साथ';
@@ -562,7 +562,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String editGoalTitle(Object title) {
-    return '$title लक्ष्य संपादित करें';
+    return '$title संपादित करें';
   }
 
   @override
@@ -581,8 +581,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get dashboardShouldMaintainWeight => 'बनाए रखना';
 
   @override
-  String get dashboardCongratsPlanReady =>
-      'बधाई हो\\nआपका कस्टम प्लान तैयार है!';
+  String get dashboardCongratsPlanReady => 'बधाई हो आपका कस्टम प्लान तैयार है!';
 
   @override
   String dashboardYouShouldGoal(Object action) {
@@ -1281,7 +1280,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get bmiWhyItMattersBody =>
-      'सामान्य तौर पर, आपका बीएमआई जितना अधिक होगा, अतिरिक्त वजन से जुड़ी कई स्थितियों के विकसित होने का जोखिम उतना अधिक होगा, जिनमें शामिल हैं: मधुमेह\\nगठिया\\nयकृत रोग\\nकई प्रकार के कैंसर (जैसे कि स्तन, बृहदान्त्र और प्रोस्टेट), उच्च रक्तचाप (उच्च रक्तचाप) उच्च कोलेस्ट्रॉल\\nस्लीप एपनिया';
+      'सामान्य तौर पर, आपका बीएमआई जितना अधिक होगा, अतिरिक्त वजन से जुड़ी कई स्थितियों के विकसित होने का जोखिम उतना अधिक होगा, जिनमें शामिल हैं: मधुमेह गठिया यकृत रोग कई प्रकार के कैंसर (जैसे कि स्तन, बृहदान्त्र और प्रोस्टेट), उच्च रक्तचाप (उच्च रक्तचाप) उच्च कोलेस्ट्रॉल स्लीप एपनिया';
 
   @override
   String get noWeightHistoryYet =>

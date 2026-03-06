@@ -292,6 +292,7 @@ class UserNotifier extends StateNotifier<User> {
   /// Recalculates nutrition goals via API using current state
   Future<void> refreshNutritionGoals() async {
     final newGoal = await _service.fetchGoals(state, forceRefresh: true);
+    await _service.updateProfile(state);
 
     final String todayId = DateFormat('yyyy-MM-dd').format(DateTime.now());
 

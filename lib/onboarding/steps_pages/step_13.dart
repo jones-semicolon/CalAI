@@ -226,7 +226,7 @@ class _OnboardingStep13State extends ConsumerState<OnboardingStep13>
             child: Text(
               label,
               style: TextStyle(
-                color: isActive ? Colors.white : Theme.of(context).colorScheme.primary,
+                color: isActive ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
               ),
             ),

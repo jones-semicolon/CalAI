@@ -214,8 +214,8 @@
   "month6Label": "Month 6",
   "traditionalDietLabel": "Traditional Diet",
   "weightChartSummary": "80% of Cal AI users maintain their weight loss even 6 months later",
-  "comparisonWithoutCalAi": "Without\\nCal AI",
-  "comparisonWithCalAi": "With\\nCal AI",
+  "comparisonWithoutCalAi": "Without Cal AI",
+  "comparisonWithCalAi": "With Cal AI",
   "comparisonLeftValue": "20%",
   "comparisonRightValue": "2X",
   "comparisonBottomLine1": "Cal AI makes it easy and holds",
@@ -223,7 +223,7 @@
   "speedSlowSteady": "Slow and steady",
   "speedRecommended": "Recommended",
   "speedAggressiveWarning": "You may feel very tired and develop loose skin",
-  "subscriptionHeadline": "Unlock CalAI to reach\\nyour goals faster.",
+  "subscriptionHeadline": "Unlock CalAI to reach your goals faster.",
   "subscriptionPriceHint": "Just PHP {yearlyPrice} per year (PHP {monthlyPrice}/mo)",
   "@subscriptionPriceHint": {
     "placeholders": {
@@ -234,7 +234,7 @@
   "goalGainWeight": "Gain Weight",
   "goalLoseWeight": "Lose Weight",
   "goalMaintainWeight": "Maintain Weight",
-  "editGoalTitle": "Edit {title} Goal",
+  "editGoalTitle": "Edit {title}",
   "@editGoalTitle": {
     "placeholders": {
       "title": {}
@@ -245,7 +245,7 @@
   "dashboardShouldGainWeight": "gain",
   "dashboardShouldLoseWeight": "lose",
   "dashboardShouldMaintainWeight": "maintain",
-  "dashboardCongratsPlanReady": "Congratulations\\nyour custom plan is ready!",
+  "dashboardCongratsPlanReady": "Congratulations your custom plan is ready!",
   "dashboardYouShouldGoal": "You should {action}:",
   "@dashboardYouShouldGoal": {
     "placeholders": {
@@ -292,7 +292,7 @@
   "loadingApplyingBmrFormula": "Applying BMR formula...",
   "loadingEstimatingMetabolicAge": "Estimating your metabolic age...",
   "loadingFinalizingResults": "Finalizing results...",
-  "loadingSetupForYou": "We're setting everything\\nup for you",
+  "loadingSetupForYou": "We're setting everything up for you",
   "step4TriedOtherCalorieApps": "Have you tried other calorie tracking apps?",
   "step5CalAiLongTermResults": "Cal AI creates long-term results",
   "step6HeightWeightTitle": "Height & Weight",
@@ -327,10 +327,10 @@
   "step10OptionConsistency": "Stay motivated and consistent",
   "step10OptionBodyConfidence": "Feel better about my body",
   "step11PotentialTitle": "You have great potential to crush your goal",
-  "step12ThankYouTitle": "Thank you for\\ntrusting us!",
+  "step12ThankYouTitle": "Thank you for trusting us!",
   "step12PersonalizeSubtitle": "Now let's personalize Cal AI for you...",
   "step12PrivacyCardTitle": "Your privacy and security matter to us.",
-  "step12PrivacyCardBody": "We promise to always keep your\\npersonal information private and secure.",
+  "step12PrivacyCardBody": "We promise to always keep your personal information private and secure.",
   "step13ReachGoalsWithNotifications": "Reach your goals with notifications",
   "step13NotificationPrompt": "Cal AI would like to send you notifications",
   "allowLabel": "Allow",
@@ -502,7 +502,7 @@
   "bmiDisclaimerTitle": "Disclaimer",
   "bmiDisclaimerBody": "As with most measures of health, BMI is not a perfect test. For example, results can be thrown off by pregnancy or high muscle mass, and it may not be a good measure of health for child or the elderly.",
   "bmiWhyItMattersTitle": "So then, why does BMI matter?",
-  "bmiWhyItMattersBody": "In general, the higher your BMI, the higher the risk of developing a range of conditions linked with excess weight, including:\\n� diabetes\\n� arthritis\\n� liver disease\\n� several types of cancer (such as those of the breast, colon, and prostate)\\n� high blood pressure (hypertension)\\n� high cholesterol\\n� sleep apnea",
+  "bmiWhyItMattersBody": "In general, the higher your BMI, the higher the risk of developing a range of conditions linked with excess weight, including: � diabetes � arthritis � liver disease � several types of cancer (such as those of the breast, colon, and prostate) � high blood pressure (hypertension) � high cholesterol � sleep apnea",
   "noWeightHistoryYet": "No weight history recorded yet.",
   "overLabel": "over",
   "dailyBreakdownTitle": "Daily Breakdown",

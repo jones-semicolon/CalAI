@@ -125,7 +125,7 @@ class TermsFeedbackSection extends ConsumerWidget {
               // ✅ 2. Trigger Support Email
               _launchEmail(
                 subject: "Cal AI - Support Request",
-                body: "Hello Cal AI Team,\n\nI need help with:\n\n\n\n--- App Info ---\n(Please leave this intact so we can help you better)\nApp Version: 1.0\nPlatform: ${Theme.of(context).platform.name} \nUserID: ${ref.read(userProvider)?.id ?? "Unknown"}",
+                body: "Hello Cal AI Team,\n\nI need help with:\n\n\n\n--- App Info ---\n(Please leave this intact so we can help you better)\nApp Version: 1.0\nPlatform: ${Theme.of(context).platform.name} \nUserID: ${ref.read(userProvider).id}",
               );
             },
           ),

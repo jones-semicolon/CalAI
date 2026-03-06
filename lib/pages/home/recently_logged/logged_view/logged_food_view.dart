@@ -3,7 +3,7 @@ import 'package:calai/widgets/edit_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
+import 'package:calai/l10n/l10n.dart';
 import 'package:calai/services/calai_firestore_service.dart';
 import 'package:calai/models/food_model.dart';
 import 'package:calai/enums/food_enums.dart';
@@ -93,8 +93,8 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
   Widget _buildFoodTitle() {
     if (isNewEntry) {
       return TextField(
-        decoration: const InputDecoration(
-          hintText: "Enter food name",
+        decoration: InputDecoration(
+          hintText: context.l10n.enterFoodNameHint,
           border: InputBorder.none,
           hintStyle: TextStyle(
             fontSize: 24,
@@ -175,6 +175,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
     final theme = Theme.of(context);
     final hasImage = _tempLog.imageUrl != null;
     final bool isNameValid = _tempLog.name.trim().isNotEmpty;
+    final l10n = context.l10n;
 
     final double ratio =
         _servingsCount / (_tempLog.amount > 0 ? _tempLog.amount : 1.0);
@@ -234,7 +235,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
                     _buildFoodTitle(),
                     const SizedBox(height: 25),
 
-                    _buildSectionLabel(theme, "Measurement"),
+                    _buildSectionLabel(theme, l10n.measurementLabel),
                     const SizedBox(height: 10),
                     _buildMeasurementTabs(), // ✅ Displaying the portion tab here
                     const SizedBox(height: 14),
@@ -251,7 +252,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
                     ],
 
                     const SizedBox(height: 26),
-                    _buildSectionLabel(theme, "Total Nutrition"),
+                    _buildSectionLabel(theme, l10n.totalNutritionLabel),
                     const SizedBox(height: 10),
                     _buildDetailedNutritionList(previewLog),
                   ],
@@ -306,8 +307,8 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 
   Widget _buildServingsRow(ThemeData theme) => Row(
     children: [
-      const Text(
-        "Number of Servings",
+      Text(
+        context.l10n.numberOfServingsLabel,
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       const Spacer(),
@@ -334,8 +335,8 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Health Score',
+              Text(
+                context.l10n.healthScoreTitle,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
@@ -376,8 +377,8 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Calories",
+                  Text(
+                    context.l10n.caloriesLabel,
                     style: TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
@@ -402,7 +403,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
             right: 0,
             child: GestureDetector(
               onTap: () => _showEditModal(
-                title: 'Calories',
+                title: context.l10n.caloriesLabel,
                 initialValue: data.calories,
                 onSave: (val) =>
                     setState(() => _tempLog = _tempLog.copyWith(calories: val)),
@@ -422,7 +423,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           value: "${data.protein.round()}g",
           nutritionType: NutritionType.protein,
           onEdit: () => _showEditModal(
-            title: 'Protein',
+            title: context.l10n.proteinLabel,
             initialValue: data.protein,
             onSave: (val) =>
                 setState(() => _tempLog = _tempLog.copyWith(protein: val)),
@@ -435,7 +436,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           value: "${data.carbs.round()}g",
           nutritionType: NutritionType.carbs,
           onEdit: () => _showEditModal(
-            title: 'Carbs',
+            title: context.l10n.carbsLabel,
             initialValue: data.carbs,
             onSave: (val) =>
                 setState(() => _tempLog = _tempLog.copyWith(carbs: val)),
@@ -448,7 +449,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
           value: "${data.fats.round()}g",
           nutritionType: NutritionType.fats,
           onEdit: () => _showEditModal(
-            title: 'Fats',
+            title: context.l10n.fatsLabel,
             initialValue: data.fats,
             onSave: (val) =>
                 setState(() => _tempLog = _tempLog.copyWith(fats: val)),
@@ -460,9 +461,9 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
 
   Widget _buildDetailedNutritionList(FoodLog data) => Column(
     children: [
-      _nutriRow("Sugar", "${data.sugar.toStringAsFixed(2)}g"),
-      _nutriRow("Fiber", "${data.fiber.toStringAsFixed(2)}g"),
-      _nutriRow("Sodium", "${data.sodium.toStringAsFixed(2)}mg"),
+      _nutriRow(context.l10n.sugarLabel, "${data.sugar.toStringAsFixed(2)}g"),
+      _nutriRow(context.l10n.fiberLabel, "${data.fiber.toStringAsFixed(2)}g"),
+      _nutriRow(context.l10n.sodiumLabel, "${data.sodium.toStringAsFixed(2)}mg"),
       for (var n in data.otherNutrients)
         _nutriRow(n.name, "${n.amount.toStringAsFixed(1)}${n.unit}"),
     ],
@@ -494,7 +495,7 @@ class _LoggedFoodPageState extends ConsumerState<LoggedFoodView> {
             ),
           ),
           Text(
-            "Nutrients",
+            context.l10n.nutrientsTitle,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.primary,
@@ -556,13 +557,17 @@ class _MacroTile extends StatelessWidget {
                       size: 12,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Text(
-                    nutritionType.getLabel(context),
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
+                  const SizedBox(width: 8), 
+                  Expanded(
+                    child: Text(
+                      nutritionType.getLabel(context),
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],

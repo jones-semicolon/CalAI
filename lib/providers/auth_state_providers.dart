@@ -1,4 +1,5 @@
 import 'package:calai/providers/global_provider.dart';
+import 'package:calai/providers/navigation_provider.dart';
 import 'package:calai/providers/user_provider.dart'; // Make sure to import this!
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,6 +31,7 @@ class AuthService {
     }
 
     ref.invalidate(userProvider);
+    ref.invalidate(selectedPageProvider);
     
     // Add any other specific providers here that hold personal data 
     // (e.g., ref.invalidate(stepTrackerProvider);)

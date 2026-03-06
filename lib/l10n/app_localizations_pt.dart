@@ -517,10 +517,10 @@ class AppLocalizationsPt extends AppLocalizations {
       '80% dos usuários do Cal AI mantêm a perda de peso mesmo 6 meses depois';
 
   @override
-  String get comparisonWithoutCalAi => 'Sem\\nCal AI';
+  String get comparisonWithoutCalAi => 'Sem Cal AI';
 
   @override
-  String get comparisonWithCalAi => 'Com\\nCal AI';
+  String get comparisonWithCalAi => 'Com Cal AI';
 
   @override
   String get comparisonLeftValue => '20%';
@@ -546,7 +546,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get subscriptionHeadline =>
-      'Desbloqueie o CalAI para alcançar\\nseus objetivos com mais rapidez.';
+      'Desbloqueie o CalAI para alcançar seus objetivos com mais rapidez.';
 
   @override
   String subscriptionPriceHint(Object yearlyPrice, Object monthlyPrice) {
@@ -564,7 +564,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String editGoalTitle(Object title) {
-    return 'Editar meta $title';
+    return 'Editar $title';
   }
 
   @override
@@ -584,7 +584,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dashboardCongratsPlanReady =>
-      'Parabéns\\nseu plano personalizado está pronto!';
+      'Parabéns seu plano personalizado está pronto!';
 
   @override
   String dashboardYouShouldGoal(Object action) {
@@ -704,7 +704,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get loadingFinalizingResults => 'Finalizando resultados...';
 
   @override
-  String get loadingSetupForYou => 'Estamos configurando tudo\\npara você';
+  String get loadingSetupForYou => 'Estamos configurando tudo para você';
 
   @override
   String get step4TriedOtherCalorieApps =>
@@ -806,7 +806,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Você tem um grande potencial para esmagar seu objetivo';
 
   @override
-  String get step12ThankYouTitle => 'Obrigado por\\nconfiar em nós!';
+  String get step12ThankYouTitle => 'Obrigado por confiar em nós!';
 
   @override
   String get step12PersonalizeSubtitle =>
@@ -818,7 +818,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get step12PrivacyCardBody =>
-      'Prometemos sempre manter suas\\ninformações pessoais privadas e seguras.';
+      'Prometemos sempre manter suas informações pessoais privadas e seguras.';
 
   @override
   String get step13ReachGoalsWithNotifications =>
@@ -1287,7 +1287,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get bmiWhyItMattersBody =>
-      'Em geral, quanto maior o seu IMC, maior o risco de desenvolver uma série de doenças relacionadas ao excesso de peso, incluindo:\\n� diabetes\\n� artrite\\n� doença hepática\\n� vários tipos de câncer (como os de mama, cólon e próstata)\\n� pressão alta (hipertensão)\\n� colesterol alto\\n� apneia do sono';
+      'Em geral, quanto maior o seu IMC, maior o risco de desenvolver uma série de doenças relacionadas ao excesso de peso, incluindo: � diabetes � artrite � doença hepática � vários tipos de câncer (como os de mama, cólon e próstata) � pressão alta (hipertensão) � colesterol alto � apneia do sono';
 
   @override
   String get noWeightHistoryYet => 'Nenhum histórico de peso registrado ainda.';

@@ -22,7 +22,7 @@ class SignInButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
         decoration: BoxDecoration(
           border: Border.all(
-            color: Theme.of(context).colorScheme.onTertiaryFixed,
+            color: Theme.of(context).colorScheme.primary,
           ),
           borderRadius: BorderRadius.circular(25),
         ),

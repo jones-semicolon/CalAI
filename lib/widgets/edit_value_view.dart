@@ -46,7 +46,6 @@ class _EditModalState extends State<EditModal> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Use Padding with MediaQuery to handle the keyboard pushing the modal up
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -55,8 +54,6 @@ class _EditModalState extends State<EditModal> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with Title and Revert
-          // Body
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
             child: Column(
@@ -97,6 +94,7 @@ class _EditModalState extends State<EditModal> {
                   autofocus: true, // Opens keyboard immediately
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))],
+                  style: TextStyle(color: theme.colorScheme.primary),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.transparent,

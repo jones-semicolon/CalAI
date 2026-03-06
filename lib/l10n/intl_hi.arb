@@ -214,7 +214,7 @@
   "month6Label": "महीना 6",
   "traditionalDietLabel": "पारंपरिक आहार",
   "weightChartSummary": "Cal AI के 80% उपयोगकर्ता 6 महीने बाद भी अपना वजन कम रखते हैं",
-  "comparisonWithoutCalAi": "बिना\\nकैल एआई",
+  "comparisonWithoutCalAi": "बिना कैल एआई",
   "comparisonWithCalAi": "कैल एआई के साथ",
   "comparisonLeftValue": "60 पाउंड",
   "comparisonRightValue": "50 पाउंड",
@@ -234,7 +234,7 @@
   "goalGainWeight": "वजन बढ़ना",
   "goalLoseWeight": "वजन कम करें",
   "goalMaintainWeight": "वज़न बनाए रखें",
-  "editGoalTitle": "{title} लक्ष्य संपादित करें",
+  "editGoalTitle": "{title} संपादित करें",
   "@editGoalTitle": {
     "placeholders": {
       "title": {}
@@ -245,7 +245,7 @@
   "dashboardShouldGainWeight": "पाना",
   "dashboardShouldLoseWeight": "खोना",
   "dashboardShouldMaintainWeight": "बनाए रखना",
-  "dashboardCongratsPlanReady": "बधाई हो\\nआपका कस्टम प्लान तैयार है!",
+  "dashboardCongratsPlanReady": "बधाई हो आपका कस्टम प्लान तैयार है!",
   "dashboardYouShouldGoal": "आपको {action} करना चाहिए:",
   "@dashboardYouShouldGoal": {
     "placeholders": {
@@ -502,7 +502,7 @@
   "bmiDisclaimerTitle": "अस्वीकरण",
   "bmiDisclaimerBody": "स्वास्थ्य के अधिकांश मापों की तरह, बीएमआई एक आदर्श परीक्षण नहीं है। उदाहरण के लिए, गर्भावस्था या उच्च मांसपेशी द्रव्यमान के कारण परिणाम ख़राब हो सकते हैं, और यह बच्चे या बुजुर्गों के लिए स्वास्थ्य का अच्छा उपाय नहीं हो सकता है।",
   "bmiWhyItMattersTitle": "तो फिर, बीएमआई क्यों मायने रखता है?",
-  "bmiWhyItMattersBody": "सामान्य तौर पर, आपका बीएमआई जितना अधिक होगा, अतिरिक्त वजन से जुड़ी कई स्थितियों के विकसित होने का जोखिम उतना अधिक होगा, जिनमें शामिल हैं: मधुमेह\\nगठिया\\nयकृत रोग\\nकई प्रकार के कैंसर (जैसे कि स्तन, बृहदान्त्र और प्रोस्टेट), उच्च रक्तचाप (उच्च रक्तचाप) उच्च कोलेस्ट्रॉल\\nस्लीप एपनिया",
+  "bmiWhyItMattersBody": "सामान्य तौर पर, आपका बीएमआई जितना अधिक होगा, अतिरिक्त वजन से जुड़ी कई स्थितियों के विकसित होने का जोखिम उतना अधिक होगा, जिनमें शामिल हैं: मधुमेह गठिया यकृत रोग कई प्रकार के कैंसर (जैसे कि स्तन, बृहदान्त्र और प्रोस्टेट), उच्च रक्तचाप (उच्च रक्तचाप) उच्च कोलेस्ट्रॉल स्लीप एपनिया",
   "noWeightHistoryYet": "अभी तक कोई वजन इतिहास दर्ज नहीं किया गया है।",
   "overLabel": "ऊपर",
   "dailyBreakdownTitle": "दैनिक टूटना",

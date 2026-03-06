@@ -42,29 +42,26 @@ class LogoutSection extends ConsumerWidget {
             ),
             TextButton(
               onPressed: () async {
-                // Navigator.pop(context); 
-                appNavigatorKey.currentState?.pop();
+                Navigator.of(context).pop();
 
                 showDialog(
                   context: context,
-                  barrierDismissible: false, // Prevents user from tapping outside to close
-                  builder: (BuildContext context) {
-                    return const Center(
-                      child: CupertinoActivityIndicator(),
-                    );
-                  },
+                  barrierDismissible: false,
+                  builder: (context) => const Center(child: CupertinoActivityIndicator()),
                 );
 
-                // 3. Run the heavy background tasks (clearing cache, terminating Firestore)
-                await ref.read(authServiceProvider).logout();
-
-                // if (!context.mounted) return;
-
-                appNavigatorKey.currentState?.pop();
-                appNavigatorKey.currentState?.pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const AppEntry()),
-                  (route) => false, 
-                );
+                try {
+                  await ref.read(authServiceProvider).logout();
+                  
+                  appNavigatorKey.currentState?.pop();
+                  appNavigatorKey.currentState?.pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const AppEntry()),
+                    (route) => false, 
+                  );
+                } catch (e) {
+                  Navigator.of(context).pop();
+                  debugPrint("Logout Error: $e");
+                }
               },
               child: Text(
                 context.l10n.logoutLabel,

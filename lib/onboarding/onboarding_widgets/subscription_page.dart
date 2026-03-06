@@ -26,7 +26,7 @@ class SubscriptionPage extends StatelessWidget {
                 child: IconButton(
                   icon: Icon(
                     Icons.close,
-                    color: Theme.of(context).colorScheme.onTertiaryFixed,
+                    color: scheme.primary,
                   ),
                   onPressed: onFinished,
                 ),
@@ -69,9 +69,9 @@ class SubscriptionPage extends StatelessWidget {
                   monthlyPrice.toStringAsFixed(2),
                 ),
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: scheme.onTertiaryFixed,
+                  color: scheme.onPrimary,
                 ),
               ),
               const SizedBox(height: 30),

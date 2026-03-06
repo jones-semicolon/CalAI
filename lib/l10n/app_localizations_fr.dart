@@ -521,10 +521,10 @@ class AppLocalizationsFr extends AppLocalizations {
       '80 % des utilisateurs de Cal AI maintiennent leur perte de poids même 6 mois plus tard';
 
   @override
-  String get comparisonWithoutCalAi => 'Sans\\nCal AI';
+  String get comparisonWithoutCalAi => 'Sans Cal AI';
 
   @override
-  String get comparisonWithCalAi => 'Avec\\nCal AI';
+  String get comparisonWithCalAi => 'Avec Cal AI';
 
   @override
   String get comparisonLeftValue => '20%';
@@ -550,7 +550,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get subscriptionHeadline =>
-      'Débloquez CalAI pour atteindre\\nvos objectifs plus rapidement.';
+      'Débloquez CalAI pour atteindre vos objectifs plus rapidement.';
 
   @override
   String subscriptionPriceHint(Object yearlyPrice, Object monthlyPrice) {
@@ -568,7 +568,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String editGoalTitle(Object title) {
-    return 'Modifier l\'objectif $title';
+    return 'Modifier $title';
   }
 
   @override
@@ -588,7 +588,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dashboardCongratsPlanReady =>
-      'Félicitations\\nvotre plan personnalisé est prêt !';
+      'Félicitations votre plan personnalisé est prêt !';
 
   @override
   String dashboardYouShouldGoal(Object action) {
@@ -709,7 +709,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get loadingFinalizingResults => 'Finalisation des résultats...';
 
   @override
-  String get loadingSetupForYou => 'Nous préparons tout\\npour vous';
+  String get loadingSetupForYou => 'Nous préparons tout pour vous';
 
   @override
   String get step4TriedOtherCalorieApps =>
@@ -811,7 +811,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Vous avez un grand potentiel pour atteindre votre objectif';
 
   @override
-  String get step12ThankYouTitle => 'Merci de\\nnous faire confiance !';
+  String get step12ThankYouTitle => 'Merci de nous faire confiance !';
 
   @override
   String get step12PersonalizeSubtitle =>
@@ -1295,7 +1295,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get bmiWhyItMattersBody =>
-      'En général, plus votre IMC est élevé, plus le risque de développer diverses affections liées à l\'excès de poids est élevé, notamment :\\n� le diabète\\n� l\'arthrite\\n� les maladies du foie\\n� plusieurs types de cancer (comme ceux du sein, du côlon et de la prostate)\\n� l\'hypertension artérielle (hypertension)\\n� l\'hypercholestérolémie\\n� l\'apnée du sommeil';
+      'En général, plus votre IMC est élevé, plus le risque de développer diverses affections liées à l\'excès de poids est élevé, notamment : � le diabète � l\'arthrite � les maladies du foie � plusieurs types de cancer (comme ceux du sein, du côlon et de la prostate) � l\'hypertension artérielle (hypertension) � l\'hypercholestérolémie � l\'apnée du sommeil';
 
   @override
   String get noWeightHistoryYet =>

@@ -234,7 +234,7 @@
   "goalGainWeight": "Ganar peso",
   "goalLoseWeight": "Perder peso",
   "goalMaintainWeight": "Mantener peso",
-  "editGoalTitle": "Editar {title} Objetivo",
+  "editGoalTitle": "Editar {title}",
   "@editGoalTitle": {
     "placeholders": {
       "title": {}

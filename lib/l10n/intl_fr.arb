@@ -214,8 +214,8 @@
   "month6Label": "Mois 6",
   "traditionalDietLabel": "Régime traditionnel",
   "weightChartSummary": "80 % des utilisateurs de Cal AI maintiennent leur perte de poids même 6 mois plus tard",
-  "comparisonWithoutCalAi": "Sans\\nCal AI",
-  "comparisonWithCalAi": "Avec\\nCal AI",
+  "comparisonWithoutCalAi": "Sans Cal AI",
+  "comparisonWithCalAi": "Avec Cal AI",
   "comparisonLeftValue": "20%",
   "comparisonRightValue": "2X",
   "comparisonBottomLine1": "Cal AI facilite les choses et tient",
@@ -223,7 +223,7 @@
   "speedSlowSteady": "Lent et régulier",
   "speedRecommended": "Recommandé",
   "speedAggressiveWarning": "Vous pouvez vous sentir très fatigué et développer une peau lâche",
-  "subscriptionHeadline": "Débloquez CalAI pour atteindre\\nvos objectifs plus rapidement.",
+  "subscriptionHeadline": "Débloquez CalAI pour atteindre vos objectifs plus rapidement.",
   "subscriptionPriceHint": "Juste PHP {yearlyPrice} par an (PHP {monthlyPrice}/mois)",
   "@subscriptionPriceHint": {
     "placeholders": {
@@ -234,7 +234,7 @@
   "goalGainWeight": "Prendre du poids",
   "goalLoseWeight": "Perdre du poids",
   "goalMaintainWeight": "Maintenir le poids",
-  "editGoalTitle": "Modifier l'objectif {title}",
+  "editGoalTitle": "Modifier {title}",
   "@editGoalTitle": {
     "placeholders": {
       "title": {}
@@ -245,7 +245,7 @@
   "dashboardShouldGainWeight": "gagner",
   "dashboardShouldLoseWeight": "perdre",
   "dashboardShouldMaintainWeight": "maintenir",
-  "dashboardCongratsPlanReady": "Félicitations\\nvotre plan personnalisé est prêt !",
+  "dashboardCongratsPlanReady": "Félicitations votre plan personnalisé est prêt !",
   "dashboardYouShouldGoal": "Vous devriez {action} :",
   "@dashboardYouShouldGoal": {
     "placeholders": {
@@ -292,7 +292,7 @@
   "loadingApplyingBmrFormula": "Application de la formule BMR...",
   "loadingEstimatingMetabolicAge": "Estimer votre âge métabolique...",
   "loadingFinalizingResults": "Finalisation des résultats...",
-  "loadingSetupForYou": "Nous préparons tout\\npour vous",
+  "loadingSetupForYou": "Nous préparons tout pour vous",
   "step4TriedOtherCalorieApps": "Avez-vous essayé d'autres applications de suivi des calories ?",
   "step5CalAiLongTermResults": "Cal AI crée des résultats à long terme",
   "step6HeightWeightTitle": "Taille et poids",
@@ -327,7 +327,7 @@
   "step10OptionConsistency": "Restez motivé et cohérent",
   "step10OptionBodyConfidence": "Me sentir mieux dans mon corps",
   "step11PotentialTitle": "Vous avez un grand potentiel pour atteindre votre objectif",
-  "step12ThankYouTitle": "Merci de\\nnous faire confiance !",
+  "step12ThankYouTitle": "Merci de nous faire confiance !",
   "step12PersonalizeSubtitle": "Personnalisons maintenant Cal AI pour vous...",
   "step12PrivacyCardTitle": "Votre confidentialité et votre sécurité nous tiennent à cœur.",
   "step12PrivacyCardBody": "Nous nous engageons à toujours garder vos informations personnelles privées et sécurisées.",
@@ -502,7 +502,7 @@
   "bmiDisclaimerTitle": "Clause de non-responsabilité",
   "bmiDisclaimerBody": "Comme pour la plupart des mesures de santé, l’IMC n’est pas un test parfait. Par exemple, les résultats peuvent être altérés par une grossesse ou une masse musculaire élevée, et cela peut ne pas constituer une bonne mesure de la santé des enfants ou des personnes âgées.",
   "bmiWhyItMattersTitle": "Alors, pourquoi l’IMC est-il important ?",
-  "bmiWhyItMattersBody": "En général, plus votre IMC est élevé, plus le risque de développer diverses affections liées à l'excès de poids est élevé, notamment :\\n� le diabète\\n� l'arthrite\\n� les maladies du foie\\n� plusieurs types de cancer (comme ceux du sein, du côlon et de la prostate)\\n� l'hypertension artérielle (hypertension)\\n� l'hypercholestérolémie\\n� l'apnée du sommeil",
+  "bmiWhyItMattersBody": "En général, plus votre IMC est élevé, plus le risque de développer diverses affections liées à l'excès de poids est élevé, notamment : � le diabète � l'arthrite � les maladies du foie � plusieurs types de cancer (comme ceux du sein, du côlon et de la prostate) � l'hypertension artérielle (hypertension) � l'hypercholestérolémie � l'apnée du sommeil",
   "noWeightHistoryYet": "Aucun historique de poids n'a encore été enregistré.",
   "overLabel": "sur",
   "dailyBreakdownTitle": "Répartition quotidienne",

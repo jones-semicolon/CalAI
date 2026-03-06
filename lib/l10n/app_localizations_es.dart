@@ -567,7 +567,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String editGoalTitle(Object title) {
-    return 'Editar $title Objetivo';
+    return 'Editar $title';
   }
 
   @override

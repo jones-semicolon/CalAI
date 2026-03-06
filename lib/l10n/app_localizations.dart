@@ -1035,13 +1035,13 @@ abstract class AppLocalizations {
   /// No description provided for @comparisonWithoutCalAi.
   ///
   /// In en, this message translates to:
-  /// **'Without\\nCal AI'**
+  /// **'Without Cal AI'**
   String get comparisonWithoutCalAi;
 
   /// No description provided for @comparisonWithCalAi.
   ///
   /// In en, this message translates to:
-  /// **'With\\nCal AI'**
+  /// **'With Cal AI'**
   String get comparisonWithCalAi;
 
   /// No description provided for @comparisonLeftValue.
@@ -1089,7 +1089,7 @@ abstract class AppLocalizations {
   /// No description provided for @subscriptionHeadline.
   ///
   /// In en, this message translates to:
-  /// **'Unlock CalAI to reach\\nyour goals faster.'**
+  /// **'Unlock CalAI to reach your goals faster.'**
   String get subscriptionHeadline;
 
   /// No description provided for @subscriptionPriceHint.
@@ -1119,7 +1119,7 @@ abstract class AppLocalizations {
   /// No description provided for @editGoalTitle.
   ///
   /// In en, this message translates to:
-  /// **'Edit {title} Goal'**
+  /// **'Edit {title}'**
   String editGoalTitle(Object title);
 
   /// No description provided for @revertLabel.
@@ -1155,7 +1155,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardCongratsPlanReady.
   ///
   /// In en, this message translates to:
-  /// **'Congratulations\\nyour custom plan is ready!'**
+  /// **'Congratulations your custom plan is ready!'**
   String get dashboardCongratsPlanReady;
 
   /// No description provided for @dashboardYouShouldGoal.
@@ -1365,7 +1365,7 @@ abstract class AppLocalizations {
   /// No description provided for @loadingSetupForYou.
   ///
   /// In en, this message translates to:
-  /// **'We\'re setting everything\\nup for you'**
+  /// **'We\'re setting everything up for you'**
   String get loadingSetupForYou;
 
   /// No description provided for @step4TriedOtherCalorieApps.
@@ -1545,7 +1545,7 @@ abstract class AppLocalizations {
   /// No description provided for @step12ThankYouTitle.
   ///
   /// In en, this message translates to:
-  /// **'Thank you for\\ntrusting us!'**
+  /// **'Thank you for trusting us!'**
   String get step12ThankYouTitle;
 
   /// No description provided for @step12PersonalizeSubtitle.
@@ -1563,7 +1563,7 @@ abstract class AppLocalizations {
   /// No description provided for @step12PrivacyCardBody.
   ///
   /// In en, this message translates to:
-  /// **'We promise to always keep your\\npersonal information private and secure.'**
+  /// **'We promise to always keep your personal information private and secure.'**
   String get step12PrivacyCardBody;
 
   /// No description provided for @step13ReachGoalsWithNotifications.
@@ -2439,7 +2439,7 @@ abstract class AppLocalizations {
   /// No description provided for @bmiWhyItMattersBody.
   ///
   /// In en, this message translates to:
-  /// **'In general, the higher your BMI, the higher the risk of developing a range of conditions linked with excess weight, including:\\n� diabetes\\n� arthritis\\n� liver disease\\n� several types of cancer (such as those of the breast, colon, and prostate)\\n� high blood pressure (hypertension)\\n� high cholesterol\\n� sleep apnea'**
+  /// **'In general, the higher your BMI, the higher the risk of developing a range of conditions linked with excess weight, including: � diabetes � arthritis � liver disease � several types of cancer (such as those of the breast, colon, and prostate) � high blood pressure (hypertension) � high cholesterol � sleep apnea'**
   String get bmiWhyItMattersBody;
 
   /// No description provided for @noWeightHistoryYet.
