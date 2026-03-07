@@ -139,7 +139,7 @@ class _MyAppState extends State<MyApp> {
               children: [
                 if (child != null) child,
 
-                if (kDebugMode) const DebugOverlay(),
+                // if (kDebugMode) const DebugOverlay(),
               ],
             );
           },
