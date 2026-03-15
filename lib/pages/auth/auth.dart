@@ -193,44 +193,42 @@ class AuthService {
   static Future<UserCredential?> linkGoogleAccount() async {
     await initSignIn();
 
-    // 1. Trigger the sign-in flow
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-    
-    if (googleUser == null) {
-      // User cancelled the picker - this prevents the "loading" hang
-      throw FirebaseAuthException(code: 'ERROR_ABORTED_BY_USER', message: 'Sign in aborted');
+    final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+    final idToken = googleUser.authentication.idToken;
+    final authorizationClient = googleUser.authorizationClient;
+
+    var authorization = await authorizationClient.authorizationForScopes(['email', 'profile']);
+    var accessToken = authorization?.accessToken;
+
+    if (accessToken == null) {
+      final retry = await authorizationClient.authorizationForScopes(['email', 'profile']);
+      accessToken = retry?.accessToken;
+      if (accessToken == null) throw Exception("Token error");
     }
 
-    // 2. Get the auth details (This contains BOTH accessToken and idToken)
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-    // 3. Create the credential
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
+      accessToken: accessToken,
+      idToken: idToken,
     );
 
     try {
-      // 4. Perform the link
       final userCredential = await _auth.currentUser!.linkWithCredential(credential);
 
-      // 5. Refresh the user state so the 'isAnonymous' flag updates
-      await _auth.currentUser?.reload();
-
       if (userCredential.user != null) {
-        await _syncUserToFirestore(userCredential.user!, "google"); // Simplified source string
+        await _syncUserToFirestore(userCredential.user!, UserProvider.google.value);
       }
-      
       return userCredential;
 
     } on FirebaseAuthException catch (e) {
-      // The account already exists - rethrow so your UI can show the switch dialog
-      rethrow; 
-    } catch (e) {
-      print("Linking Error: $e");
+      if (e.code == 'credential-already-in-use') {
+        // This Google account is already linked to another user UID.
+        // You must decide: do you sign into that old account, or force merge?
+        print('This google account already exists as a separate user.');
+        rethrow;
+      }
       rethrow;
     }
-}
+  }
 
   /// Verifies the link and signs the user in
   static Future<UserCredential?> signInWithMagicLink(String email, String emailLink) async {
